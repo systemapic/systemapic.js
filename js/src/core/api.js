@@ -25,6 +25,8 @@ Wu.Api = Wu.Class.extend({
 				window.location.href = app.options.servers.portal;
 			}
 		});
-	}
+	},
+
+	// todo: move post fn's to this file
 
 });

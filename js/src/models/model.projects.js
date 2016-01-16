@@ -238,6 +238,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getCreatedByUsername : function () {
+		console.log('store', this.store);
 		return this.store.createdByUsername;
 	},
 
