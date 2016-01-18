@@ -1,6 +1,7 @@
 Wu.Api = Wu.Class.extend({
 
-	
+	// initialize : function (options) {
+	// },
 
 	shareDataset : function (options, done) {
 		var path = '/api/dataset/share'; // todo: fix api names, organize
@@ -29,17 +30,15 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-
-
 	auth : function (done) {
-		var path = '/api/user/info';
+		var path = '/api/user/session';
 		this.post(path, {}, done);
-		// console.log('auth!');
-		// done(null);
-
 	},
 
-
+	getTokenFromPassword : function (options, done) {
+		var path = '/api/token';
+		this.post(path, options, done);
+	},
 
 
 
@@ -63,47 +62,37 @@ Wu.Api = Wu.Class.extend({
 		});
 	},
 	_post : function (path, json, done, context, baseurl) {
-		var that = context;
 		var http = new XMLHttpRequest();
 		var url = baseurl || Wu.Util._getServerUrl();
-		
 		url += path;
 
+		// open
 		http.open("POST", url, true);
 
-		//Send the proper header information along with the request
+		// set json header
 		http.setRequestHeader('Content-type', 'application/json');
 
-		// set access_token on header
-		// http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
-
+		// response
 		http.onreadystatechange = function() {
-			if(http.readyState == 4 && http.status == 200) {
-
-				// verify response
-				// var valid = Wu.verify(http.responseText);
-
-				// callback
-				done && done(null, http.responseText); 
+			if (http.readyState == 4) {
+				if (http.status == 200) {
+					done && done(null, http.responseText); 
+				} else {
+					console.log('http.status: ', http.status);
+					console.log('httP', http);
+					done && done(http.status, http.responseText);
+				}
 			}
+
 		}
 
-		// add access_token
-		if (_.isString(json)) {
-			var parsed = Wu.parse(json);
-			parsed.access_token = app.tokens.access_token;
-			var send_json = JSON.stringify(parsed);
+		// add access_token to request
+		var access_token = app.tokens ? app.tokens.access_token : null;
+		var options = _.isString(json) ? Wu.parse(json) : json;
+		options.access_token = access_token;
+		var send_json = Wu.stringify(options);
 
-		} else {
-			json.access_token = app.tokens.access_token;
-			var send_json = JSON.stringify(json);
-		}
-
-		// stringify objects
-		// if (Wu.Util.isObject(json)) json = JSON.stringify(json);
-
+		// send
 		http.send(send_json);
 	},
-
-
 });

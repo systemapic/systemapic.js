@@ -550,6 +550,7 @@
     padding-bottom: 0;
     /* padding: 0; */
     /* width: 0; */
+    background-color: #FCFCFC;
 }
 .add-another-email {
     font-weight: 600;
