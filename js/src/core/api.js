@@ -1,11 +1,6 @@
 Wu.Api = Wu.Class.extend({
 
-	// post to path
-	post : function (path, options, done) {
-		Wu.post(path, JSON.stringify(options), function (err, response) {
-			done && done(err, response);
-		});
-	},
+	
 
 	shareDataset : function (options, done) {
 		var path = '/api/dataset/share'; // todo: fix api names, organize
@@ -18,15 +13,97 @@ Wu.Api = Wu.Class.extend({
 	},
 
 	verifyAccessToken : function () {
-		var path = '/api/userinfo';
+		var path = '/api/token/check';
 		this.post(path, {}, function (err, body) {
-			if (err == 401) {
-				console.error('you been logged out');
-				window.location.href = app.options.servers.portal;
-			}
+			if (err == 401) console.error('you been logged out');
 		});
 	},
 
-	// todo: move post fn's to this file
+	getPortal : function (done) {
+		var path = '/api/portal';
+		this.post(path, {}, done);
+	},
+
+	createProject : function (options, done) {
+		var path = '/api/project/create';
+		this.post(path, options, done);
+	},
+
+
+
+	auth : function (done) {
+		var path = '/api/user/info';
+		this.post(path, {}, done);
+		// console.log('auth!');
+		// done(null);
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// helper fn's
+	post : function (path, options, done) {
+		this._post(path, JSON.stringify(options), function (err, response) {
+			done && done(err, response);
+		});
+	},
+	_post : function (path, json, done, context, baseurl) {
+		var that = context;
+		var http = new XMLHttpRequest();
+		var url = baseurl || Wu.Util._getServerUrl();
+		
+		url += path;
+
+		http.open("POST", url, true);
+
+		//Send the proper header information along with the request
+		http.setRequestHeader('Content-type', 'application/json');
+
+		// set access_token on header
+		// http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
+		http.onreadystatechange = function() {
+			if(http.readyState == 4 && http.status == 200) {
+
+				// verify response
+				// var valid = Wu.verify(http.responseText);
+
+				// callback
+				done && done(null, http.responseText); 
+			}
+		}
+
+		// add access_token
+		if (_.isString(json)) {
+			var parsed = Wu.parse(json);
+			parsed.access_token = app.tokens.access_token;
+			var send_json = JSON.stringify(parsed);
+
+		} else {
+			json.access_token = app.tokens.access_token;
+			var send_json = JSON.stringify(json);
+		}
+
+		// stringify objects
+		// if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+
+		http.send(send_json);
+	},
+
 
 });

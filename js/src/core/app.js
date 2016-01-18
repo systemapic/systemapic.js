@@ -22,26 +22,36 @@ Wu.App = Wu.Class.extend({
 		// init api
 		app.api = new Wu.Api();
 
-		// set access token
-		this.setAccessTokens();
+		// auth
+		app.api.auth(function (err, user) {
 
-		// init socket
-		app.Socket = new Wu.Socket();
+			// user has been sat?
 
-		// error handling
-		this._initErrorHandling();
+			console.log('app, api', app.api);
 
-		// merge options
-		Wu.setOptions(this, options);
+			// set access token
+			// this.setAccessTokens();
 
-		// set page title
-		document.title = this.options.portalTitle;
+			// init socket
+			app.Socket = new Wu.Socket();
 
-		// get objects from server
-		this.initServer();
+			// error handling
+			this._initErrorHandling();
 
-		// init sniffers
-		this._initSniffers();
+			// merge options
+			Wu.setOptions(this, options);
+
+			// set page title
+			document.title = this.options.portalTitle;
+
+			// get objects from server
+			this.initServer();
+
+			// init sniffers
+			this._initSniffers();
+
+		}.bind(this));
+
 	},
 
 	_initSniffers : function () {
@@ -110,16 +120,20 @@ Wu.App = Wu.Class.extend({
 
 		// data for server
 		var data = JSON.stringify(this.options);
+
+		console.log('data:', data);
 		
 		// post         path          json      callback    this
-		Wu.post('api/portal', data, this.initServerResponse, this, this.options.servers.portal);
+		// Wu.post('api/portal', data, this.initServerResponse, this, this.options.servers.portal);
+
+		app.api.getPortal(this.initServerResponse.bind(this));
 	},
 
-	initServerResponse : function (that, responseString) {
+	initServerResponse : function (err, responseString) {
 		var responseObject = Wu.parse(responseString);
 
 		// revv it up
-		that.initApp(responseObject);
+		this.initApp(responseObject);
 	},
 
 	initApp : function (portalStore) {
@@ -178,7 +192,7 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
-		this.Account.setRoles(this.options.json.roles);
+		// this.Account.setRoles(this.options.json.roles);
 
 		// contact list
 		this.Users = {};

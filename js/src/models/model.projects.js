@@ -370,7 +370,7 @@ Wu.Project = Wu.Class.extend({
 	// create project on server
 	create : function (opts, callback) {
 
-		console.log('this: store', this.store);
+		console.log('this: store', this.store);	// refactor! create on server first, then new Wu.Project(response);
 
 		var options = {
 			name 		: this.store.name,
@@ -381,7 +381,9 @@ Wu.Project = Wu.Class.extend({
 		}
 
 		// send request to API		
- 		Wu.post('/api/project/create', JSON.stringify(options), callback.bind(opts.context), this);
+ 		// Wu.post('/api/project/create', JSON.stringify(options), callback.bind(opts.context), this);
+
+ 		app.api.createProject(options, callback.bind(opts.context));
 	},
 
 

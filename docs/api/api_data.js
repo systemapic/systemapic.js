@@ -56,7 +56,162 @@ define({ "api": [
             "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
           }
         ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/api/data/delete",
+    "title": "Delete data",
+    "name": "delete_data",
+    "group": "Data",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "file_id",
+            "description": "<p>File id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
       }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Upload Status JSON</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n \"success\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Data",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/data/delete"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/api/import",
+    "title": "Import data",
+    "name": "import",
+    "group": "Data",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Buffer",
+            "optional": false,
+            "field": "data",
+            "description": "<p>File buffer</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Upload Status JSON</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n\t\"file_id\":\"file_fxqzngykgzjxtsunulti\",\n\t\"user_id\":\"test-user-uuid\",\n\t\"filename\":\"shapefile.zip\",\n\t\"timestamp\":1453063189097,\n\t\"status\":\"Processing\",\n\t\"size\":109770,\n\t\"upload_success\":true,\n\t\"error_code\":null,\n\t\"error_text\":null\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Data",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/import"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
     }
   },
   {
@@ -116,7 +271,14 @@ define({ "api": [
             "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
     }
   },
   {
@@ -190,50 +352,46 @@ define({ "api": [
             "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
     }
   },
   {
     "type": "post",
-    "url": "/oauth/token",
+    "url": "/api/token",
     "title": "Get access token",
     "name": "access_token",
     "group": "User",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "Authorization",
-            "defaultValue": "Basic YWJjMTIzOnNzaC1zZWNyZXQ=",
-            "description": ""
-          }
-        ]
-      }
-    },
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
+            "type": "String",
             "optional": false,
             "field": "username",
-            "description": "<p>Email</p>"
+            "description": "<p>Email or username</p>"
           },
           {
             "group": "Parameter",
+            "type": "String",
             "optional": false,
             "field": "password",
             "description": "<p>Password</p>"
           },
           {
             "group": "Parameter",
-            "optional": false,
-            "field": "grant_type",
-            "defaultValue": "password",
-            "description": "<p>Grant-type</p>"
+            "type": "Boolean",
+            "optional": true,
+            "field": "refresh",
+            "defaultValue": "false",
+            "description": "<p>Refresh access token</p>"
           }
         ]
       }
@@ -258,14 +416,94 @@ define({ "api": [
         }
       ]
     },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "json",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>Missing or invalid information.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n    \"error\": \"Please provide username/email and password.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
     "sampleRequest": [
       {
-        "url": "https://dev.systemapic.com/oauth/token"
+        "url": "https://dev.systemapic.com/api/token"
       }
     ]
+  },
+  {
+    "type": "post",
+    "url": "/api/token/check",
+    "title": "Check access token",
+    "name": "check_access_token",
+    "group": "User",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Access token JSON</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/token/check"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   },
   {
     "type": "post",
@@ -331,7 +569,81 @@ define({ "api": [
             "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
           }
         ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/api/token/refresh",
+    "title": "Refresh access token",
+    "name": "refresh_access_token",
+    "group": "User",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Access token JSON</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n\t\"access_token\":\"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4\",\n\t\"expires_in\":\"36000\",\n\t\"token_type\":\"Bearer\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/token/refresh"
       }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
     }
   }
 ] });
