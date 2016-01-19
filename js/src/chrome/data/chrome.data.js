@@ -2211,6 +2211,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		toggleButton
 			.on('click', function(d) {
+				console.log('click toggle layer');
 				this.toggleLayer(d);
 			}.bind(this));		
 
@@ -2323,6 +2324,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// TOGGLE LAYERS
 	
 	toggleLayer : function (layer) {
+		console.log('toggleLayer', layer);
 		var uuid = layer.getUuid();
 		var on = this.isLayerOn(uuid);
 		on ? this.removeLayer(layer) : this.addLayer(layer);

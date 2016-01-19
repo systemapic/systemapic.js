@@ -30,6 +30,17 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	updateProject : function (options, done) {
+		var path = '/api/project/update';
+		this.post(path, options, done);
+	},
+
+	deleteProject : function (options, done) {
+		var path = '/api/project/delete';
+		this.post(path, options, done);
+	},
+
+
 	auth : function (done) {
 		var path = '/api/user/session';
 		this.post(path, {}, done);

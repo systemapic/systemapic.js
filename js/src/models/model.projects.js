@@ -134,6 +134,7 @@ Wu.Project = Wu.Class.extend({
 		
 		// get new layer from server
  		Wu.Util.postcb('/api/layers/new', options, this._createdLayerFromGeoJSON, this);
+
 	},
 
 	_createdLayerFromGeoJSON : function (context, data) {
@@ -238,14 +239,12 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getCreatedByUsername : function () {
-		console.log('store', this.store);
 		return this.store.createdByUsername;
 	},
 
 	setNewStore : function (store) {
 		this.store = store;
 		this._initObjects();
-		// this.select();
 	},
 
 	setStore : function (store) {
@@ -265,7 +264,6 @@ Wu.Project = Wu.Class.extend({
 			access : projectAccess
 		}
 
-
 		// send request to API		
  		Wu.Util.postcb('/api/project/setAccess', JSON.stringify(options), function (ctx, response) {
  		
@@ -283,11 +281,8 @@ Wu.Project = Wu.Class.extend({
 			access : projectAccess
 		}
 
-
 		// send request to API		
  		Wu.Util.postcb('/api/project/addInvites', JSON.stringify(options), function (ctx, response) {
-
- 			console.log('response: ', response, ctx);
 
  			var updatedAccess = Wu.parse(response);
 
@@ -307,46 +302,28 @@ Wu.Project = Wu.Class.extend({
 
 		// refresh project and sidepane
 		this._refresh();
-		// this.refreshSidepane();
 	},
 
 	_update : function (field) {
 
 		// set fields
-		var json = {};
-		json[field] = this.store[field];
-		json.uuid = this.store.uuid;
-
-
-		// // dont save if no changes
-		// var fieldclone = _.clone(this[field]);
-		// console.log('fieldclone: ', fieldclone, this[field]);
-		// if (this.lastSaved[field]) {
-		//         if (_.isEqual(json[field], this.lastSaved[field])) {
-		//                 console.log('shits equal, not saving!!', json[field], this.lastSaved[field]);
-		//                 return;
-		//         }
-		// }
-		// this.lastSaved[field] = fieldclone;
-		// console.log('this.lastSaved= ', this.lastSaved);
-
+		var options = {};
+		options[field] = this.store[field];
+		options.uuid = this.store.uuid;
 
 		// save to server
-		var string = JSON.stringify(json);
-		this._save(string);
+		this._save(options);
 	},
 
 
 	save : function (field) {
-
-		// save all fields that has changed since last save (or if no last save...?)
-		// todo
+		console.error('deprecated');
 	},
 	
 
-	_save : function (string) {
-		// save to server                                       	// TODO: pgp
-		Wu.send('/api/project/update', string, this._saved.bind(this));  
+	_save : function (options) {
+		// save to server                                       	
+		app.api.updateProject(options, this._saved.bind(this)); 
 	},
 
 	// callback for save
@@ -370,7 +347,7 @@ Wu.Project = Wu.Class.extend({
 	// create project on server
 	create : function (opts, callback) {
 
-		console.log('this: store', this.store);	// refactor! create on server first, then new Wu.Project(response);
+		// refactor! create on server first, then new Wu.Project(response);
 
 		var options = {
 			name 		: this.store.name,
@@ -381,8 +358,6 @@ Wu.Project = Wu.Class.extend({
 		}
 
 		// send request to API		
- 		// Wu.post('/api/project/create', JSON.stringify(options), callback.bind(opts.context), this);
-
  		app.api.createProject(options, callback.bind(opts.context));
 	},
 
@@ -401,11 +376,14 @@ Wu.Project = Wu.Class.extend({
 		var json = JSON.stringify({ 
 			    'pid' : this.store.uuid,
 			    'projectUuid' : this.store.uuid,
-			    // 'clientUuid' : this._client.uuid
 		});
 		
+		var callback = callback || this._deleted;
+
 		// post with callback:    path       data    callback   context of cb
-		Wu.Util.postcb('/api/project/delete', json, callback || this._deleted, this);
+		// Wu.Util.postcb('/api/project/delete', json, callback || this._deleted, this);
+
+		app.api.deleteProject(options, callback.bind(this));
 	},
 
 	_deleted : function (project, json) {
