@@ -178,7 +178,14 @@ Wu.Model.File = Wu.Model.extend({
 	_save : function (string) {
 		// TODO: save only if actual changes! saving too much already
 		app.api.updateFile('/api/file/update', string, function (err, response) {
-			console.log(response);
+			if (response.error) return app.feedback.setError({
+				title : "Could not update file", 
+				description : response.error
+			});
+
+			Wu.Mixin.Events.fire('fileChanged', { detail : {
+				fileUuid : this.getUuid()
+			}});
 		}); // save to server 
 
 		app.setSaveStatus();// set status
