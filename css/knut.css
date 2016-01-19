@@ -1513,3 +1513,19 @@ input.target-input.polygon {
     margin: auto;
 }
 
+
+.chrome-button.active {
+	background: #FCFCFC;
+	color: #3C4759 !important;
+}
+.chrome-button.active:hover {
+	background: #FCFCFC;
+	color: #3C4759 !important;
+}
+.chrome-menu-button.active {
+	background: #FCFCFC;
+	color: #3C4759 !important;
+}
+.smooth-fullscreen-save.invite.cancel {
+	margin-left: 258px;
+}

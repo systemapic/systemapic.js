@@ -235,7 +235,8 @@ Wu.App = Wu.Class.extend({
 		app.Share = new Wu.Share();
 
 		// add account tab
-		app.Account.addAccountTab();
+		// app.Account.addAccountTab();
+		app.AccountPane = new Wu.Pane.Account();
 	},
 
 	// init default view on page-load

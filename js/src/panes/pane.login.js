@@ -2,22 +2,19 @@ Wu.Pane.Login = Wu.Pane.extend({
 
 	open : function () {
 
-		console.log('open Login');
-
-		// frame
+		// frames
 		this._loginFullscreen = Wu.DomUtil.create('div', 'fullscreen-background', app._appPane);
-		var login_wrapper = Wu.DomUtil.create('div', 'login-wrapper', this._loginFullscreen);
-		var login_box = Wu.DomUtil.create('div', 'login-box', login_wrapper);
+		this._login_wrapper = Wu.DomUtil.create('div', 'login-wrapper', this._loginFullscreen);
+		this._login_box = Wu.DomUtil.create('div', 'login-box', this._login_wrapper);
 
 		// logo
-		var logo = Wu.DomUtil.create('div', 'login-popup-logo', login_box);
-
+		var logo = Wu.DomUtil.create('div', 'login-popup-logo', this._login_box);
 
 		// email input
 		this._email_input = this._createInput({
 			label : 'Email',
 			placeholder : 'name@domain.com',
-			appendTo : login_box,
+			appendTo : this._login_box,
 			type : 'email'
 		});
 
@@ -25,25 +22,49 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._password_input = this._createInput({
 			label : 'Password',
 			placeholder : 'Enter your password',
-			appendTo : login_box,
+			appendTo : this._login_box,
 			type : 'password'
 		});
 
 		// error feedback
-		this._error_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', login_box);
-
-
+		this._error_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', this._login_box);
 
 		// button
-		var loginBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', login_box, 'Login');
+		this._loginBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', this._login_box, 'Login');
+		
+		// cancel button
+		this._cancelBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite cancel', this._login_box, 'Cancel');
 
+		// add events
+		this.addEvents();
 
+		// focus
+		this._email_input.focus();
+	},
 
-		// events
+	addEvents : function () {
+		// add events
 		Wu.DomEvent.on(this._loginFullscreen, 'click', this.close, this);
-		Wu.DomEvent.on(login_box, 'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(loginBtn, 'click', this._doLogin, this);
+		Wu.DomEvent.on(this._login_box, 'click', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._loginBtn, 'click', this._doLogin, this);
+		Wu.DomEvent.on(this._cancelBtn, 'click', this.close, this);
+		Wu.DomEvent.on(this._password_input, 'keydown', this._checkEnter, this);
+	},
 
+	removeEvents : function () {
+		// remove events
+		Wu.DomEvent.off(this._loginFullscreen, 'click', this.close, this);
+		Wu.DomEvent.off(this._login_box, 'click', Wu.DomEvent.stop, this);
+		Wu.DomEvent.off(this._loginBtn, 'click', this._doLogin, this);
+		Wu.DomEvent.off(this._cancelBtn, 'click', this.close, this);
+		Wu.DomEvent.off(this._password_input, 'keydown', this._checkEnter, this);
+	},
+
+	_checkEnter : function (e) {
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if(code == 13) { //Enter keycode	
+			this._doLogin(e);
+		}	
 	},
 
 	_doLogin : function (e) {
@@ -77,7 +98,8 @@ Wu.Pane.Login = Wu.Pane.extend({
 		app.tokens = tokens;
 
 		// reload
-		window.location.reload(true);
+		window.location = app.options.servers.portal;
+
 	},
 
 	_createInput : function (options) {
@@ -86,7 +108,6 @@ Wu.Pane.Login = Wu.Pane.extend({
 		var label = options.label;
 		var type = options.type;
 		var placeholder = options.placeholder;
-
 
 		// label
 		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label invite-emails', appendTo, label);
@@ -107,8 +128,13 @@ Wu.Pane.Login = Wu.Pane.extend({
 	},
 
 	close : function () {
+		this.removeEvents();
 		Wu.DomUtil.remove(this._loginFullscreen);
+		// Wu.Mixin.Events.fire('closeMenuTabs');
 	},
 
+	_onCloseMenuTabs : function () {
+		this.close();
+	},
 
 })
