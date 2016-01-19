@@ -29,8 +29,6 @@ Wu.App = Wu.Class.extend({
 
 	authed : function (err, access_token) {
 
-		console.log('authed:', err, access_token);
-
 		// catch err
 		if (err) return console.error('Something went horribly wrong: ', err);
 

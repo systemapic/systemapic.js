@@ -52,7 +52,10 @@ Wu.Api = Wu.Class.extend({
 	},
 
 
-
+	updateFile : function (options, done) {
+		var path = '/api/file/update';
+		this.post(path, options, done)
+  	},
 
 
 
