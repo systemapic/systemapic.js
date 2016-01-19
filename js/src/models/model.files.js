@@ -177,7 +177,9 @@ Wu.Model.File = Wu.Model.extend({
 	// save json to server
 	_save : function (string) {
 		// TODO: save only if actual changes! saving too much already
-		Wu.save('/api/file/update', string); // save to server   
+		app.api.updateFile('/api/file/update', string, function (err, response) {
+			console.log(response);
+		}); // save to server 
 
 		app.setSaveStatus();// set status
 	},

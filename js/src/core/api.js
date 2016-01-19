@@ -25,6 +25,11 @@ Wu.Api = Wu.Class.extend({
 				window.location.href = app.options.servers.portal;
 			}
 		});
+	},
+
+	updateFile : function (options, done) {
+		var path = '/api/file/update';
+		this.post(path, options, done)
 	}
 
 });
