@@ -20,7 +20,9 @@ Wu.Socket = Wu.Class.extend({
 
 	_getServerStats : function () {
 		var socket = this._socket;
-		socket.emit('get_server_stats');
+		// socket.emit('get_server_stats');
+		// this.send('get_server_stats');
+		app.Socket.send('get_server_stats');
 	},
 
 	sendUserEvent : function (options) {
@@ -30,10 +32,15 @@ Wu.Socket = Wu.Class.extend({
 
 		// send event
 		var socket = this._socket;
-		socket.emit('user_event', options);
+		// socket.emit('user_event', options);
+		app.Socket.send('get_server_stats');
 	},
 
 	send : function (channel, options, callback) {
+
+		// add access_token
+		var options = options || {};
+		options.access_token = app.tokens.access_token;
 
 		// send event
 		var socket = this._socket;
@@ -50,7 +57,8 @@ Wu.Socket = Wu.Class.extend({
 		});
 		socket.on('connect', function(){
 			console.log('Securely connected to socket.');
-			socket.emit('ready', 'koko')
+			// socket.emit('ready', 'koko')
+			app.Socket.send('ready');
 		});
 		socket.on('event', function(data){
 			console.log('event data: ', data);
@@ -73,12 +81,13 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('hola', function(data){
 			console.log('hola!', data);
 		});
-		socket.on('processingProgress', function(data){
+		socket.on('processingProgress', function(data) {
+			console.log('scoket progress');
 			Wu.Mixin.Events.fire('processingProgress', {
 				detail : data
 			});
 		});
-		socket.on('stats', function(data){
+		socket.on('stats', function(data) {
 		});
 		socket.on('uploadDone', function (data) {
 		});
@@ -100,11 +109,14 @@ Wu.Socket = Wu.Class.extend({
 		});
 		socket.on('downloadReady', function (data) {
 
+
 			// select project
 			var event_id = 'downloadReady-' + data.file_id;
 			Wu.Mixin.Events.fire(event_id, {detail : data});
 		});
 		socket.on('processingDone', function (data) {
+
+			console.log('processing done');
 
 			// notify data lib
 			var file_id = data.file_id;

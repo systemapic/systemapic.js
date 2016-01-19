@@ -214,11 +214,11 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	},
 
 	_cancelTimer : function () {
-		if (this._clearTimer && !app.debug) clearTimeout(this._clearTimer);
+		if (this._clearTimer) clearTimeout(this._clearTimer);
 	},
 
 	clearTimer : function (delay) {
-		if (!this.options.clearTimer || app.debug) return;
+		if (!this.options.clearTimer) return;
 		this._clearTimer = setTimeout(this.clear.bind(this), delay || this.options.clearDelay);
 	},
 
