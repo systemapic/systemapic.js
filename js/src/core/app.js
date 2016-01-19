@@ -2,8 +2,6 @@ Wu.version = '1.3.5';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
-	// debug : true,
-
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
 
@@ -16,59 +14,59 @@ Wu.App = Wu.Class.extend({
 		// print version
 		console.log('Systemapic v.' + Wu.version);
 
-		// set global this
-		Wu.app = window.app = this; // todo: remove Wu.app, use only window.app
+		// set global app
+		window.app = Wu.app = this; // todo: remove Wu.app, use only window.app
+
+		// merge options
+		Wu.setOptions(app, options);
 
 		// init api
-		app.api = new Wu.Api();
+		app.api = new Wu.Api({});
 
-		// set access token
-		this.setAccessTokens();
+		// auth
+		app.api.auth(app.authed);
+	},
+
+	authed : function (err, access_token) {
+
+		console.log('authed:', err, access_token);
+
+		// catch err
+		if (err) return console.error('Something went horribly wrong: ', err);
+
+		// set access_token
+		app.tokens = Wu.parse(access_token);
 
 		// init socket
 		app.Socket = new Wu.Socket();
 
 		// error handling
-		this._initErrorHandling();
-
-		// merge options
-		Wu.setOptions(this, options);
+		app._initErrorHandling();
 
 		// set page title
-		document.title = this.options.portalTitle;
+		document.title = app.options.portalTitle;
 
 		// get objects from server
-		this.initServer();
+		app.initServer();
 
 		// init sniffers
-		this._initSniffers();
+		app._initSniffers();
+
 	},
 
 	_initSniffers : function () {
 
 		// Detect mobile devices
-		this.detectMobile();
+		app.detectMobile();
 
 		// get user agent
-		this.sniffer = Sniffer(navigator.userAgent);
+		app.sniffer = Sniffer(navigator.userAgent);
 	},
 	
-	setAccessTokens : function () {
-
-		// get tokens
-		app.tokens = window.tokens;
-
-		// get access token
-		var access_token = app.tokens.access_token;
-
-		// verify token
-		app.api.verifyAccessToken();
-	},
-
 	_initErrorHandling : function () {
 
 		// log all errors
-		window.onerror = this._onError;
+		window.onerror = app._onError;
 
 		// forward console.error's to log also
 		// console.error = function (message) {
@@ -78,11 +76,9 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_onError : function (message, file, line, char, ref) {
-
 		var stack = ref.stack;
 		var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
 		var username = app.Account ? app.Account.getName() : 'No username';
-		
 		var options = JSON.stringify({
 			message : message,
 			file : file,
@@ -91,72 +87,71 @@ Wu.App = Wu.Class.extend({
 			stack : stack,
 			project : project
 		});
-
-		Wu.save('/api/error/log', options);
+		Wu.save('/api/error/log', options); // todo: move req to api.js
 	},
 
 	_checkForInvite : function () {
 		var pathname = window.location.pathname;
 		if (pathname.indexOf('/invite/') == -1) return;
 		var invite_token = pathname.split('/').reverse()[0];
-		if (invite_token) this.options.invite_token = invite_token;
+		if (invite_token) app.options.invite_token = invite_token;
 	},
 
 	initServer : function () {
-		console.log('Securely connected to server: \n', this.options.servers.portal);
+		console.log('Securely connected to server: \n', app.options.servers.portal);
 
 		// check for invite link
-		this._checkForInvite();
+		app._checkForInvite();
 
 		// data for server
-		var data = JSON.stringify(this.options);
-		
-		// post         path          json      callback    this
-		Wu.post('api/portal', data, this.initServerResponse, this, this.options.servers.portal);
+		var data = JSON.stringify(app.options);
+
+		// get portal
+		app.api.getPortal(function (err, response) {
+			if (err) return console.error('Something went wrong.');
+
+			// parse
+			var store = Wu.parse(response);
+
+			// build app
+			app.build(store)
+		});
 	},
 
-	initServerResponse : function (that, responseString) {
-		var responseObject = Wu.parse(responseString);
 
-		// revv it up
-		that.initApp(responseObject);
-	},
+	build : function (portalStore) {
 
-	initApp : function (portalStore) {
 		// set vars
-		this.options.json = portalStore;
+		app.options.json = portalStore;
 
 		// load json model
-		this._initObjects();
+		app._initObjects();
 
 		// create app container
-		this._initContainer();
+		app._initContainer();
 
 		// init chrome
-		this._initChrome();
+		app._initChrome();
 
 		// create panes
-		this._initPanes();
+		app._initPanes();
 
 		// init pane view
-		this._initView();
+		app._initView();
 
 		// ready
-		this._ready = true;
-
-		// debug
-		this._debug();
+		app._ready = true; // todo: fire app ready event
 
 		// log entry
-		this._logEntry();
+		app._logEntry();
 
 		// analytics
-		this.Analytics = new Wu.Analytics();
+		app.Analytics = new Wu.Analytics();
 	},
 
 	_logEntry : function () {
-		var b = this.sniffer.browser;
-		var o = this.sniffer.os;
+		var b = app.sniffer.browser;
+		var o = app.sniffer.os;
 		var browser = b.fullName + ' ' + b.majorVersion + '.' + b.minorVersion;
 		var os = o.fullName + ' ' + o.majorVersion + '.' + o.minorVersion;
 
@@ -171,97 +166,97 @@ Wu.App = Wu.Class.extend({
 	_initObjects : function () {
 
 		// data controller
-		this.Data = new Wu.Data();
+		app.Data = new Wu.Data();
 
-		// controller
-		this.Controller = new Wu.Controller(); // todo: remove this?
+		// controller .. todo: refactor what's in controller.. or expand..
+		app.Controller = new Wu.Controller();
 
 		// main user account
-		this.Account = new Wu.User(this.options.json.account);
-		this.Account.setRoles(this.options.json.roles);
+		app.Account = new Wu.User(app.options.json.account);
 
 		// contact list
-		this.Users = {};
+		app.Users = {};
 		app.Account.getContactList().forEach(function(user) {
-		       this.Users[user.uuid] = new Wu.User(user);    
-		}, this);
-		this.options.json.users.project_users.forEach(function(user) {
-		       if (!this.Users[user.uuid]) this.Users[user.uuid] = new Wu.User(user);             
-		}, this);
+		       app.Users[user.uuid] = new Wu.User(user);    
+		});
+		app.options.json.users.project_users.forEach(function(user) {
+		       if (!app.Users[user.uuid]) app.Users[user.uuid] = new Wu.User(user);             
+		});
 
 		// add self to users list
-		this.Users[app.Account.getUuid()] = this.Account;
+		app.Users[app.Account.getUuid()] = app.Account;
 
 		// create project objects
-		this.Projects = {};
-		this.options.json.projects.forEach(function(elem, i, arr) {
-		       this.Projects[elem.uuid] = new Wu.Project(elem, this);
-		}, this);
+		app.Projects = {};
+		app.options.json.projects.forEach(function(elem, i, arr) {
+		       app.Projects[elem.uuid] = new Wu.Project(elem);
+		});
 	},
 
 	_initChrome : function () {
 
 		// chrome
-		this.Chrome = {};
+		app.Chrome = {};
 
 		// top chrome
-		this.Chrome.Top = new Wu.Chrome.Top();
+		app.Chrome.Top = new Wu.Chrome.Top();
 
 		// right chrome
-		this.Chrome.Right = new Wu.Chrome.Right();
+		app.Chrome.Right = new Wu.Chrome.Right();
 
 		// right chrome
-		this.Chrome.Left = new Wu.Chrome.Left();
+		app.Chrome.Left = new Wu.Chrome.Left();
 	},
 
 	_initPanes : function () {
 
 		// render tooltip
-		this.Tooltip = new Wu.Tooltip();
+		app.Tooltip = new Wu.Tooltip();
 
 		// render style handler
-		this.Style = new Wu.Style();
+		app.Style = new Wu.Style();
 
 		// render progress bar
-		this.ProgressBar = new Wu.ProgressPane({
+		app.ProgressBar = new Wu.ProgressPane({
 			color : 'white',
-			addTo : this._appPane
+			addTo : app._appPane
 		});
 
 		// render map pane
-		this.MapPane = new Wu.MapPane();
+		app.MapPane = new Wu.MapPane();
 
 		// render eror pane
-		this.FeedbackPane = new Wu.FeedbackPane();
+		app.FeedbackPane = new Wu.FeedbackPane();
 
 		// settings pane
-		this.MapSettingsPane = new Wu.MapSettingsPane();
+		app.MapSettingsPane = new Wu.MapSettingsPane();
 
 		// share pane
-		this.Share = new Wu.Share();
+		app.Share = new Wu.Share();
 
 		// add account tab
-		this.Account.addAccountTab();
+		// app.Account.addAccountTab();
+		app.AccountPane = new Wu.Pane.Account();
 	},
 
 	// init default view on page-load
 	_initView : function () {
 
 		// check invite
-		if (this._initInvite()) return;
+		if (app._initInvite()) return;
 
 		// check location
-		if (this._initLocation()) return;
+		if (app._initLocation()) return;
 			
 		// runs hotlink
-		if (this._initHotlink()) return;
+		if (app._initHotlink()) return;
 
 		// open first project (ordered by lastUpdated)
 		app.Controller.openLastUpdatedProject();
 	},
 
 	_initInvite : function () {
-		var project = this.options.json.invite;
+		var project = app.options.json.invite;
 
 		if (!project) return false;
 
@@ -284,26 +279,25 @@ Wu.App = Wu.Class.extend({
 		    search  = window.location.search.split('?'),
 		    params  = Wu.Util.parseUrl();
 
-
 		// done if no location
 		if (!username || !project) return false;
 
 		// get project
-		var project = this._projectExists(project, username);
+		var project = app._projectExists(project, username);
 		
 		// return if no such project
 		if (!project) {
-			Wu.Util.setAddressBar(this.options.servers.portal);
+			Wu.Util.setAddressBar(app.options.servers.portal);
 			return false;
 		}
 
 		// set project
-		this._setProject(project);
+		app._setProject(project);
 
 		// init hash
 		if (hash) {
 			console.log('got hash!', hash, project);
-			this._initHash(hash, project);
+			app._initHash(hash, project);
 		}
 		return true;
 	},
@@ -311,19 +305,19 @@ Wu.App = Wu.Class.extend({
 	_initHotlink : function () {
 		
 		// parse error prone content of hotlink..
-		this.hotlink = Wu.parse(window.hotlink);
+		app.hotlink = Wu.parse(window.hotlink);
 
 		// return if no hotlink
-		if (!this.hotlink) return false;
+		if (!app.hotlink) return false;
 
 		// check if project slug exists, and if belongs to client slug
-		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
+		var project = app._projectExists(app.hotlink.project, app.hotlink.client);
 
 		// return if not found
 		if (!project) return false;
 
 		// set project
-		this._setProject(project);
+		app._setProject(project);
 
 		return true;
 	},
@@ -337,7 +331,9 @@ Wu.App = Wu.Class.extend({
 		for (p in Wu.app.Projects) {
 			var project = Wu.app.Projects[p];
 			if (project_slug == project.store.slug) {
-				if (project.store.createdByUsername == username) return project; 
+				if (project.store.createdByUsername == username) {
+					return project; 
+				}
 			}
 		}
 		return false;
@@ -364,11 +360,11 @@ Wu.App = Wu.Class.extend({
 	_initContainer : function () {
 
 		// find or create container
-		var id = this.options.id;
-		this._appPane = Wu.DomUtil.get(id) || Wu.DomUtil.createId('div', id || 'app', document.body);
+		var id = app.options.id;
+		app._appPane = Wu.DomUtil.get(id) || Wu.DomUtil.createId('div', id || 'app', document.body);
 
 		// create map container
-		this._mapContainer = Wu.DomUtil.createId('div', 'map-container', this._appPane);
+		app._mapContainer = Wu.DomUtil.createId('div', 'map-container', app._appPane);
 	},
 
 	_setProject : function (project) {
@@ -377,12 +373,11 @@ Wu.App = Wu.Class.extend({
 		Wu.Mixin.Events.fire('projectSelected', {detail : {
 			projectUuid : project.getUuid()
 		}});
-
 	},
 
 	// get name provided for portal from options hash 
 	getPortalName : function () {
-		return this.options.portalName;
+		return app.options.portalName;
 	},
 
 	// shorthands for setting status bar
@@ -394,10 +389,11 @@ Wu.App = Wu.Class.extend({
 		// app.StatusPane.setSaveStatus(delay);
 	},
 
+	// todo: move hashes to own script
 	_initHash : function (hash, project) {
 
 		// get hash values from server,
-		this.getHash(hash, project, this._renderHash);
+		app.getHash(hash, project, app._renderHash);
 		return true;
 	},
 
@@ -432,7 +428,7 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	// save a hash // todo: move to controller
+	// save a hash 
 	setHash : function (callback, project) {
 
 		// get active layers
@@ -457,6 +453,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 
+	// todo: move phantom to own script.. app.phantomjs = new Wu.PhantomJS()
 	phantomJS : function (args) {
 		var projectUuid = args.projectUuid,
 	   	    hash    	= args.hash,
@@ -527,27 +524,27 @@ Wu.App = Wu.Class.extend({
 	},
 	
 	_setPhantomArgs : function (args) {
-		this._phantomArgs = args;
+		app._phantomArgs = args;
 	},
 	
 	phantomReady : function () {
 		if (!app.activeProject) return false;
 
-		var hashLayers = _.size(this._phantomHash.layers),
+		var hashLayers = _.size(app._phantomHash.layers),
 		    baseLayers = _.size(app.activeProject.getBaselayers()),
 		    numLayers = hashLayers + baseLayers;
 
 		// check if ready for screenshot
-		if (!this._loaded || !this._loading) return false;
+		if (!app._loaded || !app._loading) return false;
 
 		// if no layers, return
 		if (numLayers == 0) return true;
 
 		// if not loaded, return
-		if (this._loaded.length == 0 ) return false; 
+		if (app._loaded.length == 0 ) return false; 
 
 		// if all layers loaded
-		if (this._loaded.length == numLayers) return true;
+		if (app._loaded.length == numLayers) return true;
 
 		// not yet
 		return false;
@@ -558,6 +555,7 @@ Wu.App = Wu.Class.extend({
 
 	_loading : [],
 
+	// todo: move to own script
 	detectMobile : function() {
 		
 		// Detect if it's a mobile
@@ -598,29 +596,26 @@ Wu.App = Wu.Class.extend({
 		}
 	},
 
-	// debug mode
-	_debug : function (debug) {
-		if (!debug && !this.debug) return;
-		this.debug = true;
+	debug : function () {
 
-		// set style
+		// add red borders to tiles
 		app.Style.setStyle('img.leaflet-tile', {
 			'border-top': '1px solid rgba(255, 0, 0, 0.65)',
 			'border-left': '1px solid rgba(255, 0, 0, 0.65)'
 		});
 
-		// add map click event
+		// click event to get tile address
 		if (app._map) app._map.on('mousedown', function (e) {
-			var lat = e.latlng.lat,
-			    lng = e.latlng.lng,
-			    zoom = app._map.getZoom(),
-			    tile = this._getTileURL(lat, lng, zoom);
+			var lat = e.latlng.lat;
+			var lng = e.latlng.lng;
+			var zoom = app._map.getZoom();
+			var tile = app._getTileURL(lat, lng, zoom);
 
+			// log to console
 			console.log('tile:', tile);
-			
-		}, this);
+		});
 
-		// extend 
+		// extend Number with toRad
 		if (typeof(Number.prototype.toRad) === "undefined") {
 			Number.prototype.toRad = function() {
 				return this * Math.PI / 180;

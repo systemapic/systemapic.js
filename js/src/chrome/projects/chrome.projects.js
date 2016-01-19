@@ -1003,6 +1003,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// create project on server
 		project.create(options, function (project, json) {
+			console.log('project, json', arguments);
 			var result = Wu.parse(json),
 			    error  = result.error,
 			    store  = result.project;
