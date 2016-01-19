@@ -42,8 +42,6 @@
 Wu.Analytics = Wu.Class.extend({
 
 	initialize : function () {
-
-		// this.initGoogle();
 		this._listen();
 	},
 
@@ -64,9 +62,10 @@ Wu.Analytics = Wu.Class.extend({
 		Wu.Mixin.Events.on('fileDeleted',     this._onFileDeleted, this);
 
 		// map events
-		if (app._map) {
-			app._map.on('zoomstart', this._onZoomStart);
-			app._map.on('zoomend', this._onZoomEnd);
+		var map = app._map;
+		if (map) {
+			map.on('zoomstart', this._onZoomStart);
+			map.on('zoomend', this._onZoomEnd);
 		}
 
 		// on browser close
@@ -74,18 +73,18 @@ Wu.Analytics = Wu.Class.extend({
 	},
 
 	// dummies
-	_editEnabled 	 : function () {},
-	_editDisabled 	 : function () {},
-	_layerEnabled 	 : function () {},
-	_layerDisabled 	 : function () {},
-	_updateView 	 : function () {},
-	_refresh 	 : function () {},
-	_onFileImported  : function () {},
-	_onFileDeleted   : function () {},
-	_onLayerAdded    : function () {},
-	_onLayerEdited   : function () {},
-	_onLayerStyleEdited   : function () {},
-	_onLayerDeleted  : function () {},
+	_editEnabled 	 	: function () {},
+	_editDisabled 	 	: function () {},
+	_layerEnabled 	 	: function () {},
+	_layerDisabled 	 	: function () {},
+	_updateView 	 	: function () {},
+	_refresh 	 	: function () {},
+	_onFileImported  	: function () {},
+	_onFileDeleted   	: function () {},
+	_onLayerAdded    	: function () {},
+	_onLayerEdited   	: function () {},
+	_onLayerStyleEdited   	: function () {},
+	_onLayerDeleted  	: function () {},
 	
 	_onUnload : function () {
 
@@ -94,7 +93,7 @@ Wu.Analytics = Wu.Class.extend({
 		    	event : 'exited.',
 		    	description : '',
 		    	timestamp : Date.now()
-		})
+		});
 	},
 
 	_onZoomStart : function () {

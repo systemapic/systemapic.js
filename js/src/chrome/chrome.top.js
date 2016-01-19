@@ -17,7 +17,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
 		// Menu Button
-		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button active', this._container);
+		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);
 
 		// css experiment
 		this._menuButton.innerHTML = '<i class="top-button fa fa-bars"></i>';		
@@ -79,7 +79,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		}
 
 		// register event
-		Wu.DomEvent.on(buttonDiv, 'click', trigger, ctx);
+		Wu.DomEvent.on(buttonDiv, 'mousedown', trigger, ctx);
 
 		return buttonDiv;
 	},
@@ -109,7 +109,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		}
 	},
 
-
 	initDefault : function () {
 
 		// this._setUsername();
@@ -119,7 +118,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this.initCPUclock(this._container);
 	},
 
-
+	// todo: refactor into own script
 	initCPUclock : function (wrapper) {	
 
 		this._CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
@@ -135,7 +134,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	updateCPUclock : function (percent) {
 
-
 		// hide if not editor
 		var project = app.activeProject;
 		if (!project || !project.isEditable()) {
@@ -143,7 +141,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		} else {
 			this._CPUwrapper.style.display = 'block';
 		}
-
 
 		// Get value as numbers
 		var pp = parseInt(percent);
@@ -163,14 +160,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setHooks : function (onoff) {
 
-		// Toggle layer menu
-		// Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
-
 		// Toggle left pane
 		Wu.DomEvent[onoff](this._menuButton, 'click', this._toggleLeftPane, this);
-
-		// Log out button
-		// Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
 
 	},
 
@@ -218,14 +209,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	
 	_showHideLayerButton : function () {
-
-		// // If there are no layers, hide button
-		// if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
-		// 	Wu.DomUtil.addClass(this._layersBtn, 'displayNone');
-		// } else {
-		// 	Wu.DomUtil.removeClass(this._layersBtn, 'displayNone');
-		// }
-
 	},
 
 	_setProjectTitle : function () {
@@ -237,24 +220,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._projectTitle.innerHTML = this._projectTitleName.camelize();
 	},
 
-	// _setUsername : function () {
-	// 	var username = app.Account.getFullName();
-	// 	this._userName.innerHTML = username.toLowerCase();
-	// },
 
 	_setPortalLogo : function () {
-
-		// portal logo from config
-
-		// this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
-	// default open
-	// _leftPaneisOpen : false,
-
 	_toggleLeftPane : function (e) {
-		Wu.DomEvent.stop(e);
-
 		this._leftPaneisOpen ? this.closeLeftPane() : this.openLeftPane();
 	},
 
@@ -283,6 +253,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// close left chrome
 		app.Chrome.Left.close();
+
 	},
 
 	// close menu when clicking on map, header, etc.

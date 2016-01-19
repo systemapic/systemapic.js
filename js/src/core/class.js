@@ -334,94 +334,198 @@ Wu.Util = {
 	},
 
 	// post without callback
-	post : function (path, json) {
-		var that = this,
-		    http = new XMLHttpRequest(),
-		    url = Wu.Util._getServerUrl(); 
-		url += path;
+	post : function (path, json, done) {
+		// var that = this,
+		//     http = new XMLHttpRequest(),
+		//     url = Wu.Util._getServerUrl(); 
+		// url += path;
 		
+		// http.open("POST", url, true);
+
+		// //Send the proper header information along with the request
+		// http.setRequestHeader("Content-type", "application/json");
+
+		// // set access_token on header
+		// http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
+		// http.onreadystatechange = function() {
+		// 	if(http.readyState == 4 && http.status == 200) {
+		// 		var valid = Wu.verify(http.responseText);
+		// 	}
+		// }
+		// http.send(json);
+		var http = new XMLHttpRequest();
+		var url = Wu.Util._getServerUrl();
+		url += path;
+
+		// open
 		http.open("POST", url, true);
 
-		//Send the proper header information along with the request
-		http.setRequestHeader("Content-type", "application/json");
+		// set json header
+		http.setRequestHeader('Content-type', 'application/json');
 
-		// set access_token on header
-		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
-
+		// response
 		http.onreadystatechange = function() {
-			if(http.readyState == 4 && http.status == 200) {
-				var valid = Wu.verify(http.responseText);
+			if (http.readyState == 4) {
+				if (http.status == 200) {
+					done && done(null, http.responseText); 
+				} else {
+					console.log('http.status: ', http.status);
+					console.log('httP', http);
+					done && done(http.status, http.responseText);
+				}
 			}
+
 		}
-		http.send(json);
+
+		// add access_token to request
+		var access_token = app.tokens ? app.tokens.access_token : null;
+		var options = _.isString(json) ? Wu.parse(json) : json;
+		options.access_token = access_token;
+		var send_json = Wu.stringify(options);
+
+		// send
+		http.send(send_json);
+
+		console.error('deprecated: move to api.js');
 	},
 
 	// post with callback
-	postcb : function (path, json, cb, context, baseurl) {
-		var that = context,
-		    http = new XMLHttpRequest(),
-		    url = baseurl || Wu.Util._getServerUrl();
-		
+	postcb : function (path, json, done, context, baseurl) {
+		var http = new XMLHttpRequest();
+		var url = baseurl || Wu.Util._getServerUrl();
 		url += path;
 
+		// open
 		http.open("POST", url, true);
 
-		//Send the proper header information along with the request
+		// set json header
 		http.setRequestHeader('Content-type', 'application/json');
 
-		// set access_token on header
-		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
-
+		// response
 		http.onreadystatechange = function() {
-			if(http.readyState == 4 && http.status == 200) {
-
-				// verify response
-				var valid = Wu.verify(http.responseText);
-
-				// callback
-				if (cb && valid) cb(context, http.responseText); 
+			if (http.readyState == 4) {
+				if (http.status == 200) {
+					done && done(null, http.responseText); 
+				} else {
+					console.log('http.status: ', http.status);
+					console.log('httP', http);
+					done && done(http.status, http.responseText);
+				}
 			}
+
 		}
 
-		// stringify objects
-		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+		// add access_token to request
+		var access_token = app.tokens ? app.tokens.access_token : null;
+		var options = _.isString(json) ? Wu.parse(json) : json;
+		options.access_token = access_token;
+		var send_json = Wu.stringify(options);
 
-		http.send(json);
+		// send
+		http.send(send_json);
+
+		console.error('deprecated: move to api.js');
+
+		// var that = context,
+		//     http = new XMLHttpRequest(),
+		//     url = baseurl || Wu.Util._getServerUrl();
+		
+		// url += path;
+
+		// http.open("POST", url, true);
+
+		// //Send the proper header information along with the request
+		// http.setRequestHeader('Content-type', 'application/json');
+
+		// // set access_token on header
+		// http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
+		// http.onreadystatechange = function() {
+		// 	if(http.readyState == 4 && http.status == 200) {
+
+		// 		// verify response
+		// 		var valid = Wu.verify(http.responseText);
+
+		// 		// callback
+		// 		if (cb && valid) cb(context, http.responseText); 
+		// 	}
+		// }
+
+		// // stringify objects
+		// if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+
+		// http.send(json);
 	},
 
 
 	
 	// post with callback and error handling (do callback.bind(this) for context)
-	send : function (path, json, callback) {
-		var that = this;
+	send : function (path, json, done) {
+		// var that = this;
+		// var http = new XMLHttpRequest();
+		// var url = Wu.Util._getServerUrl();
+		// url += path;
+
+		// http.open("POST", url, true);
+		// http.setRequestHeader('Content-type', 'application/json');
+
+		// // set access_token on header
+		// http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
+		// http.onreadystatechange = function() {
+		// 	if (http.readyState == 4) {
+		    		
+		// 		var valid = Wu.verify(http.responseText);
+
+		// 		if (http.status == 200 && valid) { // ok
+		// 			if (callback) callback(null, http.responseText); 
+		// 		} else { 
+		// 			if (callback) callback(http.status);
+		// 		}
+		// 	}
+		// }
+		
+		// // stringify objects
+		// if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+		
+		// // send string
+		// http.send(json);
 		var http = new XMLHttpRequest();
 		var url = Wu.Util._getServerUrl();
 		url += path;
 
+		// open
 		http.open("POST", url, true);
+
+		// set json header
 		http.setRequestHeader('Content-type', 'application/json');
 
-		// set access_token on header
-		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
-
+		// response
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
-		    		
-				var valid = Wu.verify(http.responseText);
-
-				if (http.status == 200 && valid) { // ok
-					if (callback) callback(null, http.responseText); 
-				} else { 
-					if (callback) callback(http.status);
+				if (http.status == 200) {
+					done && done(null, http.responseText); 
+				} else {
+					console.log('http.status: ', http.status);
+					console.log('httP', http);
+					done && done(http.status, http.responseText);
 				}
 			}
+
 		}
-		
-		// stringify objects
-		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
-		
-		// send string
-		http.send(json);
+
+		// add access_token to request
+		var access_token = app.tokens ? app.tokens.access_token : null;
+		var options = _.isString(json) ? Wu.parse(json) : json;
+		options.access_token = access_token;
+		var send_json = Wu.stringify(options);
+
+		// send
+		http.send(send_json);
+
+		console.error('deprecated: move to api.js');
+
 	},
 
 
@@ -471,8 +575,6 @@ Wu.Util = {
 			return false; 
 		}
 	},
-
-
 
 	_getParentClientID : function (pid) {
 		var cid = '';

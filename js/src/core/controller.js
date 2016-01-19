@@ -25,6 +25,7 @@ Wu.Controller = Wu.Class.extend({
 	// _updateView 		: function () {},
 
 
+	
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
 
@@ -37,17 +38,6 @@ Wu.Controller = Wu.Class.extend({
 		this._project._setUrl(); // refactor
 
 	},
-
-	// _projectChanged : function (e) {
-	// 	var projectUuid = e.detail.projectUuid;
-	// 	var project = app.Projects[projectUuid];
-	// 	var saveState = project.getSettings().saveState;
-
-	// 	// // save map state
-	// 	// if (saveState) this._saveState({
-	// 	// 	project : project
-	// 	// });
-	// },
 
 	_loadState : function () {
 		var project = this._project,
@@ -154,7 +144,6 @@ Wu.Controller = Wu.Class.extend({
 		if (dc) dc.show();
 	},
 
-
 	showStartPane : function () {
 
 		// called from project._unload(), ie. when deleting active project
@@ -168,7 +157,7 @@ Wu.Controller = Wu.Class.extend({
 
 		var controls = app.MapPane.getControls();
 
-		for (c in controls) {
+		for (var c in controls) {
 			var control = controls[c];
 			control._off();
 		}
@@ -177,76 +166,6 @@ Wu.Controller = Wu.Class.extend({
 		app.StartPane.activate();
 
 	},
-
-
-	// createProject : function () {
-	// 	console.error('this is a debug function!');
-
-	// 	var position = app.options.defaults.project.position;
-
-	// 	// create project object
-	// 	var store = {
-	// 		name 		: 'Project title',
-	// 		description 	: 'Project description',
-	// 		createdByName 	: app.Account.getName(),
-	// 		keywords 	: '',
-	// 		position 	: app.options.defaults.project.position || {},
-	// 		bounds : {
-	// 			northEast : {
-	// 				lat : 0,
-	// 				lng : 0
-	// 			},
-	// 			southWest : {
-	// 				lat : 0,
-	// 				lng : 0
-	// 			},
-	// 			minZoom : 1,
-	// 			maxZoom : 22
-	// 		},
-	// 		header : {
-	// 			height : 50
-	// 		},
-	// 		folders : []
-
-	// 	}
-
-	// 	// create new project with options, and save
-	// 	var project = new Wu.Project(store);
-	// 	project.editMode = true;
-	// 	var options = {
-	// 		store : store,
-	// 		callback : this._projectCreated,
-	// 		context : this
-	// 	}
-
-	// 	project.create(options);
-
-	// },
-
-	// _projectCreated : function (project, json) {
-	// 	var result = Wu.parse(json),
-	// 	    error  = result.error,
-	// 	    store  = result.project;
-
-	// 	// return error
-	// 	if (error) return app.feedback.setError({
-	// 		title : 'There was an error creating new project!', 
-	// 		description : error
-	// 	});
-			
-	// 	// add to global store
-	// 	app.Projects[store.uuid] = project;
-
-	// 	// update project store
-	// 	project.setNewStore(store);
-
-	// 	// select
-	// 	Wu.Mixin.Events.fire('projectSelected', { detail : {
-	// 		projectUuid : project.getUuid()
-	// 	}});
-
-	// },
-
 
 	openLastUpdatedProject : function () {
 		var project = _.first(_.sortBy(_.toArray(app.Projects), function (p) {
@@ -260,9 +179,6 @@ Wu.Controller = Wu.Class.extend({
 			return p.getName().toLowerCase();
 		}));
 		if (project) project.selectProject();
-		
 	},
-
-
 
 });
