@@ -1458,15 +1458,39 @@ L.Control.Description = Wu.Control.extend({
 		// Legend Frame
 		_legendHTML += '<div class="info-legend-frame">';
 		_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
+
+		_legendHTML += '<div class="info-legend-globesar">' + 'Velocity in mm pr. year' + '</div>';
+
 		_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
 
 		// Gradient
 		_legendHTML += '<div class="info-legend-gradient-container" style="' + gradientStyle + '"></div>';
 		_legendHTML += '</div>';
 
+
+		var globesarSpecificByLine  = '<div class="globesar-specific-legend-container">';
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-top">Deformasjon i sikteretning til satellitten</div>';
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-line-container">';
+
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-line"></div>';
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-arrow-left"></div>';
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-arrow-right"></div>';
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-middle-line"></div>';
+    		    globesarSpecificByLine += '</div>';
+
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-toward">Mot satellitten</div>';
+		    globesarSpecificByLine += '<div class="globesar-specific-legend-from">Fra satellitten</div>';
+    		    
+		    globesarSpecificByLine += '</div>';
+
+		options.bline = globesarSpecificByLine;
+
 		if (options.bline) {
 			_legendHTML += '<div class="info-legend-gradient-bottomline"">' + options.bline + '</div>';
 		}
+
+
+
 
 		_legendHTML += '</div>';
 
