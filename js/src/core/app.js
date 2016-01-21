@@ -186,8 +186,8 @@ Wu.App = Wu.Class.extend({
 
 		// create project objects
 		app.Projects = {};
-		app.options.json.projects.forEach(function(elem, i, arr) {
-		       app.Projects[elem.uuid] = new Wu.Project(elem);
+		app.options.json.projects.forEach(function(store, i, arr) {
+		       app.Projects[store.uuid] = new Wu.Project(store);
 		});
 	},
 
@@ -244,7 +244,7 @@ Wu.App = Wu.Class.extend({
 		if (app._initInvite()) return;
 
 		// check location
-		if (app._initLocation()) return;
+		// if (app._initLocation()) return;
 			
 		// runs hotlink
 		if (app._initHotlink()) return;
@@ -305,24 +305,76 @@ Wu.App = Wu.Class.extend({
 		// parse error prone content of hotlink..
 		app.hotlink = Wu.parse(window.hotlink);
 
+		console.error('hotlink??', app.hotlink);
+
 		// return if no hotlink
-		if (!app.hotlink) return false;
+		if (_.isEmpty(app.hotlink)) return false;
+
+		// check if existing first
+		var project = app._projectExists(app.hotlink);
+		if (project) return app._setProject(project);
+
+
+
+
+		// request project from server
+		app.api.getProject({
+			username : app.hotlink.username,
+			project_slug : app.hotlink.project
+		}, function (err, project_json) {
+
+			console.log('api.getProject', err, project_store);
+
+			if (err) return console.error('not a publci project');
+
+			var project_store = Wu.parse(project_json);
+
+			// import project
+			app._importProject(project_store, function (err, project) {
+				console.log('CREATED PROJECT', project, project.getUuid(), project.getName());
+				app._setProject(project);
+			});
+
+
+		});
+
+
 
 		// check if project slug exists, and if belongs to client slug
-		var project = app._projectExists(app.hotlink.project, app.hotlink.client);
+		// var project = app._projectExists(app.hotlink.project, app.hotlink.client);
 
 		// return if not found
-		if (!project) return false;
+		// if (!project) return false;
 
 		// set project
-		app._setProject(project);
+		// app._setProject(project);
 
 		return true;
 	},
 
+	_importProject : function (project_store, done) {
+
+		// already exists
+		if (app.Projects[project_store.uuid]) {
+			console.log('already exitst');
+			return; 
+		}
+
+		console.log('project not imported yet, importing!');
+		var project = new Wu.Project(project_store);
+		app.Projects[project.getUuid()] = project;
+
+		app.Chrome.Projects._addProject(project);
+
+
+		done(null, project);
+	},
+
 
 	// check if project exists (for hotlink)
-	_projectExists : function (project_slug, username) {
+	_projectExists : function (hotlink) {
+		var project_slug = hotlink.project; 
+		var username = hotlink.username;
 
 		// find project slug in Wu.app.Projects
 		var project_slug = project_slug || window.hotlink.project;
@@ -366,6 +418,8 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_setProject : function (project) {
+
+		console.log('project.getUuid()', project.getUuid());
 
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {

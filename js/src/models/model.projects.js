@@ -366,17 +366,17 @@ Wu.Project = Wu.Class.extend({
 
 		// load random project
 		app.MapPane._flush();
-		app.HeaderPane._flush();
+		// app.HeaderPane._flush();
 		this.selected = false;
 	},
 
 
 	_delete : function (callback) {
 		// var project = this;
-		var json = JSON.stringify({ 
+		var options = { 
 			    'pid' : this.store.uuid,
 			    'projectUuid' : this.store.uuid,
-		});
+		};
 		
 		var callback = callback || this._deleted;
 
@@ -386,7 +386,17 @@ Wu.Project = Wu.Class.extend({
 		app.api.deleteProject(options, callback.bind(this));
 	},
 
-	_deleted : function (project, json) {
+	_deleted : function (err, response) {
+
+		console.log('_deleted', arguments);
+
+		var result = Wu.parse(response);
+
+		if (!result.deleted) return console.error('Error deleting project.');
+
+		var project_id = result.project;
+
+		var project = app.Projects[project_id];
 
 		// set address bar
 		var url = app.options.servers.portal;

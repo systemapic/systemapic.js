@@ -216,6 +216,88 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/project/get",
+    "title": "Get a project",
+    "name": "create",
+    "group": "Project",
+    "description": "<p>Can get project <em>either</em> by <code>project_id</code> OR <code>username, project_slug</code></p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "project_id",
+            "description": "<p>Id project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "username",
+            "description": "<p>Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "project_slug",
+            "description": "<p>Project slug (shortname in url)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "JSON",
+            "optional": false,
+            "field": "Project",
+            "description": "<p>JSON object of the newly created project</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Project",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/project/get"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
     "url": "/api/project/create",
     "title": "Create a project",
     "name": "create",
@@ -506,6 +588,73 @@ define({ "api": [
     }
   },
   {
+    "type": "get",
+    "url": "/api/token/check",
+    "title": "Check access token",
+    "name": "check_access_token",
+    "group": "User",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Valid status</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n\t\"valid\" : true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/token/check"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
     "type": "post",
     "url": "/api/portal",
     "title": "Get portal store",
@@ -645,5 +794,33 @@ define({ "api": [
         }
       ]
     }
+  },
+  {
+    "type": "post",
+    "url": "/api/user/session",
+    "title": "Check if already logged in (browser-only)",
+    "name": "user_session",
+    "group": "User",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>Valid access token (either user or public)</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/user/session"
+      }
+    ]
   }
 ] });
