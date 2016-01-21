@@ -39,6 +39,11 @@ Wu.User = Wu.Class.extend({
 		return isContact;
 	},
 
+	isPublic : function () {
+		console.log('debug: isPublic() always returns true :)');
+		return true;
+	},
+
 	getContactListUuids : function () {
 		var uuids = [];
 		this.getContactList().forEach(function (c) {

@@ -13,9 +13,8 @@ Wu.satelliteAngle = Wu.Class.extend({
 	initContent : function () {
 
 		this.color = '#019688';
-
 		this._innerContainer = Wu.DomUtil.create('div', 'd3-satellite-wrapper displayNone', this.container);
-		this._header = Wu.DomUtil.create('div', 'satellite-measurement-geometry', this._innerContainer, 'Measurement geometry');
+		// this._header = Wu.DomUtil.create('div', 'satellite-measurement-geometry', this._innerContainer, 'Measurement geometry');
 
 	},
 
@@ -44,6 +43,7 @@ Wu.satelliteAngle = Wu.Class.extend({
 			this.angleContainer.remove();
 		}
 		this.angleContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
+		this.angleTitle = Wu.DomUtil.create('div', 'd3-satellite-title', this.angleContainer, 'Målevinkel');
 
 		var size = 0.55,
 		    padding = 10,
@@ -142,7 +142,9 @@ Wu.satelliteAngle = Wu.Class.extend({
 			this.compassContainer.innerHTML = '';
 			this.compassContainer.remove();
 		}
-		this.compassContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
+		this.compassContainer = Wu.DomUtil.createId('div', 'd3-satellite-compass-container', this._innerContainer);		
+		this.compassTitle = Wu.DomUtil.create('div', 'd3-satellite-title', this.compassContainer, 'Satelittkurs');
+
 
 		var size = 0.75,
 		    padding = 10,
@@ -300,9 +302,7 @@ Wu.satelliteAngle = Wu.Class.extend({
 				.attr("text-anchor", "middle")
 				.text(path + '°');
 
-								
-
-	},	
+	}
 
 
 
