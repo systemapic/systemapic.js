@@ -560,42 +560,44 @@ Wu.App = Wu.Class.extend({
 
 	detectMobile : function() {
 		
+		app.isMobile = Wu.Util.isMobile();
+
 		// Detect if it's a mobile
-		if (L.Browser.mobile) {
+		// if (L.Browser.mobile) {
 
-			// Set mobile state to true
-			Wu.app.mobile = false;
-			Wu.app.pad = false;
+		// 	// Set mobile state to true
+		// 	Wu.app.mobile = false;
+		// 	Wu.app.pad = false;
 			
-			// Get screen resolution
-			var w = screen.height;
-			var h = screen.width;
+		// 	// Get screen resolution
+		// 	var w = screen.height;
+		// 	var h = screen.width;
 
-			// Store resolution
-			Wu.app.nativeResolution = [w, h];
+		// 	// Store resolution
+		// 	Wu.app.nativeResolution = [w, h];
 
-			if ( w >= h ) var smallest = h;
-			else var smallest = w;
+		// 	if ( w >= h ) var smallest = h;
+		// 	else var smallest = w;
 
-			// Mobile phone
-			if ( smallest < 450 ) {
+			// // Mobile phone
+			// if ( smallest < 450 ) {
 
-				Wu.app.mobile = true;
-				var mobilestyle = 'mobilestyle.css'
-			// Tablet
-			} else {
+			// 	Wu.app.mobile = true;
+			// 	var mobilestyle = 'mobilestyle.css'
+			// // Tablet
+			// } else {
 
-				Wu.app.pad = true;
-				var mobilestyle = 'padstyle.css'
-			}
+			// 	Wu.app.pad = true;
+			// 	var mobilestyle = 'padstyle.css'
+			// }
 
-			// Get the styletag
-			var styletag = document.getElementById('mobilestyle');
-			// Set stylesheet for 
-			var styleURL = '<link rel="stylesheet" href="' + app.options.servers.portal + 'css/' + mobilestyle + '">';
-			styletag.innerHTML = styleURL;
+			// // Get the styletag
+			// var styletag = document.getElementById('mobilestyle');
+			// // Set stylesheet for 
+			// var styleURL = '<link rel="stylesheet" href="' + app.options.servers.portal + 'css/' + mobilestyle + '">';
+			// styletag.innerHTML = styleURL;
 			
-		}
+		// }
 	},
 
 	// debug mode

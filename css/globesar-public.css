@@ -17,6 +17,9 @@
     	left: 0;
     	background: rgba(0,0,0,0.75);
     	z-index: 999999999;
+    	opacity: 0;
+	transition: opacity 500ms ease;
+	-webkit-transition: opacity 500ms ease;
 	}
 
 /* The container */
@@ -28,9 +31,10 @@
 	width: 606px;
 	height: 250px;
 	text-align: center;
+	opacity: 0;
 	z-index: 9999999999;
-	transition: width 500ms ease, height 500ms ease, top 500ms ease;
-	-webkit-transition: width 500ms ease, height 500ms ease, top 500ms ease;
+	transition: width 500ms ease, height 500ms ease, top 500ms ease, opacity 500ms ease;
+	-webkit-transition: width 500ms ease, height 500ms ease, top 500ms ease, opacity 500ms ease;
 	top: 230px;
 	}
 

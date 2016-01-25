@@ -1,0 +1,6 @@
+/* Tablet style */
+
+#app {
+	min-width: 0px !important;
+	overflow: hidden !important;
+	}

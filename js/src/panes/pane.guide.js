@@ -43,7 +43,7 @@ Wu.Guide = Wu.Evented.extend({
 	
 		// Welcome text
 		var welcomeTextHeader = '<h3><b>Velkommen til Globesar!</b></h3>';
-		var welcomeTextBody = 'Vi har prøvd å demonstrere satellitt InSAR deformasjonsmålinger så selvforklarende som mulig, og vår webtjeneste har en del funksjonalitet slik<br>at du få mer ut av målingene.<br><br><b>Ønsker du en kort demo?</b>';
+		var welcomeTextBody = 'Vi har prøvd å demonstrere satellitt InSAR deformasjonsmålinger så selvforklarende som mulig, og vår webtjeneste har en del funksjonalitet slik at du få mer ut av målingene.<br><br><b>Ønsker du en kort demo?</b>';
 
 		this._welcomeText = welcomeTextHeader + welcomeTextBody;
 		
@@ -54,7 +54,7 @@ Wu.Guide = Wu.Evented.extend({
 		this._multiText = 'Tegneverktøyet muliggjør at du kan studere gjennomsnittsverdiene for flere punkt.<br>Husk at du lukker polygonen ved å klikke der du startet å tegne.';
 
 		this._contactText = '(+47) 40601994 – <a href="mailto:info@globesar.com">info@globesar.com</a> – <a href="http://www.globesar.com">www.globesar.com</a>';
-		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten akepterer&nbsp;';
+		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten akepterer du&nbsp;';
 		this._diclaimerButtonText = 'disse vilkårene';
 
 		// Buttons text
@@ -78,7 +78,8 @@ Wu.Guide = Wu.Evented.extend({
 		this._bg = Wu.DomUtil.create('div', 'guide-fullscreen-block', app._appPane);
 
 		// The container
-		this._container = Wu.DomUtil.create('div', 'guide-container', app._appPane);
+		this._outerContainer = Wu.DomUtil.create('div', 'guide-outer-container', app._appPane);
+		this._container = Wu.DomUtil.create('div', 'guide-container', this._outerContainer);
 
 		// Welcome container
 		this._welcomeOuterContainer = Wu.DomUtil.create('div', 'tour-welcome-outer-container', this._container);
@@ -93,7 +94,7 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Welcome disclaimer
 		this._disclaimerContainer = Wu.DomUtil.create('div', 'tour-welcome-disclaimer', this._welcomeOuterContainer);
-		this._disclaimerTextArea = Wu.DomUtil.create('div', 'tour-welcome-disclaimerText', this._disclaimerContainer, this._diclaimerText);
+		this._disclaimerTextArea = Wu.DomUtil.create('span', 'tour-welcome-disclaimerText', this._disclaimerContainer, this._diclaimerText);
 		this._termsButton = Wu.DomUtil.create('a', 'tour-welcome-disclaimer-terms', this._disclaimerContainer, this._diclaimerButtonText);
 		this._termsButton.href = '#';		
 
@@ -103,6 +104,11 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Centralize this._container
 		this._centralize(this._container, 370);
+
+		setTimeout(function (argument) {
+			this._bg.style.opacity = 1;
+			this._container.style.opacity = 1;	
+		}.bind(this))
 
 	},
 
@@ -348,17 +354,17 @@ Wu.Guide = Wu.Evented.extend({
 
 
 	addEvents : function () {
-
 		Wu.DomEvent.on(this._welcomeButtonStart, 'click', this.abort, this);
 		Wu.DomEvent.on(this._welcomeButtonTour, 'click', this._initTour, this);
-
 		Wu.DomEvent.on(this._termsButton, 'click', this._initTerms, this);
 	},
 
 	removeEvents : function () {
 	},
 
-	abort : function () {
+	abort : function (e) {
+
+		e && Wu.DomEvent.stop(e);
 
 		this._container.remove();
 		this._container = null;

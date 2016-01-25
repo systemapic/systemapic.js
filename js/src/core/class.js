@@ -971,6 +971,31 @@ Wu.Util = {
 	},
 	
 
+	isMobile : function  () {
+		
+		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			var isMobile = {};
+			isMobile.userAgent = navigator.userAgent;
+			// OBS! Perhaps this loads too early... it often gives the wrong number, for some reason...
+			// isMobile.width = window.innerWidth ||
+			// 		 document.documentElement.clientWidth ||
+			// 		 document.body.clientWidth ||
+			// 		 document.body.offsetWidth;
+			isMobile.width = screen.width;
+			isMobile.height = screen.height;
+			var ismobile = (/iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(navigator.userAgent.toLowerCase()));
+			var istablet = (/ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(navigator.userAgent.toLowerCase()));
+			isMobile.tablet = istablet;
+			isMobile.mobile = ismobile;
+		} else {
+			var isMobile = false;
+		}
+
+		return isMobile;
+
+	}
+
+
 	
 };
 
@@ -1049,6 +1074,7 @@ Wu.Evented = Wu.Class.extend({
 			types = Wu.Util.splitWords(types);
 
 			for (var i = 0, len = types.length; i < len; i++) {
+				
 				this._on(types[i], fn, context);
 			}
 		}
@@ -1474,7 +1500,7 @@ Wu.DomUtil = {
 				imgContainer.style.top = - Math.floor(hProp)/2 + 'px';				
 			}
 		}
-	},	
+	},
 
 
 
@@ -1488,7 +1514,9 @@ Wu.DomEvent = {
 
     on: function (obj, types, fn, context) {
 
+
 	if (typeof types === 'object') {
+		
 	    for (var type in types) {
 		this._on(obj, type, types[type], fn);
 	    }
@@ -1496,7 +1524,30 @@ Wu.DomEvent = {
 	    types = Wu.Util.splitWords(types);
 
 	    for (var i = 0, len = types.length; i < len; i++) {
-		this._on(obj, types[i], fn, context);
+
+	    	// OBS!!!
+
+	    	// From Jørgen: I've changed this code, so that there is an automatic fallback to 
+	    	// touchstart for click events. I've done this so that we don't have to change the
+	    	// whole code for touch devices, but perhaps it needs to be written elsewhere?
+
+	    	// Check with Knut Ole :)
+
+	    	// This is the original one...
+		// this._on(obj, types[i], fn, context);
+
+	    	// This is a fallback for mobile/touch devices...
+	    	if ( isMobile && types[i] == 'click') { //  || types[i] == 'mousedown' 
+	    		var type = 'touchstart';
+	    	} else {
+	    		var type = types[i];
+	    	}
+
+	    	this._on(obj, type, fn, context);
+
+	    
+	
+
 	    }
 	}
 

@@ -164,6 +164,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			var minWidth = 200;			
 		}
 
+
+
 		// create popup
 		var popup = this._popup = Wu.popup({
 			offset : [18, 0],			
@@ -174,6 +176,35 @@ Wu.Control.Chart = Wu.Control.extend({
 			maxHeight : 350,
 			appendTo : app._appPane // where to put popup
 		});
+
+
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('isMobile.mobile', isMobile.mobile);
+		console.log('');
+		console.log('');
+		console.log('');
+		
+		if ( isMobile.mobile ) {
+
+			var _mobileWidth = window.innerWidth ||
+				document.documentElement.clientWidth ||
+				document.body.clientWidth ||
+				document.body.offsetWidth;			
+
+			popup._container.style.maxWidth = _mobileWidth - 13 + 'px';
+		}
+
+		
+
+		
+		// alert(popup._container.style.maxWidth);
+		// alert('window.innerWidth' + window.innerWidth);
+		// alert('document.documentElement.clientWidth' + document.documentElement.clientWidth);
+		// alert('document.body.clientWidth' + document.body.clientWidth);
+		// alert('document.body.offsetWidth' + document.body.offsetWidth);
+		// alert('isMobile.width' + isMobile.width);
 
 
 
@@ -667,6 +698,22 @@ Wu.Control.Chart = Wu.Control.extend({
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
 
 
+		// var _width = isMobile ? isMobile.width - 138 : 430;
+
+
+		if ( isMobile.mobile ) {
+
+			var _mobileWidth = window.innerWidth ||
+				document.documentElement.clientWidth ||
+				document.body.clientWidth ||
+				document.body.offsetWidth;			
+
+			var _width = _mobileWidth - 33;
+		} else {
+			var _width = 430;
+		}	
+
+
 		// CHART SETTINGS
 		var chart = this._chart = c3.generate({
 		        
@@ -676,7 +723,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		        
 			size: {
 				height: 200,
-				width: 430
+				// width: 430
+				width : _width
 			},
 
 			point : {
