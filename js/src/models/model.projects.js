@@ -468,9 +468,9 @@ Wu.Project = Wu.Class.extend({
 		// todo: remove on server, ie. remove layers from project...
 		// remove from server
 		var json = {
-		    projectUuid : this.getUuid(),
-		    layerUuids : lids
-		}
+			project_id : this.getUuid(),
+			layer_id : lids
+		};
 		var string = JSON.stringify(json);
 		Wu.save('/api/layers/delete', string); 
 
@@ -479,9 +479,9 @@ Wu.Project = Wu.Class.extend({
 	deleteLayer : function (layer) {
 
 		var options = {
-			layerUuid : layer.getUuid(),
-			projectUuid : this.getUuid()
-		}
+			layer_id : layer.getUuid(),
+			project_id : this.getUuid()
+		};
 
 		Wu.post('/api/layers/delete', JSON.stringify(options), function (err, response) {
 			if (err) return console.error('layer delete err:', err);
