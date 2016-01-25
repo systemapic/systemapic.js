@@ -1,5 +1,11 @@
 Wu.Pane.Login = Wu.Pane.extend({
 
+	_description : 'Please log in',
+	
+	setDescription : function (text) {
+		this._description = text;
+	},
+
 	open : function () {
 
 		// frames
@@ -9,6 +15,9 @@ Wu.Pane.Login = Wu.Pane.extend({
 
 		// logo
 		var logo = Wu.DomUtil.create('div', 'login-popup-logo', this._login_box);
+
+		// description
+		this._descriptionDiv = Wu.DomUtil.create('div', 'login-description', this._login_box, this._description);
 
 		// email input
 		this._email_input = this._createInput({

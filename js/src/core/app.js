@@ -317,9 +317,6 @@ Wu.App = Wu.Class.extend({
 		var project = app._projectExists(app.hotlink);
 		if (project) return app._setProject(project);
 
-
-
-
 		// request project from server
 		app.api.getProject({
 			username : app.hotlink.username,
@@ -328,31 +325,27 @@ Wu.App = Wu.Class.extend({
 
 			console.log('api.getProject', err, project_store);
 
-			if (err) return console.error('not a publci project');
+			if (err) return app._login();
 
 			var project_store = Wu.parse(project_json);
 
 			// import project
 			app._importProject(project_store, function (err, project) {
-				console.log('CREATED PROJECT', project, project.getUuid(), project.getName());
+				console.log('Imported project', project, project.getUuid(), project.getName());
 				app._setProject(project);
 			});
 
 
 		});
 
-
-
-		// check if project slug exists, and if belongs to client slug
-		// var project = app._projectExists(app.hotlink.project, app.hotlink.client);
-
-		// return if not found
-		// if (!project) return false;
-
-		// set project
-		// app._setProject(project);
-
 		return true;
+	},
+
+	_login : function () {
+		// open login
+		var login = new Wu.Pane.Login();
+		login.setDescription('Please log in to view this private project.');
+		login.open();
 	},
 
 	_importProject : function (project_store, done) {
