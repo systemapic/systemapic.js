@@ -238,9 +238,8 @@ Wu.App = Wu.Class.extend({
 		// add account tab
 		app.AccountPane = new Wu.Pane.Account();
 
+		// load public stylesheet
 		if (app.Account.isPublic()) {
-			// load public stylesheet
-			console.log('isPublic!');
 			app.Controller.loadjscssfile('/css/public-stylesheet.css', 'css');
 		}
 	},
@@ -302,7 +301,6 @@ Wu.App = Wu.Class.extend({
 
 		// init hash
 		if (hash) {
-			console.log('got hash!', hash, project);
 			app._initHash(hash, project);
 		}
 		return true;
@@ -331,7 +329,6 @@ Wu.App = Wu.Class.extend({
 
 			// import project
 			app._importProject(project_store, function (err, project) {
-				console.log('Imported project', project, project.getUuid(), project.getName());
 				app._setProject(project);
 			});
 		});
@@ -350,17 +347,15 @@ Wu.App = Wu.Class.extend({
 
 		// already exists
 		if (app.Projects[project_store.uuid]) {
-			console.log('already exitst');
 			return; 
 		}
 
-		console.log('project not imported yet, importing!');
+		// create project model
 		var project = new Wu.Project(project_store);
 		app.Projects[project.getUuid()] = project;
-
 		app.Chrome.Projects._addProject(project);
 
-
+		// return
 		done(null, project);
 	},
 
@@ -412,8 +407,6 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_setProject : function (project) {
-
-		console.log('project.getUuid()', project.getUuid());
 
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {

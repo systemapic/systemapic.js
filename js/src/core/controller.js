@@ -14,11 +14,12 @@ Wu.Controller = Wu.Class.extend({
 	},
 
 	_appReady : function () {
-		console.log('appReady controller');
+
+		var domain = app.options.servers.portal;
 
 		// globesar guide
-		if (app.options.servers.portal.indexOf('https://maps.globesar.com/') >= 0) {
-			
+		if (_.contains(domain, 'globesar')) {
+
 			// run globesar 
 			this._initGlobesar();
 		}

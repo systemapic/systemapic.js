@@ -1161,11 +1161,6 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 
 	type : 'norkartLayer',
 
-	// ATTRIBUTION // TODO!
-	// -----------
-	// add attribution to layer.options (ie. leaflet layer)
-	// change attribution on mapmove, use _getCopyrightText
-
 	options : {
 		// norkart options
 		log_url : 'https://www.webatlas.no/weblog/Log2.aspx?',
