@@ -68,9 +68,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		this._projectsWrapper = Wu.DomUtil.create('div', 'chrome-left-project-wrapper', projectsContainer);
 
 		// iterate projects, create item
-		_.each(projects, function (project) {
+		_.each(projects, this._addProject, this);
+		// _.each(projects, function (project) {
 
-			this._addProject(project);
+		// 	this._addProject(project);
 
 			// var project = app.Projects[project.getUuid()];
 
@@ -134,19 +135,19 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// 	trigger : trigger
 			// }
 
-		}, this);
+		// }, this);
 	},
 
 
 	_addProject : function (project) {
 
-		console.log('ADDDDD _addProject', project);
+		console.log('ADDDDD _addProject', project, this);
 
 		// ensure right project
 		var project = app.Projects[project.getUuid()];
 
 		// Create line with project
-		var wrapper = Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', this._projectWrapper);
+		var wrapper = Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', this._projectsWrapper);
 		var title = Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
 
 		// add edit button if project is editable
