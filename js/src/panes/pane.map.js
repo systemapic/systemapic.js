@@ -159,8 +159,8 @@ Wu.MapPane = Wu.Pane.extend({
 		this._attributionControl = L.control.attribution({position : 'bottomleft', prefix : false});
 		map.addControl(this._attributionControl);
 
-		// this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
-		this._attributionControl.addAttribution('<a class="systemapic-attribution-logo" href="https://systemapic.com" target="_blank"><img src="../images/systemapic-attribution-logo-white.png"></a>');
+		this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
+		// this._attributionControl.addAttribution('<a class="systemapic-attribution-logo" href="https://systemapic.com" target="_blank"><img src="../images/systemapic-attribution-logo-white.png"></a>');
 		this._attributionControl.removeAttribution('Leaflet');
 
 		// slack event on attribution

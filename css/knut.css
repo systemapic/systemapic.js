@@ -1572,3 +1572,18 @@ input.target-input.polygon {
 .tour-buttons-container {
 	text-align: center;
 }
+.leaflet-control-attribution {
+	color: 
+}
+.leaflet-container .leaflet-control-attribution a {
+    color: rgba(252, 252, 252, 0.72);
+}
+.leaflet-control-attribution:hover {
+	color: rgba(252, 252, 252, 0.72);
+}
+.leaflet-control-attribution.leaflet-control {
+    color: rgba(252, 252, 252, 0.72);
+}
+
+
+

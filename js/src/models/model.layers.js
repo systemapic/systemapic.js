@@ -13,7 +13,6 @@ Wu.Model.Layer = Wu.Model.extend({
 		
 		// data not loaded
 		this.loaded = false;
-
 	},
 
 	addHooks : function () {
@@ -31,6 +30,9 @@ Wu.Model.Layer = Wu.Model.extend({
 		Wu.DomEvent[on](this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
 	},
+
+	// dummy
+	_mapMove : function () {},
 	
 	_unload : function (e) {
 		// delete 
@@ -224,8 +226,6 @@ Wu.Model.Layer = Wu.Model.extend({
 		return app.MapPane.getZIndexControls();
 	},
 
-
-	// xoxoxox
 	remove : function (map) {
 		var map = map || app._map;
 
@@ -604,7 +604,11 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 	isPostgis : function () {
 		return this.isPostGIS();
-	}
+	},
+
+	getAttributionControl : function () {
+		return app.MapPane._attributionControl;
+	},
 	
 
 });
@@ -934,7 +938,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 
 	},
 
-
 	initLayer : function () {
 		this.update();
 	},
@@ -949,7 +952,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		this._prepareRaster();
 
 	},
-
 
 	_prepareRaster : function () {
 
@@ -973,7 +975,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 			tms : true
 		});
 	},
-
 
 	_getLayerUuid : function () {
 		return this.store.data.raster;
@@ -1053,9 +1054,26 @@ Wu.MapboxLayer = Wu.Model.Layer.extend({
 		});
 
 		// add hooks
-		this.addHooks();
+		this._addEvents();
 		this.loaded = true;
 		this._inited = true;
+	},
+
+	setAttribution : function () {
+		var att = this.getAttribution();
+		var attributionControl = this.getAttributionControl();
+		attributionControl.clear();
+		attributionControl.addAttribution(att);
+	},
+
+	getAttribution : function () {
+		var att = app.options.attribution ? app.options.attribution + ', ' : '';
+		att += '<a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">&copy; OpenStreetMap</a>';
+		return att;
+	},
+
+	_addEvents : function () {
+		Wu.DomEvent.on(this.layer, 'loading', this.setAttribution, this);
 	},
 });
 
@@ -1077,6 +1095,24 @@ Wu.GoogleLayer = Wu.Model.Layer.extend({
 		
 		// data not loaded
 		this.loaded = false;
+		
+	},
+
+	_addEvents : function () {
+		Wu.DomEvent.on(this.layer, 'loading', this.setAttribution, this);
+	},
+
+	getAttribution : function () {
+		var att = app.options.attribution ? app.options.attribution + ', ' : '';
+		att += ' Map data © 2015 <a href="https://maps.google.com/" target="_blank">Google</a>';
+		return att;
+	},
+
+	setAttribution : function () {
+		var att = this.getAttribution();
+		var attributionControl = this.getAttributionControl();
+		attributionControl.clear();
+		attributionControl.addAttribution(att);
 	},
 
 	initLayer : function () {
@@ -1089,6 +1125,8 @@ Wu.GoogleLayer = Wu.Model.Layer.extend({
 		// prepare raster
 		this._prepareRaster();
 	},
+
+	
 
 	getTileType : function () {
 		return this.store.tileType || 'aerial';
@@ -1113,8 +1151,9 @@ Wu.GoogleLayer = Wu.Model.Layer.extend({
 			minZoom : this.options.minZoom,
 		});
 
-	},
+		this._addEvents();
 
+	},
 });
 
 
@@ -1171,7 +1210,6 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 		var type = this.getTileType();
 		var format = this.options.tileformats[type];
 		var access_token = '?access_token=' + app.tokens.access_token;
-		// var url = 'https://{s}.systemapic.com/proxy/norkart/{type}/{z}/{x}/{y}.{format}' + access_token;
 		var url = app.options.servers.proxy.uri + 'norkart/{type}/{z}/{x}/{y}.{format}' + access_token;
 		var subdomains  = app.options.servers.proxy.subdomains;
 
@@ -1197,7 +1235,22 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 	_addEvents : function () {
 		app._map.on('zoomend', this._clearBackgroundCache.bind(this));
 		app._map.on('moveend', _.throttle(this.logMapRequest.bind(this), 350));
+		app._map.on('moveend', _.throttle(this.setAttribution.bind(this), 350));
+		Wu.DomEvent.on(this.layer, 'loading', this.setAttribution, this);
 		this._eventsAdded = true;
+	},
+
+	getAttribution : function () {
+		var att = app.options.attribution ? app.options.attribution + ', ' : '';
+		att += ' ' + this._getCopyrightText();
+		return att;
+	},
+
+	setAttribution : function () {
+		var att = this.getAttribution();
+		var attributionControl = this.getAttributionControl();
+		attributionControl.clear();
+		attributionControl.addAttribution(att);
 	},
 
 	_clearBackgroundCache : function () {
@@ -1232,36 +1285,40 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 
 	// norkart fn
 	_getCopyrightText: function() {
-		var e = this._map.getCenter(),
-		    t = this._map.getZoom(),
+		var map = this._map || app._map;
+		var e = map.getCenter(),
+		    t = map.getZoom(),
 		    n = [
 		    	"&copy; 2015 Norkart AS/Plan- og bygningsetaten, Oslo Kommune", 
 		    	"&copy; 2015 Norkart AS/Geovekst og kommunene/OpenStreetMap/NASA, Meti", 
 		    	"&copy; 2015 Norkart AS/Geovekst og kommunene/OpenStreetMap/NASA, Meti", 
-		    	"&copy; 2015 Norkart AS/OpenStreetMap/EEA CLC2006"
+		    	"&copy; 2015 Norkart AS/OpenStreetMap/EEA CLC2006",
+		    	"&copy; 2015 Norkart AS"
 		    ];
 		
 		if (t >= 13) {
 			if (t <= 14) {
 				try {
 					if (this.t_containsPoint(e, L.Control.WAAttribution.t_norgeLat, L.Control.WAAttribution.t_norgeLon)) return n[1];
-				} catch (r) {console.log('catch err', r);};
+				} catch (r) {};
 			} else {
 				try {
 					if (this.t_containsPoint(e, L.Control.WAAttribution.t_osloLat, L.Control.WAAttribution.t_osloLon)) return n[0];
-				} catch (r) {console.log('catch err', r);};
+				} catch (r) {};
 			}
 			
 			try {
 				if (this.t_containsPoint(e, L.Control.WAAttribution.t_norgeLat, L.Control.WAAttribution.t_norgeLon)) return n[1];
-			} catch (r) {console.log('catch err', r);};
+			} catch (r) {};
 		
 			return n[3]
 		}
 		
 		try {
 			return this.t_containsPoint(e, L.Control.WAAttribution.t_norgeLat, L.Control.WAAttribution.t_norgeLon) ? n[2] : n[3]
-		} catch (r) {console.log('catch err', r);};
+		} catch (r) {};
+
+		return n[4];
 
         },
 
@@ -1284,11 +1341,9 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 
 });
 
-
+// todo
 Wu.CartodbLayer = Wu.Model.Layer.extend({});
-
 Wu.ErrorLayer = Wu.Model.Layer.extend({})
-
 
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
@@ -1328,8 +1383,6 @@ Wu.createLayer = function (layer) {
 
 
 
-
-
 // update options and redraw
 L.TileLayer.include({
 	setOptions : function (options) {
@@ -1344,6 +1397,3 @@ L.UtfGrid.include({
 		this.redraw();
 	}
 });
-
-
-
