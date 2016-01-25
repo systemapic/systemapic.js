@@ -47,8 +47,7 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		app.initServer();
 
-		// init sniffers
-		app._initSniffers();
+		
 
 	},
 
@@ -143,11 +142,15 @@ Wu.App = Wu.Class.extend({
 		// select project
 		Wu.Mixin.Events.fire('appReady');
 
+		// analytics
+		app.Analytics = new Wu.Analytics();
+
+		// init sniffers
+		app._initSniffers();
+
 		// log entry
 		app._logEntry();
 
-		// analytics
-		app.Analytics = new Wu.Analytics();
 	},
 
 	_logEntry : function () {
@@ -597,42 +600,19 @@ Wu.App = Wu.Class.extend({
 	// todo: move to own script
 	detectMobile : function() {
 		
-		// Detect if it's a mobile
-		if (L.Browser.mobile) {
+		app.isMobile = Wu.Util.isMobile();
 
-			// Set mobile state to true
-			Wu.app.mobile = false;
-			Wu.app.pad = false;
-			
-			// Get screen resolution
-			var w = screen.height;
-			var h = screen.width;
+		if (app.isMobile) {
+			var device = app.isMobile.mobile ? 'mobile' : 'tablet';
 
-			// Store resolution
-			Wu.app.nativeResolution = [w, h];
+			// load stylesheet
+			app.Controller.loadjscssfile('/css/' + device + '.css', 'css');
 
-			if ( w >= h ) var smallest = h;
-			else var smallest = w;
-
-			// Mobile phone
-			if ( smallest < 450 ) {
-
-				Wu.app.mobile = true;
-				var mobilestyle = 'mobilestyle.css'
-			// Tablet
-			} else {
-
-				Wu.app.pad = true;
-				var mobilestyle = 'padstyle.css'
-			}
-
-			// Get the styletag
-			var styletag = document.getElementById('mobilestyle');
-			// Set stylesheet for 
-			var styleURL = '<link rel="stylesheet" href="' + app.options.servers.portal + 'css/' + mobilestyle + '">';
-			styletag.innerHTML = styleURL;
-			
+			// set width of map
+			var width = app.isMobile.width;
+			app._map._container.style.width = width + 'px';
 		}
+
 	},
 
 	debug : function () {

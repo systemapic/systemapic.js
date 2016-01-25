@@ -24,22 +24,24 @@ Wu.Controller = Wu.Class.extend({
 			this._initGlobesar();
 		}
 
+		// alert(app._map._container.offsetWidth);
+
 	},
 
 	_initGlobesar : function () {
 
 		// start guide if public
 		if (app.Account.isPublic()) {
-			this._guide = new Wu.Guide();
-			this._guide.start();
+			setTimeout(function () {
+				this._guide = new Wu.Guide();
+				this._guide.start();
+			}, 500);
 		}
 
 		// remove systeampic logo in corner if public
 		if (app.Account.isPublic()) {
 			app.MapPane._attributionControl.removeAttribution('<a class="systemapic-attribution-logo" href="https://systemapic.com" target="_blank"><img src="../images/systemapic-attribution-logo-white.png"></a>');
 		}
-
-		// 
 
 	},
 	

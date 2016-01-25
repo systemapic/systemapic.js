@@ -1434,3 +1434,32 @@ input.chrome-field-input {
     height: 5px;
     cursor: pointer;
 }
+
+
+
+.leaflet-marker-icon.leaflet-div-icon.leaflet-editing-icon.leaflet-zoom-animated.leaflet-clickable {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 12px !important;
+    background: transparent;
+    border: 3px solid cyan;
+    margin-left: -7px !important;
+    margin-top: -7px !important;
+    box-shadow: 0 0 2px 2px rgba(0,0,0,0.2);
+    }
+
+.leaflet-marker-icon.leaflet-div-icon.leaflet-editing-icon.leaflet-zoom-animated.leaflet-clickable:nth-child(3) {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 18px !important;
+    margin-left: -9px !important;
+    margin-top: -9px !important;
+    border-width: 3px;
+    background: rgba(255,0,0,0.5);    
+}
+
+
+
+#app {
+    min-width: auto !important;
+}

@@ -28,7 +28,7 @@ Wu.Guide = Wu.Evented.extend({
 	
 		// Welcome text
 		var welcomeTextHeader = '<h3><b>Velkommen til Globesar!</b></h3>';
-		var welcomeTextBody = 'Vi har prøvd å demonstrere satellitt InSAR deformasjonsmålinger så selvforklarende som mulig, og vår webtjeneste har en del funksjonalitet slik<br>at du får mer ut av målingene.<br><br><b>Ønsker du en kort demo?</b>';
+		var welcomeTextBody = 'Vi har prøvd å demonstrere satellitt InSAR deformasjonsmålinger så selvforklarende som mulig, og vår webtjeneste har en del funksjonalitet slik at du får mer ut av målingene.<br><br><b>Ønsker du en kort demo?</b>';
 
 		this._welcomeText = welcomeTextHeader + welcomeTextBody;
 		
@@ -39,7 +39,7 @@ Wu.Guide = Wu.Evented.extend({
 		this._multiText = 'Tegneverktøyet muliggjør at du kan studere gjennomsnittsverdiene for flere punkt.<br>Husk å lukke polygonet ved å klikke der du startet å tegne.';
 
 		this._contactText = '(+47) 40601994 – <a target="_blank" href="mailto:info@globesar.com">info@globesar.com</a> – <a href="http://www.globesar.com" target="_blank">www.globesar.com</a>';
-		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten akepterer&nbsp;';
+		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten akepterer du&nbsp;';
 		this._diclaimerButtonText = 'disse vilkårene';
 
 		// Buttons text
@@ -60,7 +60,8 @@ Wu.Guide = Wu.Evented.extend({
 		this._bg = Wu.DomUtil.create('div', 'guide-fullscreen-block', app._appPane);
 
 		// The container
-		this._container = Wu.DomUtil.create('div', 'guide-container', app._appPane);
+		this._outerContainer = Wu.DomUtil.create('div', 'guide-outer-container', app._appPane);
+		this._container = Wu.DomUtil.create('div', 'guide-container', this._outerContainer);
 
 		// Welcome container
 		this._welcomeOuterContainer = Wu.DomUtil.create('div', 'tour-welcome-outer-container', this._container);
@@ -75,7 +76,7 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Welcome disclaimer
 		this._disclaimerContainer = Wu.DomUtil.create('div', 'tour-welcome-disclaimer', this._welcomeOuterContainer);
-		this._disclaimerTextArea = Wu.DomUtil.create('div', 'tour-welcome-disclaimerText', this._disclaimerContainer, this._diclaimerText);
+		this._disclaimerTextArea = Wu.DomUtil.create('span', 'tour-welcome-disclaimerText', this._disclaimerContainer, this._diclaimerText);
 		this._termsButton = Wu.DomUtil.create('a', 'tour-welcome-disclaimer-terms', this._disclaimerContainer, this._diclaimerButtonText);
 		this._termsButton.href = '#';		
 
@@ -84,7 +85,12 @@ Wu.Guide = Wu.Evented.extend({
 		this._contactTextArea = Wu.DomUtil.create('div', 'tour-welcome-contact-text', this._contactContainer, this._contactText)
 
 		// Centralize this._container
-		this._centralize(this._container, 370);
+		this._centralize(this._container, 400);
+
+		setTimeout(function (argument) {
+			this._bg.style.opacity = 1;
+			this._container.style.opacity = 1;	
+		}.bind(this))
 
 	},
 
@@ -102,7 +108,7 @@ Wu.Guide = Wu.Evented.extend({
 		this._termsTextArea = Wu.DomUtil.create('div', 'tour-terms-text-area', this._termsContainer, this._termsText);
 
 		this._termsButtonContainer = Wu.DomUtil.create('div', 'tour-terms-button-container', this._termsContainer);
-		this._termsButtonOK = Wu.DomUtil.create('div', 'terms-ok tour-button', this._termsButtonContainer, this._termsOkayText);
+		this._termsButtonOK = Wu.DomUtil.create('div', 'terms-ok smooth-button', this._termsButtonContainer, this._termsOkayText);
 
 		// Event listnener
 		Wu.DomEvent.on(this._termsButtonOK, 'click', this._closeTerms, this);
@@ -127,7 +133,7 @@ Wu.Guide = Wu.Evented.extend({
 	_closeTerms : function () {
 
 		this._termsContainer.style.opacity = 0;
-		this._centralize(this._container, 370);
+		this._centralize(this._container, 400);
 
 		setTimeout(function() {
 			
@@ -346,7 +352,21 @@ Wu.Guide = Wu.Evented.extend({
 		}
 	},
 
-	close : function () {
+	// abort : function (e) {
+	// 	console.error('remove me!');
+	// 	e && Wu.DomEvent.stop(e);
+
+	// 	this._container.remove();
+	// 	this._container = null;
+
+	// 	this._bg.remove();
+	// 	this._bg = null;
+		
+	// },
+
+	close : function (e) {
+		e && Wu.DomEvent.stop(e);
+
 		if (!this._container) return;
 
 		this.removeEvents();

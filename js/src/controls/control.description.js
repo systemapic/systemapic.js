@@ -48,7 +48,7 @@ L.Control.Description = Wu.Control.extend({
 		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._inner});
 
 		// opacity 
-		var opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._inner, 'Opacity:');
+		this._opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._inner, 'Opacity:');
 		this._opacityContainer = Wu.DomUtil.create('div', 'description-control-opacity-container', this._inner);
 
 		// legend
@@ -67,8 +67,15 @@ L.Control.Description = Wu.Control.extend({
 
 	_addHooks : function () {
 		
-		// collapsers
-		Wu.DomEvent.on(this._toggle, 'click', this.toggle, this);	
+		if ( app.isMobile ) {
+			// Toggle while clicking on the container on toch devices
+			Wu.DomEvent.on(this._container, 'click', this.toggle, this);
+		} else {
+			// collapsers
+			Wu.DomEvent.on(this._toggle, 'click', this.toggle, this);
+		}
+
+
 	
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stop, this);
@@ -185,11 +192,37 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
 
-
 		if ( !this.satelliteAngle.closed ) Wu.DomUtil.removeClass(this.satelliteAngle._innerContainer, 'displayNone');
+
+
+		if ( app.isMobile ) {
+			
+			Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
+			Wu.DomUtil.removeClass(this._opacityTitle, 'displayNone');
+			Wu.DomUtil.removeClass(this._opacityContainer, 'displayNone');
+			this._legendContainer.style.marginTop = '26px';
+
+			var _globesarXtra = document.getElementById('globesar-specific-legend-container');
+			Wu.DomUtil.removeClass(_globesarXtra, 'displayNone');
+
+			console.log('_globesarXtra', _globesarXtra);
+
+			Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-adjusted');
+			Wu.DomUtil.removeClass(this._outer, 'legend-box-adjusted');
+
+
+			Wu.DomUtil.removeClass(this._multipleLegendInner, 'displayNone');
+
+		}
+
+
+
+
 	},
 
 	toggleClose : function () {
+
+		// xoxoxoxoxoxoxoxo
 
 		this.isCollapsed = true;
 
@@ -202,6 +235,26 @@ L.Control.Description = Wu.Control.extend({
 
 
 		Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
+
+
+		if ( app.isMobile ) {
+			
+			Wu.DomUtil.addClass(this._metaContainer, 'displayNone');
+			Wu.DomUtil.addClass(this._opacityTitle, 'displayNone');
+			Wu.DomUtil.addClass(this._opacityContainer, 'displayNone');
+			this._legendContainer.style.marginTop = '0px';
+
+			var _globesarXtra = document.getElementById('globesar-specific-legend-container');
+			Wu.DomUtil.addClass(_globesarXtra, 'displayNone');
+
+
+
+			Wu.DomUtil.addClass(this._toggle, 'legend-toggle-adjusted');
+			Wu.DomUtil.addClass(this._outer, 'legend-box-adjusted');
+
+			Wu.DomUtil.addClass(this._multipleLegendInner, 'displayNone');
+
+		}
 	},
 
 	_addLayer : function (layer) {
@@ -1468,7 +1521,7 @@ L.Control.Description = Wu.Control.extend({
 		_legendHTML += '</div>';
 
 
-		var globesarSpecificByLine  = '<div class="globesar-specific-legend-container">';
+		var globesarSpecificByLine  = '<div id="globesar-specific-legend-container" class="globesar-specific-legend-container">';
 		    globesarSpecificByLine += '<div class="globesar-specific-legend-top">Deformasjon i sikteretning til satellitten</div>';
 		    globesarSpecificByLine += '<div class="globesar-specific-legend-line-container">';
 

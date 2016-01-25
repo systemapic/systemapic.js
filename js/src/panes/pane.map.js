@@ -221,10 +221,14 @@ Wu.MapPane = Wu.Pane.extend({
 	_updateWidth : function (d) {
 		var map = this._map;
 		if (!map || !d) return;
+
 		
 		// set width
-		map._container.style.width = d.width - parseInt(map._container.offsetLeft) + 'px';
+		var w = d.width - parseInt(map._container.offsetLeft) + 'px';
+		map._container.style.width = w;
 		
+		alert('setting map width', w);
+
 		// refresh map size
 		setTimeout(function() {
 			if (map) map.reframe();
