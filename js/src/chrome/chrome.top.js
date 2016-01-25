@@ -25,7 +25,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
 
-
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
 
@@ -34,15 +33,13 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._projectTitle = Wu.DomUtil.create('div', 'chrome-button chrome-project-title', this._buttonWrapper);
 
 		// Client Logo
-		var clientLogo = app.options.logos.clientLogo.image;
-		if (clientLogo) {
+		var clientLogoConfig = app.options.logos.clientLogo;
+		if (clientLogoConfig) {
 			this._clientLogo = Wu.DomUtil.create('div', 'chrome-button chrome-client-logo', this._buttonWrapper);
-			// this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
-			this._clientLogo.style.backgroundImage = clientLogo;
-			this._clientLogo.style.backgroundSize = app.options.logos.clientLogo.size;
-			this._clientLogo.style.backgroundPosition = app.options.logos.clientLogo.position;
-			this._clientLogo.style.backgroundColor = app.options.logos.clientLogo.backgroundColor;
-
+			this._clientLogo.style.backgroundImage = clientLogoConfig.image;
+			this._clientLogo.style.backgroundSize = clientLogoConfig.backgroundSize;
+			this._clientLogo.style.backgroundPosition = clientLogoConfig.backgroundPosition;
+			this._clientLogo.style.backgroundColor = clientLogoConfig.backgroundColor;
 		}
 		
 		// set default

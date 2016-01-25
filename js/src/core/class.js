@@ -1134,7 +1134,7 @@ Wu.getJSON = Wu.Util._getJSON;
 Wu.confirm = Wu.Util.confirm;
 
 
-Wu.Evented = Wu.Class.extend({
+Wu.Events = Wu.Class.extend({
 
 	on: function (types, fn, context) {
 
@@ -1358,7 +1358,7 @@ Wu.Evented = Wu.Class.extend({
 
 });
 
-var proto = Wu.Evented.prototype;
+var proto = Wu.Events.prototype;
 
 // aliases; we should ditch those eventually
 proto.addEventListener = proto.on;

@@ -140,6 +140,9 @@ Wu.App = Wu.Class.extend({
 		// ready
 		app._ready = true; // todo: fire app ready event
 
+		// select project
+		Wu.Mixin.Events.fire('appReady');
+
 		// log entry
 		app._logEntry();
 
@@ -322,9 +325,6 @@ Wu.App = Wu.Class.extend({
 			username : app.hotlink.username,
 			project_slug : app.hotlink.project
 		}, function (err, project_json) {
-
-			console.log('api.getProject', err, project_store);
-
 			if (err) return app._login();
 
 			var project_store = Wu.parse(project_json);
@@ -334,8 +334,6 @@ Wu.App = Wu.Class.extend({
 				console.log('Imported project', project, project.getUuid(), project.getName());
 				app._setProject(project);
 			});
-
-
 		});
 
 		return true;

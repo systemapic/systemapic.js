@@ -1529,3 +1529,46 @@ input.target-input.polygon {
 .smooth-fullscreen-save.invite.cancel {
 	margin-left: 258px;
 }
+
+.login-description {
+	text-align: center;
+}
+
+.smooth-button {
+    margin-top: 10px;
+    border: 1px solid #DCDCDC;
+    width: auto;
+    /*position: absolute;*/
+    position: relative;
+    padding: 5px;
+    font-size: 19px;
+    border-radius: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background: #F9F9F9;
+    color: #616161;
+    font-weight: 500;
+    cursor: pointer;
+    float: left;
+    margin-left: 20px;
+}
+
+.smooth-button:hover {
+	background: #3C4759;
+	color: #FCFCFC;
+}
+
+.smooth-button.relative {
+	position: relative;
+	float: none;
+	display: inline-block;
+	margin-left: 0;
+
+}
+
+.tour-welcome-buttons-container {
+	left: 15px;
+}
+.tour-buttons-container {
+	text-align: center;
+}

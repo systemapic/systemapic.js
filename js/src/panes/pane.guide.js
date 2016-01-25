@@ -2,33 +2,13 @@ Wu.Guide = Wu.Evented.extend({
 
 	_initialize : function () {
 
-		// this._cleanUI(); // do it on public, not guide
-
 	},
-
-	_cleanUI : function (argument) {
-
-		// Hide these
-		// TODO: Remove from DOM on public user.
-		if (app.Chrome.Top._CPUwrapper ) 			Wu.DomUtil.addClass(app.Chrome.Top._CPUwrapper, 'displayNone');
-		if (app.Chrome.Top._menuButton ) 			Wu.DomUtil.addClass(app.Chrome.Top._menuButton, 'displayNone');
-		// if (app.Chrome.Top._buttons.account.div ) 		Wu.DomUtil.addClass(app.Chrome.Top._buttons.account.div, 'displayNone');
-		if (app.Chrome.Top._buttons.data.div ) 			Wu.DomUtil.addClass(app.Chrome.Top._buttons.data.div, 'displayNone');
-		if (app.Chrome.Top._buttons.settings.div ) 		Wu.DomUtil.addClass(app.Chrome.Top._buttons.settings.div, 'displayNone');
-		if (app.Chrome.Top._buttons.settingsSelector.div ) 	Wu.DomUtil.addClass(app.Chrome.Top._buttons.settingsSelector.div, 'displayNone');
-		if (app.Chrome.Top._buttons.share.div ) 		Wu.DomUtil.addClass(app.Chrome.Top._buttons.share.div, 'displayNone');		
-
-		// Move project title to the left...
-		Wu.DomUtil.addClass(app.Chrome.Top._buttonWrapper, 'zero-left');
-
-		// move login box to the left
-		// app.Chrome.Top._buttons.account.options.context._accountDropdown.style.left = 0;
-
+	
+	_onClosePopups : function () {
+		this.close();
 	},
 
 	start : function () {
-
-		console.log('start!');
 
 		// Init texts
 		this.initTexts();
@@ -48,7 +28,7 @@ Wu.Guide = Wu.Evented.extend({
 	
 		// Welcome text
 		var welcomeTextHeader = '<h3><b>Velkommen til Globesar!</b></h3>';
-		var welcomeTextBody = 'Vi har prøvd å demonstrere satellitt InSAR deformasjonsmålinger så selvforklarende som mulig, og vår webtjeneste har en del funksjonalitet slik<br>at du få mer ut av målingene.<br><br><b>Ønsker du en kort demo?</b>';
+		var welcomeTextBody = 'Vi har prøvd å demonstrere satellitt InSAR deformasjonsmålinger så selvforklarende som mulig, og vår webtjeneste har en del funksjonalitet slik<br>at du får mer ut av målingene.<br><br><b>Ønsker du en kort demo?</b>';
 
 		this._welcomeText = welcomeTextHeader + welcomeTextBody;
 		
@@ -56,7 +36,7 @@ Wu.Guide = Wu.Evented.extend({
 		this._layerText = 'Klikk på datasettet for å velge hvilket område du ønsker å studere.<br>Aktive datasett er markert med et grønt punkt.<br>Klikk på forstørrelsesglasset for å raskt komme til dataen på kartet';
 		this._infoText = 'Denne boksen viser kjennetegn for valgt måleserie (datasett)<br>Fargeskalaen viser størrelse på målt bevegelse i tidsperioden.<br>Bevegelse fra satellitten vises som rødt (nedsynking), mens bevegelse mot satellitten vises i blått.';
 		this._graphText = 'Punktene illustrerer hvor vi har måleverdier og fargene illustrerer hastighet.<br>Klikk på et punkt for å studere utviklingen i tid.<br>Klikk "Regression" for å se trenden.';
-		this._multiText = 'Tegneverktøyet muliggjør at du kan studere gjennomsnittsverdiene for flere punkt.<br>Husk at du lukker polygonen ved å klikke der du startet å tegne.';
+		this._multiText = 'Tegneverktøyet muliggjør at du kan studere gjennomsnittsverdiene for flere punkt.<br>Husk å lukke polygonet ved å klikke der du startet å tegne.';
 
 		this._contactText = '(+47) 40601994 – <a target="_blank" href="mailto:info@globesar.com">info@globesar.com</a> – <a href="http://www.globesar.com" target="_blank">www.globesar.com</a>';
 		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten akepterer&nbsp;';
@@ -71,9 +51,6 @@ Wu.Guide = Wu.Evented.extend({
 		// Terms
 		this._termsText = 'Ved å bruke denne tjenesten aksepterer du at...';
 		this._termsOkayText = 'OK! Jeg aksepterer vilkårene.';
-
-
-
 	},
 
 
@@ -93,8 +70,8 @@ Wu.Guide = Wu.Evented.extend({
 		
 		// Welcome buttons
 		this._welcomeButtonsContainer = Wu.DomUtil.create('div', 'tour-welcome-buttons-container', this._welcomeOuterContainer);
-		this._welcomeButtonTour = Wu.DomUtil.create('div', 'tour-button', this._welcomeButtonsContainer, this._tourText);		
-		this._welcomeButtonStart = Wu.DomUtil.create('div', 'tour-button', this._welcomeButtonsContainer, this._directButtonText)		
+		this._welcomeButtonTour = Wu.DomUtil.create('div', 'smooth-button', this._welcomeButtonsContainer, this._tourText);		
+		this._welcomeButtonStart = Wu.DomUtil.create('div', 'smooth-button right', this._welcomeButtonsContainer, this._directButtonText)		
 
 		// Welcome disclaimer
 		this._disclaimerContainer = Wu.DomUtil.create('div', 'tour-welcome-disclaimer', this._welcomeOuterContainer);
@@ -163,9 +140,6 @@ Wu.Guide = Wu.Evented.extend({
 
 		}.bind(this), 250);		
 
-		// this._termsContainer.remove();
-		// this._termsContainer = null;
-
 	},
 
 	// Initialize tour
@@ -218,7 +192,7 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Buttons
 		this._buttonsContainer = Wu.DomUtil.create('div', 'tour-buttons-container', this._tourContainer);
-		this._nextButton = Wu.DomUtil.create('div', 'tour-button', this._buttonsContainer);
+		this._nextButton = Wu.DomUtil.create('div', 'smooth-button relative', this._buttonsContainer);
 
 		// Know which GIF we're showing
 		this.counter = 1;
@@ -234,10 +208,9 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Start the "layer" GIF after one second
 		setTimeout(function () {
-			this._guideImagesForeground.appendChild(
-				this.img_layers
-				); 
-		}.bind(this), 2000);
+			if (!this.img_layers) return;
+			this._guideImagesForeground.appendChild(this.img_layers); 
+		}.bind(this), 1000);
 
 		// Register click event on button
 		Wu.DomEvent.on(this._nextButton, 'click', this.next, this);
@@ -249,7 +222,7 @@ Wu.Guide = Wu.Evented.extend({
 
 		// If we're at the last slide => go to map
 		if ( !this.counter ) {
-			this.abort();
+			this.close();
 			return;		
 		}
 
@@ -353,28 +326,33 @@ Wu.Guide = Wu.Evented.extend({
 
 
 	addEvents : function () {
-
-		Wu.DomEvent.on(this._welcomeButtonStart, 'click', this.abort, this);
+		Wu.DomEvent.on(this._welcomeButtonStart, 'click', this.close, this);
 		Wu.DomEvent.on(this._welcomeButtonTour, 'click', this._initTour, this);
-
 		Wu.DomEvent.on(this._termsButton, 'click', this._initTerms, this);
+		Wu.DomEvent.on(window, 'keydown', this._keyDown, this);
 	},
 
 	removeEvents : function () {
+		Wu.DomEvent.off(this._welcomeButtonStart, 'click', this.close, this);
+		Wu.DomEvent.off(this._welcomeButtonTour, 'click', this._initTour, this);
+		Wu.DomEvent.off(this._termsButton, 'click', this._initTerms, this);
+		Wu.DomEvent.off(window, 'keydown', this._keyDown, this);
 	},
 
-	abort : function () {
-
-		this._container.remove();
-		this._container = null;
-
-		this._bg.remove();
-		this._bg = null;
-		
+	_keyDown : function (e) {
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if(code == 27) { //Enter keycode
+			this.close(e);
+		}
 	},
 
 	close : function () {
-		this.abort();
+		if (!this._container) return;
+
+		this.removeEvents();
+
+		Wu.DomUtil.remove(this._container);
+		Wu.DomUtil.remove(this._bg);
 	},
 
 

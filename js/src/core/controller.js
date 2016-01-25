@@ -8,23 +8,39 @@ Wu.Controller = Wu.Class.extend({
 	_listen : function () {
 
 		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
+		Wu.Mixin.Events.on('appReady', this._appReady, this);
 		
-		// Wu.Mixin.Events.on('projectChanged', _.throttle(this._projectChanged, 1000), this);
-
-		// Wu.Mixin.Events.on('editEnabled',     this._editEnabled, this);
-		// Wu.Mixin.Events.on('editDisabled',    this._editDisabled, this);
-		// Wu.Mixin.Events.on('layerEnabled',    this._layerEnabled, this);
-		// Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
+		
 	},
 
-	// _initialize 		: function () {},
-	// _editEnabled 	: function () {},
-	// _editDisabled 	: function () {},
-	// _layerEnabled 	: function () {},
-	// _layerDisabled 	: function () {},
-	// _updateView 		: function () {},
+	_appReady : function () {
+		console.log('appReady controller');
 
+		// globesar guide
+		if (app.options.servers.portal.indexOf('https://maps.globesar.com/') >= 0) {
+			
+			// run globesar 
+			this._initGlobesar();
+		}
 
+	},
+
+	_initGlobesar : function () {
+
+		// start guide if public
+		if (app.Account.isPublic()) {
+			this._guide = new Wu.Guide();
+			this._guide.start();
+		}
+
+		// remove systeampic logo in corner if public
+		if (app.Account.isPublic()) {
+			app.MapPane._attributionControl.removeAttribution('<a class="systemapic-attribution-logo" href="https://systemapic.com" target="_blank"><img src="../images/systemapic-attribution-logo-white.png"></a>');
+		}
+
+		// 
+
+	},
 	
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
