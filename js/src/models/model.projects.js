@@ -483,7 +483,7 @@ Wu.Project = Wu.Class.extend({
 			project_id : this.getUuid()
 		};
 
-		Wu.post('/api/layers/delete', JSON.stringify(options), function (err, response) {
+		app.api.deleteLayer('/api/layers/delete', JSON.stringify(options), function (err, response) {
 			if (err) return console.error('layer delete err:', err);
 
 			var result = Wu.parse(response);
