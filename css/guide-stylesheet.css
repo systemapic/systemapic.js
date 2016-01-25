@@ -303,10 +303,6 @@
 
 
 
-
-
-
-
 /* Ceralized caption above legend */
 /* ... "Velocity in mm per. year" */
 .info-legend-globesar {
@@ -411,32 +407,3 @@
 	display: inline-block;
 	}
 
-
-
-/* ADJUSTMENTS TO MAKE WHITE BOXES SLIGHTLY TRANSLUCENT */
-/* ADJUSTMENTS TO MAKE WHITE BOXES SLIGHTLY TRANSLUCENT */
-/* ADJUSTMENTS TO MAKE WHITE BOXES SLIGHTLY TRANSLUCENT */
-
-/*
-
-.description-multiple-toggle-wrapper,
-.description-control-content-box,
-#layer-menu-inner-content,
-.leaflet-popup-content-wrapper {
-	background-color: rgba(255,255,255,0.9) !important;
-	}
-
-.layer-menu-item-wrap,
-#c3-header-metacontainer {
-	background-color: transparent !important;
-	}
-
-.c3-zoom-rect {
-	fill: transparent !important;
-	}	
-
-.layer-menu-item-wrap:hover {
-	background-color: white !important;
-	}
-
-*/

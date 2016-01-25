@@ -49,6 +49,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 		Wu.DomEvent.on(this._loginBtn, 'click', this._doLogin, this);
 		Wu.DomEvent.on(this._cancelBtn, 'click', this.close, this);
 		Wu.DomEvent.on(this._password_input, 'keydown', this._checkEnter, this);
+		Wu.DomEvent.on(window, 'keydown', this._keyDown, this);
 	},
 
 	removeEvents : function () {
@@ -58,6 +59,15 @@ Wu.Pane.Login = Wu.Pane.extend({
 		Wu.DomEvent.off(this._loginBtn, 'click', this._doLogin, this);
 		Wu.DomEvent.off(this._cancelBtn, 'click', this.close, this);
 		Wu.DomEvent.off(this._password_input, 'keydown', this._checkEnter, this);
+		Wu.DomEvent.off(window, 'keydown', this._keyDown, this);
+
+	},
+
+	_keyDown : function (e) {
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if(code == 27) { //Enter keycode
+			this.close(e);
+		}
 	},
 
 	_checkEnter : function (e) {

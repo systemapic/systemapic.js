@@ -2,7 +2,7 @@ Wu.Guide = Wu.Evented.extend({
 
 	_initialize : function () {
 
-		this._cleanUI();
+		// this._cleanUI(); // do it on public, not guide
 
 	},
 
@@ -12,7 +12,7 @@ Wu.Guide = Wu.Evented.extend({
 		// TODO: Remove from DOM on public user.
 		if (app.Chrome.Top._CPUwrapper ) 			Wu.DomUtil.addClass(app.Chrome.Top._CPUwrapper, 'displayNone');
 		if (app.Chrome.Top._menuButton ) 			Wu.DomUtil.addClass(app.Chrome.Top._menuButton, 'displayNone');
-		if (app.Chrome.Top._buttons.account.div ) 		Wu.DomUtil.addClass(app.Chrome.Top._buttons.account.div, 'displayNone');
+		// if (app.Chrome.Top._buttons.account.div ) 		Wu.DomUtil.addClass(app.Chrome.Top._buttons.account.div, 'displayNone');
 		if (app.Chrome.Top._buttons.data.div ) 			Wu.DomUtil.addClass(app.Chrome.Top._buttons.data.div, 'displayNone');
 		if (app.Chrome.Top._buttons.settings.div ) 		Wu.DomUtil.addClass(app.Chrome.Top._buttons.settings.div, 'displayNone');
 		if (app.Chrome.Top._buttons.settingsSelector.div ) 	Wu.DomUtil.addClass(app.Chrome.Top._buttons.settingsSelector.div, 'displayNone');
@@ -21,9 +21,14 @@ Wu.Guide = Wu.Evented.extend({
 		// Move project title to the left...
 		Wu.DomUtil.addClass(app.Chrome.Top._buttonWrapper, 'zero-left');
 
+		// move login box to the left
+		// app.Chrome.Top._buttons.account.options.context._accountDropdown.style.left = 0;
+
 	},
 
 	start : function () {
+
+		console.log('start!');
 
 		// Init texts
 		this.initTexts();
@@ -53,7 +58,7 @@ Wu.Guide = Wu.Evented.extend({
 		this._graphText = 'Punktene illustrerer hvor vi har måleverdier og fargene illustrerer hastighet.<br>Klikk på et punkt for å studere utviklingen i tid.<br>Klikk "Regression" for å se trenden.';
 		this._multiText = 'Tegneverktøyet muliggjør at du kan studere gjennomsnittsverdiene for flere punkt.<br>Husk at du lukker polygonen ved å klikke der du startet å tegne.';
 
-		this._contactText = '(+47) 40601994 – <a href="mailto:info@globesar.com">info@globesar.com</a> – <a href="http://www.globesar.com">www.globesar.com</a>';
+		this._contactText = '(+47) 40601994 – <a target="_blank" href="mailto:info@globesar.com">info@globesar.com</a> – <a href="http://www.globesar.com" target="_blank">www.globesar.com</a>';
 		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten akepterer&nbsp;';
 		this._diclaimerButtonText = 'disse vilkårene';
 

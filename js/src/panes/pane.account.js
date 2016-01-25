@@ -12,7 +12,7 @@ Wu.Pane.Account = Wu.Pane.extend({
 		// add a button to top chrome
 		this._accountTab = top._registerButton({
 			name : 'account',
-			className : 'chrome-button share',
+			className : 'chrome-button account',
 			trigger : this._toggleAccountTab,
 			context : this,
 			project_dependent : false
@@ -37,10 +37,16 @@ Wu.Pane.Account = Wu.Pane.extend({
 		// for public account
 		if (app.Account.isPublic()) {
 
+			// temp hack
+			return this.openLogin();
+
 			// create login button if public account
 			// create dropdown
 			this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
 			var account_name = 'Not logged in';
+
+			// temp hack, set to left
+			this._accountDropdown.style.left = 0;
 
 			// items
 			// this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + account_name);

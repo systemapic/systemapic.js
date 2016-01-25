@@ -233,8 +233,13 @@ Wu.App = Wu.Class.extend({
 		app.Share = new Wu.Share();
 
 		// add account tab
-		// app.Account.addAccountTab();
 		app.AccountPane = new Wu.Pane.Account();
+
+		if (app.Account.isPublic()) {
+			// load public stylesheet
+			console.log('isPublic!');
+			app.Controller.loadjscssfile('/css/public-stylesheet.css', 'css');
+		}
 	},
 
 	// init default view on page-load
@@ -244,7 +249,7 @@ Wu.App = Wu.Class.extend({
 		if (app._initInvite()) return;
 
 		// check location
-		if (app._initLocation()) return;
+		// if (app._initLocation()) return;
 			
 		// runs hotlink
 		if (app._initHotlink()) return;
@@ -304,6 +309,8 @@ Wu.App = Wu.Class.extend({
 		
 		// parse error prone content of hotlink..
 		app.hotlink = Wu.parse(window.hotlink);
+
+		console.log('hotlink:', app.hotlink);
 
 		// return if no hotlink
 		if (!app.hotlink) return false;
