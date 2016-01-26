@@ -27,6 +27,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	_initialize : function () {
 
+		// shortcut
+		app.Chrome.Projects = this;
+
 		// init container
 		this._initContainer();
 
@@ -62,74 +65,79 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		});
 
 		// project wrapper
-		var projectWrapper = Wu.DomUtil.create('div', 'chrome-left-project-wrapper', projectsContainer);
+		this._projectsWrapper = Wu.DomUtil.create('div', 'chrome-left-project-wrapper', projectsContainer);
 
 		// iterate projects, create item
-		_.each(projects, function (project) {
+		_.each(projects, this._addProject, this);
+	
+	},
 
-			var project = app.Projects[project.getUuid()];
 
-			// Create line with project
-			var wrapper = Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', projectWrapper);
-			var title = Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
+	_addProject : function (project) {
 
-			// add edit button if project is editable
-			if (project.isEditable()) {
+		// ensure right project
+		var project = app.Projects[project.getUuid()];
 
-				// edit trigger, todo: only if can edit
-				var trigger = Wu.DomUtil.create('div', 'chrome-left-popup-trigger', wrapper);
+		// Create line with project
+		var wrapper = Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', this._projectsWrapper);
+		var title = Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
+
+		// add edit button if project is editable
+		if (project.isEditable()) {
+
+			// edit trigger, todo: only if can edit
+			var trigger = Wu.DomUtil.create('div', 'chrome-left-popup-trigger', wrapper);
+		
+			// edit trigger event
+			Wu.DomEvent.on(trigger, 'click', this._openEditProjectFullscreen.bind(this, project), this);
+
+			// add extra padding
+			Wu.DomUtil.addClass(title, 'extra-padding-right');
+		}
+
+
+		var projectTitle = '';
+
+		// if project is not created by self -> shared with the user
+		if (project.store.createdBy != app.Account.getUuid()) {
 			
-				// edit trigger event
-				Wu.DomEvent.on(trigger, 'click', this._openEditProjectFullscreen.bind(this, project), this);
+			// get user
+			var createdBy = project.store.createdByName;
+			var tooltipText = 'Shared with you by ' + createdBy;
 
-				// add extra padding
-				Wu.DomUtil.addClass(title, 'extra-padding-right');
-			}
+			// set tooltip width
+			var width = tooltipText.length * 7 + 'px';
+
+			// set title + tooltip
+			projectTitle += '<i class="project-icon fa fa-arrow-circle-right"><div class="absolute"><div class="project-tooltip" style="width:' + width + '">' + tooltipText + '</div></div></i>';
+		}
+
+		// add project name
+		projectTitle += project.getName();
+
+		// if public, add globe icon + tooltip
+		if (project.isPublic()) {
+			var tooltipText = 'Public';
+			var tooltipWidth = this.options.publicTooltipWidth + 'px';
+			projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
+		}
+
+		// set title
+		title.innerHTML = projectTitle;
+
+		// select project trigger
+		Wu.DomEvent.on(wrapper, 'click', function () {
+			project.selectProject();
+		}, project);
+
+		
+		// remember
+		this._projects[project.getUuid()] = {
+			wrapper : wrapper,
+			trigger : trigger
+		}
 
 
-			var projectTitle = '';
-
-			// if project is not created by self -> shared with the user
-			if (project.store.createdBy != app.Account.getUuid()) {
-				
-				// get user
-				var createdBy = project.store.createdByName;
-				var tooltipText = 'Shared with you by ' + createdBy;
-
-				// set tooltip width
-				var width = tooltipText.length * 7 + 'px';
-
-				// set title + tooltip
-				projectTitle += '<i class="project-icon fa fa-arrow-circle-right"><div class="absolute"><div class="project-tooltip" style="width:' + width + '">' + tooltipText + '</div></div></i>';
-			}
-
-			// add project name
-			projectTitle += project.getName();
-
-			// if public, add globe icon + tooltip
-			if (project.isPublic()) {
-				var tooltipText = 'Public';
-				var tooltipWidth = this.options.publicTooltipWidth + 'px';
-				projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
-			}
-
-			// set title
-			title.innerHTML = projectTitle;
-
-			// select project trigger
-			// Wu.DomEvent.on(wrapper, 'click', project.selectProject, project);
-			Wu.DomEvent.on(wrapper, 'click', function () {
-				project.selectProject();
-			}, project);
-
-			
-			// remember
-			this._projects[project.getUuid()] = {
-				wrapper : wrapper,
-				trigger : trigger
-			}
-
-		}, this);
 	},
 
 	_refreshContent : function () {

@@ -1,6 +1,15 @@
 Wu.Pane.Login = Wu.Pane.extend({
 
+	_description : 'Please log in',
+	
+	setDescription : function (text) {
+		this._description = text;
+	},
+
 	open : function () {
+
+		// select project
+		Wu.Mixin.Events.fire('closePopups');
 
 		// frames
 		this._loginFullscreen = Wu.DomUtil.create('div', 'fullscreen-background', app._appPane);
@@ -8,7 +17,10 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._login_box = Wu.DomUtil.create('div', 'login-box', this._login_wrapper);
 
 		// logo
-		var logo = Wu.DomUtil.create('div', 'login-popup-logo', this._login_box);
+		this._createLogo();
+
+		// description
+		this._descriptionDiv = Wu.DomUtil.create('div', 'login-description', this._login_box, this._description);
 
 		// email input
 		this._email_input = this._createInput({
@@ -42,6 +54,18 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._email_input.focus();
 	},
 
+	_createLogo : function () {
+
+		var logoConfig = app.options.logos.loginLogo;
+
+		var logo = Wu.DomUtil.create('div', 'login-popup-logo', this._login_box);
+		logo.style.backgroundImage = logoConfig.image;
+		logo.style.height = logoConfig.height;
+		logo.style.width = logoConfig.width;
+		logo.style.backgroundSize = logoConfig.backgroundSize;
+		logo.style.backgroundPosition = logoConfig.backgroundPosition;
+	},
+
 	addEvents : function () {
 		// add events
 		Wu.DomEvent.on(this._loginFullscreen, 'click', this.close, this);
@@ -49,6 +73,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 		Wu.DomEvent.on(this._loginBtn, 'click', this._doLogin, this);
 		Wu.DomEvent.on(this._cancelBtn, 'click', this.close, this);
 		Wu.DomEvent.on(this._password_input, 'keydown', this._checkEnter, this);
+		Wu.DomEvent.on(window, 'keydown', this._keyDown, this);
 	},
 
 	removeEvents : function () {
@@ -58,6 +83,15 @@ Wu.Pane.Login = Wu.Pane.extend({
 		Wu.DomEvent.off(this._loginBtn, 'click', this._doLogin, this);
 		Wu.DomEvent.off(this._cancelBtn, 'click', this.close, this);
 		Wu.DomEvent.off(this._password_input, 'keydown', this._checkEnter, this);
+		Wu.DomEvent.off(window, 'keydown', this._keyDown, this);
+
+	},
+
+	_keyDown : function (e) {
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if(code == 27) { //Enter keycode
+			this.close(e);
+		}
 	},
 
 	_checkEnter : function (e) {
