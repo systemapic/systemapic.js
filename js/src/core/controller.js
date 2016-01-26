@@ -186,6 +186,16 @@ Wu.Controller = Wu.Class.extend({
 
 	},
 
+	openDefaultProject : function () {
+		var defaultProject = app.options.defaults.project.name;
+
+		if (!_.isEmpty(defaultProject)) {
+			return app._initHotlink(Wu.stringify(defaultProject));
+		}
+
+		app.Controller.openLastUpdatedProject();
+	},
+
 	openLastUpdatedProject : function () {
 		var project = _.first(_.sortBy(_.toArray(app.Projects), function (p) {
 			return p.store.lastUpdated;

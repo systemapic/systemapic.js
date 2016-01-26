@@ -54,16 +54,24 @@ Wu.Api = Wu.Class.extend({
 
 	updateFile : function (options, done) {
 		var path = '/api/file/update';
-		this.post(path, options, done)
+		this.post(path, options, done);
   	},
 
+	deleteLayer : function (options, done) {
+		var path = '/api/layers/delete';
+		this.post(path, options, done);
+	},
+
+	addFileToTheProject : function (options, done) {
+		var path = '/api/file/addtoproject';
+		this.post(path, options, done);
+	},
 
   	getProject : function (options, done) {
   		var path = '/api/project/get';
 		this.post(path, options, done)
   	},
-
-
+	
 
 
 

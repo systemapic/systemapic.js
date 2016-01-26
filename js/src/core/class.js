@@ -376,7 +376,7 @@ Wu.Util = {
 				}
 			}
 
-		}
+		};
 
 		// add access_token to request
 		var access_token = app.tokens ? app.tokens.access_token : null;
@@ -414,7 +414,7 @@ Wu.Util = {
 				}
 			}
 
-		}
+		};
 
 		// add access_token to request
 		var access_token = app.tokens ? app.tokens.access_token : null;
