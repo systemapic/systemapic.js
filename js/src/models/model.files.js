@@ -104,15 +104,18 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	_addToProject : function (projectUuid) {
-
 		var options = {
-			projectUuid : projectUuid, 
-			fileUuid : this.getUuid()
-		}
+			project_id : projectUuid,
+			file_id : this.getUuid()
+		};
+		app.api.addFileToTheProject(options, function (err, response) {
+			if (response.error) return app.feedback.setError({
+				title : "Could not add file to the project",
+				description : response.error.message
+			});
 
-		Wu.Util.postcb('/api/file/addtoproject', JSON.stringify(options), function (err, body) {
-
-		});
+			Wu.Mixin.Events.fire('fileHasBeenAdded', { detail : {}});
+		}.bind(this));
 	},
 
 
@@ -157,9 +160,6 @@ Wu.Model.File = Wu.Model.extend({
 		this.save('description');
 	},
 
-
-
-
 	// save field to server
 	save : function (field) {
 
@@ -169,17 +169,25 @@ Wu.Model.File = Wu.Model.extend({
 		json.uuid = this.store.uuid;
 
 		// save to server
-		var string = JSON.stringify(json);
-		this._save(string);
+		this._save(json);
 
 	},
 
 	// save json to server
-	_save : function (string) {
-		// TODO: save only if actual changes! saving too much already
-		Wu.save('/api/file/update', string); // save to server   
+	_save : function (options) {
 
-		app.setSaveStatus();// set status
+		app.api.updateFile(options, function (err, response) {
+			if (response.error) return app.feedback.setError({
+				title : "Could not update file", 
+				description : response.error
+			});
+
+			Wu.Mixin.Events.fire('fileChanged', { detail : {
+				fileUuid : options.uuid
+			}});
+  		}); 
+
+		app.setSaveStatus();
 	},
 
 

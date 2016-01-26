@@ -14,7 +14,7 @@ Wu.User = Wu.Class.extend({
 	},
 
 	_listen : function () {
-		Wu.Mixin.Events.on('closeMenuTabs',   this._onCloseMenuTabs, this);
+		// Wu.Mixin.Events.on('closeMenuTabs',   this._onCloseMenuTabs, this);
 	},
 
 	initFiles : function () {
@@ -28,6 +28,10 @@ Wu.User = Wu.Class.extend({
 		files.forEach(function (file) {
 			this._files[file.uuid] = new Wu.Model.File(file);
 		}, this);
+	},
+
+	isPublic : function () {
+		return this.store.uuid == 'systemapic-public';	
 	},
 
 	isContact : function () {
@@ -329,11 +333,7 @@ Wu.User = Wu.Class.extend({
 
 
 	setRoles : function (roles) {
-		// this._roles = [];
-		// roles.forEach(function (r) {
-		// 	var role = new Wu.Role({role : r});
-		// 	this._roles.push(role);
-		// }, this);
+		console.error('deprectated');
 	},
 
 	getRoles : function () {
@@ -402,119 +402,121 @@ Wu.User = Wu.Class.extend({
 	},
 
 
-	addAccountTab : function () {
+	// addAccountTab : function () {
 
-		// return; // todo later
+	// 	// register button in top chrome
+	// 	var top = app.Chrome.Top;
 
-		// register button in top chrome
-		var top = app.Chrome.Top;
-
-		// add a button to top chrome
-		this._accountTab = top._registerButton({
-			name : 'account',
-			className : 'chrome-button share',
-			trigger : this._toggleAccountTab,
-			context : this,
-			project_dependent : false
+	// 	// add a button to top chrome
+	// 	this._accountTab = top._registerButton({
+	// 		name : 'account',
+	// 		className : 'chrome-button share',
+	// 		trigger : this._toggleAccountTab,
+	// 		context : this,
+	// 		project_dependent : false
 			
-		});
+	// 	});
 
-		// user icon
-		this._accountTab.innerHTML = '<i class="fa fa-user"></i>';
+	// 	// user icon
+	// 	this._accountTab.innerHTML = '<i class="fa fa-user"></i>';
 
-	},
-
-
-	_toggleAccountTab : function () {
+	// },
 
 
-		this._accountTabOpen ? this._closeAccountTab() : this._openAccountTab();
+	// _toggleAccountTab : function () {
 
-	},
 
-	_openAccountTab : function () {
+	// 	this._accountTabOpen ? this._closeAccountTab() : this._openAccountTab();
 
-		// close other tabs
-		Wu.Mixin.Events.fire('closeMenuTabs');
+	// },
+
+
+	// // todo: refactor into new Wu.Pane.Account()
+	// _openAccountTab : function () {
+
+	// 	// close other tabs
+	// 	Wu.Mixin.Events.fire('closeMenuTabs');
+
+	// 	// for public account
+	// 	if (app.Account.isPublic()) {
+
+	// 		// create login button if public account
+	// 		// create dropdown
+	// 		this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
+	// 		var account_name = 'Not logged in';
+
+	// 		// items
+	// 		this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + account_name);
+	// 		this._logoutDiv = Wu.DomUtil.create('div', 'share-item', this._accountDropdown, '<i class="fa fa-sign-in logout-icon"></i>Log in');
+
+	// 		// events
+	// 		Wu.DomEvent.on(this._logoutDiv,  'click', this.openLogin, this);
+
+
+	// 	// normal user account
+	// 	} else {
+
+	// 		// create dropdown
+	// 		this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
+	// 		var account_name = app.Account.getUsername();
+
+	// 		// items
+	// 		this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + account_name);
+	// 		this._logoutDiv = Wu.DomUtil.create('div', 'share-item', this._accountDropdown, '<i class="fa fa-sign-out logout-icon"></i>Log out');
+
+	// 		// events
+	// 		Wu.DomEvent.on(this._logoutDiv,  'click', this.logout, this);
+
+	// 	}
 		
-		// create dropdown
-		this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
+	// 	// mark open
+	// 	this._accountTabOpen = true;
 
-		var account_name = app.Account.getUsername();
+	// 	// mark active
+	// 	Wu.DomUtil.addClass(this._accountTab, 'active');
 
-		// items
-		this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + account_name);
-		this._logoutDiv = Wu.DomUtil.create('div', 'share-item', this._accountDropdown, '<i class="fa fa-sign-out logout-icon"></i>Log out');
+	// },
 
-		// events
-		Wu.DomEvent.on(this._logoutDiv,  'click', this.logout, this);
+	// _closeAccountTab : function () {
+	// 	if (!this._accountTabOpen) return;
 
-		this._accountTabOpen = true;
-	},
+	// 	Wu.DomEvent.off(this._logoutDiv,  'click', this.logout, this);
 
-	_closeAccountTab : function () {
+	// 	Wu.DomUtil.remove(this._accountDropdown);
 
-		if (!this._accountTabOpen) return;
+	// 	this._accountTabOpen = false;
 
-		Wu.DomEvent.off(this._logoutDiv,  'click', this.logout, this);
+	// 	// mark closed
+	// 	Wu.DomUtil.removeClass(this._accountTab, 'active');
+	// },
 
-		Wu.DomUtil.remove(this._accountDropdown);
+	// logout : function () {
+	// 	window.location.href = '/logout';
+	// },
 
-		this._accountTabOpen = false;
-	},
+	// openLogin : function () {
+	// 	// close other tabs
+	// 	Wu.Mixin.Events.fire('closeMenuTabs');
 
-	logout : function () {
-		window.location.href = '/logout';
-	},
+	// 	var login = new Wu.Pane.Login();
 
-	_onCloseMenuTabs : function () {
+	// 	login.open();
+
+	// 	// open login form
+	// 	// app.Controller.openLogin();
+	// },
+
+	// _onCloseMenuTabs : function () {
 		
-		// app.Chrome();
-		this._closeAccountTab();
-	},
+	// 	// app.Chrome();
+	// 	this._closeAccountTab();
+	// },
 
 	isSuper : function () {
 		return this.store.access.account_type == 'super';
 	},
 
-	// _open : function () {
-
-	// 	// close other tabs
-	// 	Wu.Mixin.Events.fire('closeMenuTabs');
-
-	// 	Wu.DomUtil.removeClass(this._shareDropdown, 'displayNone');
-	// 	this._isOpen = true;
-
-	// 	// add fullscreen click-ghost
-	// 	// this._addGhost();
-
-	// 	// mark button active
-	// 	Wu.DomUtil.addClass(this._shareButton, 'active');
-
-	// 	// fill titles
-	// 	this._fillTitles();
-	// },
-
-	// _close : function () {
-	// 	Wu.DomUtil.addClass(this._shareDropdown, 'displayNone');
-	// 	this._isOpen = false;
-
-	// 	// remove links if open
-	// 	if (this._shareLinkWrapper) Wu.DomUtil.remove(this._shareLinkWrapper);
-	// 	if (this._sharePDFInput) Wu.DomUtil.remove(this._sharePDFInput);
-	// 	if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
-		
-	// 	this._shareInviteButton.innerHTML = 'Invite users...';
-	// 	Wu.DomUtil.removeClass(this._shareDropdown, 'wide-share');
-
-	// 	// remove ghost
-	// 	// this._removeGhost();
-
-	// 	// mark button inactive
-	// 	Wu.DomUtil.removeClass(this._shareButton, 'active');
-	// },
-
-
+	
 
 
 

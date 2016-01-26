@@ -1358,8 +1358,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Hides layer button if there are no layers to show
 		app.Chrome.Top._showHideLayerButton();
-
-		// this._setHeight();
 	},
 
 
