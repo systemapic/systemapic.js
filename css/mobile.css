@@ -179,3 +179,10 @@
 .tour-buttons-container {
 	bottom: 30px;
 }	
+
+
+.description-control-content-box,
+.leaflet-popup-content-wrapper,
+.description-multiple-toggle-wrapper {
+    background: white;
+}

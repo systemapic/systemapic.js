@@ -178,6 +178,8 @@
 /* Terms text */
 .tour-terms-text-area {
 	padding-top: 20px;
+	font-size: 12px;
+    	text-align: left;
 	}
 
 /* Terms button container */

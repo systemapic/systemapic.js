@@ -1463,3 +1463,21 @@ input.chrome-field-input {
 #app {
     min-width: auto !important;
 }
+
+.chrome.chrome-container.chrome-top {
+    height: 0;
+}
+
+#c3-header-metacontainer {
+    background-color: transparent;
+}
+
+.c3-zoom-rect {
+    fill: transparent;
+}
+
+.description-control-content-box,
+.leaflet-popup-content-wrapper,
+.description-multiple-toggle-wrapper {
+    background: rgba(255,255,255,0.9);
+}

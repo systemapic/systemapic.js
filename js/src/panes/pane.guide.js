@@ -39,8 +39,8 @@ Wu.Guide = Wu.Evented.extend({
 		this._multiText = 'Tegneverktøyet muliggjør at du kan studere gjennomsnittsverdiene for flere punkt.<br>Husk å lukke polygonet ved å klikke der du startet å tegne.';
 
 		this._contactText = '(+47) 40601994 – <a target="_blank" href="mailto:info@globesar.com">info@globesar.com</a> – <a href="http://www.globesar.com" target="_blank">www.globesar.com</a>';
-		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten akepterer du&nbsp;';
-		this._diclaimerButtonText = 'disse vilkårene';
+		this._diclaimerText = 'Ved å benytte seg av denne webtjenesten aksepterer du&nbsp;';
+		this._diclaimerButtonText = 'disse vilkårene.';
 
 		// Buttons text
 		this._nextButtonText = 'Ok. Neste steg!';
@@ -49,7 +49,7 @@ Wu.Guide = Wu.Evented.extend({
 		this._tourText = 'Ok, vi tar en demo. ';
 
 		// Terms
-		this._termsText = 'Ved å bruke denne tjenesten aksepterer du at...';
+		this._termsText = 'Produkter som er tilgjengeliggjort for uregistrerte brukere på nettstedet https://maps.globesar.com/demo/dams er vist kun for eksperimentelle og demonstrasjonsformål. Produktene fra Globesar AS vises uten noen som helst form for garanti og Globesar AS tar ikke noe ansvar for produktenes egnethet og bruk i et bestemt formål.  <br><br>Produktene skal tolkes av personers med relevant fagkompetanse for det bestemte formålet.  Globesar AS kan ikke på noen som helst måte holdes ansvarlig for tolkning knyttet til produktene, som eksempelvis men ikke begrenset til, geologisk, geoteknisk, geofysisk, strukturell eller annen tolking som er utledet fra produktene. Globesar kan ikke heller holdes ansvarlig for tap eller skade påført av brukeren eller en tredjepart som direkte eller indirekte har utledet, videreforedlet, tolket eller integrert produktene sammen med annen type av informasjon.<br><br>Produktene er ett resultat av en algoritme basert på en statistisk metode. Globesar AS kan derfor ikke garantere at produktene er 100% nøyaktige. Produktene som viser deformasjonsverdier er produsert utfra et relativt fastpunkt. Globesar gir ikke noe som helst garantier at viste deformasjonsverdier er 100% reelle og at de punkter som ikke viser noe bevegelse er ikke en garanti for at dem er stabile. <br><br>Brukeren påtar seg all risiko som følger bruk av produktene. Brukeren skal holde Globesar AS skadesløs fra ethvert krav, eller krav om erstatning fra tredjepart, som følge av offentliggjøringen av produktene. For mer informasjon om Globesar sine produkter og tjenester, se http://www.globesar.com .<br><br>https://maps.globesar.com/demo/dams er basert på grunnlagsdata fra Norkart og brukeren må være innforstått med Norkart’s sine brukervillkår. Globesar AS er ikke på noen som helst måte ansvarlig og gir ikke noen som helst garanti for informasjonen som er tilgjengelig fra Norkart, dets tredjepart og kontinuitet i tjenesten fra Norkart.';
 		this._termsOkayText = 'OK! Jeg aksepterer vilkårene.';
 	},
 
