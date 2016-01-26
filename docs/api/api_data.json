@@ -280,7 +280,7 @@
             "group": "Error 4xx",
             "optional": false,
             "field": "Missing",
-            "description": "<p>required fields. (422)</p>"
+            "description": "<p>required fields. (400)</p>"
           }
         ]
       },
@@ -292,12 +292,12 @@
         },
         {
           "title": "Error-Response:",
-          "content": "Error 422: Missing type parameter or database_name and table_name for postgis type\n{\n   \"error\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\"\n}",
+          "content": "Error 400: Missing type parameter or database_name and table_name for postgis type\n{\n   \"error\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\"\n}",
           "type": "json"
         },
         {
           "title": "Error-Response:",
-          "content": "Error 422: Missing file_id for rater type\n{\n   \"error\": \"request body should contains data.file_id\"\n}",
+          "content": "Error 400: Missing file_id for rater type\n{\n   \"error\": \"request body should contains data.file_id\"\n}",
           "type": "json"
         },
         {
@@ -382,7 +382,7 @@
             "group": "Error 4xx",
             "optional": false,
             "field": "File",
-            "description": "<p>with uuid <code>uuid</code> doesn't exist. (422)</p>"
+            "description": "<p>with uuid <code>uuid</code> doesn't exist. (400)</p>"
           }
         ]
       },
@@ -394,7 +394,7 @@
         },
         {
           "title": "Error-Response:",
-          "content": "Error 422: File doesn't exist\n{\n   \"error\": \"bad file uuid\"\n}",
+          "content": "Error 400: File doesn't exist\n{\n   \"error\": \"bad file uuid\"\n}",
           "type": "json"
         },
         {
@@ -670,7 +670,7 @@
             "group": "Error 4xx",
             "optional": false,
             "field": "Missing",
-            "description": "<p>required fields. (422)</p>"
+            "description": "<p>required fields. (400)</p>"
           }
         ]
       },
@@ -682,7 +682,7 @@
         },
         {
           "title": "Error-Response:",
-          "content": "Error 422: Missing layer parameter or layer with such id doesn't exist\n{\n   \"error\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\"\n}",
+          "content": "Error 400: Missing layer parameter or layer with such id doesn't exist\n{\n   \"error\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\"\n}",
           "type": "json"
         },
         {
