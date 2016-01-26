@@ -1585,5 +1585,11 @@ input.target-input.polygon {
     color: rgba(252, 252, 252, 0.72);
 }
 
-
+.logo-link {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
 

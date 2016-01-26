@@ -1068,8 +1068,7 @@ Wu.MapboxLayer = Wu.Model.Layer.extend({
 
 	getAttribution : function () {
 		var att = app.options.attribution ? app.options.attribution + ' | ' : '';
-		att += '<a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">&copy; OpenStreetMap</a>';
-		att += ' | &copy;<a href="https://systemapic.com" target="_blank">Systemapic</a>';
+		att += '<a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a>';
 		return att;
 	},
 
@@ -1105,8 +1104,7 @@ Wu.GoogleLayer = Wu.Model.Layer.extend({
 
 	getAttribution : function () {
 		var att = app.options.attribution ? app.options.attribution + ' | ' : '';
-		att += ' Map data © 2015 <a href="https://maps.google.com/" target="_blank">Google</a>';
-		att += ' | &copy;<a href="https://systemapic.com" target="_blank">Systemapic</a>';
+		att += '© 2015 <a href="https://maps.google.com/" target="_blank">Google</a>';
 		return att;
 	},
 
@@ -1240,7 +1238,6 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 	getAttribution : function () {
 		var att = app.options.attribution ? app.options.attribution + ' | ' : '';
 		att += ' ' + this._getCopyrightText();
-		att += ' | &copy;<a href="https://systemapic.com" target="_blank">Systemapic</a>';
 		return att;
 	},
 
@@ -1287,11 +1284,16 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 		var e = map.getCenter(),
 		    t = map.getZoom(),
 		    n = [
-		    	"&copy; 2015 Norkart AS/Plan- og bygningsetaten, Oslo Kommune", 
-		    	"&copy; 2015 Norkart AS/Geovekst og kommunene/OpenStreetMap/NASA, Meti", 
-		    	"&copy; 2015 Norkart AS/Geovekst og kommunene/OpenStreetMap/NASA, Meti", 
-		    	"&copy; 2015 Norkart AS/OpenStreetMap/EEA CLC2006",
-		    	"&copy; 2015 Norkart AS"
+		    	// "&copy; 2015 Norkart AS/Plan- og bygningsetaten, Oslo Kommune", 
+		    	// "&copy; 2015 Norkart AS/Geovekst og kommunene/OpenStreetMap/NASA, Meti", 
+		    	// "&copy; 2015 Norkart AS/Geovekst og kommunene/OpenStreetMap/NASA, Meti", 
+		    	// "&copy; 2015 Norkart AS/OpenStreetMap/EEA CLC2006",
+		    	// "&copy; 2015 Norkart AS"
+		    	"©2015 Norkart AS",
+		    	"©2015 Norkart AS",
+		    	"©2015 Norkart AS",
+		    	"©2015 Norkart AS",
+		    	"©2015 Norkart AS"
 		    ];
 		
 		if (t >= 13) {
