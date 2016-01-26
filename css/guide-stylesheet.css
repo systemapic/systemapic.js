@@ -17,6 +17,9 @@
     	left: 0;
     	background: rgba(0,0,0,0.75);
     	z-index: 999999999;
+    	opacity: 0;
+	transition: opacity 500ms ease;
+	-webkit-transition: opacity 500ms ease;
 	}
 
 /* The container */
@@ -28,9 +31,10 @@
 	width: 606px;
 	height: 250px;
 	text-align: center;
+	opacity: 0;
 	z-index: 9999999999;
-	transition: width 500ms ease, height 500ms ease, top 500ms ease;
-	-webkit-transition: width 500ms ease, height 500ms ease, top 500ms ease;
+	transition: width 500ms ease, height 500ms ease, top 500ms ease, opacity 500ms ease;
+	-webkit-transition: width 500ms ease, height 500ms ease, top 500ms ease, opacity 500ms ease;
 	top: 230px;
 	}
 
@@ -112,9 +116,23 @@
 
 /* Welcome buttons container */
 .tour-welcome-buttons-container {
+	/*position: relative;*/
+	/*margin-top: 13px;*/
+	left: 0;
 	position: relative;
 	margin-top: 13px;
+	text-align: center;	
 	}
+
+.tour-welcome-buttons-container .smooth-button {
+	float: none;
+	display: inline-block;
+	text-align: center;
+	margin: auto;
+	margin-bottom: 10px;
+	margin-left: 3px;
+	margin-right: 3px;
+	}	
 
 /* Disclaimer, one liner */
 .tour-welcome-disclaimer {
@@ -140,8 +158,10 @@
     	position: relative;
     	top: 10px;
 	}
-
-
+	
+.tour-welcome-disclaimerText {
+	padding-top: 15px;
+}
 
 
 /* TERMS */
@@ -158,6 +178,8 @@
 /* Terms text */
 .tour-terms-text-area {
 	padding-top: 20px;
+	font-size: 12px;
+    	text-align: left;
 	}
 
 /* Terms button container */
@@ -166,7 +188,16 @@
     	width: 100%;
     	left: 0;
     	bottom: 30px;	
+    	text-align: center;
 	}
+
+.terms-ok.smooth-button {
+	margin: auto;
+	position: relative;
+	display: inline-block;	
+	float: none;
+	}
+
 
 
 
@@ -407,3 +438,7 @@
 	display: inline-block;
 	}
 
+
+.tour-terms-button-container {
+
+}

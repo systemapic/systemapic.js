@@ -8,13 +8,16 @@ Wu.Pane.Login = Wu.Pane.extend({
 
 	open : function () {
 
+		// select project
+		Wu.Mixin.Events.fire('closePopups');
+
 		// frames
 		this._loginFullscreen = Wu.DomUtil.create('div', 'fullscreen-background', app._appPane);
 		this._login_wrapper = Wu.DomUtil.create('div', 'login-wrapper', this._loginFullscreen);
 		this._login_box = Wu.DomUtil.create('div', 'login-box', this._login_wrapper);
 
 		// logo
-		var logo = Wu.DomUtil.create('div', 'login-popup-logo', this._login_box);
+		this._createLogo();
 
 		// description
 		this._descriptionDiv = Wu.DomUtil.create('div', 'login-description', this._login_box, this._description);
@@ -49,6 +52,18 @@ Wu.Pane.Login = Wu.Pane.extend({
 
 		// focus
 		this._email_input.focus();
+	},
+
+	_createLogo : function () {
+
+		var logoConfig = app.options.logos.loginLogo;
+
+		var logo = Wu.DomUtil.create('div', 'login-popup-logo', this._login_box);
+		logo.style.backgroundImage = logoConfig.image;
+		logo.style.height = logoConfig.height;
+		logo.style.width = logoConfig.width;
+		logo.style.backgroundSize = logoConfig.backgroundSize;
+		logo.style.backgroundPosition = logoConfig.backgroundPosition;
 	},
 
 	addEvents : function () {

@@ -47,8 +47,7 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		app.initServer();
 
-		// init sniffers
-		app._initSniffers();
+		
 
 	},
 
@@ -140,11 +139,18 @@ Wu.App = Wu.Class.extend({
 		// ready
 		app._ready = true; // todo: fire app ready event
 
-		// log entry
-		app._logEntry();
+		// select project
+		Wu.Mixin.Events.fire('appReady');
 
 		// analytics
 		app.Analytics = new Wu.Analytics();
+
+		// init sniffers
+		app._initSniffers();
+
+		// log entry
+		app._logEntry();
+
 	},
 
 	_logEntry : function () {
@@ -235,9 +241,8 @@ Wu.App = Wu.Class.extend({
 		// add account tab
 		app.AccountPane = new Wu.Pane.Account();
 
+		// load public stylesheet
 		if (app.Account.isPublic()) {
-			// load public stylesheet
-			console.log('isPublic!');
 			app.Controller.loadjscssfile('/css/public-stylesheet.css', 'css');
 		}
 	},
@@ -299,7 +304,6 @@ Wu.App = Wu.Class.extend({
 
 		// init hash
 		if (hash) {
-			console.log('got hash!', hash, project);
 			app._initHash(hash, project);
 		}
 		return true;
@@ -322,20 +326,14 @@ Wu.App = Wu.Class.extend({
 			username : app.hotlink.username,
 			project_slug : app.hotlink.project
 		}, function (err, project_json) {
-
-			console.log('api.getProject', err, project_store);
-
 			if (err) return app._login();
 
 			var project_store = Wu.parse(project_json);
 
 			// import project
 			app._importProject(project_store, function (err, project) {
-				console.log('Imported project', project, project.getUuid(), project.getName());
 				app._setProject(project);
 			});
-
-
 		});
 
 		return true;
@@ -352,17 +350,15 @@ Wu.App = Wu.Class.extend({
 
 		// already exists
 		if (app.Projects[project_store.uuid]) {
-			console.log('already exitst');
 			return; 
 		}
 
-		console.log('project not imported yet, importing!');
+		// create project model
 		var project = new Wu.Project(project_store);
 		app.Projects[project.getUuid()] = project;
-
 		app.Chrome.Projects._addProject(project);
 
-
+		// return
 		done(null, project);
 	},
 
@@ -414,8 +410,6 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_setProject : function (project) {
-
-		console.log('project.getUuid()', project.getUuid());
 
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {
@@ -606,42 +600,19 @@ Wu.App = Wu.Class.extend({
 	// todo: move to own script
 	detectMobile : function() {
 		
-		// Detect if it's a mobile
-		if (L.Browser.mobile) {
+		app.isMobile = Wu.Util.isMobile();
 
-			// Set mobile state to true
-			Wu.app.mobile = false;
-			Wu.app.pad = false;
-			
-			// Get screen resolution
-			var w = screen.height;
-			var h = screen.width;
+		if (app.isMobile) {
+			var device = app.isMobile.mobile ? 'mobile' : 'tablet';
 
-			// Store resolution
-			Wu.app.nativeResolution = [w, h];
+			// load stylesheet
+			app.Controller.loadjscssfile('/css/' + device + '.css', 'css');
 
-			if ( w >= h ) var smallest = h;
-			else var smallest = w;
-
-			// Mobile phone
-			if ( smallest < 450 ) {
-
-				Wu.app.mobile = true;
-				var mobilestyle = 'mobilestyle.css'
-			// Tablet
-			} else {
-
-				Wu.app.pad = true;
-				var mobilestyle = 'padstyle.css'
-			}
-
-			// Get the styletag
-			var styletag = document.getElementById('mobilestyle');
-			// Set stylesheet for 
-			var styleURL = '<link rel="stylesheet" href="' + app.options.servers.portal + 'css/' + mobilestyle + '">';
-			styletag.innerHTML = styleURL;
-			
+			// set width of map
+			var width = app.isMobile.width;
+			app._map._container.style.width = width + 'px';
 		}
+
 	},
 
 	debug : function () {

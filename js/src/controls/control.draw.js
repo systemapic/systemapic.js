@@ -15,9 +15,9 @@ L.Control.Draw = Wu.Control.extend({
 					message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
 				},
 				shapeOptions: {
-					color: 'blue',
-				}, 
-				smoothFactor : 0.5
+					color: 'cyan'
+				},
+				smoothFactor : 0.5,
 			}
 		},
 	},
