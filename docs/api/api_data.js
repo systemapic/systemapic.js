@@ -68,80 +68,6 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/api/data/delete",
-    "title": "Delete data",
-    "name": "delete_data",
-    "group": "Data",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "file_id",
-            "description": "<p>File id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "access_token",
-            "description": "<p>A valid access token</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "json",
-            "optional": false,
-            "field": "status",
-            "description": "<p>Upload Status JSON</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "{\n \"success\": true\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "routes/routes.js",
-    "groupTitle": "Data",
-    "sampleRequest": [
-      {
-        "url": "https://dev.systemapic.com/api/data/delete"
-      }
-    ],
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "Unauthorized",
-            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
-          "type": "json"
-        }
-      ]
-    }
-  },
-  {
-    "type": "post",
     "url": "/api/import",
     "title": "Import data",
     "name": "import",
@@ -216,6 +142,123 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/file/delete",
+    "title": "Delete data",
+    "name": "delete",
+    "group": "File",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "file_id",
+            "description": "<p>File id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Upload Status JSON</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"success\": true,\n  \"err\": {}\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>file_id does not exist in request body (400)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Not_found",
+            "description": "<p>database_name or table_name does not exist in file.data.postgis or file_id doesn't exist in file.data.raster (404)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Internal_server_error",
+            "description": "<p>Problems with drop table (500)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['file_id']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 404: Not found\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"404\"\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 500: Internal server error\n{\n   \"error\": {\n\t\t\"message\": \"Can't drop table tableName\",\n\t\t\"code\": \"500\"\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 404: Not found\n{\n   \"error\": {\n\t\t\"message\": \"No such file.\",\n\t\t\"code\": \"404\"\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "File",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/file/delete"
+      }
+    ]
+  },
+  {
+    "type": "post",
     "url": "/api/file/getLayers",
     "title": "Get layers",
     "name": "getLayers",
@@ -262,7 +305,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "[\n  {\n\t  uuid: 'layer uuid',\n\t  title: 'layer title',\n\t  description: 'layer description',\n\t  satellite_position: 'layer satellite_position',\n\t  copyright: 'layer copyright',\n\t  legend: 'layer legend',\n\t  maxZoom: 'layer maxZoom',\n\t  minZoom: 'layer minZoom',\n\t  zIndex: 4,\t// number\n\t  bounds: 'layer bounds',\n\t  tms: true,\n\t  attribution: 'layer attribution',\n\t  accessToken: 'layer accessToken',\n\t  opacity: 'layer opacity', \t\n\t  data : {\n\t  \tgeojson: 'geojson',\n\t\ttopojson: 'topojson',\n\t\tcartoid: 'cartoid',\n\t\traster: 'raster',\n\t\trastertile: 'rastertile',\n\t\tvectortile: 'vectortile',\n\t\tmapbox: 'mapbox',\n\t\tcartodb: 'cartodb',\n\t\tosm: 'osm',\n\t\tnorkart: 'norkart',\n\t\tgoogle: 'google',\n\t\tpostgis: {\n\t\t  sql: 'sql',\n\t\t  cartocss: 'cartocss',\n\t\t  cartocss_version: 'cartocss_version',\n\t\t  geom_column: 'geom_column',\n\t\t  file_id: 'file_id',\n\t\t  database_name: 'database_name',\n\t\t  table_name: 'table_name',\n\t\t  data_type: 'data_type',\n\t\t  geom_type: 'geom_type',\n\t\t  raster_band: 5,\n\t\t  layer_id: 'layer_id',\n\t\t  metadata: 'metadata',\n\t\t}\n\t  },\n\t  metadata : 'metadata',\n\t  tooltip: 'tooltip',\n\t  legends: 'legends',\n\t  file: 'file',\n\t  style: 'style',\n\t  filter: 'filter',\n\t  tileType: 'tileType'\n  }\n]",
+          "content": "[\n  {\n\t  uuid: 'layer uuid',\n\t  title: 'layer title',\n\t  description: 'layer description',\n\t  ... etc\n  }\n]",
           "type": "json"
         }
       ]
@@ -364,7 +407,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n  \"updated\": ['name', 'description'],\n  \"file\": {\n      lastUpdated: '2016-01-19T12:49:49.076Z',\n      created: '2016-01-19T12:49:48.943Z',\n      type: 'postgis',\n      status: 'new status',\n      version: 1,\n      category: 'new category',\n      copyright: 'new copyright',\n      description: 'new description',\n      originalName: 'test_file_originalName',\n      name: 'new name',\n      absfolder: 'test_file_absfolder',\n      folder: 'test_file_folder',\n      createdByName: 'test_file_createdByName',\n      createdBy: 'test-user-uuid',\n      family: 'test_file_family',\n      uuid: 'test_file_uuid',\n      __v: 1,\n      access: {\n          users   : ['new user'],\n          projects: ['new project'],\n           clients : ['new clients']\n      },\n      data: {\n          postgis : {\n              database_name : 'new database name',\n              table_name : 'new table name',\n              data_type : 'new data type',\n              original_format : 'new original format',\n              metadata : 'new metadata'\n          }\n      },\n      format: ['new format'],\n      keywords: ['new keywords'],\n      files: ['new files']\n  }\n}",
+          "content": "{\n  \"updated\": ['name', 'description'],\n  \"file\": {\n      lastUpdated: '2016-01-19T12:49:49.076Z',\n      created: '2016-01-19T12:49:48.943Z',\n      ... etc\n  }\n}",
           "type": "json"
         }
       ]
@@ -746,6 +789,88 @@ define({ "api": [
     "sampleRequest": [
       {
         "url": "https://dev.systemapic.com/api/project/create"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/api/project/get",
+    "title": "Get a project",
+    "name": "create",
+    "group": "Project",
+    "description": "<p>Can get project <em>either</em> by <code>project_id</code> OR <code>username, project_slug</code></p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "project_id",
+            "description": "<p>Id project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "username",
+            "description": "<p>Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "project_slug",
+            "description": "<p>Project slug (shortname in url)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "JSON",
+            "optional": false,
+            "field": "Project",
+            "description": "<p>JSON object of the newly created project</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Project",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/project/get"
       }
     ],
     "error": {
