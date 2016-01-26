@@ -43,6 +43,7 @@ Wu.User = Wu.Class.extend({
 		return isContact;
 	},
 
+
 	getContactListUuids : function () {
 		var uuids = [];
 		this.getContactList().forEach(function (c) {

@@ -1,0 +1,18 @@
+.chrome-button.settings {
+	display: none;
+}
+.chrome-button.settingsSelector {
+	display: none;
+}
+.chrome-button.datalib {
+	display: none;
+}
+.chrome-menu-button {
+	display: none;
+}
+.chrome-button.share {
+	display: none;
+}
+.chrome-buttons {
+	left: 0px !important;
+}

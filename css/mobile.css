@@ -1,0 +1,188 @@
+/* Mobile style */
+
+#app {
+	min-width: 0px !important;
+	overflow: hidden !important;
+	}
+
+.chrome-button.datalib,
+.chrome-button.settingsSelector,
+.chrome-button.settings,
+.chrome-button.chrome-client-logo,
+.chrome-button.chrome-project-title,
+.cpu-wrapper,
+.chrome-menu-button,
+.chrome-button.share,
+.leaflet-control-mouseposition.leaflet-control,
+.leaflet-bottom.leaflet-left,
+.leaflet-control-scale.leaflet-control,
+.description-control-opacity-title,
+.description-control-opacity-container,
+.c3-footer-dates,
+.chrome-button.layer.rounded-layer-button .layer-button-text,
+.leaflet-draw.leaflet-control {
+	display: none !important;
+	}
+
+.chrome-button.layer {
+	border-radius: 4px 4px 0px 0px;
+	}
+
+.leaflet-right .leaflet-control {
+	top: 45px;
+	}
+
+.chrome-button.layer.rounded-layer-button,
+.chrome-button.layer.rounded-layer-button:hover,
+.chrome-button.layer.rounded-layer-button:active {
+	width: 44px;
+	border-radius: 4px;
+	text-align: center;
+	padding: 5px 0px 5px 6px;
+	font-size: 21px;
+	background-color: white;
+	color: #3F4652 !important;
+	}
+
+.leaflet-top.leaflet-left {
+	margin-top: 0px;
+    	margin-left: 0px;
+    	left: 0px;
+    	top: -4px;
+    	zoom: 1.2;	
+	}
+
+.description-control-header-toggle {
+	zoom: 1.5;
+	top: 5px;
+	right: 4px;
+	}
+
+.legend-toggle-adjusted {
+    	z-index: 999999;
+    	top: -8px !important;	
+	}
+
+.legend-box-adjusted {
+	border-radius: 4px;
+	}
+
+.leaflet-popup-close-button {
+	zoom: 2;
+	}
+
+.chrome-button.layer {
+	top: 6px;
+	}
+
+#c3-container:before {
+	content: '';
+	}
+
+
+.guide-outer-container {
+	height: 100%;
+	width: 100%;
+	padding: 20px;
+}
+
+
+.guide-container {
+    top: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    /*margin: 20px !important;*/
+    width: auto !important;
+
+    transition: opacity 500ms ease;
+    -webkit-transition: opacity 500ms ease;    
+
+}	
+
+
+.guide-foreground,
+.guide-background,
+.guide-images,
+.guide-images img {
+	width: 100%;
+	height: auto;
+}
+
+.guide-background {
+	position: relative;
+}
+
+
+
+.tour-text-area {
+	padding: 10px;
+	font-size: 13px;
+}
+
+.welcome-text h3 {
+	margin-bottom: 14px;
+}
+
+.tour-welcome-disclaimer {
+    margin-top: 0px;	
+    font-size: 10px;
+}
+
+.tour-button {
+	font-size: 13px;
+}
+
+.tour-welcome-contact {
+    position: absolute;
+    left: 0;
+    bottom: 23px;
+    font-size: 12px;
+    width: 100%;	
+}
+
+.tour-welcome-contact-text {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+
+/* Remove elements on tiny phones (iPhone 4) */
+@media all and (max-height: 500px) {
+    .tour-welcome-contact {
+        display: none;
+    }
+
+}
+
+
+
+
+.layer-button-text:after {
+    content: '[close]';
+    position: absolute;
+    right: 11px;
+    font-size: 12px;
+    top: 12px;
+    opacity: 0.5;
+}
+
+.chrome-button.account {
+	display:  none;
+	}
+
+
+
+.guide-outer-container .smooth-button { 
+	font-size: 14px !important;
+	}
+
+.tour-buttons-container {
+	bottom: 30px;
+}	
+
+
+.description-control-content-box,
+.leaflet-popup-content-wrapper,
+.description-multiple-toggle-wrapper {
+    background: white;
+}

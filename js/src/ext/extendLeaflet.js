@@ -97,3 +97,12 @@ L.Polygon.include({
 
 // prevent minifed bug
 L.Icon.Default.imagePath = '/css/images';
+
+
+L.Control.Attribution.include({
+	clear : function () {
+		this._attributions = {};
+		this._update();
+		return this;
+	},
+})

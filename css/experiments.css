@@ -245,6 +245,16 @@
     opacity: 1;
 }
 
+.chrome-button.account {
+    /*background: #3C4759;*/
+    width: 40px;
+    padding-top: 9px;
+    text-align: center;
+    color: #f8f8f8;
+    font-weight: 700;
+    opacity: 1;
+}
+
 .chrome-menu-button {
     border-right: none;
     position: relative;

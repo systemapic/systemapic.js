@@ -1,4 +1,4 @@
-Wu.version = '1.3.5';
+Wu.version = '1.3.6';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -47,8 +47,7 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		app.initServer();
 
-		// init sniffers
-		app._initSniffers();
+		
 
 	},
 
@@ -140,11 +139,18 @@ Wu.App = Wu.Class.extend({
 		// ready
 		app._ready = true; // todo: fire app ready event
 
-		// log entry
-		app._logEntry();
+		// select project
+		Wu.Mixin.Events.fire('appReady');
 
 		// analytics
 		app.Analytics = new Wu.Analytics();
+
+		// init sniffers
+		app._initSniffers();
+
+		// log entry
+		app._logEntry();
+
 	},
 
 	_logEntry : function () {
@@ -186,8 +192,8 @@ Wu.App = Wu.Class.extend({
 
 		// create project objects
 		app.Projects = {};
-		app.options.json.projects.forEach(function(elem, i, arr) {
-		       app.Projects[elem.uuid] = new Wu.Project(elem);
+		app.options.json.projects.forEach(function(store, i, arr) {
+		       app.Projects[store.uuid] = new Wu.Project(store);
 		});
 	},
 
@@ -233,8 +239,12 @@ Wu.App = Wu.Class.extend({
 		app.Share = new Wu.Share();
 
 		// add account tab
-		// app.Account.addAccountTab();
 		app.AccountPane = new Wu.Pane.Account();
+
+		// load public stylesheet
+		if (app.Account.isPublic()) {
+			app.Controller.loadjscssfile('/css/public-stylesheet.css', 'css');
+		}
 	},
 
 	// init default view on page-load
@@ -244,7 +254,7 @@ Wu.App = Wu.Class.extend({
 		if (app._initInvite()) return;
 
 		// check location
-		if (app._initLocation()) return;
+		// if (app._initLocation()) return;
 			
 		// runs hotlink
 		if (app._initHotlink()) return;
@@ -294,7 +304,6 @@ Wu.App = Wu.Class.extend({
 
 		// init hash
 		if (hash) {
-			console.log('got hash!', hash, project);
 			app._initHash(hash, project);
 		}
 		return true;
@@ -306,23 +315,58 @@ Wu.App = Wu.Class.extend({
 		app.hotlink = Wu.parse(window.hotlink);
 
 		// return if no hotlink
-		if (!app.hotlink) return false;
+		if (_.isEmpty(app.hotlink)) return false;
 
-		// check if project slug exists, and if belongs to client slug
-		var project = app._projectExists(app.hotlink.project, app.hotlink.client);
+		// check if existing first
+		var project = app._projectExists(app.hotlink);
+		if (project) return app._setProject(project);
 
-		// return if not found
-		if (!project) return false;
+		// request project from server
+		app.api.getProject({
+			username : app.hotlink.username,
+			project_slug : app.hotlink.project
+		}, function (err, project_json) {
+			if (err) return app._login();
 
-		// set project
-		app._setProject(project);
+			var project_store = Wu.parse(project_json);
+
+			// import project
+			app._importProject(project_store, function (err, project) {
+				app._setProject(project);
+			});
+		});
 
 		return true;
 	},
 
+	_login : function () {
+		// open login
+		var login = new Wu.Pane.Login();
+		login.setDescription('Please log in to view this private project.');
+		login.open();
+	},
+
+	_importProject : function (project_store, done) {
+
+		// already exists
+		if (app.Projects[project_store.uuid]) {
+			return; 
+		}
+
+		// create project model
+		var project = new Wu.Project(project_store);
+		app.Projects[project.getUuid()] = project;
+		app.Chrome.Projects._addProject(project);
+
+		// return
+		done(null, project);
+	},
+
 
 	// check if project exists (for hotlink)
-	_projectExists : function (project_slug, username) {
+	_projectExists : function (hotlink) {
+		var project_slug = hotlink.project; 
+		var username = hotlink.username;
 
 		// find project slug in Wu.app.Projects
 		var project_slug = project_slug || window.hotlink.project;
@@ -556,42 +600,19 @@ Wu.App = Wu.Class.extend({
 	// todo: move to own script
 	detectMobile : function() {
 		
-		// Detect if it's a mobile
-		if (L.Browser.mobile) {
+		app.isMobile = Wu.Util.isMobile();
 
-			// Set mobile state to true
-			Wu.app.mobile = false;
-			Wu.app.pad = false;
-			
-			// Get screen resolution
-			var w = screen.height;
-			var h = screen.width;
+		if (app.isMobile) {
+			var device = app.isMobile.mobile ? 'mobile' : 'tablet';
 
-			// Store resolution
-			Wu.app.nativeResolution = [w, h];
+			// load stylesheet
+			app.Controller.loadjscssfile('/css/' + device + '.css', 'css');
 
-			if ( w >= h ) var smallest = h;
-			else var smallest = w;
-
-			// Mobile phone
-			if ( smallest < 450 ) {
-
-				Wu.app.mobile = true;
-				var mobilestyle = 'mobilestyle.css'
-			// Tablet
-			} else {
-
-				Wu.app.pad = true;
-				var mobilestyle = 'padstyle.css'
-			}
-
-			// Get the styletag
-			var styletag = document.getElementById('mobilestyle');
-			// Set stylesheet for 
-			var styleURL = '<link rel="stylesheet" href="' + app.options.servers.portal + 'css/' + mobilestyle + '">';
-			styletag.innerHTML = styleURL;
-			
+			// set width of map
+			var width = app.isMobile.width;
+			app._map._container.style.width = width + 'px';
 		}
+
 	},
 
 	debug : function () {
