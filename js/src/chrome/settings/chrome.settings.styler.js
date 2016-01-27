@@ -205,7 +205,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var options = {
 			style : json,
 			columns : this._columns
-		}
+		};
 
 		// get carto from server
 		Wu.post('/api/geo/json2carto', JSON.stringify(options), callback.bind(this), this);

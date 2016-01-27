@@ -378,7 +378,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		var options = {
 			styleJSON : json,
 			columns : this.columns
-		}
+		};
 
 
 		Wu.post('/api/geo/json2carto', JSON.stringify(options), callback.bind(this), this);
@@ -397,9 +397,9 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			css : finalCarto, 
 			sql : sql,
 			layer : this._layer
-		}
+		};
 
-		this._updateLayer(layerOptions);;		
+		this._updateLayer(layerOptions);
 
 	},
 
@@ -434,7 +434,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			file_id: file_id,
 			return_model : true,
 			layerUuid : layer.getUuid()
-		}
+		};
 
 		var that = this;
 
