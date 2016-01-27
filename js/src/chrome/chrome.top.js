@@ -40,6 +40,15 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 			this._clientLogo.style.backgroundSize = clientLogoConfig.backgroundSize;
 			this._clientLogo.style.backgroundPosition = clientLogoConfig.backgroundPosition;
 			this._clientLogo.style.backgroundColor = clientLogoConfig.backgroundColor;
+
+			// add link
+			var logoLink = app.options.logos.portalLink;
+			if (logoLink) {
+				var linkDiv = Wu.DomUtil.create('a', 'logo-link');
+				linkDiv.setAttribute('href', logoLink);
+				linkDiv.setAttribute('target', '_blank');
+				this._clientLogo.appendChild(linkDiv);
+			}
 		}
 		
 		// set default

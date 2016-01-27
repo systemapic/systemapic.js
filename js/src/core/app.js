@@ -251,7 +251,7 @@ Wu.App = Wu.Class.extend({
 	_initView : function () {
 
 		// check invite
-		if (app._initInvite()) return;
+		// if (app._initInvite()) return;
 
 		// check location
 		// if (app._initLocation()) return;
@@ -260,7 +260,7 @@ Wu.App = Wu.Class.extend({
 		if (app._initHotlink()) return;
 
 		// open first project (ordered by lastUpdated)
-		app.Controller.openLastUpdatedProject();
+		app.Controller.openDefaultProject();
 	},
 
 	_initInvite : function () {
@@ -309,10 +309,11 @@ Wu.App = Wu.Class.extend({
 		return true;
 	},
 
-	_initHotlink : function () {
+	_initHotlink : function (hotlink) {
 		
 		// parse error prone content of hotlink..
-		app.hotlink = Wu.parse(window.hotlink);
+		var hotlink = hotlink || window.hotlink;
+		app.hotlink = Wu.parse(hotlink);
 
 		// return if no hotlink
 		if (_.isEmpty(app.hotlink)) return false;

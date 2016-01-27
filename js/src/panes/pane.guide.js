@@ -140,7 +140,8 @@ Wu.Guide = Wu.Evented.extend({
 			this._welcomeOuterContainer.style.opacity = 1;
 			Wu.DomUtil.removeClass(this._welcomeOuterContainer, 'displayNone');
 
-			this._termsContainer.remove();
+			// this._termsContainer.remove();
+			Wu.DomUtil.remove(this._termsContainer);
 			this._termsContainer = null;
 
 
@@ -234,7 +235,10 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Going from "Layers" to "Description/legends"
 		if ( this.counter == 1 ) { 			
-			this.img_layers.remove(); 
+			
+			Wu.DomUtil.remove(this.img_layers);
+			// this.img_layers.remove(); 
+			
 			this.img_layers = null;
 			this._guideImagesForeground.appendChild(this.img_info);
 
@@ -250,7 +254,8 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Going from "Description/legends" to "Graph"
 		if ( this.counter == 2 ) { 
-			this.img_info.remove();
+			// this.img_info.remove();
+			Wu.DomUtil.remove(this.img_info);
 			this.img_info = null;
 			this._guideImagesForeground.appendChild(this.img_graph); 
 
@@ -268,7 +273,8 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Going from "Graph" to "Multi Graph"
 		if ( this.counter == 3 ) {
-			this.img_graph.remove();
+			// this.img_graph.remove();
+			Wu.DomUtil.remove(this.img_graph);
 			this.img_graph = null;
 			this._guideImagesForeground.appendChild(this.img_multi); 
 			this._nextButton.innerHTML = this._finalButtonText;
