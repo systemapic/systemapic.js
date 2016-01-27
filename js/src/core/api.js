@@ -72,7 +72,10 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done)
   	},
 	
-
+  	resetPassword : function (options, done) {
+   		var path = '/reset';
+		this.post(path, options, done) 		
+  	},
 
 
 

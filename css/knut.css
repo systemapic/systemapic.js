@@ -1498,10 +1498,14 @@ input.target-input.polygon {
     border-radius: 5px;
     background: #FCFCFC;
     width: 400px;
-    height: 400px;
+    height: 470px;
     margin: auto;
     padding: 30px;
     padding-top: 20px;
+     -moz-transition: height 0.5s ease;
+    -webkit-transition: height 0.5s ease;
+    -o-transition: height 0.5s ease;
+    transition: height 0.5s ease;
 }
 
 .login-popup-logo {
@@ -1532,6 +1536,8 @@ input.target-input.polygon {
 
 .login-description {
 	text-align: center;
+	font-size: 16px;
+	padding-top: 20px;
 }
 
 .smooth-button {
@@ -1573,7 +1579,6 @@ input.target-input.polygon {
 	text-align: center;
 }
 .leaflet-control-attribution {
-	color: 
 }
 .leaflet-container .leaflet-control-attribution a {
     color: rgba(252, 252, 252, 0.72);
@@ -1592,4 +1597,32 @@ input.target-input.polygon {
 	left: 0px;
 	top: 0px;
 }
+
+.login-error-label {
+	height: 20px;
+	color: #E45252;
+	cursor: default;
+}
+
+.login-buttons-wrapper {
+	position: relative;
+	top: 0px;
+}
+
+.login-forgot-link {
+    position: relative;
+    top: 90px;
+    text-align: center;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
 

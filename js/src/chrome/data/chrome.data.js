@@ -1985,7 +1985,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				if ( isSelected ) option.selected = true;
 
 				// Print option text
-				option.innerHTML = layer.getTitle() + ' (' + provider.key + ')';
+				option.innerHTML = layer.getTitle();// + ' (' + provider.key + ')';
 
 
 			}.bind(this))

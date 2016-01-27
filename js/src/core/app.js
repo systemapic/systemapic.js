@@ -47,8 +47,6 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		app.initServer();
 
-		
-
 	},
 
 	_initSniffers : function () {
@@ -279,35 +277,35 @@ Wu.App = Wu.Class.extend({
 		});
 	},
 
-	_initLocation : function () {
-		var path    = window.location.pathname,
-		    username  = path.split('/')[1],
-		    project = path.split('/')[2],
-		    hash    = path.split('/')[3],
-		    search  = window.location.search.split('?'),
-		    params  = Wu.Util.parseUrl();
+	// _initLocation : function () {
+	// 	var path    = window.location.pathname,
+	// 	    username  = path.split('/')[1],
+	// 	    project = path.split('/')[2],
+	// 	    hash    = path.split('/')[3],
+	// 	    search  = window.location.search.split('?'),
+	// 	    params  = Wu.Util.parseUrl();
 
-		// done if no location
-		if (!username || !project) return false;
+	// 	// done if no location
+	// 	if (!username || !project) return false;
 
-		// get project
-		var project = app._projectExists(project, username);
+	// 	// get project
+	// 	var project = app._projectExists(project, username);
 		
-		// return if no such project
-		if (!project) {
-			Wu.Util.setAddressBar(app.options.servers.portal);
-			return false;
-		}
+	// 	// return if no such project
+	// 	if (!project) {
+	// 		Wu.Util.setAddressBar(app.options.servers.portal);
+	// 		return false;
+	// 	}
 
-		// set project
-		app._setProject(project);
+	// 	// set project
+	// 	app._setProject(project);
 
-		// init hash
-		if (hash) {
-			app._initHash(hash, project);
-		}
-		return true;
-	},
+	// 	// init hash
+	// 	if (hash) {
+	// 		app._initHash(hash, project);
+	// 	}
+	// 	return true;
+	// },
 
 	_initHotlink : function (hotlink) {
 		
@@ -315,19 +313,23 @@ Wu.App = Wu.Class.extend({
 		var hotlink = hotlink || window.hotlink;
 		app.hotlink = Wu.parse(hotlink);
 
+		console.log('app.hotlink', app.hotlink);
+
 		// return if no hotlink
 		if (_.isEmpty(app.hotlink)) return false;
 
-		// check if existing first
+		// check if user owns project
 		var project = app._projectExists(app.hotlink);
-		if (project) return app._setProject(project);
-
+		if (project) {
+			app._setProject(project);
+			return true;
+		}
 		// request project from server
 		app.api.getProject({
 			username : app.hotlink.username,
 			project_slug : app.hotlink.project
 		}, function (err, project_json) {
-			if (err) return app._login();
+			if (err) return app._login('Please log in to view this private project.');
 
 			var project_store = Wu.parse(project_json);
 
@@ -340,10 +342,10 @@ Wu.App = Wu.Class.extend({
 		return true;
 	},
 
-	_login : function () {
+	_login : function (msg) {
 		// open login
 		var login = new Wu.Pane.Login();
-		login.setDescription('Please log in to view this private project.');
+		login.setDescription(msg);
 		login.open();
 	},
 
@@ -371,7 +373,7 @@ Wu.App = Wu.Class.extend({
 
 		// find project slug in Wu.app.Projects
 		var project_slug = project_slug || window.hotlink.project;
-		for (p in Wu.app.Projects) {
+		for (var p in Wu.app.Projects) {
 			var project = Wu.app.Projects[p];
 			if (project_slug == project.store.slug) {
 				if (project.store.createdByUsername == username) {
@@ -468,7 +470,6 @@ Wu.App = Wu.Class.extend({
 
 		// set position
 		app.MapPane.setPosition(hash.position);
-
 	},
 
 	// save a hash 
