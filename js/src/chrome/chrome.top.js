@@ -36,7 +36,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var clientLogoConfig = app.options.logos.clientLogo;
 		if (clientLogoConfig) {
 			this._clientLogo = Wu.DomUtil.create('div', 'chrome-button chrome-client-logo', this._buttonWrapper);
-			this._clientLogo.style.backgroundImage = clientLogoConfig.image;
+			this._clientLogo.style.backgroundImage = clientLogoConfig.backgroundImage;
 			this._clientLogo.style.backgroundSize = clientLogoConfig.backgroundSize;
 			this._clientLogo.style.backgroundPosition = clientLogoConfig.backgroundPosition;
 			this._clientLogo.style.backgroundColor = clientLogoConfig.backgroundColor;
