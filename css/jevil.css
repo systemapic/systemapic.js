@@ -1482,3 +1482,14 @@ input.chrome-field-input {
 .description-multiple-toggle-wrapper {
     background: rgba(255,255,255,0.9);
 }
+
+
+.tour-terms-text-area {
+    height: 100%;
+    overflow: scroll;
+    padding: 20px;  
+}
+
+.tour-terms-container {
+    padding-bottom: 90px;
+}
