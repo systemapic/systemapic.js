@@ -158,7 +158,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			appendTo : wrapper,
 			title    : 'Satellite angle',
 			input    : false,		
-		})
+		});
 
 		var angleMiniInput = new Wu.button({
 			id 	    : 'satelliteAngle',
@@ -171,7 +171,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			className   : 'globesar-extras-input',
 			tabindex    : 1,
 			fn 	    : this._saveMiniBlur.bind(this),
-		})
+		});
 
 
 		// PATH
@@ -183,7 +183,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			appendTo : wrapper,
 			title    : 'Satellite path',
 			input    : false,	
-		})
+		});
 
 		var pathMiniInput = new Wu.button({
 			id 	    : 'satellitePath',
@@ -196,7 +196,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			className   : 'globesar-extras-input',
 			tabindex    : 2,
 			fn 	    : this._saveMiniBlur.bind(this),		
-		})
+		});
 
 
 		// Reference point
@@ -208,7 +208,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			appendTo : wrapper,
 			title    : 'Reference point',
 			input    : false,	
-		})
+		});
 
 
 		var range = this.cartoJSON.extras.referencepoint.column;
@@ -268,7 +268,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			this.selectedColumn = false;
 			this.cartoJSON.extras = {
 				referencepoint : false
-			}
+			};
 
 
 			Wu.DomUtil.addClass(_miniInput, 'left-mini-kill');
@@ -308,7 +308,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		if ( !value || value == '' || column == this.options.staticText || column == this.options.staticDivider ) {
 			this.cartoJSON.extras = {
 				referencepoint : false,
-			}
+			};
 
 		// Store value
 		} else {
@@ -378,11 +378,9 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		var options = {
 			styleJSON : json,
 			columns : this.columns
-		}
+		};
 
-
-		Wu.post('/api/geo/json2carto', JSON.stringify(options), callback.bind(this), this);
-
+		app.api.json2carto(JSON.stringify(options), callback.bind(this));
 	},	
 
 
@@ -397,9 +395,9 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			css : finalCarto, 
 			sql : sql,
 			layer : this._layer
-		}
+		};
 
-		this._updateLayer(layerOptions);;		
+		this._updateLayer(layerOptions);
 
 	},
 
@@ -434,7 +432,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			file_id: file_id,
 			return_model : true,
 			layerUuid : layer.getUuid()
-		}
+		};
 
 		var that = this;
 
@@ -460,7 +458,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			done && done();
 		}.bind(this));
 
-	},		
+	}
 });
 
 

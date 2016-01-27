@@ -69,8 +69,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			styler 	: this,
 			meta 	: this._meta,
 			columns : this._columns,
-			container : this._fieldsWrapper,
-		}
+			container : this._fieldsWrapper
+		};
 
 		// create point styler
 		this._pointStyler = new Wu.Styler.Point(options);
@@ -205,10 +205,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var options = {
 			style : json,
 			columns : this._columns
-		}
+		};
 
 		// get carto from server
-		Wu.post('/api/geo/json2carto', JSON.stringify(options), callback.bind(this), this);
-	},
+		app.api.json2carto(JSON.stringify(options), callback.bind(this));
+	}
 
 });

@@ -69,10 +69,18 @@ Wu.Api = Wu.Class.extend({
 
   	getProject : function (options, done) {
   		var path = '/api/project/get';
-		this.post(path, options, done)
+		this.post(path, options, done);
   	},
-	
 
+	reloadMeta : function (options, done) {
+		var path = '/api/layer/reloadmeta';
+		this.post(path, options, done);
+	},
+
+	json2carto : function (options, done) {
+		var path = '/api/geo/json2carto';
+		this.post(path, options, done);
+	},
 
 
 
