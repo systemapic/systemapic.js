@@ -442,14 +442,13 @@ Wu.Model.Layer = Wu.Model.extend({
 	reloadMeta : function (callback) {
 
 		var json = JSON.stringify({
-			fileUuid : this.getFileUuid(),
-			layerUuid : this.getUuid()
+			file_id : this.getFileUuid(),
+			layer_id : this.getUuid()
 		});
 
-		Wu.post('/api/layer/reloadmeta', json, callback || function (ctx, json) {
+		app.api.reloadMeta(json, callback || function (ctx, json) {
 
-		}, this);
-
+		});
 	},
 
 	getTooltip : function () {
