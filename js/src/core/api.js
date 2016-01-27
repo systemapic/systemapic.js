@@ -77,6 +77,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	json2carto : function (options, done) {
+		var path = '/api/geo/json2carto';
+		this.post(path, options, done);
+	},
+
 
 
 
