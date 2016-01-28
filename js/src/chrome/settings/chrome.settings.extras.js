@@ -380,7 +380,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			columns : this.columns
 		};
 
-		app.api.json2carto(JSON.stringify(options), callback.bind(this));
+		app.api.json2carto(options, callback.bind(this));
 	},	
 
 

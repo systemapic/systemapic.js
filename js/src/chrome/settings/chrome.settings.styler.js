@@ -208,7 +208,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		};
 
 		// get carto from server
-		app.api.json2carto(JSON.stringify(options), callback.bind(this));
+		app.api.json2carto(options, callback.bind(this));
 	}
 
 });
