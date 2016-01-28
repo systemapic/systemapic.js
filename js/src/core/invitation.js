@@ -214,7 +214,7 @@ Wu.Invite = Wu.Class.extend({
 		var email = input.value;
 
 		// post to endpoint
-		this._post('/api/user/uniqueEmail', {
+		app.api.uniqueEmail({
 			email : email
 		}, function (err, result) {
 
