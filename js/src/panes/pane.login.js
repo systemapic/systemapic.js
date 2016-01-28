@@ -1,6 +1,6 @@
 Wu.Pane.Login = Wu.Pane.extend({
 
-	_description : 'Please log in',
+	_description : 'Log in',
 	
 	setDescription : function (text) {
 		this._description = text;
@@ -19,14 +19,18 @@ Wu.Pane.Login = Wu.Pane.extend({
 		// logo
 		this._createLogo();
 
+		// login content wrapper
+		this._loginInner = Wu.DomUtil.create('div', 'login-inner', this._login_box);
+		this._forgotInner = Wu.DomUtil.create('div', 'login-forgot-inner', this._login_box);
+
 		// description
-		this._descriptionDiv = Wu.DomUtil.create('div', 'login-description', this._login_box, this._description);
+		this._descriptionDiv = Wu.DomUtil.create('div', 'login-description', this._loginInner, this._description);
 
 		// email input
 		this._email_input = this._createInput({
 			label : 'Email',
 			placeholder : 'name@domain.com',
-			appendTo : this._login_box,
+			appendTo : this._loginInner,
 			type : 'email'
 		});
 
@@ -34,18 +38,24 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._password_input = this._createInput({
 			label : 'Password',
 			placeholder : 'Enter your password',
-			appendTo : this._login_box,
+			appendTo : this._loginInner,
 			type : 'password'
 		});
 
 		// error feedback
-		this._error_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', this._login_box);
+		this._error_feedback = Wu.DomUtil.create('div', 'login-error-label', this._loginInner);
+
+		// buttons wrapper
+		this._buttons = Wu.DomUtil.create('div', 'login-buttons-wrapper', this._loginInner);
 
 		// button
-		this._loginBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', this._login_box, 'Login');
+		this._loginBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', this._buttons, 'Login');
 		
 		// cancel button
-		this._cancelBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite cancel', this._login_box, 'Cancel');
+		this._cancelBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite cancel', this._buttons, 'Cancel');
+
+		// forgot password
+		this._forgotLink = Wu.DomUtil.create('a', 'login-forgot-link', this._buttons, 'Forgot your password?');
 
 		// add events
 		this.addEvents();
@@ -66,6 +76,61 @@ Wu.Pane.Login = Wu.Pane.extend({
 		logo.style.backgroundPosition = logoConfig.backgroundPosition;
 	},
 
+	_openForgotPassword : function () {
+		console.log('_openForgotPassword');
+
+		// hide login
+		Wu.DomUtil.addClass(this._loginInner, 'displayNone');
+
+		// add buttons
+		this._forgotDescriptionDiv = Wu.DomUtil.create('div', 'login-description', this._forgotInner, 'Request password reset');
+
+		// add input
+		this._forgot_input = this._createInput({
+			label : 'Email',
+			placeholder : 'Enter your email',
+			appendTo : this._forgotInner,
+			type : 'email'
+		});
+
+		// buttons wrapper
+		this._forgotButtons = Wu.DomUtil.create('div', 'login-buttons-wrapper', this._forgotInner);
+
+		// button
+		this._resetBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', this._forgotButtons, 'Reset');
+		
+		// cancel button
+		this._forgotCancelBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite cancel', this._forgotButtons, 'Cancel');
+
+		// events
+		Wu.DomEvent.on(this._forgotCancelBtn, 'click', this.close, this);
+		Wu.DomEvent.on(this._resetBtn, 'click', this.requestReset, this);
+
+		// set height
+		this._login_box.style.height = '340px';
+	},
+
+	requestReset : function () {
+		console.log('request reset');
+
+		var email = this._forgot_input.value;
+
+		console.log('email', email);
+
+		app.api.resetPassword({
+			email : email
+		}, function (err, result) {
+			console.log('err, result', err, result);
+
+			this.close();
+
+			app.feedback.setMessage({
+				title : 'Password reset',
+				description : result
+			});
+		}.bind(this));
+	},
+
 	addEvents : function () {
 		// add events
 		Wu.DomEvent.on(this._loginFullscreen, 'click', this.close, this);
@@ -73,6 +138,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 		Wu.DomEvent.on(this._loginBtn, 'click', this._doLogin, this);
 		Wu.DomEvent.on(this._cancelBtn, 'click', this.close, this);
 		Wu.DomEvent.on(this._password_input, 'keydown', this._checkEnter, this);
+		Wu.DomEvent.on(this._forgotLink, 'click', this._openForgotPassword, this);
 		Wu.DomEvent.on(window, 'keydown', this._keyDown, this);
 	},
 
