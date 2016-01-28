@@ -237,19 +237,23 @@ Wu.Invite = Wu.Class.extend({
 		var username = input.value;
 
 		// post to endpoint
-		this._post('/api/user/uniqueUsername', {
+		app.api.uniqueUsername({
 			username : username
 		}, function (err, result) {
+			var result = Wu.parse(result);
 
-			// remember
-			this._uniqueUsername = result.unique;
+			if (result.error) {
+				console.error('something went worng', result);
+			} else {
+				// remember
+				this._uniqueUsername = result.unique;
 
-			// mark submit button disabled/enabled
-			this.checkSubmitBtn();
+				// mark submit button disabled/enabled
+				this.checkSubmitBtn();
 
-			// mark input
-			input.style.backgroundColor = this._uniqueUsername ? 'transparent' : '#FF4545';
-
+				// mark input
+				input.style.backgroundColor = this._uniqueUsername ? 'transparent' : '#FF4545';
+			}
 		}.bind(this));
 	},
 

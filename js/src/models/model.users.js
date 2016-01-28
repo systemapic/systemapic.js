@@ -220,7 +220,7 @@ Wu.User = Wu.Class.extend({
 
 	_save : function (changes) {
 		if (app.activeProject) changes.project = app.activeProject.getUuid(); // for edit_user access, may need project...
-		app.api.updateUser(JSON.stringify(changes), function (err, result) {
+		app.api.updateUser(changes, function (err, result) {
 			if (err) console.error('err', err);
 
 			var result = Wu.parse(result);
