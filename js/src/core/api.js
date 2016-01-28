@@ -83,11 +83,20 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	updateUser: function (options, done) {
+		var path = '/api/user/update';
+		this.post(path, options, done);
+	},
 
+	uniqueEmail: function (options, done) {
+		var path = '/api/user/uniqueEmail';
+		this.post(path, options, done);
+	},
 
-
-
-
+	uniqueUsername: function (options, done) {
+		var path = '/api/user/uniqueUsername';
+		this.post(path, options, done);
+	},
 
 	// helper fn's
 	post : function (path, options, done) {
