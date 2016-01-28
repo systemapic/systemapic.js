@@ -13,13 +13,6 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	verifyAccessToken : function () {
-		var path = '/api/token/check';
-		this.post(path, {}, function (err, body) {
-			if (err == 401) console.error('you been logged out');
-		});
-	},
-
 	getPortal : function (done) {
 		var path = '/api/portal';
 		this.post(path, {}, done);
@@ -40,7 +33,6 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-
 	auth : function (done) {
 		var path = '/api/user/session';
 		this.post(path, {}, done);
@@ -50,7 +42,6 @@ Wu.Api = Wu.Class.extend({
 		var path = '/api/token';
 		this.post(path, options, done);
 	},
-
 
 	updateFile : function (options, done) {
 		var path = '/api/file/update';
@@ -68,7 +59,12 @@ Wu.Api = Wu.Class.extend({
 	},
 
   	getProject : function (options, done) {
-  		var path = '/api/project/get';
+  		var path = '/api/project/get/public';
+		this.post(path, options, done)
+  	},
+
+  	getPrivateProject : function (options, done) {
+  		var path = '/api/project/get/private';
 		this.post(path, options, done)
   	},
 	
@@ -76,6 +72,17 @@ Wu.Api = Wu.Class.extend({
    		var path = '/reset';
 		this.post(path, options, done) 		
   	},
+
+
+
+
+
+
+
+
+
+
+
 
 
 

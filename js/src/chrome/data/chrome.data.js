@@ -277,7 +277,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._tempFiles = {};
 
 		// Empty containers
-		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
+		if ( this._layersContainer ) this._layersContainer.innerHTML = 'Currently no layers. Add data below.';
 		if ( this._filesContainer )  this._filesContainer.innerHTML = '';
 
 		// only update list if project is editable
@@ -288,7 +288,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this._refreshLayers();
 
 			// this._initBaseLayerList(); // why twice?
-			this._refreshBaseLayerList();
+			// this._refreshBaseLayerList();
 		}
 
 		this._refreshBaseLayerList();
@@ -339,7 +339,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			if ( c == 'file-popup-trigger') stop = true;
 			if ( c == 'file-popup') stop = true;
 			if ( c == 'toggle-button') stop = true;
-		})
+		});
 
 		// Stop if we're editing name
 		if (e.target.name == this.editingFileName) stop = true;

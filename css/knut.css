@@ -1618,7 +1618,11 @@ input.target-input.polygon {
 
 
 
-
+/*DEBUG!!!*/
+/*disable screenshot for beta until working*/
+.chrome-button.share {
+	display: none;
+}
 
 
 
