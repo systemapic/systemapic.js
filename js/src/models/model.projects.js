@@ -279,17 +279,17 @@ Wu.Project = Wu.Class.extend({
 		var options = {
 			project : this.getUuid(),
 			access : projectAccess
-		}
+		};
 
 		// send request to API		
- 		Wu.Util.postcb('/api/project/addInvites', JSON.stringify(options), function (ctx, response) {
+ 		app.api.addInvites(options, function (ctx, response) {
 
  			var updatedAccess = Wu.parse(response);
 
  			// set locally
  			this.store.access = updatedAccess;
 
- 		}.bind(this), this);
+ 		}.bind(this));
 	},
 
 	getAccess : function () {

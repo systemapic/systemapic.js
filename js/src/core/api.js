@@ -98,6 +98,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	addInvites: function (options, done) {
+		var path = '/api/project/addInvites';
+		this.post(path, options, done);
+	},
+
 	// helper fn's
 	post : function (path, options, done) {
 		this._post(path, JSON.stringify(options), function (err, response) {
