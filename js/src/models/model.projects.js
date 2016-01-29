@@ -283,6 +283,7 @@ Wu.Project = Wu.Class.extend({
 
 		// send request to API		
  		app.api.addInvites(options, function (err, result) {
+			if (err) return console.error('addInvites err:', err);
 
  			var updatedAccess = Wu.parse(result);
 
