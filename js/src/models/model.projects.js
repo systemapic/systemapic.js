@@ -282,12 +282,15 @@ Wu.Project = Wu.Class.extend({
 		};
 
 		// send request to API		
- 		app.api.addInvites(options, function (ctx, response) {
+ 		app.api.addInvites(options, function (err, result) {
 
- 			var updatedAccess = Wu.parse(response);
+ 			var updatedAccess = Wu.parse(result);
 
- 			// set locally
- 			this.store.access = updatedAccess;
+			if (updatedAccess.error) {
+				return console.error('add invite error:', updatedAccess.error);
+			}
+
+			this.store.access = updatedAccess;
 
  		}.bind(this));
 	},
