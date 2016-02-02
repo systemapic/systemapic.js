@@ -65,11 +65,14 @@ Wu.Reset = Wu.Class.extend({
 		// logo.style.backgroundImage = 'url(../' + logo_img + ')';
 
 		// logo
-		var logo = Wu.DomUtil.create('img', '', logo_wrap);
+		var logo_img = window.systemapicConfigOptions.logos.invitationLogo;
+		logo_wrap.style.backgroundImage = logo_img.backgroundImage;
+    	logo_wrap.style.backgroundRepeat = "no-repeat";
+    	logo_wrap.style.backgroundPosition = "center";
+		// var logo = Wu.DomUtil.create('img', '', logo_wrap);
 
 		// set image
-		var logo_img = loginConfig.invitationLogo;
-		logo.src = logo_img;
+		// logo.src = logo_img;
 
 		// set width
 		// var width = loginConfig.loginLogoWidth || 210;
