@@ -65,10 +65,10 @@ Wu.Reset = Wu.Class.extend({
 		// logo.style.backgroundImage = 'url(../' + logo_img + ')';
 
 		// logo
+		var logo_img = app.options.logos.invitationLogo;
 		var logo = Wu.DomUtil.create('img', '', logo_wrap);
 
 		// set image
-		var logo_img = loginConfig.invitationLogo;
 		logo.src = logo_img;
 
 		// set width
