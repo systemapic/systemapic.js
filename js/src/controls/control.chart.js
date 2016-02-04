@@ -205,6 +205,9 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Create single point C3 pop-up content
 	singlePopUp : function (e) {
 
+
+		console.log('popup with chart?', this.popupSettings.timeSeries);
+
 		// check if timeseries
 		var timeSeries = (this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true );
 
@@ -621,6 +624,8 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Chart
 	C3Chart : function (c3Obj) {
 		
+		console.log('C3Chart', c3Obj);
+
 		var data = c3Obj.d3array;
 
 		// Ticks

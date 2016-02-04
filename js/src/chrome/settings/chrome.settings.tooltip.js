@@ -249,6 +249,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			placeholder : 'auto',
 			tabindex    : 1,
 			fn 	    : this._saveMiniBlur.bind(this),
+			className   : 'time-series-input'
 		})
 
 
@@ -450,6 +451,11 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	// Splits metadata into "time series" and "meta fields"
 	buildTimeSeries : function (columns) {
 
+
+		console.log('%c BUILD TIME SERIES', 'background: red; color: white;');
+		console.log('%c ************************', 'background: red; color: white;');
+
+
 		var metaData = {
 			title : '',
 			description : false,			
@@ -460,6 +466,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var timeSeriesCount = 0;
 
 		for ( var f in columns ) {
+
 
 			// validate time
 			var isTime = this._validateDateFormat(f);
