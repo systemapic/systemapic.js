@@ -73,6 +73,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	inviteLink : function (options, done) {
+		var path = '/api/invite/link';
+		this.post(path, options, done);
+	},
+
 	addFileToTheProject : function (options, done) {
 		var path = '/api/file/addtoproject';
 		this.post(path, options, done);

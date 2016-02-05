@@ -362,13 +362,13 @@ Wu.Share = Wu.Pane.extend({
 			project_name : this._project.getTitle(),
 			access_type : 'view',
 			permissions : permissions
-		}
+		};
 
 		// slack
 		app.Analytics.onInvite(options);
 
 		// get invite link
-		Wu.post('/api/invite/link', JSON.stringify(options), callback);
+		app.api.inviteLink(options, callback.bind(this));
 	},
 
 

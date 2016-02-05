@@ -279,14 +279,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		});
 
 		// this._access[options.type]
-		var options = JSON.stringify({
+		var options = {
 			access : access
-		});
+		};
 
 		// create share link
-		Wu.post('/api/invite/link', options, function (a, b) {
+		app.api.inviteLink(options, function (a, b) {
 			this._shareLinkInput.value = b;
-		}.bind(this), this);
+		}.bind(this));
 	},
 
 	// icon on user
