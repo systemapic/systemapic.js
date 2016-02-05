@@ -78,6 +78,56 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	userInvite : function (options, done) {
+		var path = '/api/user/invite';
+		this.post(path, options, done);
+	},
+
+	dbFetchArea : function (options, done) {
+		var path = '/api/db/fetchArea';
+		this.post(path, options, done);
+	},
+
+	setrolemember : function (options, done) {
+		var path = '/api/access/super/setrolemember';
+		this.post(path, options, done);
+	},
+
+	portalSetrolemember : function (options, done) {
+		var path = '/api/access/portal/setrolemember';
+		this.post(path, options, done);
+	},
+
+	requestContact : function (options, done) {
+		var path = '/api/user/requestContact';
+		this.post(path, options, done);
+	},
+
+	inviteToProjects : function (options, done) {
+		var path = '/api/user/inviteToProjects';
+		this.post(path, options, done);
+	},
+
+	utilSnapshot : function (options, done) {
+		var path = '/api/util/snapshot';
+		this.post(path, options, done);
+	},
+
+	accessSetrolemember : function (options, done) {
+		var path = '/api/access/setrolemember';
+		this.post(path, options, done);
+	},
+
+	analyticsGet : function (options, done) {
+		var path = '/api/analytics/get';
+		this.post(path, options, done);
+	},
+
+	clientUpdate : function (options, done) {
+		var path = '/api/client/update';
+		this.post(path, options, done);
+	},
+
 	inviteLink : function (options, done) {
 		var path = '/api/invite/link';
 		this.post(path, options, done);

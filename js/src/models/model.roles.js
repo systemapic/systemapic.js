@@ -70,14 +70,14 @@ Wu.Role.Super = Wu.Role.extend({
 		var options = {
 			userUuid : user.getUuid(),
 			roleUuid : this.getUuid()
-		}
+		};
 
 		// send
-		Wu.send('/api/access/super/setrolemember', options, function (err, json) {
+		app.api.setrolemember(options, function (err, json) {
 			callback(err, json);
 		});
 
-	},
+	}
 
 });
 
@@ -89,13 +89,13 @@ Wu.Role.Portal = Wu.Role.extend({
 		var options = {
 			userUuid : user.getUuid(),
 			roleUuid : this.getUuid()
-		}
+		};
 		
 		// send
-		Wu.send('/api/access/portal/setrolemember', options, function (err, json) {
+		app.api.portalSetrolemember(options, function (err, json) {
 			callback(err, json);
 		});
 
-	},
+	}
 
 });

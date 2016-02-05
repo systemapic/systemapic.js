@@ -397,7 +397,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var access = {
 			edit : [],
 			read : []
-		}
+		};
 
 		this._access.edit.forEach(function (p) {
 			access.edit.push(p.project.getUuid());
@@ -411,10 +411,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			emails : emails,
 			customMessage : customMessage,
 			access : access
-		}
+		};
 
 		// send to server
-		Wu.send('/api/user/invite', options, this._sentInvites.bind(this, e.target), this);
+		app.api.userInvite(options, this._sentInvites.bind(this, e.target));
 
 		// logs
 		this._logInvites(options);

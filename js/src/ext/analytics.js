@@ -301,7 +301,7 @@ Wu.Analytics = Wu.Class.extend({
 	get : function (options) {
 
 		// send to server. JSON.stringify not needed for options object.
-		Wu.send('/api/analytics/get', options, function (err, result) {
+		app.api.analyticsGet(options, function (err, result) {
 		});
 	},
 

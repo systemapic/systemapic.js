@@ -59,7 +59,7 @@ Wu.Client = Wu.Class.extend({
 	},
 
 	_save : function (string) {
-		Wu.send('/api/client/update', string, this._saved.bind(this));  // TODO: pgp & callback
+		app.api.clientUpdate(string, this._saved.bind(this));  // TODO: pgp & callback
 	},
 
 	_saved : function (err, json) {

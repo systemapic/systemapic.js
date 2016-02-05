@@ -37,10 +37,10 @@ Wu.Access = Wu.Class.extend({
 			projectUuid : project.getUuid(),
 			roleUuid : role.getUuid(),
 			currentRoleUuid : currentRoleUuid
-		}
+		};
 
 		// send
-		Wu.send('/api/access/setrolemember', options, function (err, json) {
+		app.api.accessSetrolemember(options, function (err, json) {
 			if (err) return callback(err);
 
 			var result = Wu.parse(json);

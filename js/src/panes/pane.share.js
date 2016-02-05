@@ -181,9 +181,9 @@ Wu.Share = Wu.Pane.extend({
 		app.setHash(function (ctx, hash) {
 
 			// get snapshot from server
-			Wu.send('/api/util/snapshot', hash, function (a, b) {
+			app.api.utilSnapshot(hash, function (a, b) {
 				this._createdImage(a, b);
-			}.bind(this), this);
+			}.bind(this));
 
 		}.bind(this));
 
