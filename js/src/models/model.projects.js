@@ -1178,10 +1178,10 @@ Wu.Project = Wu.Class.extend({
 			obj.dimensions = {
 				height : 233,
 				width : 350
-			}
+			};
 
 			// get snapshot from server
-			Wu.post('/api/util/createThumb', JSON.stringify(obj), this.createdProjectThumb, this);
+			app.api.createThumb(obj, this.createdProjectThumb);
 
 		}.bind(this), this);
 	},

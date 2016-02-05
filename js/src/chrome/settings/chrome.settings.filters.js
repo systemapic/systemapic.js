@@ -844,11 +844,16 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			column : column,
 			access_token : app.tokens.access_token,
 			num_buckets : this.options.num_buckets
-		}
+		};
 
 		// get histogram 
-		Wu.post('/api/db/fetchHistogram', JSON.stringify(options), function (err, histogramJSON) {
-
+		app.api.fetchHistogram(options, function (err, histogramJSON) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _getFreshHistogram',
+					description : err
+				});
+			}
 			// parse
 			var histogramData = Wu.parse(histogramJSON);
 

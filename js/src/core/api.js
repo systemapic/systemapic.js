@@ -68,6 +68,56 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	setCartocss : function (options, done) {
+		var path = '/api/layers/cartocss/set';
+		this.post(path, options, done);
+	},
+
+	getCartocss : function (options, done) {
+		var path = '/api/layers/cartocss/get';
+		this.post(path, options, done);
+	},
+
+	createlegends : function (options, done) {
+		var path = '/api/layer/createlegends';
+		this.post(path, options, done);
+	},
+
+	getfeaturesvalues : function (options, done) {
+		var path = '/api/util/getfeaturesvalues';
+		this.post(path, options, done);
+	},
+
+	hashSet : function (options, done) {
+		var path = '/api/project/hash/set';
+		this.post(path, options, done);
+	},
+
+	fileGetLayers : function (options, done) {
+		var path = '/api/file/getLayers';
+		this.post(path, options, done);
+	},
+
+	downloadDataset : function (options, done) {
+		var path = '/api/file/downloadDataset';
+		this.post(path, options, done);
+	},
+
+	downloadLayerDataset : function (options, done) {
+		var path = '/api/layer/downloadDataset';
+		this.post(path, options, done);
+	},
+
+	createThumb : function (options, done) {
+		var path = '/api/util/createThumb';
+		this.post(path, options, done);
+	},
+
+	pdfsnapshot : function (options, done) {
+		var path = '/api/util/pdfsnapshot';
+		this.post(path, options, done);
+	},
+
 	analyticsSet : function (options, done) {
 		var path = '/api/analytics/set';
 		this.post(path, options, done);
@@ -110,6 +160,16 @@ Wu.Api = Wu.Class.extend({
 
 	utilSnapshot : function (options, done) {
 		var path = '/api/util/snapshot';
+		this.post(path, options, done);
+	},
+
+	errorLog : function (options, done) {
+		var path = '/api/error/log';
+		this.post(path, options, done);
+	},
+
+	fetchHistogram : function (options, done) {
+		var path = '/api/db/fetchHistogram';
 		this.post(path, options, done);
 	},
 

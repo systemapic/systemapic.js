@@ -69,12 +69,19 @@ Wu.Controller = Wu.Class.extend({
 		var json = {
 			projectUuid : this._project.getUuid(),
 			id : state
-		}
+		};
 
 		// get a saved setup - which layers are active, position, 
-		Wu.post('/api/project/hash/get', JSON.stringify(json), function (ctx, reply) {
+		app.api.getHash(json, function (err, response) {
 
-			var result = Wu.parse(reply);
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _loadState',
+					description : err
+				});
+			}
+
+			var result = Wu.parse(response);
 
 			var hash = result.hash;
 
@@ -115,12 +122,20 @@ Wu.Controller = Wu.Class.extend({
 				layers 	 : layerUuids 			// layermenuItem uuids, todo: order as z-index
 			},
 			saveState : true
-		}
+		};
 
 		// save hash to server
-		Wu.post('/api/project/hash/set', JSON.stringify(json), function (a, b) {
+		app.api.hashSet(json, function (err, response) {
+
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _saveState',
+					description : err
+				});
+			}
+
 			console.log('saved state!', json);
-		}, this);
+		}.bind(this));
 
 	},
 

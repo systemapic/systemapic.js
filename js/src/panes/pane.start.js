@@ -315,7 +315,7 @@ Wu.StartPane = Wu.Pane.extend({
 		app.setHash(function (ctx, hash) {
 
 			// get snapshot from server
-			Wu.post('/api/util/snapshot', hash, that.createdImage, that);
+			app.api.utilSnapshot(hash, that.createdImage.bind(that));
 
 		});
 	},

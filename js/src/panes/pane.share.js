@@ -274,10 +274,10 @@ Wu.Share = Wu.Pane.extend({
 
 			var h = JSON.parse(hash);
 			h.hash.slug = app.activeProject.getName();
-			var json = JSON.stringify(h); 
+			var json = h;
 
 			// get snapshot from server
-			Wu.post('/api/util/pdfsnapshot', json, that._createdPrint, that);
+			app.api.pdfsnapshot(json, that._createdPrint.bind(that));
 
 		});
 

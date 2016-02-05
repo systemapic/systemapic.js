@@ -1178,10 +1178,16 @@ L.Control.Cartocss = Wu.Control.extend({
 			file_id: file_id,
 			return_model : true,
 			layerUuid : layer.getUuid()
-		}
+		};
 
-		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
+		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
 
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _updateLayer',
+					description : err
+				});
+			}
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 
