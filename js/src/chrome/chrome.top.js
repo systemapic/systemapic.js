@@ -75,7 +75,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var buttonDiv = Wu.DomUtil.create('div', className);
 
 		// css exp // hacky!
-		var referenceNode = app.options.logos.clientLogo.image ? this._buttonWrapper.lastChild.previousSibling : this._buttonWrapper.lastChild;
+		var referenceNode = this._buttonWrapper.lastChild.previousSibling;
 		this._buttonWrapper.insertBefore(buttonDiv, referenceNode);
 
 		// save
