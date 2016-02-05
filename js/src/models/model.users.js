@@ -62,8 +62,13 @@ Wu.User = Wu.Class.extend({
 			contact : user.getUuid()
 		};
 
-		app.api.requestContact(options, function (a, b) {
-			console.log('request sent!', a, b);
+		app.api.requestContact(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in sendContactRequest',
+					description : err
+				});
+			}
 			// set feedback 
 			app.feedback.setMessage({
 				title : 'Friend request sent'
