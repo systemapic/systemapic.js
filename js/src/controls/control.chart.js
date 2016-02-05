@@ -624,7 +624,6 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Chart
 	C3Chart : function (c3Obj) {
 		
-		console.log('C3Chart', c3Obj);
 
 		var data = c3Obj.d3array;
 
@@ -995,9 +994,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			var cleanDate = moment(isDate);
 			var chartTick = new Date(cleanDate);
 
-
-
 			var newTick = true;
+
 
 			// Calculate the ticks
 			d3array.ticks.forEach(function(ct) { 
@@ -1012,6 +1010,9 @@ Wu.Control.Chart = Wu.Control.extend({
 		// CREATE META FIELDS
 		// CREATE META FIELDS
 		} else {
+
+			// Exclude the generated fields
+			if ( _key.substring(0,7) == 'the_geo') return;
 
 			d3array.meta.push([_key, _val])
 
@@ -1034,52 +1035,48 @@ Wu.Control.Chart = Wu.Control.extend({
 		return layerUuid;		
 	},	
 
+	// xoxoxoxoxoxo
 	_validateDateFormat : function (_key) {
 
-		// Default fields that for some reason gets read as time formats...
-		if ( _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return false;
 
-		if (_key.length < 6) return false; // cant possibly be date
+		var _m = moment(_key,"YYYY-MM-DD");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
+			if ( m != 'Invalid date' ) return m;	
+		}
 
-		// if only letters, not a date
-		if (this._validate.onlyLetters(_key)) return;
+		var _m = moment(_key,"DD-MM-YYYY");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(_key, ["DDMMYYYY", moment.ISO_8601]).format("DD-MM-YYYY");
+			if ( m != 'Invalid date' ) return m;	
+		}
 
-		// if less than six and has letters
-		if (this._validate.shortWithLetters(_key)) return;
-
-		// If it's Frano's time series format
-		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
-		if ( _m != 'Invalid date' ) return _m;
-
-		// If it's other time format
-		var _m = moment(_key).format("YYYY-MM-DD"); // buggy
-		if ( _m != 'Invalid date' ) return _m;
-
-		// If it's not a valid date...
 		return false;
 	},	
 
-	_validate : {
+	// _validate : {
 
-		onlyLetters : function (string) {
-			var nums = [];
-			_.each(string, function (s) {
-				if (!isNaN(s)) nums.push(s);
-			})
-			if (nums.length) return false;
-			return true;
-		},
+	// 	onlyLetters : function (string) {
+	// 		var nums = [];
+	// 		_.each(string, function (s) {
+	// 			if (!isNaN(s)) nums.push(s);
+	// 		})
+	// 		if (nums.length) return false;
+	// 		return true;
+	// 	},
 
-		shortWithLetters : function (string) {
-			var letters = [];
-			_.each(string, function (s) {
-				if (isNaN(s)) letters.push(s);
-			});
+	// 	shortWithLetters : function (string) {
+	// 		var letters = [];
+	// 		_.each(string, function (s) {
+	// 			if (isNaN(s)) letters.push(s);
+	// 		});
 
-			if (letters.length && string.length < 7) return true;
-			return false;
-		},
-	},
+	// 		if (letters.length && string.length < 7) return true;
+	// 		return false;
+	// 	},
+	// },
 
 	
 

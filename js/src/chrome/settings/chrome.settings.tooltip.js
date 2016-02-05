@@ -452,10 +452,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	buildTimeSeries : function (columns) {
 
 
-		console.log('%c BUILD TIME SERIES', 'background: red; color: white;');
-		console.log('%c ************************', 'background: red; color: white;');
-
-
 		var metaData = {
 			title : '',
 			description : false,			
@@ -482,8 +478,10 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				timeSeriesCount ++;
 
 			// Is not time series
-			} else {
+			} else if ( f.substring(0,7) != 'the_geo' && f != '_columns') {
 				
+				console.log(f);
+
 				metaData.metaFields[f] = {
 						title : false,
 						on    : true
