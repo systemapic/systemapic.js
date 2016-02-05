@@ -168,6 +168,31 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	clientNew : function (options, done) {
+		var path = '/api/client/new';
+		this.post(path, options, done);
+	},
+
+	clientDelete : function (options, done) {
+		var path = '/api/client/delete';
+		this.post(path, options, done);
+	},
+
+	createLayer : function (options, done) {
+		var path = '/api/layers/new';
+		this.post(path, options, done);
+	},
+
+	deleteUser : function (options, done) {
+		var path = '/api/user/delete';
+		this.post(path, options, done);
+	},
+
+	createOsmLayer : function (options, done) {
+		var path = '/api/layers/osm/new';
+		this.post(path, options, done);
+	},
+
 	fetchHistogram : function (options, done) {
 		var path = '/api/db/fetchHistogram';
 		this.post(path, options, done);

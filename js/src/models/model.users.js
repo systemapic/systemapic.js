@@ -258,7 +258,7 @@ Wu.User = Wu.Class.extend({
 		});
 
 		// post              path          data           callback        context of cb
-		Wu.Util.postcb('/api/user/delete', json, context[callback], context);
+		app.api.deleteUser(json, context[callback]);
 
 	},
 

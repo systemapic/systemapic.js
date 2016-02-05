@@ -750,7 +750,13 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	_createLayerModel : function (options, done) {
-		Wu.Util.postcb('/api/layers/new', JSON.stringify(options), function (err, body) {
+		app.api.createLayer(options, function (err, body) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _createLayerModel',
+					description : err
+				});
+			}
 			var layerModel = Wu.parse(body);
 			done(null, layerModel);
 		}.bind(this));

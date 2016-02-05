@@ -100,9 +100,15 @@ Wu.Project = Wu.Class.extend({
 		});
 
 		// get new layer from server
- 		Wu.Util.postcb('/api/layers/osm/new', options, function (ctx, json) {
+ 		app.api.createOsmLayer(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in createOSMLayer',
+					description : err
+				});
+			}
 
- 			var layer = ctx.addLayer(JSON.parse(json));
+ 			var layer = this.addLayer(JSON.parse(response));
 
  			// callback to wherever intiated
  			callback(null, layer);
@@ -133,7 +139,7 @@ Wu.Project = Wu.Class.extend({
 		});
 		
 		// get new layer from server
- 		Wu.Util.postcb('/api/layers/new', options, this._createdLayerFromGeoJSON, this);
+ 		app.api.createLayer(options, this._createdLayerFromGeoJSON.bind(this));
 
 	},
 
