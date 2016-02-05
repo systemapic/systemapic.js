@@ -269,7 +269,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var access = {
 			edit : [],
 			read: []
-		}
+		};
 
 		this._access.read.forEach(function (r) {
 			access.read.push(r.project.getUuid());
@@ -284,8 +284,15 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		};
 
 		// create share link
-		app.api.inviteLink(options, function (a, b) {
-			this._shareLinkInput.value = b;
+		app.api.inviteLink(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _createShareableInvite',
+					description : err
+				});
+			}
+
+			this._shareLinkInput.value = response;
 		}.bind(this));
 	},
 

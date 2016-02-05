@@ -699,6 +699,12 @@ Wu.Model.File = Wu.Model.extend({
 
 		// create postgis layer
 		app.api.createLayer(layerJSON, function (err, layerJSON) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _requestDefaultVectorLayer',
+					description : err
+				});
+			}
 			var layer = Wu.parse(layerJSON);
 
 			console.log('c l', layer);

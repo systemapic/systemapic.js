@@ -553,7 +553,12 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	_save : function (json) {
 		app.api.updateLayer(json, function (err, result) {
-			if (err) console.error('err', err);
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in _save',
+					description : err
+				});
+			}
 
 			var result = Wu.parse(result);
 

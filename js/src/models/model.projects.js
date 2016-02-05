@@ -487,7 +487,12 @@ Wu.Project = Wu.Class.extend({
 		};
 
 		app.api.deleteLayer(json, function (err, result) {
-			if (err) console.error('err', err);
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in removeMapboxAccount',
+					description : err
+				});
+			}
 
 			var result = Wu.parse(result);
 
@@ -508,7 +513,12 @@ Wu.Project = Wu.Class.extend({
 		};
 
 		app.api.deleteLayer('/api/layers/delete', JSON.stringify(options), function (err, response) {
-			if (err) return console.error('layer delete err:', err);
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in deleteLayer',
+					description : err
+				});
+			}
 
 			var result = Wu.parse(response);
 

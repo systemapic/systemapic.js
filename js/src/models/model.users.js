@@ -86,8 +86,13 @@ Wu.User = Wu.Class.extend({
 		};
 
 		// send to server
-		app.api.inviteToProjects(invites, function (a, response) {
-
+		app.api.inviteToProjects(invites, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong in inviteToProjects',
+					description : err
+				});
+			}
 			var result = Wu.parse(response);
 
 			// set feedback 

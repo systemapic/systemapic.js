@@ -181,8 +181,15 @@ Wu.Share = Wu.Pane.extend({
 		app.setHash(function (ctx, hash) {
 
 			// get snapshot from server
-			app.api.utilSnapshot(hash, function (a, b) {
-				this._createdImage(a, b);
+			app.api.utilSnapshot(hash, function (err, response) {
+				if (err) {
+					return app.feedback.setError({
+						title : 'Something went wrong in _shareImage',
+						description : err
+					});
+				}
+
+				this._createdImage(err, response);
 			}.bind(this));
 
 		}.bind(this));
