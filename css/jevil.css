@@ -1188,3 +1188,32 @@ input.chrome-field-input {
      width: 36px; 
      top: 5px !important; 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+#layer-menu-inner-content {
+    border-radius: 0;
+}
+
+.leaflet-bottom.leaflet-right {
+    width: 253px;
+}
+
+.leaflet-control-layermenu .scroller-frame .inner-scroller {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.leaflet-control-layermenu .scroller-frame {
+    max-height: 300px;
+    overflow: scroll;
+}
