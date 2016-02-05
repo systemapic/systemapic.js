@@ -1863,6 +1863,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	       			       		
 			this.layerListContainers[provider] = {};
 
+			// Empty layers container
+			this._layersContainer.innerHTML = '';
+
 			// Create wrapper
 			this.layerListContainers[provider].wrapper = Wu.DomUtil.create('div', 'layer-list-container', this._layersContainer);
 

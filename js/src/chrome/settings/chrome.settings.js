@@ -213,16 +213,20 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_validateDateFormat : function (key) {
 
-		// Default fields that for some reason gets read as time formats...
-		if ( key == 'the_geom_3857' || key == 'the_geom_4326' || key == '_columns' ) return false;
+		// If it's InSAR data time series format
+		var _m = moment(key,"YYYY-MM-DD");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
+			if ( m != 'Invalid date' ) return m;	
+		}
 
-		// If it's Frano's time series format
-		var m = moment(key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
-		if ( m != 'Invalid date' ) return m;
-
-		// If it's other time format
-		var m = moment(key).format("YYYY-MM-DD");
-		if ( m != 'Invalid date' ) return m;
+		var _m = moment(key,"DD-MM-YYYY");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(key, ["DDMMYYYY", moment.ISO_8601]).format("DD-MM-YYYY");
+			if ( m != 'Invalid date' ) return m;	
+		}
 
 		// If it's not a valid date...
 		return false;

@@ -90,12 +90,9 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 	_getMarkerPosition : function (latlng, e) {
-
 		// try to calculate true position of point, instead of mouse pos. need to look in data. 
 		// this is kinda specific to globesar's data, but could be made pluggable.
-
 		// var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
-
 		return latlng;
 	},
 
@@ -484,7 +481,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 
-	// xoxoxoxoxoxoxo
 	chartTicks : function (c3Obj) {
 
 		// Data
@@ -493,7 +489,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Ticks
 		var t = data.ticks;
 
-		// var first_data_point = t[0]; // wrong, first tick is actually second data point
 		var first_data_point = data.x[1];
 		var last_data_point = data.x[data.x.length -1];
 
@@ -505,9 +500,6 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 
-	// PRODUCE HTML
-	// PRODUCE HTML
-	// PRODUCE HTML		
 
 	createFooter : function () {
 		var footerContainer = this._footerContainer = Wu.DomUtil.create('div', 'c3-footer');
@@ -621,6 +613,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Chart
 	C3Chart : function (c3Obj) {
 		
+
 		var data = c3Obj.d3array;
 
 		// Ticks
@@ -680,9 +673,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create container
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
-
-
-		// var _width = isMobile ? isMobile.width - 138 : 430;
 
 
 		if ( app.isMobile.mobile ) {
@@ -990,9 +980,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			var cleanDate = moment(isDate);
 			var chartTick = new Date(cleanDate);
 
-
-
 			var newTick = true;
+
 
 			// Calculate the ticks
 			d3array.ticks.forEach(function(ct) { 
@@ -1008,16 +997,14 @@ Wu.Control.Chart = Wu.Control.extend({
 		// CREATE META FIELDS
 		} else {
 
+			// Exclude the generated fields
+			if ( _key.substring(0,7) == 'the_geo') return;
+
 			d3array.meta.push([_key, _val])
 
 		}
 	},
 
-
-
-	// OTHER HELPERS
-	// OTHER HELPERS
-	// OTHER HELPERS	
 
 	_getWuLayerFromPostGISLayer : function (postgis_layer_id) {
 
@@ -1031,51 +1018,22 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	_validateDateFormat : function (_key) {
 
-		// Default fields that for some reason gets read as time formats...
-		if ( _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return false;
 
-		if (_key.length < 6) return false; // cant possibly be date
+		var _m = moment(_key,"YYYY-MM-DD");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
+			if ( m != 'Invalid date' ) return m;	
+		}
 
-		// if only letters, not a date
-		if (this._validate.onlyLetters(_key)) return;
+		var _m = moment(_key,"DD-MM-YYYY");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(_key, ["DDMMYYYY", moment.ISO_8601]).format("DD-MM-YYYY");
+			if ( m != 'Invalid date' ) return m;	
+		}
 
-		// if less than six and has letters
-		if (this._validate.shortWithLetters(_key)) return;
-
-		// If it's Frano's time series format
-		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
-		if ( _m != 'Invalid date' ) return _m;
-
-		// If it's other time format
-		var _m = moment(_key).format("YYYY-MM-DD"); // buggy
-		if ( _m != 'Invalid date' ) return _m;
-
-		// If it's not a valid date...
 		return false;
 	},	
-
-	_validate : {
-
-		onlyLetters : function (string) {
-			var nums = [];
-			_.each(string, function (s) {
-				if (!isNaN(s)) nums.push(s);
-			})
-			if (nums.length) return false;
-			return true;
-		},
-
-		shortWithLetters : function (string) {
-			var letters = [];
-			_.each(string, function (s) {
-				if (isNaN(s)) letters.push(s);
-			});
-
-			if (letters.length && string.length < 7) return true;
-			return false;
-		},
-	},
-
-	
 
 })

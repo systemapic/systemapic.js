@@ -166,7 +166,6 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		var carto = this._cartoEditor.getWrapperElement();
 		if (carto) {
 			carto.style.width = dims.width + 'px';
-			// carto.style.height = dims.height - 363 + 'px';
 			carto.style.height = dims.height - 325 + 'px';
 		}
 
@@ -191,6 +190,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 
 
 	_updateStyle : function () {
+
 
 		// return if no active layer
 		if (!this._layer) return console.error('no layer');
@@ -387,6 +387,8 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 
 	show : function () {
 		if (!this._inited) this._initLayout();
+
+		this._updateDimensions();
 
 		// hide others
 		this.hideAll();

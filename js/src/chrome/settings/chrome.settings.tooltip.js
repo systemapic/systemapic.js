@@ -249,6 +249,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			placeholder : 'auto',
 			tabindex    : 1,
 			fn 	    : this._saveMiniBlur.bind(this),
+			className   : 'time-series-input'
 		})
 
 
@@ -450,6 +451,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	// Splits metadata into "time series" and "meta fields"
 	buildTimeSeries : function (columns) {
 
+
 		var metaData = {
 			title : '',
 			description : false,			
@@ -460,6 +462,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var timeSeriesCount = 0;
 
 		for ( var f in columns ) {
+
 
 			// validate time
 			var isTime = this._validateDateFormat(f);
@@ -475,8 +478,10 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				timeSeriesCount ++;
 
 			// Is not time series
-			} else {
+			} else if ( f.substring(0,7) != 'the_geo' && f != '_columns') {
 				
+				console.log(f);
+
 				metaData.metaFields[f] = {
 						title : false,
 						on    : true
