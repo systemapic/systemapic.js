@@ -90,12 +90,9 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 	_getMarkerPosition : function (latlng, e) {
-
 		// try to calculate true position of point, instead of mouse pos. need to look in data. 
 		// this is kinda specific to globesar's data, but could be made pluggable.
-
 		// var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
-
 		return latlng;
 	},
 
@@ -204,9 +201,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	// Create single point C3 pop-up content
 	singlePopUp : function (e) {
-
-
-		console.log('popup with chart?', this.popupSettings.timeSeries);
 
 		// check if timeseries
 		var timeSeries = (this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true );
@@ -487,7 +481,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 
-	// xoxoxoxoxoxoxo
 	chartTicks : function (c3Obj) {
 
 		// Data
@@ -496,7 +489,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Ticks
 		var t = data.ticks;
 
-		// var first_data_point = t[0]; // wrong, first tick is actually second data point
 		var first_data_point = data.x[1];
 		var last_data_point = data.x[data.x.length -1];
 
@@ -508,9 +500,6 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 
-	// PRODUCE HTML
-	// PRODUCE HTML
-	// PRODUCE HTML		
 
 	createFooter : function () {
 		var footerContainer = this._footerContainer = Wu.DomUtil.create('div', 'c3-footer');
@@ -684,9 +673,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create container
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
-
-
-		// var _width = isMobile ? isMobile.width - 138 : 430;
 
 
 		if ( app.isMobile.mobile ) {
@@ -1020,11 +1006,6 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 
-
-	// OTHER HELPERS
-	// OTHER HELPERS
-	// OTHER HELPERS	
-
 	_getWuLayerFromPostGISLayer : function (postgis_layer_id) {
 
 		var layers = app.activeProject.getLayers();
@@ -1035,7 +1016,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		return layerUuid;		
 	},	
 
-	// xoxoxoxoxoxo
 	_validateDateFormat : function (_key) {
 
 
@@ -1055,29 +1035,5 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		return false;
 	},	
-
-	// _validate : {
-
-	// 	onlyLetters : function (string) {
-	// 		var nums = [];
-	// 		_.each(string, function (s) {
-	// 			if (!isNaN(s)) nums.push(s);
-	// 		})
-	// 		if (nums.length) return false;
-	// 		return true;
-	// 	},
-
-	// 	shortWithLetters : function (string) {
-	// 		var letters = [];
-	// 		_.each(string, function (s) {
-	// 			if (isNaN(s)) letters.push(s);
-	// 		});
-
-	// 		if (letters.length && string.length < 7) return true;
-	// 		return false;
-	// 	},
-	// },
-
-	
 
 })
