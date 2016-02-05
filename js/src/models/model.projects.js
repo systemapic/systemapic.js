@@ -485,8 +485,18 @@ Wu.Project = Wu.Class.extend({
 			project_id : this.getUuid(),
 			layer_id : lids
 		};
-		var string = JSON.stringify(json);
-		Wu.save('/api/layers/delete', string); 
+
+		app.api.deleteLayer(json, function (err, result) {
+			if (err) console.error('err', err);
+
+			var result = Wu.parse(result);
+
+			if (result.error) {
+				console.error('something went worng', result);
+			} else {
+				console.error('Layer deleted successfully', result);
+			}
+		}.bind(this));
 
 	},
 

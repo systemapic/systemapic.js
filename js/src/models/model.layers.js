@@ -553,8 +553,17 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	_save : function (json) {
-		var string  = JSON.stringify(json);
-		Wu.save('/api/layer/update', string);
+		app.api.updateLayer(json, function (err, result) {
+			if (err) console.error('err', err);
+
+			var result = Wu.parse(result);
+
+			if (result.error) {
+				console.error('something went worng', result);
+			} else {
+				console.error('Layer updated successfully', result);
+			}
+		}.bind(this));
 	},
 
 	_setZIndex : function (z) {

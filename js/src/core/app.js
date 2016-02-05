@@ -446,10 +446,10 @@ Wu.App = Wu.Class.extend({
 	getHash : function (id, project, callback) {
 
 		// get a saved setup - which layers are active, position, 
-		Wu.post('/api/project/hash/get', JSON.stringify({
+		app.api.getHash({
 			projectUuid : project.getUuid(),
 			id : id
-		}), callback, this);
+		}, callback.bind(this));
 	},
 
 	_renderHash : function (context, json) {

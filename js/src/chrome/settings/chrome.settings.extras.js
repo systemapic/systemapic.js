@@ -439,7 +439,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		console.log('layerJSON', layerJSON);
 
 		// create layer on server
-		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
+		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
 
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
