@@ -563,9 +563,10 @@ Wu.Model.Layer = Wu.Model.extend({
 			var result = Wu.parse(result);
 
 			if (result.error) {
-				console.error('something went worng', result);
-			} else {
-				console.error('Layer updated successfully', result);
+				return app.feedback.setError({
+					title : 'Something went wrong in _save',
+					description : err
+				});
 			}
 		}.bind(this));
 	},
