@@ -21,6 +21,7 @@ L.Control.Description = Wu.Control.extend({
 
 		this._outer = Wu.DomUtil.create('div', 'description-control-content-box', this._content);
 	
+		L.DomEvent.disableScrollPropagation(container);
 
 		return container; // turns into this._container on return
 	},
@@ -293,6 +294,7 @@ L.Control.Description = Wu.Control.extend({
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
 		var wrapper = this._multipleLegendInner;
+		
 		wrapper.innerHTML = '';
 
 		var length = 0;
