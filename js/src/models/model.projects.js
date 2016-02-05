@@ -262,15 +262,15 @@ Wu.Project = Wu.Class.extend({
 		var options = {
 			project : this.getUuid(),
 			access : projectAccess
-		}
+		};
 
 		// send request to API		
- 		Wu.Util.postcb('/api/project/setAccess', JSON.stringify(options), function (ctx, response) {
- 		
+ 		app.api.projectSetAccess(options, function (err, response) {
+
  			// set locally
  			this.store.access = projectAccess;
 
- 		}.bind(this), this);
+ 		}.bind(this));
 
 	},
 
