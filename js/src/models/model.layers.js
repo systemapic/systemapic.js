@@ -270,7 +270,7 @@ Wu.Model.Layer = Wu.Model.extend({
 
 		// save if editable
 		var project = app.activeProject;
-		if (project.isEditable()) {
+		if (project && project.isEditable()) {
 			this.store.opacity = opacity;
 			this.save('opacity');
 		}
