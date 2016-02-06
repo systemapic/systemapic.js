@@ -65,9 +65,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 	},
 
 	_createLogo : function () {
-
 		var logoConfig = app.options.logos.loginLogo;
-
 		var logo = Wu.DomUtil.create('div', 'login-popup-logo', this._login_box);
 		logo.style.backgroundImage = logoConfig.image;
 		logo.style.height = logoConfig.height;
@@ -77,7 +75,6 @@ Wu.Pane.Login = Wu.Pane.extend({
 	},
 
 	_openForgotPassword : function () {
-		console.log('_openForgotPassword');
 
 		// hide login
 		Wu.DomUtil.addClass(this._loginInner, 'displayNone');
@@ -111,23 +108,25 @@ Wu.Pane.Login = Wu.Pane.extend({
 	},
 
 	requestReset : function () {
-		console.log('request reset');
-
 		var email = this._forgot_input.value;
-
-		console.log('email', email);
 
 		app.api.resetPassword({
 			email : email
 		}, function (err, result) {
-			console.log('err, result', err, result);
+			if (err) {
+				app.feedback.setError({
+					title : 'Something went wrong.',
+				});
+			} else {
+				app.feedback.setMessage({
+					title : 'Password reset',
+					description : result
+				});
+			}
 
+			// close window
 			this.close();
 
-			app.feedback.setMessage({
-				title : 'Password reset',
-				description : result
-			});
 		}.bind(this));
 	},
 
@@ -190,16 +189,14 @@ Wu.Pane.Login = Wu.Pane.extend({
 		// invalid credentials
 		if (err && err == 401) {
 			// set error feedback
-			this._error_feedback.innerHTML = tokens.error;
-			return;
+			return this._error_feedback.innerHTML = tokens.error;
 		}
 
-		// set tokens + update user + update portal
+		// set tokens
 		app.tokens = tokens;
 
-		// reload
+		// reload portal
 		window.location = app.options.servers.portal;
-
 	},
 
 	_createInput : function (options) {
@@ -214,7 +211,6 @@ Wu.Pane.Login = Wu.Pane.extend({
 		
 		// container
 		var invite_container = Wu.DomUtil.create('div', 'invite-container narrow', appendTo);
-		
 		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
 		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
 
@@ -230,7 +226,6 @@ Wu.Pane.Login = Wu.Pane.extend({
 	close : function () {
 		this.removeEvents();
 		Wu.DomUtil.remove(this._loginFullscreen);
-		// Wu.Mixin.Events.fire('closeMenuTabs');
 	},
 
 	_onCloseMenuTabs : function () {
