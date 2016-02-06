@@ -196,10 +196,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 		app.tokens = tokens;
 
 		// reload portal
-		setTimeout(function () {
-			window.location = app.options.servers.portal;
-		}, 3000);
-
+		window.location = app.options.servers.portal;
 	},
 
 	_createInput : function (options) {
@@ -214,7 +211,6 @@ Wu.Pane.Login = Wu.Pane.extend({
 		
 		// container
 		var invite_container = Wu.DomUtil.create('div', 'invite-container narrow', appendTo);
-		
 		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
 		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
 
