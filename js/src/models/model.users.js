@@ -137,8 +137,8 @@ Wu.User = Wu.Class.extend({
 		return this._files[file.uuid];
 	},
 
-	removeFile : function (file) {
-		var fileUuid = file.file_id;
+	removeFile : function (fileUuid) {
+		// var fileUuid = file.file_id;
 		var r = _.remove(this.store.files, function (f) {
 			return f.uuid ==fileUuid;
 		});

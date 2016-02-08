@@ -287,8 +287,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this._initLayerList();
 			this._refreshLayers();
 
-			// this._initBaseLayerList(); // why twice?
-			// this._refreshBaseLayerList();
 		}
 
 		this._refreshBaseLayerList();
@@ -403,6 +401,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	
 	_refreshFiles : function () {
+
+		console.log('refresh Files');
 
 		// FILES
 		for (var p in this.fileProviders) {

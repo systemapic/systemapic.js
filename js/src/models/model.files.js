@@ -219,43 +219,35 @@ Wu.Model.File = Wu.Model.extend({
 				var removedObjects = Wu.parse(response);
 
 				// clean up locally
-				this._fileDeleted(removedObjects);
+				this._fileDeleted(removedObjects, layers);
 
 				// callback
 				done && done(null, removedObjects);
 			}.bind(this));
 
-			// Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
-
-			// 	var removedObjects = Wu.parse(response);
-
-			// 	// clean up locally
-			// 	this._fileDeleted(removedObjects);
-
-			// 	// callback
-			// 	done && done(null, removedObjects);
-
-			// }.bind(this));
 
 		}.bind(this));
 
 	},
 
 
-	_fileDeleted : function (result) {
+	_fileDeleted : function (result, layers) {
+
+		console.log('_fileDeleted', arguments);
 
 		// catch error
-		if (result.error || !result.success) return console.error(result.error || 'No success deleting!');
+		// if (result.error || !result.success) return console.error(result.error || 'No success deleting!');
 
 		// update user locally
-		app.Account.removeFile(result.removed.file);
+		app.Account.removeFile(this.getUuid());
 
 		// update projects locally
-		this._removeLayersLocally(result.removed.layers);
+		this._removeLayersLocally(layers);
 
 		// fire event
+		console.log('firing!');
 		Wu.Mixin.Events.fire('fileDeleted', {detail : {
-			fileUuid : 'lol'
+			fileUuid : this.getUuid()
 		}});
 	},
 
