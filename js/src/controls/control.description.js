@@ -15,7 +15,8 @@ L.Control.Description = Wu.Control.extend({
 
 		// Wrapper for multiple layers
 		this._multipleLegendOuter = Wu.DomUtil.create('div', 'description-multiple-toggle-wrapper', container);
-		this._multipleLegendInner = Wu.DomUtil.create('div', '', this._multipleLegendOuter);
+		this._multipleLegendInner = Wu.DomUtil.create('div', 'description-multiple-toggle-inner', this._multipleLegendOuter);
+		this._multipleLegendInnerContent = Wu.DomUtil.create('div', 'description-multiple-toggle-inner-content', this._multipleLegendInner);
 
 		this._content = Wu.DomUtil.create('div', 'description-control-content', container);
 
@@ -41,15 +42,24 @@ L.Control.Description = Wu.Control.extend({
 		// description
 		this._description = Wu.DomUtil.create('div', 'description-control-description displayNone', this._inner);
 
-		// meta
-		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);		
+		// Toggle open
+		this._toggeOpener = Wu.DomUtil.create('div', 'description-control-toggle-opener displayNone', this._inner);
+			
+		// Description box title
+		this._metaTitle = Wu.DomUtil.create('div', 'description-control-meta-title', this._inner);
 
-		// init satellite path container
-		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._inner});
+		this._metaOuterContainer = Wu.DomUtil.create('div', 'description-meta-outer-container', this._inner);
 
-		// opacity 
-		this._opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._inner, 'Opacity:');
-		this._opacityContainer = Wu.DomUtil.create('div', 'description-control-opacity-container', this._inner);
+		// Meta
+		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._metaOuterContainer);
+
+		// Init satellite path container
+		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._metaOuterContainer});
+
+		// Opacity 
+		this._opacityWrapper = Wu.DomUtil.create('div', 'description-opacity-wrapper', this._metaOuterContainer)
+		this._opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._opacityWrapper, 'Opacity:');
+		this._opacityContainer = Wu.DomUtil.create('div', 'description-control-opacity-container', this._opacityWrapper);
 
 		// legend
 		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
@@ -58,7 +68,7 @@ L.Control.Description = Wu.Control.extend({
 		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, '');
 		
 		// add tooltip
-		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
+		// app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
 
 		// add event hooks
@@ -75,10 +85,13 @@ L.Control.Description = Wu.Control.extend({
 			Wu.DomEvent.on(this._toggle, 'click', this.toggle, this);
 		}
 
-
-	
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stop, this);
+
+		Wu.DomEvent.on(this._multipleLegendInnerContent, 'onscroll scroll', Wu.DomEvent.stop, this);
+
+		// xoxoxoxoxo
+		Wu.DomEvent.on(this._toggeOpener, 'click', this.toggleOpen, this);
 	},
 	
 	_isActive : function () {
@@ -102,6 +115,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	refresh : function () {
+		this._calculateHeight();
 		this.showHide();
 	},
 
@@ -181,39 +195,47 @@ L.Control.Description = Wu.Control.extend({
 
 	toggleOpen : function () {
 
+		Wu.DomUtil.removeClass(this._multipleLegendOuter, 'displayNone');
+		Wu.DomUtil.addClass(this._toggeOpener, 'displayNone');		
+
 		this.isCollapsed = false;
 
-		Wu.DomUtil.removeClass(this._legendContainer, 'minimized');
-		Wu.DomUtil.removeClass(this._header, 'minimized');		
 
-		var description = this._description.innerHTML;
-		if (description && description != '') Wu.DomUtil.removeClass(this._description, 'displayNone');
+		this._calculateHeight();
+
+		// return;
+
+		// Wu.DomUtil.removeClass(this._legendContainer, 'minimized');
+		// Wu.DomUtil.removeClass(this._header, 'minimized');		
+
+		// var description = this._description.innerHTML;
+		// if (description && description != '') Wu.DomUtil.removeClass(this._description, 'displayNone');
 		
-		Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
-		Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
+		// Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
+		// Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
 
-		if ( !this.satelliteAngle.closed ) Wu.DomUtil.removeClass(this.satelliteAngle._innerContainer, 'displayNone');
+		// if ( !this.satelliteAngle.closed ) Wu.DomUtil.removeClass(this.satelliteAngle._innerContainer, 'displayNone');
 
 
-		if ( app.isMobile ) {
+		// if ( app.isMobile ) {
 			
-			Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
-			Wu.DomUtil.removeClass(this._opacityTitle, 'displayNone');
-			Wu.DomUtil.removeClass(this._opacityContainer, 'displayNone');
-			this._legendContainer.style.marginTop = '26px';
+		// 	Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
+		// 	Wu.DomUtil.removeClass(this._opacityTitle, 'displayNone');
+		// 	Wu.DomUtil.removeClass(this._opacityContainer, 'displayNone');
+		// 	this._legendContainer.style.marginTop = '26px';
 
-			var _globesarXtra = document.getElementById('globesar-specific-legend-container');
-			Wu.DomUtil.removeClass(_globesarXtra, 'displayNone');
+		// 	var _globesarXtra = document.getElementById('globesar-specific-legend-container');
+		// 	Wu.DomUtil.removeClass(_globesarXtra, 'displayNone');
 
-			console.log('_globesarXtra', _globesarXtra);
+		// 	console.log('_globesarXtra', _globesarXtra);
 
-			Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-adjusted');
-			Wu.DomUtil.removeClass(this._outer, 'legend-box-adjusted');
+		// 	Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-adjusted');
+		// 	Wu.DomUtil.removeClass(this._outer, 'legend-box-adjusted');
 
 
-			Wu.DomUtil.removeClass(this._multipleLegendInner, 'displayNone');
+		// 	Wu.DomUtil.removeClass(this._multipleLegendInner, 'displayNone');
 
-		}
+		// }
 
 
 
@@ -222,39 +244,47 @@ L.Control.Description = Wu.Control.extend({
 
 	toggleClose : function () {
 
-		// xoxoxoxoxoxoxoxo
+
+		Wu.DomUtil.addClass(this._multipleLegendOuter, 'displayNone');
+		Wu.DomUtil.removeClass(this._toggeOpener, 'displayNone');
 
 		this.isCollapsed = true;
 
-		Wu.DomUtil.addClass(this._legendContainer, 'minimized');
-		Wu.DomUtil.addClass(this._header, 'minimized');
+		this._calculateHeight();
 
-		Wu.DomUtil.addClass(this._description, 'displayNone');
-		Wu.DomUtil.addClass(this._metaContainer, 'displayNone');		
-		Wu.DomUtil.addClass(this._toggle, 'legend-toggle-open');
+		// return;
+
+		// this.isCollapsed = true;
+
+		// Wu.DomUtil.addClass(this._legendContainer, 'minimized');
+		// Wu.DomUtil.addClass(this._header, 'minimized');
+
+		// Wu.DomUtil.addClass(this._description, 'displayNone');
+		// Wu.DomUtil.addClass(this._metaContainer, 'displayNone');		
+		// Wu.DomUtil.addClass(this._toggle, 'legend-toggle-open');
 
 
-		Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
+		// Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
 
-		if ( app.isMobile ) {
+		// if ( app.isMobile ) {
 			
-			Wu.DomUtil.addClass(this._metaContainer, 'displayNone');
-			Wu.DomUtil.addClass(this._opacityTitle, 'displayNone');
-			Wu.DomUtil.addClass(this._opacityContainer, 'displayNone');
-			this._legendContainer.style.marginTop = '0px';
+		// 	Wu.DomUtil.addClass(this._metaContainer, 'displayNone');
+		// 	Wu.DomUtil.addClass(this._opacityTitle, 'displayNone');
+		// 	Wu.DomUtil.addClass(this._opacityContainer, 'displayNone');
+		// 	this._legendContainer.style.marginTop = '0px';
 
-			var _globesarXtra = document.getElementById('globesar-specific-legend-container');
-			Wu.DomUtil.addClass(_globesarXtra, 'displayNone');
+		// 	var _globesarXtra = document.getElementById('globesar-specific-legend-container');
+		// 	Wu.DomUtil.addClass(_globesarXtra, 'displayNone');
 
 
 
-			Wu.DomUtil.addClass(this._toggle, 'legend-toggle-adjusted');
-			Wu.DomUtil.addClass(this._outer, 'legend-box-adjusted');
+		// 	Wu.DomUtil.addClass(this._toggle, 'legend-toggle-adjusted');
+		// 	Wu.DomUtil.addClass(this._outer, 'legend-box-adjusted');
 
-			Wu.DomUtil.addClass(this._multipleLegendInner, 'displayNone');
+		// 	Wu.DomUtil.addClass(this._multipleLegendInner, 'displayNone');
 
-		}
+		// }
 	},
 
 	_addLayer : function (layer) {
@@ -292,7 +322,7 @@ L.Control.Description = Wu.Control.extend({
 
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
-		var wrapper = this._multipleLegendInner;
+		var wrapper = this._multipleLegendInnerContent;
 		wrapper.innerHTML = '';
 
 		var length = 0;
@@ -309,7 +339,34 @@ L.Control.Description = Wu.Control.extend({
 			multipleLayer.id = 'mulitidec_' + uuid;
 
 			if ( uuid == layerUuid ) {
-				length > 1 ? Wu.DomUtil.addClass(multipleLayer, 'active') : Wu.DomUtil.addClass(multipleLayer, 'one-layer');
+				if ( length > 1 ) {
+					// MULTIPLE LAYERS ARE OPEN
+					Wu.DomUtil.addClass(multipleLayer, 'active');					
+
+					// Display toggle open button if menu is collapsed
+					if ( this.isCollapsed ) {
+
+						Wu.DomUtil.removeClass(this._toggeOpener, 'displayNone');
+						
+					} else {
+						// Show layer list box
+						Wu.DomUtil.removeClass(this._multipleLegendOuter, 'displayNone');
+
+						Wu.DomUtil.addClass(this._toggeOpener, 'displayNone');
+					}
+
+
+				} else {
+					// ONLY ONE LAYER IS OPEN
+					Wu.DomUtil.addClass(multipleLayer, 'one-layer');
+
+					// Hide layer list box
+					Wu.DomUtil.addClass(this._multipleLegendOuter, 'displayNone');
+
+					// Remove toggle open button
+					Wu.DomUtil.addClass(this._toggeOpener, 'displayNone');
+				}
+				
 
 
 			} else {
@@ -319,9 +376,11 @@ L.Control.Description = Wu.Control.extend({
 
 			Wu.DomEvent.on(multipleLayer, 'click', this.toggleLegend, this);
 		}
+
+		this._calculateHeight();
 	},
 
-	toggleLegend : function (e) {
+	toggleLegend : function (e) {		
 
 		var id = e.target.id;
 		var layerUuid = id.slice(10, id.length);
@@ -484,6 +543,9 @@ L.Control.Description = Wu.Control.extend({
 			path : satPos.path
 		});
 
+		// Set title
+		this.setMetaTitle(title);
+
 		// Set description
 		this.setDescriptionHTML(description);
 
@@ -496,6 +558,20 @@ L.Control.Description = Wu.Control.extend({
 
 		// set opacity slider
 		this.setOpacity(layer);
+
+	},
+
+	// xoxoxoxox
+	setMetaTitle : function (title) {
+
+		// console.log('');
+		// console.log('');
+		// console.log('%c setMetaHTML ', 'background: red; color: white;');
+		// console.log('meta', meta);
+		// console.log('');
+		// console.log('');
+
+		this._metaTitle.innerHTML = title;
 
 	},
 
@@ -1190,8 +1266,9 @@ L.Control.Description = Wu.Control.extend({
 			style      += 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + size + 'px;';
 
 			// Set dot position
-			var topLeft = (20/2) - (size/2);
-			style += 'top: ' + topLeft + 'px; ' + 'left: ' + topLeft + 'px; ';
+			var _top = (20/2) - (size/2);
+			var _left = (28/2) - (size/2);
+			style += 'top: ' + _top + 'px; ' + 'left: ' + _left + 'px; ';
 
 			// Set HTML
 			str += '<div class="legend-each-container">';
@@ -1236,8 +1313,10 @@ L.Control.Description = Wu.Control.extend({
 			pointStyle += 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + size + 'px;';
 
 			// Set dot position
-			var topLeft = (20/2) - (size/2);
-			pointStyle += 'top: ' + topLeft + 'px; ' + 'left: ' + topLeft + 'px; ';			
+			// var topLeft = (20/2) - (size/2);
+			var _top = (20/2) - (size/2);
+			var _left = (28/2) - (size/2);			
+			pointStyle += 'top: ' + _top + 'px; ' + 'left: ' + _left + 'px; ';			
 
 			if ( opacity != 0 ) hasAllStyle = true;
 		}
@@ -1247,7 +1326,7 @@ L.Control.Description = Wu.Control.extend({
 
 			var layerName = this.legendObj.layerName;
 
-			var name = 'All ' + layerName;
+			var name = layerName;
 			str += '<div class="legend-each-container">';
 			str += '<div class="legend-each-name">' + name + '</div>';
 			str += '<div class="legend-each-color" style="' + pointStyle + '"></div>';
@@ -1308,6 +1387,7 @@ L.Control.Description = Wu.Control.extend({
 				// If it is a match
 				if ( p.value == l.value ) {
 
+
 					// Line style
 					var lineColor   = l.color;
 					var lineOpacity = l.opacity;
@@ -1315,6 +1395,11 @@ L.Control.Description = Wu.Control.extend({
 					var lineRGB     = this.color2RGB(lineColor);
 					var lineRgba    = 'rgba(' + lineRGB.r + ',' + lineRGB.g + ',' + lineRGB.b + ',' + lineOpacity + ');';
 					var lineStyle   = 'border: ' + (lineWidth/2) + 'px solid ' + lineRgba;
+
+					if ( !p.color ) {
+						lineStyle += 'height: 0px; top: 7px;';
+					}
+
 
 					// Polygon style
 					var polygonColor   = p.color;
@@ -1355,6 +1440,11 @@ L.Control.Description = Wu.Control.extend({
 			var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
 			var style   = 'border: ' + width + 'px solid ' + rgba;
 
+
+			// if ( !p.color ) {
+				style += 'height: 0px; top: 7px;';
+			// }			
+
 			// Name
 			var name = '';
 			var operator = line.operator + ' ';
@@ -1392,8 +1482,11 @@ L.Control.Description = Wu.Control.extend({
 				var style   = 'background:' + rgba;
 			}
 
+
+			// console.log('polygon', polygon);
+
 			// Name
-			var name = '';
+			var name = polygon.column + ': ';
 			var operator = polygon.operator + ' ';
 			if ( operator != '= ' ) name += operator;
 			name += polygon.value;
@@ -1441,6 +1534,12 @@ L.Control.Description = Wu.Control.extend({
 			var width   = lines.all.width.value;
 			var RGB = this.color2RGB(color);
 			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
+
+			if ( !polygons.all.color ) {
+				allStyle += 'height: 0px; top: 7px;';
+				width = width/2;
+			}
+
 			allStyle += 'border: ' + width + 'px solid ' + rgba;
 
 			if ( opacity != 0 ) hasAllStyle = true;
@@ -1451,7 +1550,7 @@ L.Control.Description = Wu.Control.extend({
 
 			var layerName = this.legendObj.layerName;
 
-			var name = 'All ' + layerName;
+			var name = layerName;
 			str += '<div class="legend-each-container">';
 			str += '<div class="legend-each-name">' + name + '</div>';
 			str += '<div class="legend-each-color" style="' + allStyle + '"></div>';
@@ -1788,7 +1887,115 @@ L.Control.Description = Wu.Control.extend({
 		// Return black if there are no matches
 		// (could return false, but will have to catch that error later)
 		return '#000000';				
-	},	
+	},
+
+
+	_calculateHeight : function () {
+
+
+		var windowSize = this._getWindowSize();
+		var h = windowSize.height - 50; // Remove 50 for the top chrome.
+
+
+		// LEGEND/DESCRIPTION HEIGHTS
+		// LEGEND/DESCRIPTION HEIGHTS
+
+		// Actual height
+		var legendSelectorHeight = this._multipleLegendInner.offsetHeight;
+		// Height is zero if collapsed (fallback – should provide 0 anyways)
+		if ( this.isCollapsed ) legendSelectorHeight = 0;
+		
+		// Height of inner content, including overflow
+		var legendSelectorScrollHeight = this._multipleLegendInnerContent.scrollHeight;
+		// Not fallback - this number has to be set to zero.
+		if ( this.isCollapsed ) legendSelectorScrollHeight = 0;
+
+		// Height of bottom part, with legend
+		var legendContentHeight = this._content.offsetHeight;
+
+		// Actual height of legend section, with layer name on top. 15 pixels buffer
+		var legendSectionHeight = legendSelectorHeight + legendContentHeight + 15;
+
+
+		// LAYER SELECTOR HEIGHTS
+		// LAYER SELECTOR HEIGHTS
+
+		// Check if Layer selector exists
+		if ( app.MapPane._controls.layermenu && app.MapPane._controls.layermenu._innerScroller ) {
+
+			var layermenu = app.MapPane._controls.layermenu._innerScroller;
+			// Height of wrapper
+			var layermenuHeight = layermenu.offsetHeight;
+			// Inner height of scroller content
+			var layermenuContentHeight = app.MapPane._controls.layermenu._content.scrollHeight;
+
+		// If the layer menu does not exist, set values to zero and declare false
+		} else {
+
+			var layermenu = false;
+			var layermenuHeight = 0;
+			var layermenuContentHeight = 0;
+
+		}
+
+
+		// Check if we need scrollers
+
+		// The height of everything, including scrollers
+		var allScrollHeight = layermenuContentHeight + legendSelectorScrollHeight + legendContentHeight + 15;
+		
+		// Content is higher than screen = we need scrollers
+		if ( allScrollHeight > h ) {
+
+			// Check how much overflow there is
+			// var _diff = allScrollHeight - h;
+			// var _layerOverflow = layermenuContentHeight - layermenuHeight;
+			// var _legendOverflow = legendSelectorScrollHeight - legendSelectorHeight + 8;
+
+			// Calculate max height!
+			var windowHeight = h;
+
+			// Never make legends take more than half of the screen if we need scrollers
+			var maxLegendHeight = Math.floor(h/2 - legendContentHeight - 15);
+			if ( this.isCollapsed ) maxLegendHeight = 0;
+
+			// Calculate max height of layer menu
+			var spaceLeft = h - (maxLegendHeight + legendContentHeight + 15);
+			if ( spaceLeft < h/2 ) spaceLeft = h/2;
+
+			// Set heights
+			if ( layermenu ) layermenu.style.maxHeight = spaceLeft + 'px';
+			this._multipleLegendInner.style.maxHeight = maxLegendHeight + 'px';
+
+
+		} else {
+
+			if ( layermenu ) layermenu.style.maxHeight = 'none';
+			this._multipleLegendInner.style.maxHeight = 'none';			
+		}
+	},
+
+	buildAllLegendYo : function () {
+		var allLegendHTML = '';
+		for ( var f in this.layers ) {
+			var layer = this.layers[f]
+			this.buildLegendObject(layer);
+			var legend = this.getLegend(layer);
+			allLegendHTML += legend;
+		}
+		this._inner.innerHTML = allLegendHTML;
+	},
+
+	_getWindowSize : function (argument) {
+		var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+		    return {width : x, height : y};
+	}
+
 
 
 

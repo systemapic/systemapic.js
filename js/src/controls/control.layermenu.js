@@ -14,8 +14,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// add html
 		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
-		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
-		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
+		this._innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
+		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', this._innerScroller);
 
 		this._bottomContainer = Wu.DomUtil.create('div', 'layers-bottom-container', this._layermenuOuter);
 
@@ -62,15 +62,17 @@ L.Control.Layermenu = Wu.Control.extend({
 	open : function  () {
 		this._isOpen = true;
 		Wu.DomUtil.removeClass(this._innerContainer, 'displayNone');
-
 		Wu.DomUtil.removeClass(this._layerButton, 'rounded-layer-button');
+
+		this.calculateHeight();
 	}, 
 
 	close : function () {
 		this._isOpen = false;
 		Wu.DomUtil.addClass(this._innerContainer, 'displayNone');
-
 		Wu.DomUtil.addClass(this._layerButton, 'rounded-layer-button');
+
+		this.calculateHeight();
 	},
 
 	_addTo : function () {
@@ -1395,6 +1397,14 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._project.store.layermenu[i].enabled = onoff;
 		this.save();
 	},
+
+	calculateHeight : function () {
+		
+		if ( app.MapPane._controls.description ) {
+			app.MapPane._controls.description._calculateHeight();
+		}
+
+	}
 
 
 });
