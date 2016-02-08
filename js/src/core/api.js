@@ -138,6 +138,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	dbFetch : function (options, done) {
+		var path = '/api/db/fetch';
+		this.post(path, options, done);
+	},
+
 	setrolemember : function (options, done) {
 		var path = '/api/access/super/setrolemember';
 		this.post(path, options, done);

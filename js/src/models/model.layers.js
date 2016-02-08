@@ -815,7 +815,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			access_token : app.tokens.access_token
 		};
 
-		app.api.dbFetchArea(options, callback.bind(this));
+		app.api.dbFetch(options, callback.bind(this));
 	},
 
 	_gridOnMousedown : function(e) {
