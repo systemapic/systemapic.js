@@ -1480,6 +1480,26 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			return u.store.firstName;
 		});
 		var itemsContainers = [];
+		var checkedUsers = {};
+
+		function onKeyUp(e) {
+			var filterUsers = [];
+
+			_.each(itemsContainers, function (user) {
+				if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(checkedUsers).indexOf(user.name) !== -1) {
+					user.container.style.display = 'none';
+				} else {
+					user.container.style.display = 'block';
+					filterUsers.push(user);					
+				}
+			});
+
+			if (_.isEmpty(filterUsers)) {
+				invite_list_container.style.display = 'none';
+			} else {
+				invite_list_container.style.display = 'block';
+			}
+		};
 
 		_.each(allUsers, function (user) {
 
@@ -1504,11 +1524,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				if (user.getUuid() == app.Account.getUuid()) return;
 
 				// add selected user item to input box
+				checkedUsers[user.getFullName()] = user;
 				this._addUserAccessItem({
 					input : invite_input,
 					user : user,
-					type : options.type
+					type : options.type,
+ 					checkedUsers : checkedUsers,
+ 					onKeyUp: onKeyUp
 				});
+
+ 				invite_input.value = '';
+ 				onKeyUp();
 					
 			}, this);
 
@@ -1569,24 +1595,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		}, this);
 
-		Wu.DomEvent.on(invite_input, 'keyup', function (e) {
-			var filterUsers = [];
-
-			_.each(itemsContainers, function (user) {
-				if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1) {
-					user.container.style.display = 'none';
-				} else {
-					user.container.style.display = 'block';
-					filterUsers.push(user);					
-				}
-			});
-
-			if (_.isEmpty(filterUsers)) {
-				invite_list_container.style.display = 'none';
-			} else {
-				invite_list_container.style.display = 'block';
-			}
-		}, this);
+		Wu.DomEvent.on(invite_input, 'keyup', onKeyUp, this);
 
 		// close dropdown on any click
 		Wu.DomEvent.on(container, 'click', function (e) {
@@ -1703,7 +1712,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			_.remove(this._divs.users, function (i) {
 				return i.user == user;
 			});
-
+			delete options.checkedUsers[user.getFullName()];
+			options.onKeyUp();
 		}, this);
 
 		// add to array
