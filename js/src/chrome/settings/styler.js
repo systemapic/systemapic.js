@@ -1153,7 +1153,7 @@ Wu.Styler = Wu.Class.extend({
 		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _updateLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

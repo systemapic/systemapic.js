@@ -286,7 +286,7 @@ Wu.Model.File = Wu.Model.extend({
 		app.api.fileGetLayers(options, function (err, response) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _getLayers',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -354,7 +354,7 @@ Wu.Model.File = Wu.Model.extend({
 		app.api.downloadDataset(options, function (err, response) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _downloadDataset',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -600,7 +600,7 @@ Wu.Model.File = Wu.Model.extend({
 		app.api.createLayer(layerJSON, function (err, layerJSON) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _requestDefaultRasterLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -701,7 +701,7 @@ Wu.Model.File = Wu.Model.extend({
 		app.api.createLayer(layerJSON, function (err, layerJSON) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _requestDefaultVectorLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -753,7 +753,7 @@ Wu.Model.File = Wu.Model.extend({
 		app.api.createLayer(options, function (err, body) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _createLayerModel',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

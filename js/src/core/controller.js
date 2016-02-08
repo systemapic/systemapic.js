@@ -76,7 +76,7 @@ Wu.Controller = Wu.Class.extend({
 
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _loadState',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -129,7 +129,7 @@ Wu.Controller = Wu.Class.extend({
 
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _saveState',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

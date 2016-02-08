@@ -555,7 +555,7 @@ Wu.Model.Layer = Wu.Model.extend({
 		app.api.updateLayer(json, function (err, result) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _save',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -564,7 +564,7 @@ Wu.Model.Layer = Wu.Model.extend({
 
 			if (result.error) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _save',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -882,7 +882,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		app.api.downloadLayerDataset(options, function (err, resp) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in downloadLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

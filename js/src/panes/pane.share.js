@@ -184,7 +184,7 @@ Wu.Share = Wu.Pane.extend({
 			app.api.utilSnapshot(hash, function (err, response) {
 				if (err) {
 					return app.feedback.setError({
-						title : 'Something went wrong in _shareImage',
+						title : 'Something went wrong',
 						description : err
 					});
 				}
