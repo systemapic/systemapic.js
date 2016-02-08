@@ -19,9 +19,6 @@ Wu.Socket = Wu.Class.extend({
 	},
 
 	_getServerStats : function () {
-		var socket = this._socket;
-		// socket.emit('get_server_stats');
-		// this.send('get_server_stats');
 		app.Socket.send('get_server_stats');
 	},
 
@@ -32,7 +29,6 @@ Wu.Socket = Wu.Class.extend({
 
 		// send event
 		var socket = this._socket;
-		// socket.emit('user_event', options);
 		app.Socket.send('get_server_stats');
 	},
 
@@ -45,7 +41,6 @@ Wu.Socket = Wu.Class.extend({
 		// send event
 		var socket = this._socket;
 		socket.emit(channel, options);
-
 	},
 
 	_listen : function () {
@@ -57,7 +52,6 @@ Wu.Socket = Wu.Class.extend({
 		});
 		socket.on('connect', function(){
 			console.log('Securely connected to socket.');
-			// socket.emit('ready', 'koko')
 			app.Socket.send('ready');
 		});
 		socket.on('event', function(data){
@@ -74,7 +68,6 @@ Wu.Socket = Wu.Class.extend({
 				detail : data
 			});
 		});
-
 		socket.on('disconnect', function(){
 			console.log('disconnect!');
 		});
@@ -82,7 +75,6 @@ Wu.Socket = Wu.Class.extend({
 			console.log('hola!', data);
 		});
 		socket.on('processingProgress', function(data) {
-			console.log('scoket progress');
 			Wu.Mixin.Events.fire('processingProgress', {
 				detail : data
 			});
@@ -93,13 +85,7 @@ Wu.Socket = Wu.Class.extend({
 		});
 		socket.on('generate_tiles', function (data) {
 
-			console.log('generate tiles done?', data);
-
-			if (data.err) {
-				console.error('generetate err', data);
-
-				return;
-			}
+			if (data.err) return;
 
 			// fire
 			Wu.Mixin.Events.fire('generatedTiles', {
@@ -108,15 +94,11 @@ Wu.Socket = Wu.Class.extend({
 
 		});
 		socket.on('downloadReady', function (data) {
-
-
 			// select project
 			var event_id = 'downloadReady-' + data.file_id;
 			Wu.Mixin.Events.fire(event_id, {detail : data});
 		});
 		socket.on('processingDone', function (data) {
-
-			console.log('processing done');
 
 			// notify data lib
 			var file_id = data.file_id;
@@ -124,9 +106,7 @@ Wu.Socket = Wu.Class.extend({
 
 			app.Data._onImportedFile(file_id, import_took_ms);
 		});
-		
 		socket.on('errorMessage', function (data) {
-			console.log('errorMessage!', data);
 
 			var content = data.error;
 
@@ -148,7 +128,6 @@ Wu.Socket = Wu.Class.extend({
 			}
 
 		});
-		
 
 	},
 
