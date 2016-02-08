@@ -2,6 +2,14 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 
+		console.log('');
+		console.log('%cinitialize popup', 'background: green; color: white;');
+		// console.log('this', this);
+		// console.log('this._isOpen', this._isOpen);
+		console.log('');
+		console.log('');
+		console.log('');
+
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
@@ -35,7 +43,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		this._popup = null;
 
 		// return if no content
-		if (!content) return;
+		if (!content) return;		
 
 		// Create empty		
 		if (!this._popupContent) this._popupContent = '';
@@ -46,13 +54,31 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Open popup
 		this.openPopup(e, multiPopUp);
 
+		// Set open state to true
+		this._isOpen = true;
+
 	},
 
 
 	// Open pop-up
 	openPopup : function (e, multiPopUp) {
 
-		if (this._popup) return;
+		this.createNewPopup(e, multiPopUp);
+
+		// if ( app.MapPane._chart && app.MapPane._chart._isOpen ) {
+		// 	this.updateExistingPopup(e, multiPopUp)
+		// } else {
+		// 	this.createNewPopup(e, multiPopUp)
+		// }
+		
+	},
+
+	createNewPopup : function (e, multiPopUp) {
+
+		console.log('%c createNewPopup ', 'background: red; color: white;');
+
+	
+		if ( this._popup ) return;
 
 		var popup   = this._createPopup(),
 		    content = this._popupContent,
@@ -86,7 +112,17 @@ Wu.Control.Chart = Wu.Control.extend({
 			// Add marker circle
 			this._addMarkerCircle(latlng);
 		}
-		
+
+	},
+
+	updateExistingPopup : function (e, multiPopUp) {
+	
+		console.log('%c updateExistingPopup ', 'background: blue; color: white;');
+		console.log('this._popupContent', this._popupContent);
+
+		// app.MapPane._chart.setContent('Hello!');
+		// console.log('app.MapPane._chart._popup', app.MapPane._chart._popup);
+
 	},
 
 	_getMarkerPosition : function (latlng, e) {
@@ -139,6 +175,9 @@ Wu.Control.Chart = Wu.Control.extend({
 		// nullify
 		this._popupContent = '';
 		this._popup = null;
+
+		// xoxoxoxoxo
+		app.MapPane._chart._isOpen = false;		
 
 		// remove marker
 		this.popUpMarkerCircle && app._map.removeLayer(this.popUpMarkerCircle);
@@ -1016,6 +1055,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		return layerUuid;		
 	},	
 
+	// OBS! This exists somewhere else too... don't quite remember where.
+	// TODO: move to class.js
 	_validateDateFormat : function (_key) {
 
 
