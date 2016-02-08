@@ -281,7 +281,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 					title : 'Something went wrong',
 					description : err
 				});
-				return done(err);
+				return done && done(err);
 			}
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
