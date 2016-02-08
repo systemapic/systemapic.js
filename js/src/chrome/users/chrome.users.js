@@ -287,7 +287,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		app.api.inviteLink(options, function (err, response) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _createShareableInvite',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

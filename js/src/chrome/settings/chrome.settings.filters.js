@@ -197,7 +197,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _updateLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -855,7 +855,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		app.api.fetchHistogram(options, function (err, histogramJSON) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _getFreshHistogram',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

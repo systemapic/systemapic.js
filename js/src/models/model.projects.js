@@ -103,7 +103,7 @@ Wu.Project = Wu.Class.extend({
  		app.api.createOsmLayer(options, function (err, response) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in createOSMLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -495,7 +495,7 @@ Wu.Project = Wu.Class.extend({
 		app.api.deleteLayer(json, function (err, result) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in removeMapboxAccount',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -503,7 +503,10 @@ Wu.Project = Wu.Class.extend({
 			var result = Wu.parse(result);
 
 			if (result.error) {
-				console.error('something went worng', result);
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : result.error
+				});
 			} else {
 				console.error('Layer deleted successfully', result);
 			}
@@ -521,7 +524,7 @@ Wu.Project = Wu.Class.extend({
 		app.api.deleteLayer('/api/layers/delete', JSON.stringify(options), function (err, response) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in deleteLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

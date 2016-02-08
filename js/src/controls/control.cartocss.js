@@ -1184,7 +1184,7 @@ L.Control.Cartocss = Wu.Control.extend({
 
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in _updateLayer',
+					title : 'Something went wrong',
 					description : err
 				});
 			}

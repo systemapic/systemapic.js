@@ -65,7 +65,7 @@ Wu.User = Wu.Class.extend({
 		app.api.requestContact(options, function (err, response) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in sendContactRequest',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
@@ -94,7 +94,7 @@ Wu.User = Wu.Class.extend({
 		app.api.inviteToProjects(invites, function (err, response) {
 			if (err) {
 				return app.feedback.setError({
-					title : 'Something went wrong in inviteToProjects',
+					title : 'Something went wrong',
 					description : err
 				});
 			}
