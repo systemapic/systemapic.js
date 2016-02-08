@@ -1479,6 +1479,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
 			return u.store.firstName;
 		});
+		var itemsContainers = [];
 
 		_.each(allUsers, function (user) {
 
@@ -1510,6 +1511,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				});
 					
 			}, this);
+
+			itemsContainers.push({
+				name: user.getFullName(),
+				container: list_item_container
+			});
 		}, this);
 
 
@@ -1563,6 +1569,24 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		}, this);
 
+		Wu.DomEvent.on(invite_input, 'keyup', function (e) {
+			var filterUsers = [];
+
+			_.each(itemsContainers, function (user) {
+				if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1) {
+					user.container.style.display = 'none';
+				} else {
+					user.container.style.display = 'block';
+					filterUsers.push(user);					
+				}
+			});
+
+			if (_.isEmpty(filterUsers)) {
+				invite_list_container.style.display = 'none';
+			} else {
+				invite_list_container.style.display = 'block';
+			}
+		}, this);
 
 		// close dropdown on any click
 		Wu.DomEvent.on(container, 'click', function (e) {
