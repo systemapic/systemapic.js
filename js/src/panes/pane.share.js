@@ -181,9 +181,16 @@ Wu.Share = Wu.Pane.extend({
 		app.setHash(function (ctx, hash) {
 
 			// get snapshot from server
-			Wu.send('/api/util/snapshot', hash, function (a, b) {
-				this._createdImage(a, b);
-			}.bind(this), this);
+			app.api.utilSnapshot(hash, function (err, response) {
+				if (err) {
+					return app.feedback.setError({
+						title : 'Something went wrong',
+						description : err
+					});
+				}
+
+				this._createdImage(err, response);
+			}.bind(this));
 
 		}.bind(this));
 
@@ -274,10 +281,10 @@ Wu.Share = Wu.Pane.extend({
 
 			var h = JSON.parse(hash);
 			h.hash.slug = app.activeProject.getName();
-			var json = JSON.stringify(h); 
+			var json = h;
 
 			// get snapshot from server
-			Wu.post('/api/util/pdfsnapshot', json, that._createdPrint, that);
+			app.api.pdfsnapshot(json, that._createdPrint.bind(that));
 
 		});
 
@@ -362,13 +369,13 @@ Wu.Share = Wu.Pane.extend({
 			project_name : this._project.getTitle(),
 			access_type : 'view',
 			permissions : permissions
-		}
+		};
 
 		// slack
 		app.Analytics.onInvite(options);
 
 		// get invite link
-		Wu.post('/api/invite/link', JSON.stringify(options), callback);
+		app.api.inviteLink(options, callback.bind(this));
 	},
 
 

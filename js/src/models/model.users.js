@@ -60,21 +60,21 @@ Wu.User = Wu.Class.extend({
 
 		var options = {
 			contact : user.getUuid()
-		}
+		};
 
-		Wu.send('/api/user/requestContact', options, function (a, b) {
-
-			console.log('request sent!', a, b);
-
-
+		app.api.requestContact(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			// set feedback 
 			app.feedback.setMessage({
-				title : 'Friend request sent',
+				title : 'Friend request sent'
 				// description : description
 			});
-
-
-		}, this);
+		});
 
 	},
 
@@ -88,11 +88,16 @@ Wu.User = Wu.Class.extend({
 			edit : options.edit,
 			read : options.read,
 			user : userUuid
-		}
+		};
 
 		// send to server
-		Wu.send('/api/user/inviteToProjects', invites, function (a, response) {
-
+		app.api.inviteToProjects(invites, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			var result = Wu.parse(response);
 
 			// set feedback 
@@ -107,7 +112,7 @@ Wu.User = Wu.Class.extend({
 				project.store.access = projectAccess.access;
 			});
 
-		}.bind(this), this);
+		}.bind(this));
 
 	},
 
@@ -253,7 +258,7 @@ Wu.User = Wu.Class.extend({
 		});
 
 		// post              path          data           callback        context of cb
-		Wu.Util.postcb('/api/user/delete', json, context[callback], context);
+		app.api.deleteUser(json, context[callback]);
 
 	},
 

@@ -273,10 +273,16 @@ Wu.Model.File = Wu.Model.extend({
 
 	
 	_getLayers : function (callback) {
-
 		// get layers connected to dataset
 		var options = this._getLayerData();
-		Wu.post('/api/file/getLayers', JSON.stringify(options), function (err, response) {
+		app.api.fileGetLayers(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
+
 			var layers = Wu.parse(response);
 			callback(err, layers);
 		});
@@ -331,13 +337,19 @@ Wu.Model.File = Wu.Model.extend({
 		var options = {
 			file_id : this.getUuid(),
 			socket_notification : true
-		}
+		};
 
 		// set download id for feedback
 		this._downloadingID = Wu.Util.createRandom(5);
 
 		// post download request to server
-		Wu.post('/api/file/downloadDataset', JSON.stringify(options), function (err, response) {
+		app.api.downloadDataset(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 
 			// give feedback
 			app.feedback.setMessage({
@@ -555,7 +567,7 @@ Wu.Model.File = Wu.Model.extend({
 
 		var cutColor = options.cutColor || false;
 
-		console.log('cutColor', cutColor)
+		console.log('cutColor', cutColor);
 
 
 		var layerJSON = {
@@ -574,10 +586,17 @@ Wu.Model.File = Wu.Model.extend({
 			"return_model" : true,
 			"projectUuid" : project.getUuid(),
 			"cutColor" : cutColor
-		}
+		};
 
 		// create postgis layer
-		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
+		app.api.createLayer(layerJSON, function (err, layerJSON) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
+
 			var layer = Wu.parse(layerJSON);
 
 			var options = {
@@ -588,9 +607,9 @@ Wu.Model.File = Wu.Model.extend({
 				metadata : layer.options.metadata, 	// TODO
 				title : file.getName(),
 				description : 'Description: Layer created from ' + file.getName(),
-				file : file.getUuid(),
+				file : file.getUuid()
 				// style : JSON.stringify(defaultStyle) // save default json style
-			}
+			};
 
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
@@ -668,10 +687,16 @@ Wu.Model.File = Wu.Model.extend({
 			"file_id": file_id,
 			"return_model" : true,
 			"projectUuid" : project.getUuid()
-		}
+		};
 
 		// create postgis layer
-		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
+		app.api.createLayer(layerJSON, function (err, layerJSON) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			var layer = Wu.parse(layerJSON);
 
 			console.log('c l', layer);
@@ -686,7 +711,7 @@ Wu.Model.File = Wu.Model.extend({
 				description : 'Description: Layer created from ' + file.getName(),
 				file : file.getUuid(),
 				style : JSON.stringify(defaultStyle) // save default json style
-			}
+			};
 
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
@@ -717,7 +742,13 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	_createLayerModel : function (options, done) {
-		Wu.Util.postcb('/api/layers/new', JSON.stringify(options), function (err, body) {
+		app.api.createLayer(options, function (err, body) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			var layerModel = Wu.parse(body);
 			done(null, layerModel);
 		}.bind(this));

@@ -191,11 +191,16 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			file_id: file_id,
 			return_model : true,
 			layerUuid : layer.getUuid()
-		}
+		};
 
 		// create layer on server
-		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
-
+		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 
@@ -844,11 +849,16 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			column : column,
 			access_token : app.tokens.access_token,
 			num_buckets : this.options.num_buckets
-		}
+		};
 
 		// get histogram 
-		Wu.post('/api/db/fetchHistogram', JSON.stringify(options), function (err, histogramJSON) {
-
+		app.api.fetchHistogram(options, function (err, histogramJSON) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			// parse
 			var histogramData = Wu.parse(histogramJSON);
 

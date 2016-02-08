@@ -201,15 +201,15 @@ L.Control.Draw = Wu.Control.extend({
 			});
 
 			return;
-		} 
+		}
 
 		var options = {
 			access_token : app.tokens.access_token,
 			geojson : options.geojson,
 			layer_id : layer_id
-		}
+		};
 
-		Wu.send('/api/db/fetchArea', options, callback, this);
+		app.api.dbFetchArea(options, callback.bind(this));
 	},
 	
 	_getActiveLayerID : function () {

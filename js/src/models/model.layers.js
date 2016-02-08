@@ -395,9 +395,9 @@ Wu.Model.Layer = Wu.Model.extend({
 			colors : ['red', 'white', 'blue'],
 			marker : {
 				width : field,
-				opacity : 1,
+				opacity : 1
 			}
-		}
+		};
 
 		return style;
 	},
@@ -405,7 +405,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	setCartoCSS : function (json, callback) {
 
 		// send to server
-		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
+		app.api.setCartocss(json, callback.bind(this));
 	
 		// set locally on layer
 		this.setCartoid(json.cartoid);
@@ -415,10 +415,10 @@ Wu.Model.Layer = Wu.Model.extend({
 
 		var json = {
 			cartoid : cartoid
-		}
+		};
 
 		// get cartocss from server
-		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
+		app.api.getCartocss(json, callback);
 	},
 
 	getMeta : function () {
@@ -514,7 +514,7 @@ Wu.Model.Layer = Wu.Model.extend({
 			cartoid : this.getCartoid()
 		});
 
-		Wu.post('/api/layer/createlegends', json, callback, this)
+		app.api.createlegends(json, callback)
 	},
 
 
@@ -527,9 +527,8 @@ Wu.Model.Layer = Wu.Model.extend({
 			cartoid : this.getCartoid()
 		});
 
-		Wu.post('/api/util/getfeaturesvalues', json, callback.bind(ctx), this)
+		app.api.getfeaturesvalues(json, callback.bind(ctx))
 	},
-
 
 	hide : function () {
 		var container = this.getContainer();
@@ -553,8 +552,23 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	_save : function (json) {
-		var string  = JSON.stringify(json);
-		Wu.save('/api/layer/update', string);
+		app.api.updateLayer(json, function (err, result) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
+
+			var result = Wu.parse(result);
+
+			if (result.error) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
+		}.bind(this));
 	},
 
 	_setZIndex : function (z) {
@@ -799,9 +813,9 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			row : row,
 			layer_id : layer_id,
 			access_token : app.tokens.access_token
-		}
+		};
 
-		Wu.send('/api/db/fetch', options, callback, this);
+		app.api.dbFetchArea(options, callback.bind(this));
 	},
 
 	_gridOnMousedown : function(e) {
@@ -860,13 +874,18 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		var options = {
 			layer_id : this.getUuid(), 
 			socket_notification : true
-		}
+		};
 
 		// set download id for feedback
 		this._downloadingID = Wu.Util.createRandom(5);
 
-		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), function (err, resp) {
-
+		app.api.downloadLayerDataset(options, function (err, resp) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			// give feedback
 			app.feedback.setMessage({
 				title : 'Preparing download',

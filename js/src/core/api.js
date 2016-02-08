@@ -53,6 +53,171 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	getHash : function (options, done) {
+		var path = '/api/project/hash/get';
+		this.post(path, options, done);
+	},
+
+	updateLayer : function (options, done) {
+		var path = '/api/layer/update';
+		this.post(path, options, done);
+	},
+
+	createLayer : function (options, done) {
+		var path = '/api/db/createLayer';
+		this.post(path, options, done);
+	},
+
+	setCartocss : function (options, done) {
+		var path = '/api/layers/cartocss/set';
+		this.post(path, options, done);
+	},
+
+	getCartocss : function (options, done) {
+		var path = '/api/layers/cartocss/get';
+		this.post(path, options, done);
+	},
+
+	createlegends : function (options, done) {
+		var path = '/api/layer/createlegends';
+		this.post(path, options, done);
+	},
+
+	getfeaturesvalues : function (options, done) {
+		var path = '/api/util/getfeaturesvalues';
+		this.post(path, options, done);
+	},
+
+	hashSet : function (options, done) {
+		var path = '/api/project/hash/set';
+		this.post(path, options, done);
+	},
+
+	fileGetLayers : function (options, done) {
+		var path = '/api/file/getLayers';
+		this.post(path, options, done);
+	},
+
+	downloadDataset : function (options, done) {
+		var path = '/api/file/downloadDataset';
+		this.post(path, options, done);
+	},
+
+	downloadLayerDataset : function (options, done) {
+		var path = '/api/layer/downloadDataset';
+		this.post(path, options, done);
+	},
+
+	createThumb : function (options, done) {
+		var path = '/api/util/createThumb';
+		this.post(path, options, done);
+	},
+
+	pdfsnapshot : function (options, done) {
+		var path = '/api/util/pdfsnapshot';
+		this.post(path, options, done);
+	},
+
+	analyticsSet : function (options, done) {
+		var path = '/api/analytics/set';
+		this.post(path, options, done);
+	},
+
+	projectSetAccess  : function (options, done) {
+		var path = '/api/project/setAccess';
+		this.post(path, options, done);
+	},
+
+	userInvite : function (options, done) {
+		var path = '/api/user/invite';
+		this.post(path, options, done);
+	},
+
+	dbFetchArea : function (options, done) {
+		var path = '/api/db/fetchArea';
+		this.post(path, options, done);
+	},
+
+	setrolemember : function (options, done) {
+		var path = '/api/access/super/setrolemember';
+		this.post(path, options, done);
+	},
+
+	portalSetrolemember : function (options, done) {
+		var path = '/api/access/portal/setrolemember';
+		this.post(path, options, done);
+	},
+
+	requestContact : function (options, done) {
+		var path = '/api/user/requestContact';
+		this.post(path, options, done);
+	},
+
+	inviteToProjects : function (options, done) {
+		var path = '/api/user/inviteToProjects';
+		this.post(path, options, done);
+	},
+
+	utilSnapshot : function (options, done) {
+		var path = '/api/util/snapshot';
+		this.post(path, options, done);
+	},
+
+	errorLog : function (options, done) {
+		var path = '/api/error/log';
+		this.post(path, options, done);
+	},
+
+	clientNew : function (options, done) {
+		var path = '/api/client/new';
+		this.post(path, options, done);
+	},
+
+	clientDelete : function (options, done) {
+		var path = '/api/client/delete';
+		this.post(path, options, done);
+	},
+
+	createLayer : function (options, done) {
+		var path = '/api/layers/new';
+		this.post(path, options, done);
+	},
+
+	deleteUser : function (options, done) {
+		var path = '/api/user/delete';
+		this.post(path, options, done);
+	},
+
+	createOsmLayer : function (options, done) {
+		var path = '/api/layers/osm/new';
+		this.post(path, options, done);
+	},
+
+	fetchHistogram : function (options, done) {
+		var path = '/api/db/fetchHistogram';
+		this.post(path, options, done);
+	},
+
+	accessSetrolemember : function (options, done) {
+		var path = '/api/access/setrolemember';
+		this.post(path, options, done);
+	},
+
+	analyticsGet : function (options, done) {
+		var path = '/api/analytics/get';
+		this.post(path, options, done);
+	},
+
+	clientUpdate : function (options, done) {
+		var path = '/api/client/update';
+		this.post(path, options, done);
+	},
+
+	inviteLink : function (options, done) {
+		var path = '/api/invite/link';
+		this.post(path, options, done);
+	},
+
 	addFileToTheProject : function (options, done) {
 		var path = '/api/file/addtoproject';
 		this.post(path, options, done);

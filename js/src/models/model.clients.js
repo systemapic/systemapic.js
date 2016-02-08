@@ -59,7 +59,7 @@ Wu.Client = Wu.Class.extend({
 	},
 
 	_save : function (string) {
-		Wu.send('/api/client/update', string, this._saved.bind(this));  // TODO: pgp & callback
+		app.api.clientUpdate(string, this._saved.bind(this));  // TODO: pgp & callback
 	},
 
 	_saved : function (err, json) {
@@ -88,12 +88,12 @@ Wu.Client = Wu.Class.extend({
 			name 		: this.name,
 			description 	: this.description,
 			keywords 	: this.keywords
-		}
+		};
 
 		var json   = JSON.stringify(options);
 		var editor = Wu.app.SidePane.Clients;
 
-		Wu.Util.postcb('/api/client/new', json, editor._created, this);
+		app.api.clientNew(json, editor._created);
 
 	},
 
@@ -107,7 +107,7 @@ Wu.Client = Wu.Class.extend({
 		json = JSON.stringify(json);
 
 		// post with callback:    path       data    callback   context of cb
-		Wu.Util.postcb('/api/client/delete', json, client._deleted, client);
+		app.api.clientDelete(json, client._deleted);
 	},
 
 	_deleted : function (client, json) {

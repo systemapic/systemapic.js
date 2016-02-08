@@ -1147,11 +1147,16 @@ Wu.Styler = Wu.Class.extend({
 			file_id: file_id,
 			return_model : true,
 			layerUuid : layer.getUuid()
-		}
+		};
 
 		// create layer on server
-		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
-
+		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 

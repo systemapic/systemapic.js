@@ -82,7 +82,14 @@ Wu.App = Wu.Class.extend({
 			stack : stack,
 			project : project
 		});
-		Wu.save('/api/error/log', options); // todo: move req to api.js
+		app.api.errorLog(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong.',
+					description : err
+				});
+			}
+		}); // todo: move req to api.js
 	},
 
 	_checkForInvite : function () {
@@ -446,10 +453,10 @@ Wu.App = Wu.Class.extend({
 	getHash : function (id, project, callback) {
 
 		// get a saved setup - which layers are active, position, 
-		Wu.post('/api/project/hash/get', JSON.stringify({
+		app.api.getHash({
 			projectUuid : project.getUuid(),
 			id : id
-		}), callback, this);
+		}, callback.bind(this));
 	},
 
 	_renderHash : function (context, json) {
@@ -479,20 +486,20 @@ Wu.App = Wu.Class.extend({
 		var active = app.MapPane.getControls().layermenu._getActiveLayers();
 		var layers = _.map(active, function (l) {
 			return l.item.layer;
-		})
+		});
 
 		// get project;
 		var project = project || app.activeProject;
 
 		// save hash to server
-		Wu.post('/api/project/hash/set', JSON.stringify({
+		app.api.hashSet({
 			projectUuid : project.getUuid(),
 			hash : {
 				id 	 : Wu.Util.createRandom(6),
 				position : app.MapPane.getPosition(),
 				layers 	 : layers 			// layermenuItem uuids, todo: order as z-index
 			}
-		}), callback, this);
+		}, callback, this);
 
 	},
 

@@ -100,9 +100,15 @@ Wu.Project = Wu.Class.extend({
 		});
 
 		// get new layer from server
- 		Wu.Util.postcb('/api/layers/osm/new', options, function (ctx, json) {
+ 		app.api.createOsmLayer(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 
- 			var layer = ctx.addLayer(JSON.parse(json));
+ 			var layer = this.addLayer(JSON.parse(response));
 
  			// callback to wherever intiated
  			callback(null, layer);
@@ -133,7 +139,7 @@ Wu.Project = Wu.Class.extend({
 		});
 		
 		// get new layer from server
- 		Wu.Util.postcb('/api/layers/new', options, this._createdLayerFromGeoJSON, this);
+ 		app.api.createLayer(options, this._createdLayerFromGeoJSON.bind(this));
 
 	},
 
@@ -262,15 +268,15 @@ Wu.Project = Wu.Class.extend({
 		var options = {
 			project : this.getUuid(),
 			access : projectAccess
-		}
+		};
 
 		// send request to API		
- 		Wu.Util.postcb('/api/project/setAccess', JSON.stringify(options), function (ctx, response) {
- 		
+ 		app.api.projectSetAccess(options, function (err, response) {
+
  			// set locally
  			this.store.access = projectAccess;
 
- 		}.bind(this), this);
+ 		}.bind(this));
 
 	},
 
@@ -485,8 +491,26 @@ Wu.Project = Wu.Class.extend({
 			project_id : this.getUuid(),
 			layer_id : lids
 		};
-		var string = JSON.stringify(json);
-		Wu.save('/api/layers/delete', string); 
+
+		app.api.deleteLayer(json, function (err, result) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
+
+			var result = Wu.parse(result);
+
+			if (result.error) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : result.error
+				});
+			} else {
+				console.error('Layer deleted successfully', result);
+			}
+		}.bind(this));
 
 	},
 
@@ -498,7 +522,12 @@ Wu.Project = Wu.Class.extend({
 		};
 
 		app.api.deleteLayer('/api/layers/delete', JSON.stringify(options), function (err, response) {
-			if (err) return console.error('layer delete err:', err);
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
 
 			var result = Wu.parse(response);
 
@@ -1168,10 +1197,10 @@ Wu.Project = Wu.Class.extend({
 			obj.dimensions = {
 				height : 233,
 				width : 350
-			}
+			};
 
 			// get snapshot from server
-			Wu.post('/api/util/createThumb', JSON.stringify(obj), this.createdProjectThumb, this);
+			app.api.createThumb(obj, this.createdProjectThumb);
 
 		}.bind(this), this);
 	},

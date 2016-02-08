@@ -269,7 +269,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var access = {
 			edit : [],
 			read: []
-		}
+		};
 
 		this._access.read.forEach(function (r) {
 			access.read.push(r.project.getUuid());
@@ -279,14 +279,21 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		});
 
 		// this._access[options.type]
-		var options = JSON.stringify({
+		var options = {
 			access : access
-		});
+		};
 
 		// create share link
-		Wu.post('/api/invite/link', options, function (a, b) {
-			this._shareLinkInput.value = b;
-		}.bind(this), this);
+		app.api.inviteLink(options, function (err, response) {
+			if (err) {
+				return app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+			}
+
+			this._shareLinkInput.value = response;
+		}.bind(this));
 	},
 
 	// icon on user
@@ -397,7 +404,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var access = {
 			edit : [],
 			read : []
-		}
+		};
 
 		this._access.edit.forEach(function (p) {
 			access.edit.push(p.project.getUuid());
@@ -411,10 +418,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			emails : emails,
 			customMessage : customMessage,
 			access : access
-		}
+		};
 
 		// send to server
-		Wu.send('/api/user/invite', options, this._sentInvites.bind(this, e.target), this);
+		app.api.userInvite(options, this._sentInvites.bind(this, e.target));
 
 		// logs
 		this._logInvites(options);

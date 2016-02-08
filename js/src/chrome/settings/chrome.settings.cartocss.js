@@ -272,11 +272,17 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 			file_id: file_id,
 			return_model : true,
 			layerUuid : layer.getUuid()
-		}
+		};
 
 		// create layer on server
-		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
-
+		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
+			if (err) {
+				app.feedback.setError({
+					title : 'Something went wrong',
+					description : err
+				});
+				return done && done(err);
+			}
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 
@@ -292,7 +298,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 
 			// return
 			done && done();
-		});
+		}.bind(this));
 
 	},
 
