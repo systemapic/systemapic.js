@@ -624,8 +624,28 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
 			return u.store.firstName;
 		});
+		var checkedUsers = {};
 		var itemsContainers = [];
 		
+		function onKeyUp(e) {
+			var filterUsers = [];
+
+			_.each(itemsContainers, function (user) {
+				if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(checkedUsers).indexOf(user.name) !== -1) {
+					user.container.style.display = 'none';
+				} else {
+					user.container.style.display = 'block';
+					filterUsers.push(user);					
+				}
+			});
+
+			if (_.isEmpty(filterUsers)) {
+				invite_list_container.style.display = 'none';
+			} else {
+				invite_list_container.style.display = 'block';
+			}
+		};
+
 		_.each(allUsers, function (user) {
 
 			// divs
@@ -647,12 +667,17 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				if (options.type == 'read' && user.getUuid() == app.Account.getUuid()) return;
 
 				// add selected user item to input box
+				checkedUsers[user.getFullName()] = user;
 				this._addUserAccessItem({
 					input : invite_input,
 					user : user,
-					type : options.type
+					type : options.type,
+					checkedUsers : checkedUsers,
+					onKeyUp: onKeyUp
 				});
-					
+
+				invite_input.value = '';
+				onKeyUp();
 			}, this);
 
 			itemsContainers.push({
@@ -712,24 +737,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		}, this);
 
-		Wu.DomEvent.on(invite_input, 'keyup', function (e) {
-			var filterUsers = [];
-
-			_.each(itemsContainers, function (user) {
-				if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1) {
-					user.container.style.display = 'none';
-				} else {
-					user.container.style.display = 'block';
-					filterUsers.push(user);					
-				}
-			});
-
-			if (_.isEmpty(filterUsers)) {
-				invite_list_container.style.display = 'none';
-			} else {
-				invite_list_container.style.display = 'block';
-			}
-		}, this);
+		Wu.DomEvent.on(invite_input, 'keyup', onKeyUp, this);
 
 		// close dropdown on any click
 		Wu.DomEvent.on(container, 'click', function (e) {
@@ -825,6 +833,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					return i.user == user;
 				});
 
+				delete options.checkedUsers[user.getFullName()];
+				options.onKeyUp();
 			}, this);
 		} else {
 
