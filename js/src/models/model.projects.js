@@ -514,10 +514,9 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	deleteLayer : function (layer) {
-
+	deleteLayerByUuid : function (layerUuid) {
 		var options = {
-			layer_id : layer.getUuid(),
+			layer_id : layerUuid,
 			project_id : this.getUuid()
 		};
 
@@ -542,6 +541,11 @@ Wu.Project = Wu.Class.extend({
 			}}); 
 
 		}.bind(this));
+	},
+
+	deleteLayer : function (layer) {
+
+		this.deleteLayerByUuid(layer.getUuid());
 
 	},
 

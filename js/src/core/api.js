@@ -183,6 +183,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	createTileLayer : function (options, done) {
+		var path = '/api/db/createLayer';
+		this.post(path, options, done);
+	},
+
 	deleteUser : function (options, done) {
 		var path = '/api/user/delete';
 		this.post(path, options, done);
