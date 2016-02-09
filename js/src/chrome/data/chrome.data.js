@@ -1440,8 +1440,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_createInviteUsersInput : function (options) {
 
 		// invite users
-		var content = options.content || this._fullscreen._content;
-		var container = this._fullscreen._container;
+		var me = this;
+		var content = options.content || me._fullscreen._content;
+		var container = me._fullscreen._container;
 		var project = options.project;
 
 		// label
@@ -1465,7 +1466,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var invite_list_inner = Wu.DomUtil.create('div', 'invite-list-inner', invite_list_container);
 
 		// remember div
-		this._divs.invite_list_container = invite_list_container;
+		me._divs.invite_list_container = invite_list_container;
 
 		// for manual scrollbar (js)
 		var monkey_scroll_bar = Wu.DomUtil.create('div', 'monkey-scroll-bar', invite_list_inner);
@@ -1481,24 +1482,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		});
 		var itemsContainers = [];
 		var checkedUsers = {};
-
-		function onKeyUp(e) {
-			var filterUsers = [];
-
-			_.each(itemsContainers, function (user) {
-				if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(checkedUsers).indexOf(user.name) !== -1) {
-					user.container.style.display = 'none';
-				} else {
-					user.container.style.display = 'block';
-					filterUsers.push(user);					
-				}
-			});
-
-			if (_.isEmpty(filterUsers)) {
-				invite_list_container.style.display = 'none';
-			} else {
-				invite_list_container.style.display = 'block';
-			}
+		me._onKeyUpparameters = {
+			itemsContainers: itemsContainers,
+			checkedUsers: checkedUsers,
+			invite_input: invite_input
 		};
 
 		_.each(allUsers, function (user) {
@@ -1519,7 +1506,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
-
 				// dont allow adding self 
 				if (user.getUuid() == app.Account.getUuid()) return;
 
@@ -1529,12 +1515,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 					input : invite_input,
 					user : user,
 					type : options.type,
- 					checkedUsers : checkedUsers,
- 					onKeyUp: onKeyUp
+					itemsContainers: itemsContainers,
+					checkedUsers: checkedUsers,
+					invite_list_container: invite_list_container
 				});
 
  				invite_input.value = '';
- 				onKeyUp();
+ 				me._onKeyUp();
 					
 			}, this);
 
@@ -1593,9 +1580,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				this._closeInviteInputs();
 			}
 
-		}, this);
+		}.bind(this), this);
 
-		Wu.DomEvent.on(invite_input, 'keyup', onKeyUp, this);
+		Wu.DomEvent.on(invite_input, 'keyup', me._onKeyUp, me);
 
 		// close dropdown on any click
 		Wu.DomEvent.on(container, 'click', function (e) {
@@ -1608,22 +1595,46 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			if (relevantTarget) this._closeInviteInputs();
 
-		},this);
+		}, this);
 
 		
 	},
+
 	_closeInviteInputs : function () {
 		console.log('closee');
 	},
 
 	_closeInviteInputs : function () {
-
 		var container = this._divs.invite_list_container;
 		if (container) container.style.display = 'none';
+	},
 
+	_showInviteInputs : function () {
+		var container = this._divs.invite_list_container;
+		if (container) container.style.display = 'block';
 	},
 
 	_currentFile : {},
+
+	_onKeyUp : function (e) {
+		var me = this;
+		var filterUsers = [];
+
+		_.each(me._onKeyUpparameters.itemsContainers, function (user) {
+			if (user.name.toLowerCase().indexOf(me._onKeyUpparameters.invite_input.value.toLowerCase()) === -1 || _.keys(me._onKeyUpparameters.checkedUsers).indexOf(user.name) !== -1) {
+				user.container.style.display = 'none';
+			} else {
+				user.container.style.display = 'block';
+				filterUsers.push(user);
+			}
+		});
+
+		if (_.isEmpty(filterUsers)) {
+			this._closeInviteInputs();
+		} else {
+			this._showInviteInputs();
+		}
+	},
 
 	_shareDataset : function () {
 		
@@ -1677,6 +1688,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		var invite_input = options.input;
 		var user = options.user;
+		var me = this;
 
 		// if user deleted. todo: clean up deleting
 		if (!user) return;
@@ -1713,7 +1725,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				return i.user == user;
 			});
 			delete options.checkedUsers[user.getFullName()];
-			options.onKeyUp();
+			me._onKeyUp();
 		}, this);
 
 		// add to array
