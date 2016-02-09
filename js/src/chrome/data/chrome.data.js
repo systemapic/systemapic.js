@@ -1536,8 +1536,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// input focus, show dropdown
 		Wu.DomEvent.on(invite_input, 'focus', function () {
-			this._closeInviteInputs();
-			invite_list_container.style.display = 'block';
+			me._onKeyUp();
 		}, this);
 
 		// focus input on any click
@@ -1560,16 +1559,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			invite_input.style.width = 30 + (text_length * 20) + 'px';
 
 			// backspace on empty field: delete added user
-			if (key == 8 && value.length == 0 && this._access[options.type].length) {
+			if (key == 8 && value.length == 0 && _.keys(me._onKeyUpparameters.checkedUsers).length) {
 
-				// get last user_uuid item 
-				var last = _.last(this._access[options.type]);
+				var popped = _.find(me._divs.users, function (user) {
+					return user.user.getFullName() === me._onKeyUpparameters.checkedUsers[_.last(_.keys(me._onKeyUpparameters.checkedUsers))].getFullName();
+				});
 
-				// dont allow adding self (as editor) to read
-				if (options.type == 'edit' && last && last.user && last.user.getUuid() == app.Account.getUuid()) return;
-
-				// remove last item
-				var popped = this._access[options.type].pop();
+				delete me._onKeyUpparameters.checkedUsers[_.last(_.keys(me._onKeyUpparameters.checkedUsers))];
+				me._divs.users.pop();
 				Wu.DomUtil.remove(popped.user_container);
 			}
 
