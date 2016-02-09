@@ -591,6 +591,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		edit: {}	
 	},
 
+	_list_item_containers : {
+		read: [],
+		edit: []
+	},
+
 	// todo: refactor into module, var userList = new Wu.Tools.UserList();
 	_createInviteUsersInput : function (options) {
 
@@ -654,8 +659,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				invite_list_container.style.display = 'block';
 			}
 		};
-
-		_.each(allUsers, function (user) {
+		_.each(allUsers, function (user, index) {
 
 			// divs
 			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container', monkey_scroll_list);
@@ -668,6 +672,23 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// set name
 			name_bold.innerHTML = user.getFullName();
 			name_subtle.innerHTML = user.getEmail();
+
+			if (index === 0) {
+				list_item_container.style.backgroundColor = '#DEE7EF';				
+				me._list_item_containers[options.type].push({
+					user: user,
+					list_item_container: list_item_container,
+					current: true,
+					checked: false
+				});
+			} else {
+				me._list_item_containers[options.type].push({
+					user: user,
+					list_item_container: list_item_container,
+					current: false,
+					checked: false
+				});
+			}
 
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
@@ -687,6 +708,20 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 				invite_input.value = '';
 				onKeyUp();
+				me._list_item_containers[options.type][index].checked = true;
+			}, this);
+
+			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
+				_.forEach(me._list_item_containers[options.type], function (_list_item_container) {
+					if (_list_item_container.list_item_container != list_item_container) {
+						_list_item_container.list_item_container.style.backgroundColor = '';
+						_list_item_container.current = false;
+					} else {
+						_list_item_container.list_item_container.style.backgroundColor = '#DEE7EF';
+						_list_item_container.current = true;
+					}
+				});
+
 			}, this);
 
 			me._itemsContainers[options.type].push({
@@ -714,6 +749,95 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// get which key
 			var key = event.which ? event.which : event.keyCode;
+			var itemContainers = me._list_item_containers[options.type];
+
+			if (key === 38) {
+				_.find(itemContainers, function (_list_item_container, index) {
+					var uncheckedItemIndexs = [];
+					var nearestLessUnchecked = 0;
+
+					_.forEach(itemContainers, function (item, index) {
+						if (!item.checked) {
+							uncheckedItemIndexs.push(index);
+						}
+					});
+
+					if (_list_item_container.current === true) {
+						itemContainers[index].current = false;
+						itemContainers[index].list_item_container.style.backgroundColor = '';
+
+							if (index > 0 && itemContainers[(index - 1) % (itemContainers.length)] && !itemContainers[(index - 1) % (itemContainers.length)].checked) {
+								itemContainers[(index - 1) % (itemContainers.length)].current = true;
+								itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+								return true;							
+							} else if (index === 0 && itemContainers[itemContainers.length - 1] && !itemContainers[itemContainers.length - 1].checked) {
+								itemContainers[itemContainers.length - 1].current = true;
+								itemContainers[itemContainers.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
+								return true;
+							}
+
+							_.forEach(uncheckedItemIndexs, function (item, itemIndex) {
+								if (item >= (index - 1)) {
+									nearestLessUnchecked = uncheckedItemIndexs[itemIndex - 1];
+								}
+							});
+
+							if (nearestLessUnchecked == undefined) {
+								nearestLessUnchecked = -1;
+							}
+
+							if (nearestLessUnchecked < 0) {
+								itemContainers[itemContainers.length - 1].current = true;
+								itemContainers[itemContainers.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
+							} else {
+								itemContainers[nearestLessUnchecked].current = true;
+								itemContainers[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+							}
+							return true;
+					}
+					return false;
+				});
+			}
+
+			if (key === 40) {
+				_.find(itemContainers, function (_list_item_container, index) {
+
+
+					if (_list_item_container.current === true) {
+						itemContainers[index].current = false;
+						itemContainers[index].list_item_container.style.backgroundColor = '';
+						itemContainers[(index + 1) % (itemContainers.length)].current = true;
+						itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+						return true;
+					}
+					return false;
+				});
+			}
+
+			if (key === 13) {
+
+				currentContainer = _.find(me._list_item_containers[options.type], function (_list_item_container, index) {
+					me._list_item_containers[options.type][index].checked = true;
+					return _list_item_container.current === true;
+				});
+
+				if (currentContainer && currentContainer.user) {
+					if (options.type == 'read' && currentContainer.user.getUuid() == app.Account.getUuid()) return;
+
+					me._checkedUsers[options.type][currentContainer.user.getFullName()] = currentContainer.user;
+					this._addUserAccessItem({
+						input : invite_input,
+						user : currentContainer.user,
+						type : options.type,
+						checkedUsers : me._checkedUsers[options.type],
+						onKeyUp: onKeyUp
+					});
+
+					invite_input.value = '';
+					onKeyUp();
+				}
+
+			}
 
 			// get string length
 			var value = invite_input.value;
@@ -740,6 +864,15 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				});
 
 				delete me._checkedUsers[options.type][item];
+
+				_.find(me._list_item_containers[options.type], function (_list_item_container, index) {
+					if (_list_item_container.user.getUuid() === last.user.getUuid()) {
+						me._list_item_containers[options.type][index].checked = false;
+						return true;
+					}
+					return false;
+				});
+
 			}
 
 			// enter: blur input
@@ -764,7 +897,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			if (relevantTarget) this._closeInviteInputs();
 
-		},this);
+		}, this);
 
 		if (project) {
 
@@ -848,6 +981,15 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				});
 
 				delete options.checkedUsers[user.getFullName()];
+
+				_.find(me._list_item_containers[options.type], function (_list_item_container, index) {
+					if (_list_item_container.user.getUuid() === user.getUuid()) {
+						me._list_item_containers[options.type][index].checked = false;
+						return true;
+					}
+					return false;
+				});
+
 				options.onKeyUp();
 			}, this);
 		} else {
