@@ -643,21 +643,36 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		
 		function onKeyUp(e) {
 			var filterUsers = [];
+			var currentIsChecked = false;
+			var key = event.which ? event.which : event.keyCode;
 
-			_.each(me._itemsContainers[options.type], function (user) {
-				if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(user.name) !== -1) {
-					user.container.style.display = 'none';
+			if (key !== 40 && key !== 38 && key !== 13) {
+				_.forEach(me._itemsContainers[options.type], function (user, index) {
+					if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(user.name) !== -1) {
+						me._itemsContainers[options.type][index].container.style.display = 'none';
+						me._itemsContainers[options.type][index].container.style.backgroundColor = '';
+						me._itemsContainers[options.type][index].current = false;
+					} else {
+						me._itemsContainers[options.type][index].container.style.display = 'block';
+						if (!currentIsChecked) {
+							me._itemsContainers[options.type][index].container.style.backgroundColor = '#DEE7EF';	
+							currentIsChecked = true;
+							me._itemsContainers[options.type][index].current = true;
+						} else {
+							me._itemsContainers[options.type][index].container.style.backgroundColor = '';
+							me._itemsContainers[options.type][index].current = false;
+						}
+						filterUsers.push(user);
+					}
+				});
+
+				if (_.isEmpty(filterUsers)) {
+					invite_list_container.style.display = 'none';
 				} else {
-					user.container.style.display = 'block';
-					filterUsers.push(user);
+					invite_list_container.style.display = 'block';
 				}
-			});
-
-			if (_.isEmpty(filterUsers)) {
-				invite_list_container.style.display = 'none';
-			} else {
-				invite_list_container.style.display = 'block';
 			}
+			console.log("KEY UP", me._itemsContainers[options.type]);
 		};
 		_.each(allUsers, function (user, index) {
 
@@ -678,15 +693,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				me._list_item_containers[options.type].push({
 					user: user,
 					list_item_container: list_item_container,
-					current: true,
-					checked: false
+					current: true
 				});
 			} else {
 				me._list_item_containers[options.type].push({
 					user: user,
 					list_item_container: list_item_container,
-					current: false,
-					checked: false
+					current: false
 				});
 			}
 
@@ -708,7 +721,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 				invite_input.value = '';
 				onKeyUp();
-				me._list_item_containers[options.type][index].checked = true;
 			}, this);
 
 			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
@@ -751,14 +763,15 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var key = event.which ? event.which : event.keyCode;
 			var itemContainers = me._list_item_containers[options.type];
 
+			console.log("key DOWN: ", itemContainers);
 			if (key === 38) {
 				_.find(itemContainers, function (_list_item_container, index) {
-					var uncheckedItemIndexs = [];
-					var nearestLessUnchecked = 0;
+					var showedItemIndexs = [];
+					var nearestLessUnchecked = -1;
 
 					_.forEach(itemContainers, function (item, index) {
-						if (!item.checked) {
-							uncheckedItemIndexs.push(index);
+						if (item.list_item_container.style.display === 'block') {
+							showedItemIndexs.push(index);
 						}
 					});
 
@@ -766,20 +779,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 						itemContainers[index].current = false;
 						itemContainers[index].list_item_container.style.backgroundColor = '';
 
-							if (index > 0 && itemContainers[(index - 1) % (itemContainers.length)] && !itemContainers[(index - 1) % (itemContainers.length)].checked) {
+							if (index > 0 && itemContainers[(index - 1) % (itemContainers.length)] && itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
 								itemContainers[(index - 1) % (itemContainers.length)].current = true;
 								itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
 								return true;							
-							} else if (index === 0 && itemContainers[itemContainers.length - 1] && !itemContainers[itemContainers.length - 1].checked) {
+							} else if (index === 0 && itemContainers[itemContainers.length - 1] && itemContainers[itemContainers.length - 1].list_item_container.style.display === 'block') {
 								itemContainers[itemContainers.length - 1].current = true;
 								itemContainers[itemContainers.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
 								return true;
 							}
 
-							_.forEach(uncheckedItemIndexs, function (item, itemIndex) {
-								if (item >= (index - 1)) {
-									nearestLessUnchecked = uncheckedItemIndexs[itemIndex - 1];
+							_.find(showedItemIndexs, function (item, itemIndex) {
+								if (item >= (index)) {
+									nearestLessUnchecked = showedItemIndexs[itemIndex - 1];
+									return true;
 								}
+								return false;
 							});
 
 							if (nearestLessUnchecked == undefined) {
@@ -787,8 +802,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 							}
 
 							if (nearestLessUnchecked < 0) {
-								itemContainers[itemContainers.length - 1].current = true;
-								itemContainers[itemContainers.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
+								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].current = true;
+								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].list_item_container.style.backgroundColor = '#DEE7EF';
 							} else {
 								itemContainers[nearestLessUnchecked].current = true;
 								itemContainers[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
@@ -801,14 +816,42 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			if (key === 40) {
 				_.find(itemContainers, function (_list_item_container, index) {
+					var showedItemIndexs = [];
+					var nearestMoreUnchecked = -1;
 
+					_.forEach(itemContainers, function (item, index) {
+						if (item.list_item_container.style.display === 'block') {
+							showedItemIndexs.push(index);
+						}
+					});
 
 					if (_list_item_container.current === true) {
 						itemContainers[index].current = false;
 						itemContainers[index].list_item_container.style.backgroundColor = '';
-						itemContainers[(index + 1) % (itemContainers.length)].current = true;
-						itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+
+						if (itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
+							itemContainers[(index + 1) % (itemContainers.length)].current = true;
+							itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+							return true;
+						}
+
+						_.find(showedItemIndexs, function (item, itemIndex) {
+							if (item > (index)) {
+								nearestMoreUnchecked = showedItemIndexs[itemIndex];
+								return true;
+							}
+							return false;
+						});
+
+						if (nearestMoreUnchecked < 0) {
+							itemContainers[showedItemIndexs[0]].current = true;
+							itemContainers[showedItemIndexs[0]].list_item_container.style.backgroundColor = '#DEE7EF';
+						} else {
+							itemContainers[nearestMoreUnchecked].current = true;
+							itemContainers[nearestMoreUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+						}
 						return true;
+
 					}
 					return false;
 				});
@@ -817,7 +860,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			if (key === 13) {
 
 				currentContainer = _.find(me._list_item_containers[options.type], function (_list_item_container, index) {
-					me._list_item_containers[options.type][index].checked = true;
 					return _list_item_container.current === true;
 				});
 
@@ -864,14 +906,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				});
 
 				delete me._checkedUsers[options.type][item];
-
-				_.find(me._list_item_containers[options.type], function (_list_item_container, index) {
-					if (_list_item_container.user.getUuid() === last.user.getUuid()) {
-						me._list_item_containers[options.type][index].checked = false;
-						return true;
-					}
-					return false;
-				});
 
 			}
 
@@ -981,15 +1015,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				});
 
 				delete options.checkedUsers[user.getFullName()];
-
-				_.find(me._list_item_containers[options.type], function (_list_item_container, index) {
-					if (_list_item_container.user.getUuid() === user.getUuid()) {
-						me._list_item_containers[options.type][index].checked = false;
-						return true;
-					}
-					return false;
-				});
-
 				options.onKeyUp();
 			}, this);
 		} else {
