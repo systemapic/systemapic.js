@@ -4,6 +4,9 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	title : 'Map settings pane',
 
 	options : {
+
+		controlsTitle : 'Controls',
+		boundsTitle : 'Bounds & Position',
 	},
 
 	_initialize : function (options) {
@@ -30,8 +33,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		if (!this._checkAccess()) return;
 
 		// create
-		this.initSettings('Controls');
-		this.initBoundPos('Bounds & Position');		
+		this.initSettings(this.options.controlsTitle);
+		this.initBoundPos(this.options.boundsTitle);		
 	},
 
 	_flush : function () {
@@ -178,7 +181,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 				name   : 'Legend'
 			},
 			baselayertoggle : {
-				enable : false,
+				enable : true,
 				name   : 'Base layer toggle'
 			},
 			cartocss : {

@@ -14,9 +14,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		var className = 'leaflet-control-baselayertoggle';
 		var container = this._container = L.DomUtil.create('div', className);
 
-		// add tooltip
-		app.Tooltip.add(container, 'Toggle between baselayers', { extends : 'systyle', offset : [23, 0]});
-
 		return container;
 	},
 
@@ -31,6 +28,8 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	},
 
 	addTo: function (map) {
+
+		console.log('addTo');
 
 		this._map = map;
 
@@ -101,7 +100,8 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
 
 		// build menu
-		var baseLayers = this._project.getBaselayers() || [];
+		// var baseLayers = this._project.getBaselayers() || [];
+		var baseLayers = this._getBaselayers();
 
 		baseLayers.forEach(function (b) {
 			var baseLayer = {
@@ -112,9 +112,42 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		}, this);
 
 	},
+
+	_getBaselayers : function () {
+		var layers = this._project.getLayers();
+		var filtered = this._filterBackgroundLayersByProvider(layers);
+		var formatted = this._formatBackgroundLayersObject(filtered);
+		return formatted;
+	},
+
+	_formatBackgroundLayersObject : function (layers) {
+		var result = [];
+		layers.forEach(function (l, n) {
+			result.push({
+				uuid : l.getUuid(),
+				zIndex : n+1,
+				opacity : 1
+			});
+		}, this);
+		return result;
+	},
+
+	_filterBackgroundLayersByProvider : function (layers) {
+		var keys = ['google', 'norkart', 'mapbox'];
+		var results = [];
+		keys.forEach(function (key) {
+			for (var l in layers) {
+				var layer = layers[l];
+				if (layer && layer.store && layer.store.data.hasOwnProperty(key)) {
+					results.push(layer)
+				}
+			}
+		}, this);
+		return results;
+	},	
 	
 	mouseOut : function () {
-
+		return;
 		if ( this._isOpen ) { this.collapse() }
 		else { return };
 
@@ -125,10 +158,10 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		
 		// create div
 		var layerName = baseLayer.layer.getTitle();
-		var item = Wu.DomUtil.create('div', 'baselayertoggle-item active', this._list, layerName);
+		var item = Wu.DomUtil.create('div', 'baselayertoggle-item', this._list, layerName);
 		
 		// set active by default
-		baseLayer.active = true;
+		baseLayer.active = false;
 
 		// add to local store
 		var id = L.stamp(baseLayer);
@@ -146,22 +179,44 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		// get layer from local store
 		var layer = this._layers[L.stamp(baseLayer)].layer;
 
-		// toggle
-		if (baseLayer.active) {
+		var bgLayers = this._getBaselayers();
 
-			// disable
-			layer.disable();
-			baseLayer.active = false;
-			Wu.DomUtil.removeClass(item, 'active');
-			
-		} else {
-			
-			// enable
+		// turn on
+		if (!baseLayer.active) {
+
+			// turn all baselayers off
+			for (var l in bgLayers) {
+				if (bgLayers.hasOwnProperty(l)) {
+					var b = bgLayers[l];
+					var layer2 = this._project.getLayer(b.uuid);
+
+					// disable
+					layer2.disable();
+					Wu.DomUtil.removeClass(item, 'active');
+
+					// mark not active
+					var bl = _.find(this._layers, function (bl2) {
+						return bl2.layer.store.uuid == b.uuid;
+					});
+					var bl3 = this._layers[L.stamp(bl)];
+					bl3.active = false;
+				}
+			}
+
+			var children = this._list.childNodes;
+
+			for (var i=0; i < children.length; i++) {
+				var div = children[i];
+				Wu.DomUtil.removeClass(div, 'active');
+			}
+
+			// turn on this baselayer
 			layer.add('baselayer');
 			baseLayer.active = true;
 			Wu.DomUtil.addClass(item, 'active');
 		}
 
+		
 		// Google Analytics event tracking
 		app.Analytics.setGaEvent(['Controls', 'Baselayer toggle: ' + layer.getTitle()]);
 
