@@ -581,11 +581,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		edit : {}
 	},
 
-	_itemsContainers : {
-		read: [],
-		edit: []
-	},
-
 	_checkedUsers : {
 		read: {},
 		edit: {}	
@@ -646,23 +641,23 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var currentIsChecked = false;
 			var key = event.which ? event.which : event.keyCode;
 
-			if (key !== 40 && key !== 38 && key !== 13) {
-				_.forEach(me._itemsContainers[options.type], function (user, index) {
-					if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(user.name) !== -1) {
-						me._itemsContainers[options.type][index].container.style.display = 'none';
-						me._itemsContainers[options.type][index].container.style.backgroundColor = '';
-						me._itemsContainers[options.type][index].current = false;
+			if (key !== 40 && key !== 38 && key !== 13 && key !== 9) {
+				_.forEach(me._list_item_containers[options.type], function (_list_item_container, index) {
+					if (_list_item_container.user.getFullName().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(_list_item_container.user.getFullName()) !== -1) {
+						me._list_item_containers[options.type][index].list_item_container.style.display = 'none';
+						me._list_item_containers[options.type][index].list_item_container.style.backgroundColor = '';
+						me._list_item_containers[options.type][index].current = false;
 					} else {
-						me._itemsContainers[options.type][index].container.style.display = 'block';
+						me._list_item_containers[options.type][index].list_item_container.style.display = 'block';
 						if (!currentIsChecked) {
-							me._itemsContainers[options.type][index].container.style.backgroundColor = '#DEE7EF';	
+							me._list_item_containers[options.type][index].list_item_container.style.backgroundColor = '#DEE7EF';	
 							currentIsChecked = true;
-							me._itemsContainers[options.type][index].current = true;
+							me._list_item_containers[options.type][index].current = true;
 						} else {
-							me._itemsContainers[options.type][index].container.style.backgroundColor = '';
-							me._itemsContainers[options.type][index].current = false;
+							me._list_item_containers[options.type][index].list_item_container.style.backgroundColor = '';
+							me._list_item_containers[options.type][index].current = false;
 						}
-						filterUsers.push(user);
+						filterUsers.push(_list_item_container);
 					}
 				});
 
@@ -672,9 +667,12 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					invite_list_container.style.display = 'block';
 				}
 			}
-			console.log("KEY UP", me._itemsContainers[options.type]);
 		};
 		_.each(allUsers, function (user, index) {
+
+			if (user.getUuid() == app.Account.getUuid()) {
+				return;
+			}
 
 			// divs
 			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container', monkey_scroll_list);
@@ -689,7 +687,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			name_subtle.innerHTML = user.getEmail();
 
 			if (index === 0) {
-				list_item_container.style.backgroundColor = '#DEE7EF';				
+				list_item_container.style.backgroundColor = '#DEE7EF';
 				me._list_item_containers[options.type].push({
 					user: user,
 					list_item_container: list_item_container,
@@ -708,6 +706,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 				// dont allow adding self (as editor) to read
 				if (options.type == 'read' && user.getUuid() == app.Account.getUuid()) return;
+				if (options.type == 'edit' && user.getUuid() == app.Account.getUuid()) return;
 
 				// add selected user item to input box
 				me._checkedUsers[options.type][user.getFullName()] = user;
@@ -736,10 +735,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			}, this);
 
-			me._itemsContainers[options.type].push({
-				name: user.getFullName(),
-				container: list_item_container
-			});
 		}, this);
 
 
@@ -763,7 +758,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var key = event.which ? event.which : event.keyCode;
 			var itemContainers = me._list_item_containers[options.type];
 
-			console.log("key DOWN: ", itemContainers);
 			if (key === 38) {
 				_.find(itemContainers, function (_list_item_container, index) {
 					var showedItemIndexs = [];
@@ -814,7 +808,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				});
 			}
 
-			if (key === 40) {
+			if (key === 40 || key === 9) {
+				if (key === 9) {
+					Wu.DomEvent.stop(e);
+				}
+
 				_.find(itemContainers, function (_list_item_container, index) {
 					var showedItemIndexs = [];
 					var nearestMoreUnchecked = -1;
@@ -824,7 +822,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 							showedItemIndexs.push(index);
 						}
 					});
-
 					if (_list_item_container.current === true) {
 						itemContainers[index].current = false;
 						itemContainers[index].list_item_container.style.backgroundColor = '';
