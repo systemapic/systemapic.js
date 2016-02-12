@@ -63,11 +63,6 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	createLayer : function (options, done) {
-		var path = '/api/db/createLayer';
-		this.post(path, options, done);
-	},
-
 	setCartocss : function (options, done) {
 		var path = '/api/layers/cartocss/set';
 		this.post(path, options, done);
