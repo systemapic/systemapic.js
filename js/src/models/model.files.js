@@ -247,6 +247,10 @@ Wu.Model.File = Wu.Model.extend({
 		// catch error
 		if (result.error || !result.success) return console.error(result.error || 'No success deleting!');
 
+
+		console.log('%c _fileDeleted', 'background: blue; color: white;');
+		console.log('result', result);
+
 		// update user locally
 		app.Account.removeFile(result.removed.file);
 

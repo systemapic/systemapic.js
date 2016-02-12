@@ -540,12 +540,40 @@ Wu.MapPane = Wu.Pane.extend({
 
 	// Create pop-up
 	_addPopupContent : function (e, multiPopUp) {
-		var options = {
-			e 		: e,
-			multiPopUp 	: multiPopUp,
-		};
-		this._chart = new Wu.Control.Chart(options);
+
+		if ( this._chart && this._chart._popup ) { 			
+			this.updatePopup(e, multiPopUp);
+		} else {			
+			this.newPopup(e, multiPopUp);			
+		}
+
 	},
+
+	// Creates a new pop-up
+	newPopup : function (e, multiPopUp) {
+		
+		var options = {
+				e 		: e,
+				multiPopUp 	: multiPopUp,
+			};
+		
+		this._chart = new Wu.Control.Chart(options);
+
+	},
+
+	// Adds data to existing pop-up
+	updatePopup : function (e, multiPopUp) {
+		
+		var options = {
+				e 		: e,
+				multiPopUp 	: multiPopUp,
+				context 	: this
+			};
+	
+		this._chart.updateExistingPopup(options);
+
+	},
+
 
 	_clearPopup : function () {
 		if (this._chart) {
