@@ -21,7 +21,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			download_on : 'Allowed to download data',
 			download_off : 'Not allowed to download data',
 			share_on : 'Allowed to invite others (as spectators)',
-			share_off : 'Not allowed to invite others',
+			share_off : 'Not allowed to invite others'
 		}
 	},
 
@@ -47,7 +47,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var projectsContainer = this._projectsContainer = Wu.DomUtil.create('div', 'chrome-left-container', this._container);
 
 		// Create Title
-		var title = 'Projects <span style="font-weight:400; font-size: 16px; color: gainsboro">(' + _.size(app.Projects) + ')</span> '
+		var title = 'Projects <span style="font-weight:400; font-size: 16px; color: gainsboro">(' + _.size(app.Projects) + ')</span> ';
 		var projectsTitle = Wu.DomUtil.create('div', 'chrome-left-title projects-title', projectsContainer, title);
 
 		// Create NEW button
@@ -270,7 +270,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// pass inputs to triggers
 		var options = {
 			name_input : name_input,
-			name_error : name_error,
+			name_error : name_error
 		};
 
 		// save button trigger
@@ -358,7 +358,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var options = {
 			// name_input : name_input,
 			// name_error : name_error,
-			project : project,
+			project : project
 		};
 
 		// buttons wrapper
@@ -374,7 +374,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		var access = {
 			read : []
-		}
+		};
 
 		this._access.read.forEach(function (v) {
 			access.read.push(v.user.getUuid());
@@ -529,11 +529,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var options = {
 			name_input : name_input,
 			name_error : name_error,
-			project : project,
+			project : project
 		};
 
 		// buttons wrapper
-		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content)
+		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content);
 
 		// save button
 		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', buttonsWrapper, 'Update');
@@ -579,11 +579,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_divs : {
 		read : {},
 		edit : {}
-	},
-
-	_itemsContainers : {
-		read: [],
-		edit: []
 	},
 
 	_checkedUsers : {
@@ -640,29 +635,32 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
 			return u.store.firstName;
 		});
+		var items = me._list_item_containers[options.type];
 		
 		function onKeyUp(e) {
 			var filterUsers = [];
 			var currentIsChecked = false;
 			var key = event.which ? event.which : event.keyCode;
 
-			if (key !== 40 && key !== 38 && key !== 13) {
-				_.forEach(me._itemsContainers[options.type], function (user, index) {
-					if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(user.name) !== -1) {
-						me._itemsContainers[options.type][index].container.style.display = 'none';
-						me._itemsContainers[options.type][index].container.style.backgroundColor = '';
-						me._itemsContainers[options.type][index].current = false;
+			if (key !== 40 && key !== 38 && key !== 13 && key !== 9) {
+				_.forEach(items, function (_list_item_container, index) {
+					var item_index = items[index];
+					
+					if (_list_item_container.user.getFullName().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(_list_item_container.user.getFullName()) !== -1) {
+						item_index.list_item_container.style.display = 'none';
+						item_index.list_item_container.style.backgroundColor = '';
+						item_index.current = false;
 					} else {
-						me._itemsContainers[options.type][index].container.style.display = 'block';
+						item_index.list_item_container.style.display = 'block';
 						if (!currentIsChecked) {
-							me._itemsContainers[options.type][index].container.style.backgroundColor = '#DEE7EF';	
+							item_index.list_item_container.style.backgroundColor = '#DEE7EF';	
 							currentIsChecked = true;
-							me._itemsContainers[options.type][index].current = true;
+							item_index.current = true;
 						} else {
-							me._itemsContainers[options.type][index].container.style.backgroundColor = '';
-							me._itemsContainers[options.type][index].current = false;
+							item_index.list_item_container.style.backgroundColor = '';
+							item_index.current = false;
 						}
-						filterUsers.push(user);
+						filterUsers.push(_list_item_container);
 					}
 				});
 
@@ -672,9 +670,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					invite_list_container.style.display = 'block';
 				}
 			}
-			console.log("KEY UP", me._itemsContainers[options.type]);
-		};
+		}
+
 		_.each(allUsers, function (user, index) {
+
+			if (user.getUuid() == app.Account.getUuid()) {
+				return;
+			}
 
 			// divs
 			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container', monkey_scroll_list);
@@ -683,20 +685,19 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container', list_item_container);
 			var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold', name_container);
 			var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
-
 			// set name
 			name_bold.innerHTML = user.getFullName();
 			name_subtle.innerHTML = user.getEmail();
 
 			if (index === 0) {
-				list_item_container.style.backgroundColor = '#DEE7EF';				
-				me._list_item_containers[options.type].push({
+				list_item_container.style.backgroundColor = '#DEE7EF';
+				items.push({
 					user: user,
 					list_item_container: list_item_container,
 					current: true
 				});
 			} else {
-				me._list_item_containers[options.type].push({
+				items.push({
 					user: user,
 					list_item_container: list_item_container,
 					current: false
@@ -708,6 +709,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 				// dont allow adding self (as editor) to read
 				if (options.type == 'read' && user.getUuid() == app.Account.getUuid()) return;
+				if (options.type == 'edit' && user.getUuid() == app.Account.getUuid()) return;
 
 				// add selected user item to input box
 				me._checkedUsers[options.type][user.getFullName()] = user;
@@ -724,7 +726,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			}, this);
 
 			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
-				_.forEach(me._list_item_containers[options.type], function (_list_item_container) {
+				_.forEach(items, function (_list_item_container) {
 					if (_list_item_container.list_item_container != list_item_container) {
 						_list_item_container.list_item_container.style.backgroundColor = '';
 						_list_item_container.current = false;
@@ -736,10 +738,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			}, this);
 
-			me._itemsContainers[options.type].push({
-				name: user.getFullName(),
-				container: list_item_container
-			});
 		}, this);
 
 
@@ -761,31 +759,29 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// get which key
 			var key = event.which ? event.which : event.keyCode;
-			var itemContainers = me._list_item_containers[options.type];
 
-			console.log("key DOWN: ", itemContainers);
 			if (key === 38) {
-				_.find(itemContainers, function (_list_item_container, index) {
+				_.find(items, function (_list_item_container, index) {
 					var showedItemIndexs = [];
 					var nearestLessUnchecked = -1;
 
-					_.forEach(itemContainers, function (item, index) {
+					_.forEach(items, function (item, index) {
 						if (item.list_item_container.style.display === 'block') {
 							showedItemIndexs.push(index);
 						}
 					});
 
 					if (_list_item_container.current === true) {
-						itemContainers[index].current = false;
-						itemContainers[index].list_item_container.style.backgroundColor = '';
+						items[index].current = false;
+						items[index].list_item_container.style.backgroundColor = '';
 
-							if (index > 0 && itemContainers[(index - 1) % (itemContainers.length)] && itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
-								itemContainers[(index - 1) % (itemContainers.length)].current = true;
-								itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+							if (index > 0 && items[(index - 1) % (items.length)] && items[(index - 1) % (items.length)].list_item_container.style.display === 'block') {
+								items[(index - 1) % (items.length)].current = true;
+								items[(index - 1) % (items.length)].list_item_container.style.backgroundColor = '#DEE7EF';
 								return true;							
-							} else if (index === 0 && itemContainers[itemContainers.length - 1] && itemContainers[itemContainers.length - 1].list_item_container.style.display === 'block') {
-								itemContainers[itemContainers.length - 1].current = true;
-								itemContainers[itemContainers.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
+							} else if (index === 0 && items[items.length - 1] && items[items.length - 1].list_item_container.style.display === 'block') {
+								items[items.length - 1].current = true;
+								items[items.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
 								return true;
 							}
 
@@ -802,11 +798,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 							}
 
 							if (nearestLessUnchecked < 0) {
-								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].current = true;
-								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].list_item_container.style.backgroundColor = '#DEE7EF';
+								items[showedItemIndexs[showedItemIndexs.length - 1]].current = true;
+								items[showedItemIndexs[showedItemIndexs.length - 1]].list_item_container.style.backgroundColor = '#DEE7EF';
 							} else {
-								itemContainers[nearestLessUnchecked].current = true;
-								itemContainers[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+								items[nearestLessUnchecked].current = true;
+								items[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
 							}
 							return true;
 					}
@@ -814,24 +810,27 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				});
 			}
 
-			if (key === 40) {
-				_.find(itemContainers, function (_list_item_container, index) {
+			if (key === 40 || key === 9) {
+				if (key === 9) {
+					Wu.DomEvent.stop(e);
+				}
+
+				_.find(items, function (_list_item_container, index) {
 					var showedItemIndexs = [];
 					var nearestMoreUnchecked = -1;
 
-					_.forEach(itemContainers, function (item, index) {
+					_.forEach(items, function (item, index) {
 						if (item.list_item_container.style.display === 'block') {
 							showedItemIndexs.push(index);
 						}
 					});
-
 					if (_list_item_container.current === true) {
-						itemContainers[index].current = false;
-						itemContainers[index].list_item_container.style.backgroundColor = '';
+						items[index].current = false;
+						items[index].list_item_container.style.backgroundColor = '';
 
-						if (itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
-							itemContainers[(index + 1) % (itemContainers.length)].current = true;
-							itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+						if (items[(index + 1) % (items.length)].list_item_container.style.display === 'block') {
+							items[(index + 1) % (items.length)].current = true;
+							items[(index + 1) % (items.length)].list_item_container.style.backgroundColor = '#DEE7EF';
 							return true;
 						}
 
@@ -844,11 +843,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 						});
 
 						if (nearestMoreUnchecked < 0) {
-							itemContainers[showedItemIndexs[0]].current = true;
-							itemContainers[showedItemIndexs[0]].list_item_container.style.backgroundColor = '#DEE7EF';
+							items[showedItemIndexs[0]].current = true;
+							items[showedItemIndexs[0]].list_item_container.style.backgroundColor = '#DEE7EF';
 						} else {
-							itemContainers[nearestMoreUnchecked].current = true;
-							itemContainers[nearestMoreUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+							items[nearestMoreUnchecked].current = true;
+							items[nearestMoreUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
 						}
 						return true;
 
@@ -1112,7 +1111,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		this._logUpdate({
 			access : access,
 			project : project,
-			projectName : projectName,
+			projectName : projectName
 		});
 
 		// reset
@@ -1220,14 +1219,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			description 	: 'Project description',
 			createdByName 	: app.Account.getName(),
 			access 		: access
-		}
+		};
 
 		// set create options
 		var options = {
 			store : store,
 			callback : this._projectCreated,
 			context : this
-		}
+		};
 
 		// create new project with options, and save
 		var project = new Wu.Project(store);
@@ -1356,8 +1355,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var dims = {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
-		}
+		};
 		return dims;
-	},
+	}
 
 });
