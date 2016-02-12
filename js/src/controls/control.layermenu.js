@@ -56,6 +56,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	toggleLayerMenu : function () {
+
 		this._isOpen ? this.close() : this.open();
 	},
 
@@ -910,6 +911,11 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	toggleLayer : function (item) {
+
+		// console.log('%c toggleLayer', 'background: red; color: white;');		
+		
+		// xoxoxoxoxoxoxoxoxo
+
 		if (this.editMode) return;
 
 		var layer = item.layer;
@@ -926,6 +932,8 @@ L.Control.Layermenu = Wu.Control.extend({
 				layer : layer
 			}}); 
 		}    
+
+		this.calculateHeight();
 	},
 
 	_enableLayer : function (layerUuid) {
@@ -952,6 +960,9 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	enableLayer : function (layerItem) {
+
+
+
 		var layer = layerItem.layer;
 
 		// folder click
@@ -1402,6 +1413,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		
 		if ( app.MapPane._controls.description ) {
 			app.MapPane._controls.description._calculateHeight();
+		} else {
+			console.log('set max height of layer menu!');
 		}
 
 	}

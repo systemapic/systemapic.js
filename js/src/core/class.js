@@ -1639,13 +1639,23 @@ Wu.DomEvent = {
 		// this._on(obj, types[i], fn, context);
 
 	    	// This is a fallback for mobile/touch devices...
-	    	if ( app.isMobile && types[i] == 'click') { //  || types[i] == 'mousedown' 
-	    		var type = 'touchstart';
-	    	} else {
-	    		var type = types[i];
-	    	}
 
-	    	this._on(obj, type, fn, context);
+	    	// App doesn't exist on login page...
+	    	if ( !app ) {
+
+	    		this._on(obj, 'click', fn, context);
+
+	    	} else {
+
+		    	if ( app.isMobile && types[i] == 'click') { //  || types[i] == 'mousedown' 
+		    		var type = 'touchstart';
+		    	} else {
+		    		var type = types[i];
+		    	}
+
+		    	this._on(obj, type, fn, context);
+
+	    	}
 
 	    
 	
@@ -2125,4 +2135,40 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 		return fn.apply(thisp, arguments);
 	};
 };
+
+
+
+
+Wu.Tools = {
+
+
+	validateDateFormat : function (_key) {
+
+
+		var _m = moment(_key,"YYYY-MM-DD");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
+			if ( m != 'Invalid date' ) return m;	
+		}
+
+		var _m = moment(_key,"DD-MM-YYYY");
+		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
+		if ( isDate ) {
+			var m = moment(_key, ["DDMMYYYY", moment.ISO_8601]).format("DD-MM-YYYY");
+			if ( m != 'Invalid date' ) return m;	
+		}
+
+		return false;
+	},		
+
+
+};
+
+
+
+
+
+
+
 

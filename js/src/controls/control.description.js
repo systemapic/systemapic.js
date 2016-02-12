@@ -15,6 +15,7 @@ L.Control.Description = Wu.Control.extend({
 
 		// Wrapper for multiple layers
 		this._multipleLegendOuter = Wu.DomUtil.create('div', 'description-multiple-toggle-wrapper', container);
+
 		this._multipleLegendInner = Wu.DomUtil.create('div', 'description-multiple-toggle-inner', this._multipleLegendOuter);
 		this._multipleLegendInnerContent = Wu.DomUtil.create('div', 'description-multiple-toggle-inner-content', this._multipleLegendInner);
 
@@ -37,32 +38,49 @@ L.Control.Description = Wu.Control.extend({
 		// header
 		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
 
-		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._multipleLegendOuter);		
+		// xoxoxoxoxoxo 
+		this._toggle = Wu.DomUtil.create('div', 'description-control-minimize', this._multipleLegendOuter, '<i class="fa fa-arrow-down"></i>');
+
+
+		// SINGLE LEGEND VIEW WRAPPER
+		this._singleLegendViewWrapper = Wu.DomUtil.create('div', 'single-legend-view-wrapper', this._inner);
 
 		// description
-		this._description = Wu.DomUtil.create('div', 'description-control-description displayNone', this._inner);
+		this._description = Wu.DomUtil.create('div', 'description-control-description displayNone', this._singleLegendViewWrapper);
 
 		// Toggle open
-		this._toggeOpener = Wu.DomUtil.create('div', 'description-control-toggle-opener displayNone', this._inner);
+		this._toggeOpener = Wu.DomUtil.create('div', 'description-control-toggle-opener displayNone', this._singleLegendViewWrapper);
 			
 		// Description box title
-		this._metaTitle = Wu.DomUtil.create('div', 'description-control-meta-title', this._inner);
+		this._metaTitle = Wu.DomUtil.create('div', 'description-control-meta-title', this._singleLegendViewWrapper);
 
-		this._metaOuterContainer = Wu.DomUtil.create('div', 'description-meta-outer-container', this._inner);
+		this._metaOuterContainer = Wu.DomUtil.create('div', 'description-meta-outer-container', this._singleLegendViewWrapper);
+
+
+		// COMPACT LEGEND VIEW WRAPPER		
+		this._compactLegendViewWrapper = Wu.DomUtil.create('div', 'compact-legend-view-wrapper displayNone', this._inner);
+		
+		this._compactExpand = Wu.DomUtil.create('div', 'compact-legends-expand displayNone', this._outer, '<i class="fa fa-arrow-up"></i>');
+		Wu.DomEvent.on(this._compactExpand, 'click', this.toggle, this);
+
+		this._compactLegendInnerScroller = Wu.DomUtil.create('div', 'compact-legend-scroll-wrapper', this._compactLegendViewWrapper)
+
+
+
 
 		// Meta
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._metaOuterContainer);
-
-		// Init satellite path container
-		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._metaOuterContainer});
 
 		// Opacity 
 		this._opacityWrapper = Wu.DomUtil.create('div', 'description-opacity-wrapper', this._metaOuterContainer)
 		this._opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._opacityWrapper, 'Opacity:');
 		this._opacityContainer = Wu.DomUtil.create('div', 'description-control-opacity-container', this._opacityWrapper);
 
+		// Init satellite path container
+		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._metaOuterContainer});
+
 		// legend
-		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
+		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._singleLegendViewWrapper);
 
 		// copyright
 		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, '');
@@ -88,10 +106,17 @@ L.Control.Description = Wu.Control.extend({
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stop, this);
 
-		Wu.DomEvent.on(this._multipleLegendInnerContent, 'onscroll scroll', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._multipleLegendInnerContent, 'onscroll scroll mousewheel', Wu.DomEvent.stopPropagation, this);
+
+		Wu.DomEvent.on(this._inner, 'onscroll scroll mousewheel', Wu.DomEvent.stopPropagation, this);
+
+
+
 
 		// xoxoxoxoxo
 		Wu.DomEvent.on(this._toggeOpener, 'click', this.toggleOpen, this);
+
+
 	},
 	
 	_isActive : function () {
@@ -111,12 +136,13 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_show : function () {
+
 		this.refresh();
 	},
 
 	refresh : function () {
-		this._calculateHeight();
 		this.showHide();
+		this._calculateHeight();
 	},
 
 	showHide : function () {
@@ -168,8 +194,11 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_onLayerStyleEdited   : function (e) {
-		var layer = e.detail.layer;
-		this._refreshLayer(layer);
+
+		return;
+
+		// var layer = e.detail.layer;
+		// this._refreshLayer(layer);
 	},
 
 	_addTo : function () {
@@ -181,6 +210,8 @@ L.Control.Description = Wu.Control.extend({
 
 	_refreshLayer : function (layer) {
 
+		// console.log('%c _refreshLayer ', 'background: brown; color: white;');
+
 		// get layer
 		this.layers[layer.getUuid()] = layer;
 
@@ -189,56 +220,22 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	toggle : function () {
-		if ( !this.isCollapsed ) this.isCollapsed = false;
 		this.isCollapsed ? this.toggleOpen() : this.toggleClose();
 	},
 
 	toggleOpen : function () {
 
 		Wu.DomUtil.removeClass(this._multipleLegendOuter, 'displayNone');
-		Wu.DomUtil.addClass(this._toggeOpener, 'displayNone');		
+		Wu.DomUtil.removeClass(this._singleLegendViewWrapper, 'displayNone');
+		Wu.DomUtil.addClass(this._toggeOpener, 'displayNone');
+		Wu.DomUtil.addClass(this._compactLegendViewWrapper, 'displayNone');
+		Wu.DomUtil.removeClass(this._inner, 'multiview');
+		Wu.DomUtil.addClass(this._compactExpand, 'displayNone');
 
 		this.isCollapsed = false;
-
+		this.miniLegend = false;
 
 		this._calculateHeight();
-
-		// return;
-
-		// Wu.DomUtil.removeClass(this._legendContainer, 'minimized');
-		// Wu.DomUtil.removeClass(this._header, 'minimized');		
-
-		// var description = this._description.innerHTML;
-		// if (description && description != '') Wu.DomUtil.removeClass(this._description, 'displayNone');
-		
-		// Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
-		// Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
-
-		// if ( !this.satelliteAngle.closed ) Wu.DomUtil.removeClass(this.satelliteAngle._innerContainer, 'displayNone');
-
-
-		// if ( app.isMobile ) {
-			
-		// 	Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
-		// 	Wu.DomUtil.removeClass(this._opacityTitle, 'displayNone');
-		// 	Wu.DomUtil.removeClass(this._opacityContainer, 'displayNone');
-		// 	this._legendContainer.style.marginTop = '26px';
-
-		// 	var _globesarXtra = document.getElementById('globesar-specific-legend-container');
-		// 	Wu.DomUtil.removeClass(_globesarXtra, 'displayNone');
-
-		// 	console.log('_globesarXtra', _globesarXtra);
-
-		// 	Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-adjusted');
-		// 	Wu.DomUtil.removeClass(this._outer, 'legend-box-adjusted');
-
-
-		// 	Wu.DomUtil.removeClass(this._multipleLegendInner, 'displayNone');
-
-		// }
-
-
-
 
 	},
 
@@ -249,45 +246,15 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._toggeOpener, 'displayNone');
 
 		this.isCollapsed = true;
+		this.compactLegend();
 
 		this._calculateHeight();
 
-		// return;
-
-		// this.isCollapsed = true;
-
-		// Wu.DomUtil.addClass(this._legendContainer, 'minimized');
-		// Wu.DomUtil.addClass(this._header, 'minimized');
-
-		// Wu.DomUtil.addClass(this._description, 'displayNone');
-		// Wu.DomUtil.addClass(this._metaContainer, 'displayNone');		
-		// Wu.DomUtil.addClass(this._toggle, 'legend-toggle-open');
-
-
-		// Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
-
-
-		// if ( app.isMobile ) {
-			
-		// 	Wu.DomUtil.addClass(this._metaContainer, 'displayNone');
-		// 	Wu.DomUtil.addClass(this._opacityTitle, 'displayNone');
-		// 	Wu.DomUtil.addClass(this._opacityContainer, 'displayNone');
-		// 	this._legendContainer.style.marginTop = '0px';
-
-		// 	var _globesarXtra = document.getElementById('globesar-specific-legend-container');
-		// 	Wu.DomUtil.addClass(_globesarXtra, 'displayNone');
-
-
-
-		// 	Wu.DomUtil.addClass(this._toggle, 'legend-toggle-adjusted');
-		// 	Wu.DomUtil.addClass(this._outer, 'legend-box-adjusted');
-
-		// 	Wu.DomUtil.addClass(this._multipleLegendInner, 'displayNone');
-
-		// }
 	},
 
 	_addLayer : function (layer) {
+
+		// console.log('%c _addLayer ', 'background: blue; color: white;');
 
 		this.layers = this.layers || {};
 
@@ -301,6 +268,8 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_removeLayer : function (layer) {
+
+		// console.log('%c _removeLayer ', 'background: green; color: white;');
 
 		// Delete layer from store
 		var layerUuid = layer.getUuid();
@@ -320,6 +289,13 @@ L.Control.Description = Wu.Control.extend({
 
 	updateMultiple : function (layerUuid) {
 
+		// console.log('%c updateMultiple ', 'background: pink; color: white;');
+
+		if ( this.miniLegend ) {
+			this.compactLegend();
+			// return;
+		}
+
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
 		var wrapper = this._multipleLegendInnerContent;
@@ -328,7 +304,8 @@ L.Control.Description = Wu.Control.extend({
 		var length = 0;
 		for (var k in this.layers) {
 		       length++;
-		}		
+		}
+
 
 		for ( var uuid in this.layers ) {
 
@@ -380,7 +357,9 @@ L.Control.Description = Wu.Control.extend({
 		this._calculateHeight();
 	},
 
-	toggleLegend : function (e) {		
+	toggleLegend : function (e) {	
+
+		// console.log('%c toggleLegend ', 'background: hotpink; color: white;');
 
 		var id = e.target.id;
 		var layerUuid = id.slice(10, id.length);
@@ -393,100 +372,11 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 
-	// Store legend data ...		
-	storeLegendData : function (layer) {
-
-		// Hard coded key
-		// Todo: remove
-		var key = 'point';
-
-		// Layer id
-		var layerUuid = layer.getUuid();
-
-		// Create empty object
-		var legendObj = {};
-
-		// meta
-		var meta = legendObj.meta = layer.getMeta();
-
-		// set title
-		legendObj.title = layer.getTitle();
-		
-		// set description
-		legendObj.description = layer.getDescription();
-
-		// create description meta
-		var area = Math.floor(meta.total_area / 1000000 * 100) / 100;
-		var num_points = meta.row_count;
-		var num_columns = _.size(meta.columns);
-		var size_bytes = meta.size_bytes;
-		var startend = this._parseStartEndDate(meta);
-		var style = Wu.parse(layer.store.style);
-
-		legendObj.description_meta = {
-			'Number of points' : num_points,
-			'Covered area (km<sup>2</sup>)' : area,
-			'Start date' : startend.start,
-			'End date' : startend.end
-		}
-
-		// // COLOR RANGE
-		// if ( style && style[key].color.column ) {
-
-		// 	var colorStops = style[key].color.value;
-		// 	// var customMinMax = style[key].color.customMinMax;
-		// 	var minMax = style[key].color.range;
-
-		// 	var min = minMax[0];
-		// 	var max = minMax[1];
-
-		// 	// create legend
-		// 	var gradientOptions = {
-		// 		colorStops : colorStops,
-		// 		minVal : minMax[0],
-		// 		maxVal : minMax[1],
-		// 		bline : 'Velocity (mm pr. year)'
-		// 	}
-
-		// 	legendObj.legendHTML = this.gradientLegend(gradientOptions);
-
-		// } else {
-
-		if (layer.isPostgis()) {
-			legendObj.legendHTML = this.createLegendHTML();
-		} else {
-			legendObj.legendHTML = '';
-		}
-
-		// }
-
-		return legendObj;
-	},
-
-
 	getLegend : function (layer) {
 		var legendHTML = layer.isPostgis() ? this.createLegendHTML() : '';
 		return legendHTML;
 	},
 
-	_getLegendCaption : function (color) {
-
-		var column = color.column;
-
-		if (column) {
-
-			// special case
-			if (column == 'vel' || column == 'mvel') { // todo: make not hardcoded!
-				return 'Velocity (mm/year)'
-			}
-
-			// camelize, return
-			return column;
-		}
-
-		return '';
-
-	},
 
 	getMetaDescription : function (layer) {
 
@@ -517,65 +407,71 @@ L.Control.Description = Wu.Control.extend({
 
 	setHTMLfromStore : function (uuid) {
 
+
+		// console.error('setHTMLfromStore');
+
 		// get layer
 		var layer = this._project.getLayer(uuid);
 		if (!layer) return;
 
-		// Build legend object
-		this.buildLegendObject(layer);		
-		
+		var legend = layer.getLegends();
+		if ( legend && !legend.enable ) return;
+
 		// Title
 		var title = layer.getTitle();
-		
-		// Description
-		var description = layer.getDescription();
-		
-		// Description meta
-		var descriptionMeta = this.getMetaDescription(layer);
-
-		// Legend
-		var legend = this.getLegend(layer);
-
-		// satellite angle
-		var satPos = Wu.parse(layer.getSatellitePosition());
-		this.satelliteAngle.update({
-			angle : satPos.angle, 
-			path : satPos.path
-		});
 
 		// Set title
 		this.setMetaTitle(title);
 
-		// Set description
-		this.setDescriptionHTML(description);
+		// Layer meta
+		if ( legend.layerMeta ) {
+			// Get description meta
+			var descriptionMeta = this.getMetaDescription(layer);
+			// Set description meta
+			this.setMetaHTML(descriptionMeta);
+			Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
+		} else {
+			Wu.DomUtil.addClass(this._metaContainer, 'displayNone');
+		}
 
-		// Set description meta
-		this.setMetaHTML(descriptionMeta);
+		// Opacity slider
+		if ( legend.opacitySlider ) {
+			Wu.DomUtil.removeClass(this._opacityWrapper, 'displayNone');
+			// Set opacity slider
+			this.setOpacity(layer);
+		} else {
+			Wu.DomUtil.addClass(this._opacityWrapper, 'displayNone');
+		}
 
-		// Set legend
-		this.setLegendHTML(legend);
+		// Legend
+		if ( legend.html && legend.html.length>10 && !legend.gradient ) {
+			this.setLegendHTML(legend.html);		
+		} else if ( legend.gradient ) {
+			var grad = legend.html + legend.gradient;
+			this.setLegendHTML(grad);
+		} else if ( !legend.gradient ) {
+			this.setLegendHTML('');
+		}
 
 
-		// set opacity slider
-		this.setOpacity(layer);
+		if ( !legend ) {
+
+			this.setLegendHTML('No leged!');
+			return;
+
+			// this._layer.setLegends( this.legendObj );
+		}		
+
+
 
 	},
 
 	// xoxoxoxox
 	setMetaTitle : function (title) {
-
-		// console.log('');
-		// console.log('');
-		// console.log('%c setMetaHTML ', 'background: red; color: white;');
-		// console.log('meta', meta);
-		// console.log('');
-		// console.log('');
-
 		this._metaTitle.innerHTML = title;
-
 	},
 
-	setOpacity : function (layer) {
+	setOpacity : function (layer) {		
 
 		// create slider once
 		if (!this._slider) {
@@ -587,7 +483,7 @@ L.Control.Description = Wu.Control.extend({
 
 		// set opacity value on slider
 		var opacity = layer.getOpacity();
-		this._slider.set(parseInt(opacity * 100));
+		this._slider.set(parseInt(opacity * 100));	
 
 		// set opacity on layer
 		layer.setOpacity(opacity);
@@ -595,6 +491,9 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_createOpacitySlider : function (layer) {
+
+		// console.log('%c _createOpacitySlider ', 'background: pink; color: white;');
+		
 
 		// create slider
 		this._sliderContainer = Wu.DomUtil.create('div', 'opacity-slider', this._opacityContainer);
@@ -613,8 +512,10 @@ L.Control.Description = Wu.Control.extend({
 
 	_updateOpacity : function (values, handle) {
 
+		// console.log('%c _updateOpacity ', 'background: hotpink; color: white;');
+
 		var opacity = parseFloat(values[0]) / 100;
-		var layer = this._slider.layer;
+		var layer = this._slider.layer;		
 
 		// set value on layer
 		layer && layer.saveOpacity(opacity);
@@ -640,11 +541,11 @@ L.Control.Description = Wu.Control.extend({
 		this._legendContainer.innerHTML = HTML;
 	},
 
-	setDescriptionHTML : function (text) {
-		if ( !text || text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
-		if ( this.isCollapsed ) Wu.DomUtil.addClass(this._description, 'displayNone');
-		this._description.innerHTML = text;
-	},
+	// setDescriptionHTML : function (text) {
+	// 	if ( !text || text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
+	// 	if ( this.isCollapsed ) Wu.DomUtil.addClass(this._description, 'displayNone');
+	// 	this._description.innerHTML = text;
+	// },
 
 	// HELPERS HELPERS HELPERS
 	_parseStartEndDate : function (meta) {
@@ -718,1272 +619,261 @@ L.Control.Description = Wu.Control.extend({
 		this._hide();
 	},
 
-
-
-
-
-
-
-	// BUILD LEGEND OBJECT
-	// BUILD LEGEND OBJECT
-	// BUILD LEGEND OBJECT
-
-	buildLegendObject : function  (layer) {
-
-		// Stop if raster layer
-		if ( !layer.isPostgis() ) return;
-
-		// Get style
-		var styleJSON   = Wu.parse(layer.store.style);
-
-		var point 	= styleJSON.point;
-		var line 	= styleJSON.line;
-		var polygon 	= styleJSON.polygon;
-
-
-		// Create blank legend object
-		this.legendObj = {
-
-			layerName : layer.getTitle(),
-			
-			point 	: {
-				all 	: {},
-				target 	: []
-			},
-
-			polygon : {
-				all 	: {},
-				target 	: []
-			},
-
-			line 	: {
-				all 	: {},
-				target 	: []
-			}
-		};
-
-
-		// Build legend object
-		this.legendPoint(point);
-		this.legendPolygon(polygon);
-		this.legendLine(line);
-
-	},
-
-	// BUILD LEGEND OBJECT: POINT
-	// BUILD LEGEND OBJECT: POINT
-	// BUILD LEGEND OBJECT: POINT
-
-	legendPoint : function (point) {
-	
-		if (!point || !point.enabled ) return;		
-
-		var legend = {};
-
-		// COLOR
-		// COLOR
-		// COLOR
-
-		// polygon color range
-		if ( point.color.column ) {
-
-			var column   = point.color.column;
-			var value    = point.color.value; 
-			var minRange = point.color.range[0];
-			var maxRange = point.color.range[1];
-
-			// Save legend data
-			legend.color = {};
-			legend.color.column   = column; 
-			legend.color.value    = value;
-			legend.color.minRange = minRange;
-			legend.color.maxRange = maxRange;
-
-
-		// static polygon color
-		} else {				
-
-			var value = point.color.staticVal ? point.color.staticVal : 'red';
-
-			// Save legend data
-			legend.color = {};
-			legend.color.column = false;
-			legend.color.value  = value;
-
-		}
-		
-
-		// OPACITY
-		// OPACITY
-		// OPACITY
-
-		// polygon opacity range
-		if ( point.opacity.column ) {
-
-			var column   = point.opacity.column;
-			var minRange = point.opacity.range[0];
-			var maxRange = point.opacity.range[1];
-
-			// Save legend data
-			legend.opacity = {};
-			legend.opacity.column   = column; 
-			legend.opacity.minRange = minRange;
-			legend.opacity.maxRange = maxRange;
-
-
-		// static polygon opacity
-		} else {
-
-			if ( !point.opacity.staticVal && point.opacity.staticVal != 0 ) {
-				var value = 1;
-			} else {
-				var value = point.opacity.staticVal;
-			}				
-
-			// Save legend data
-			legend.opacity = {};
-			legend.opacity.column = false;
-			legend.opacity.value  = value;
-
-		}
-
-
-		// POINT SIZE
-		// POINT SIZE
-		// POINT SIZE
-
-		// polygon pointsize range
-		if ( point.pointsize.column ) {
-
-			var column   = point.pointsize.column;
-			var minRange = point.pointsize.range[0];
-			var maxRange = point.pointsize.range[1];
-
-			// Save legend data
-			legend.pointsize = {};
-			legend.pointsize.column   = column; 
-			legend.pointsize.minRange = minRange;
-			legend.pointsize.maxRange = maxRange;
-
-
-		// static polygon pointsize
-		} else {
-
-			if ( !point.pointsize.staticVal && point.pointsize.staticVal != 0 ) {
-				var value = 1.2;
-			} else {
-				var value = point.pointsize.staticVal;
-			}				
-
-			// Save legend data
-			legend.pointsize = {};
-			legend.pointsize.column = false;
-			legend.pointsize.value  = value;
-
-		}
-
-
-
-
-		// Push legend object into array
-		this.legendObj.point.all = legend;
-
-
-
-		// FILTERS
-		// FILTERS
-		// FILTERS
-
-		// polygon filters
-		if ( point.targets && point.targets.length >= 1 ) {
-
-			point.targets.forEach(function (target, i) {
-
-				var column   = target.column;
-				var color    = target.color;					
-				var opacity  = target.opacity;
-				var value    = target.value;
-				var width    = target.width;
-				var operator = target.operator;
-
-				// Save legend data
-				var legend = {
-					column   : column,
-					color    : color,
-					opacity  : opacity,
-					value    : value,
-					width    : width,
-					operator : operator
-				}
-
-				this.legendObj.point.target.push(legend);
-
-			}.bind(this))
-
-		
-		}	
-
-	},	
-
-
-	// BUILD LEGEND OBJECT: POLYGON
-	// BUILD LEGEND OBJECT: POLYGON
-	// BUILD LEGEND OBJECT: POLYGON
-
-	legendPolygon : function (polygon) {
-
-
-		// polygon enabled
-		if (!polygon || !polygon.enabled ) return;
-
-	
-		// Create blank legend
-		var legend = {};
-
-		// COLOR
-		// COLOR
-		// COLOR
-
-		// polygon color range
-		if ( polygon.color.column ) {
-
-			var column   = polygon.color.column;
-			var value    = polygon.color.value; 
-			var minRange = polygon.color.range[0];
-			var maxRange = polygon.color.range[1];
-
-			// Save legend data
-			legend.color = {};
-			legend.color.column   = column; 
-			legend.color.value    = value;
-			legend.color.minRange = minRange;
-			legend.color.maxRange = maxRange;
-
-
-		// static polygon color
-		} else {
-
-			
-			var value = polygon.color.staticVal ? polygon.color.staticVal : "red";
-			
-
-			// Save legend data
-			legend.color = {};
-			legend.color.column = false;
-			legend.color.value  = value;
-
-		}
-		
-
-		// OPACITY
-		// OPACITY
-		// OPACITY
-
-		// polygon opacity range
-		if ( polygon.opacity.column ) {
-
-			var column   = polygon.opacity.column;
-			var value    = polygon.opacity.value; 
-			var minRange = polygon.opacity.range[0];
-			var maxRange = polygon.opacity.range[1];
-
-			// Save legend data
-			legend.opacity = {};
-			legend.opacity.column   = column; 
-			legend.opacity.value    = value;
-			legend.opacity.minRange = minRange;
-			legend.opacity.maxRange = maxRange;
-
-
-		// static polygon opacity
-		} else {
-
-			if ( !polygon.opacity.staticVal && polygon.opacity.staticVal != 0 ) {
-				var value = 1;
-			} else {
-				var value = polygon.opacity.staticVal;
-			}
-
-			// Save legend data
-			legend.opacity = {};
-			legend.opacity.column = false;
-			legend.opacity.value  = value;
-
-		}
-
-
-		// Push legend object into array
-		this.legendObj.polygon.all = legend;
-
-
-
-		// FILTERS	
-		// FILTERS
-		// FILTERS
-
-		// polygon filters
-		if ( polygon.targets && polygon.targets.length >= 1 ) {
-
-			polygon.targets.forEach(function (target, i) {
-				
-				var column   = target.column;
-				var color    = target.color;					
-				var opacity  = target.opacity;
-				var value    = target.value;
-				var operator = target.operator;
-
-				// Save legend data
-				var legend = {
-					column   : column,
-					color    : color,
-					opacity  : opacity,
-					value    : value,
-					operator : operator
-				}
-
-				this.legendObj.polygon.target.push(legend);
-
-			}.bind(this))	
-
-		
-		}			
-
-	},
-
-	// BUILD LEGEND OBJECTL: LINE
-	// BUILD LEGEND OBJECTL: LINE
-	// BUILD LEGEND OBJECTL: LINE
-	
-	legendLine : function (line) {
-
-
-		// line enabled
-		if (!line || !line.enabled ) return;
-		
-		// Create blank legend
-		var legend = {};			
-
-		// COLOR
-		// COLOR
-		// COLOR
-
-		// line color range
-		if ( line.color.column ) {
-
-			var column 	= line.color.column;
-			var value 	= line.color.value;
-			var minRange	= line.color.range[0];
-			var maxRange	= line.color.range[1];
-
-			// Save legend data
-			legend.color = {};
-			legend.color.column   = column; 
-			legend.color.value    = value;
-			legend.color.minRange = minRange;
-			legend.color.maxRange = maxRange;
-
-
-		// static line color
-		} else {
-			
-			var value = line.color.staticVal ? line.color.staticVal : 'red';
-
-			// Save legend data
-			legend.color = {};
-			legend.color.column = false;
-			legend.color.value  = value;
-
-
-		}
-
-
-		// OPACITY
-		// OPACITY
-		// OPACITY
-
-		// line opacity range
-		if ( line.opacity.column ) {
-
-			var column = line.opacity.column;
-			var minRange = line.opacity.range[0];
-			var maxRange = line.opacity.range[1];
-
-			// Save legend data
-			legend.opacity = {};
-			legend.opacity.column   = column; 
-			legend.opacity.minRange = minRange;
-			legend.opacity.maxRange = maxRange;
-
-		// line static opacity
-		} else {
-
-			if ( !line.opacity.staticVal && line.opacity.staticVal != 0 ) {
-				var value = 1;
-			} else {
-				var value = line.opacity.staticVal;
-			}				
-
-			// Save legend data
-			legend.opacity = {};
-			legend.opacity.column   = false;
-			legend.opacity.value    = value;
-		
-		}
-
-
-		// WIDTH
-		// WIDTH
-		// WIDTH
-
-		// line width range
-		if ( line.width.column ) {
-
-			var column = line.width.column;
-			var minRange = line.width.range[0];
-			var maxRange = line.width.range[1];
-
-			// Save legend data
-			legend.width = {};
-			legend.width.column   = column;
-			legend.width.minRange = minRange;
-			legend.width.maxRange = maxRange;
-
-		// static line width
-		} else {
-
-
-			if ( !line.width.staticVal && line.width.staticVal != 0 ) {
-				var value = 5;
-			} else {
-				var value = line.width.staticVal;
-			}
-
-
-			// Save legend data
-			legend.width = {};
-			legend.width.column   = false;
-			legend.width.value    = value;
-
-		}
-
-
-		this.legendObj.line.all = legend;
-
-
-				
-
-		// FILTERS
-		// FILTERS
-		// FILTERS
-
-		// line filters
-		if ( line.targets && line.targets.length >= 1 ) {
-
-			line.targets.forEach(function (target, i) {
-
-				var column   = target.column;
-				var color    = target.color;					
-				var opacity  = target.opacity;
-				var value    = target.value;
-				var width    = target.width;
-				var operator = target.operator;
-
-				// Save legend data
-				var legend = {
-					column   : column,
-					color    : color,
-					opacity  : opacity,
-					value    : value,
-					width    : width,
-					operator : operator
-				}
-
-				this.legendObj.line.target.push(legend);
-									
-
-			}.bind(this))
-
-		} 
-
-	},
-
-	// CREATE LEGEND HTML
-	// CREATE LEGEND HTML
-	// CREATE LEGEND HTML
-
-	createLegendHTML : function () {
-
-		var str = '';
-
-		var layerName = this.legendObj.layerName;
-
-		var polygons = this.legendObj.polygon;
-		var lines    = this.legendObj.line;
-		var points   = this.legendObj.point;
-
-		// POINTS
-		str += this.pointsHTML(points);
-
-		// POLYGONS AND LINES
-		str += this.polygonAndLinesHTML(polygons, lines);
-
-		return str;
-
-	},
-
-	// POINTS HTML
-	// POINTS HTML
-	// POINTS HTML
-
-	pointsHTML : function (points) {
-	
-		var str = '';
-
-
-		// TARGETED POINTS
-		// TARGETED POINTS
-		// TARGETED POINTS
-
-		points.target.forEach(function (point, i) {
-
-			// Color & opacity
-			var color   = point.color;
-			var opacity = point.opacity;
-			var RGB     = this.color2RGB(color);
-			var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-			var style   = 'background:' + rgba + '; ';
-		
-			// Name
-			var name = '';
-			var operator = point.operator + ' ';
-			if ( operator != '= ' ) name += operator;
-			name += point.value;
-
-			// Size
-			var size    = point.width;
-			if ( size > 20 ) size = 20;
-			if ( size < 5  ) size = 5;
-			style      += 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + size + 'px;';
-
-			// Set dot position
-			var _top = (20/2) - (size/2);
-			var _left = (28/2) - (size/2);
-			style += 'top: ' + _top + 'px; ' + 'left: ' + _left + 'px; ';
-
-			// Set HTML
-			str += '<div class="legend-each-container">';
-			str += '<div class="legend-each-name">' + name + '</div>';
-			str += '<div class="legend-each-color" style="' + style + '"></div>';
-			str += '</div>';
-
-		}.bind(this));
-
-
-		// *******************************************************************************************************************
-		// *******************************************************************************************************************
-		// *******************************************************************************************************************
-
-		// ALL POINTS
-		// ALL POINTS
-		// ALL POINTS
-
-		// Can contain range
-
-		// Static colors
-		// Static colors
-		// Static colors
-
-		var pointStyle = '';
-		var hasAllStyle = false;
-
-		
-		if ( points.all.color && !points.all.color.column ) {
-
-			var color   = points.all.color.value;
-			var opacity = points.all.opacity.value;			
-			var RGB = this.color2RGB(color);
-			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-			pointStyle += 'background:' + rgba + ';';
-
-			// Size
-			var size    = points.all.pointsize.value;
-			if ( size > 20 ) size = 20;
-			if ( size < 5  ) size = 5;
-
-			pointStyle += 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + size + 'px;';
-
-			// Set dot position
-			// var topLeft = (20/2) - (size/2);
-			var _top = (20/2) - (size/2);
-			var _left = (28/2) - (size/2);			
-			pointStyle += 'top: ' + _top + 'px; ' + 'left: ' + _left + 'px; ';			
-
-			if ( opacity != 0 ) hasAllStyle = true;
-		}
-
-
-		if ( hasAllStyle ) {
-
-			var layerName = this.legendObj.layerName;
-
-			var name = layerName;
-			str += '<div class="legend-each-container">';
-			str += '<div class="legend-each-name">' + name + '</div>';
-			str += '<div class="legend-each-color" style="' + pointStyle + '"></div>';
-			str += '</div>';
-
-		}
-
-
-
-		// Color range
-		// Color range
-		// Color range
-
-		if ( points.all.color && points.all.color.column ) {
-
-			var colorStops = points.all.color.value;
-			var minVal     = points.all.color.minRange;
-			var maxVal     = points.all.color.maxRange;
-			var column     = points.all.color.column;
-
-			// create legend
-			var gradientOptions = {
-				colorStops : colorStops,
-				minVal     : minVal,
-				maxVal     : maxVal,
-				bline      : column
-			}
-
-			var gradient = this.gradientLegend(gradientOptions);
-
-			str += gradient;
-
-		}		
-
-		return str;
-
-	},
-
-	// POLYGONS AND LINES HTML
-	// POLYGONS AND LINES HTML
-	// POLYGONS AND LINES HTML
-
-	polygonAndLinesHTML : function  (polygons, lines) {
-	
-		var str = '';
-
-		// MATCHING TARGETS
-		// MATCHING TARGETS
-		// MATCHING TARGETS
-
-		// (aka. we have a line and a polygon with the same target)
-
-		var linePolygonTargetMatches = {}
-
-		lines.target.forEach(function (l, i) {
-			polygons.target.forEach(function (p, a) {
-
-				// If it is a match
-				if ( p.value == l.value ) {
-
-
-					// Line style
-					var lineColor   = l.color;
-					var lineOpacity = l.opacity;
-					var lineWidth   = l.width;
-					var lineRGB     = this.color2RGB(lineColor);
-					var lineRgba    = 'rgba(' + lineRGB.r + ',' + lineRGB.g + ',' + lineRGB.b + ',' + lineOpacity + ');';
-					var lineStyle   = 'border: ' + (lineWidth/2) + 'px solid ' + lineRgba;
-
-					if ( !p.color ) {
-						lineStyle += 'height: 0px; top: 7px;';
-					}
-
-
-					// Polygon style
-					var polygonColor   = p.color;
-					var polygonOpacity = p.opacity;
-					var polygonRGB     = this.color2RGB(polygonColor);
-					var polygonRgba    = 'rgba(' + polygonRGB.r + ',' + polygonRGB.g + ',' + polygonRGB.b + ',' + polygonOpacity + ');';
-					var polygonStyle   = 'background:' + polygonRgba;
-
-					var style = lineStyle + polygonStyle;
-
-					// Store matches
-					linePolygonTargetMatches[l.value] = style;
-				}
-
-			}.bind(this))
-		}.bind(this))
-
-
-
-		// LINES LINES LINES LINES LINES LINES LINES 
-		// LINES LINES LINES LINES LINES LINES LINES 
-		// LINES LINES LINES LINES LINES LINES LINES 
-
-		// TARGETED LINES
-		// TARGETED LINES
-		// TARGETED LINES
-
-		lines.target.forEach(function (line, i) {
-
-			// Stop if this target also exists in polygons
-			if ( linePolygonTargetMatches[line.value] ) return;
-			
-			// Style
-			var color   = line.color;
-			var opacity = line.opacity;
-			var width   = line.width;
-			var RGB     = this.color2RGB(color);
-			var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-			var style   = 'border: ' + width + 'px solid ' + rgba;
-
-
-			// if ( !p.color ) {
-				style += 'height: 0px; top: 7px;';
-			// }			
-
-			// Name
-			var name = '';
-			var operator = line.operator + ' ';
-			if ( operator != '= ' ) name += operator;
-			name += line.value;
-
-
-			str += '<div class="legend-each-container">';
-			str += '<div class="legend-each-name">' + name + '</div>';
-			str += '<div class="legend-each-color" style="' + style + '"></div>';
-			str += '</div>';
-
-		}.bind(this));
-
-
-
-		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
-		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
-		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
-
-		// TARGETED POLYGONS
-		// TARGETED POLYGONS
-		// TARGETED POLYGONS
-
-		polygons.target.forEach(function (polygon, i) {
-
-			// Stop if this target also exists in polygons
-			if ( linePolygonTargetMatches[polygon.value] ) {
-				var style = linePolygonTargetMatches[polygon.value];
-			} else {
-				var color   = polygon.color;
-				var opacity = polygon.opacity;
-				var RGB     = this.color2RGB(color);
-				var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-				var style   = 'background:' + rgba;
-			}
-
-
-			// console.log('polygon', polygon);
-
-			// Name
-			var name = polygon.column + ': ';
-			var operator = polygon.operator + ' ';
-			if ( operator != '= ' ) name += operator;
-			name += polygon.value;
-
-			// Write HTML
-			str += '<div class="legend-each-container">';
-			str += '<div class="legend-each-name">' + name + '</div>';
-			str += '<div class="legend-each-color" style="' + style + '"></div>';
-			str += '</div>';
-
-		}.bind(this));
-
-
-		// *******************************************************************************************************************
-		// *******************************************************************************************************************
-		// *******************************************************************************************************************
-
-		// ALL POLYGONS & LINES - ALL POLYGONS & LINES - ALL POLYGONS & LINES
-		// ALL POLYGONS & LINES - ALL POLYGONS & LINES - ALL POLYGONS & LINES
-		// ALL POLYGONS & LINES - ALL POLYGONS & LINES - ALL POLYGONS & LINES
-
-
-		// Static colors
-		// Static colors
-		// Static colors
-
-		var allStyle = '';
-		var hasAllStyle = false;
-
-		// Polygon
-		if ( polygons.all.color && !polygons.all.color.column ) {
-			var color   = polygons.all.color.value;
-			var opacity = polygons.all.opacity.value;			
-			var RGB = this.color2RGB(color);
-			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-			allStyle += 'background:' + rgba;
-
-			if ( opacity != 0 ) hasAllStyle = true;
-		}
-
-		// Line
-		if ( lines.all.color && !lines.all.color.column ) {
-			var color   = lines.all.color.value;
-			var opacity = lines.all.opacity.value;
-			var width   = lines.all.width.value;
-			var RGB = this.color2RGB(color);
-			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-
-			if ( !polygons.all.color ) {
-				allStyle += 'height: 0px; top: 7px;';
-				width = width/2;
-			}
-
-			allStyle += 'border: ' + width + 'px solid ' + rgba;
-
-			if ( opacity != 0 ) hasAllStyle = true;
-		}
-
-
-		if ( hasAllStyle ) {
-
-			var layerName = this.legendObj.layerName;
-
-			var name = layerName;
-			str += '<div class="legend-each-container">';
-			str += '<div class="legend-each-name">' + name + '</div>';
-			str += '<div class="legend-each-color" style="' + allStyle + '"></div>';
-			str += '</div>';
-		}
-
-
-
-		// Color range
-		// Color range
-		// Color range
-
-		if ( polygons.all.color && polygons.all.color.column ) {
-
-			var colorStops = polygons.all.color.value;
-			var minVal     = polygons.all.color.minRange;
-			var maxVal     = polygons.all.color.maxRange;
-			var column     = polygons.all.color.column;
-
-			// create legend
-			var gradientOptions = {
-				colorStops : colorStops,
-				minVal     : minVal,
-				maxVal     : maxVal,
-				bline      : column
-			}
-
-			var gradient = this.gradientLegend(gradientOptions);
-
-			str += gradient;
-
-		}		
-
-		return str;
-
-	},
-
-
-	// GRADIENT HTML
-	// GRADIENT HTML
-	// GRADIENT HTML
-
-	gradientLegend : function (options) {
-
-		// Set color stops
-		var colorStops = options.colorStops;
-
-		// Set styling
-		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorStops.join() + ');';
-		gradientStyle    += 'background: -o-linear-gradient(right, '    + colorStops.join() + ');';
-		gradientStyle    += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
-		gradientStyle    += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
-  
-		// Container
-		var _legendHTML = '<div class="info-legend-container">';
-
-		// Legend Frame
-		_legendHTML += '<div class="info-legend-frame">';
-		_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
-
-		_legendHTML += '<div class="info-legend-globesar">' + 'Velocity in mm pr. year' + '</div>';
-
-		_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
-
-		// Gradient
-		_legendHTML += '<div class="info-legend-gradient-container" style="' + gradientStyle + '"></div>';
-		_legendHTML += '</div>';
-
-
-		var globesarSpecificByLine  = '<div id="globesar-specific-legend-container" class="globesar-specific-legend-container">';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-top">Deformasjon i sikteretning til satellitten</div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-line-container">';
-
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-line"></div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-arrow-left"></div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-arrow-right"></div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-middle-line"></div>';
-    		    globesarSpecificByLine += '</div>';
-
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-toward">Mot satellitten</div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-from">Fra satellitten</div>';
-    		    
-		    globesarSpecificByLine += '</div>';
-
-		options.bline = globesarSpecificByLine;
-
-		if (options.bline) {
-			_legendHTML += '<div class="info-legend-gradient-bottomline"">' + options.bline + '</div>';
-		}
-
-
-
-
-		_legendHTML += '</div>';
-
-		return _legendHTML;
-
-	},		
-
-
-
-	// color tools – color tools – color tools – color tools – color tools
-	// color tools – color tools – color tools – color tools – color tools
-	// color tools – color tools – color tools – color tools – color tools
-	// color tools – color tools – color tools – color tools – color tools
-	// color tools – color tools – color tools – color tools – color tools
-	// color tools – color tools – color tools – color tools – color tools
-
-	// Coverts any color (RGB, RGBA, Names (lavender), #333, #ff33ff) to [r,g,b]
-	color2RGB : function (color) {
-		
-		// The color is a hex decimal
-		if ( color[0] == '#' ) return this.hex2RGB(color);
-
-		// The color is RGBA
-		if ( color.substring(0,3).toLowerCase() == 'rgba' ) {
-			var end = color[color.length-1] == ';' ? color.length-2 : color.length-1;
-			var cc = c.substring(5,end);
-			var expl = cc.split(",");
-			var rgb = {
-				r : expl[0],
-				g : expl[1],
-				b : expl[2]
-			}
-			return rgb;
-		}
-
-		// The color is RGB
-		if ( color.substring(0,2).toLowerCase() == 'rgb' ) {		
-			var end = color[color.length-1] == ';' ? color.length-2 : color.length-1;
-			var cc = c.substring(4,end);
-			var expl = cc.split(",");
-			var rgb = {
-				r : expl[0],
-				g : expl[1],
-				b : expl[2]
-			}
-			return rgb;
-		}
-
-		// ... or else the color has a name
-		var convertedColor = this.colorNameToHex(color);
-		return this.hex2RGB(convertedColor);
-
-	},
-
-	// Creates RGB from hex
-	hex2RGB : function (hex) {
-
-		hex = this.checkHex(hex);
-
-		var r = parseInt(hex.substring(1,3), 16);
-		var g = parseInt(hex.substring(3,5), 16);
-		var b = parseInt(hex.substring(5,7), 16);
-
-		var rgb = {
-			r : r,
-			g : g,
-			b : b
-		}
-
-		return rgb;
-
-	},	
-
-	// Turns 3 digit hex values to 6 digits
-	checkHex : function (hex) {
-		
-		// If it's a 6 digit hex (plus #), run it.
-		if ( hex.length == 7 ) {
-			return hex;
-		}
-
-		// If it's a 3 digit hex, convert
-		if ( hex.length == 4 ) {
-			var r = parseInt(hex.substring(1,3), 16);
-			var g = parseInt(hex.substring(3,5), 16);
-			var b = parseInt(hex.substring(5,7), 16);
-			return '#' + r + r + g + g + b + b;
-		}
-
-	},
-	
-	// Turns color names (lavender) to hex
-	colorNameToHex : function (color) {
-
-    		var colors = {	"aliceblue" : "#f0f8ff",
-    				"antiquewhite":"#faebd7",
-    				"aqua":"#00ffff",
-    				"aquamarine":"#7fffd4",
-    				"azure":"#f0ffff",
-    				"beige":"#f5f5dc",
-    				"bisque":"#ffe4c4",
-    				"black":"#000000",
-    				"blanchedalmond":"#ffebcd",
-    				"blue":"#0000ff",
-    				"blueviolet":"#8a2be2",
-    				"brown":"#a52a2a",
-    				"burlywood":"#deb887",
-    				"cadetblue":"#5f9ea0",
-    				"chartreuse":"#7fff00",
-    				"chocolate":"#d2691e",
-    				"coral":"#ff7f50",
-    				"cornflowerblue":"#6495ed",
-    				"cornsilk":"#fff8dc",
-    				"crimson":"#dc143c",
-    				"cyan":"#00ffff",
-				"darkblue":"#00008b",
-				"darkcyan":"#008b8b",
-				"darkgoldenrod":"#b8860b",
-				"darkgray":"#a9a9a9",
-				"darkgreen":"#006400",
-				"darkkhaki":"#bdb76b",
-				"darkmagenta":"#8b008b",
-				"darkolivegreen":"#556b2f",
-				"darkorange":"#ff8c00",
-				"darkorchid":"#9932cc",
-				"darkred":"#8b0000",
-				"darksalmon":"#e9967a",
-				"darkseagreen":"#8fbc8f",
-				"darkslateblue":"#483d8b",
-				"darkslategray":"#2f4f4f",
-				"darkturquoise":"#00ced1",
-				"darkviolet":"#9400d3",
-				"deeppink":"#ff1493",
-				"deepskyblue":"#00bfff",
-				"dimgray":"#696969",
-				"dodgerblue":"#1e90ff",
-			    	"firebrick":"#b22222",
-			    	"floralwhite":"#fffaf0",
-			    	"forestgreen":"#228b22",
-			    	"fuchsia":"#ff00ff",
-    				"gainsboro":"#dcdcdc",
-    				"ghostwhite":"#f8f8ff",
-    				"gold":"#ffd700",
-    				"goldenrod":"#daa520",
-    				"gray":"#808080",
-    				"green":"#008000",
-    				"greenyellow":"#adff2f",
-    				"honeydew":"#f0fff0",
-    				"hotpink":"#ff69b4",
-				"indianred ":"#cd5c5c",
-				"indigo":"#4b0082",
-				"ivory":"#fffff0",
-				"khaki":"#f0e68c",
-				"lavender":"#e6e6fa",
-				"lavenderblush":"#fff0f5",
-				"lawngreen":"#7cfc00",
-				"lemonchiffon":"#fffacd",
-				"lightblue":"#add8e6",
-				"lightcoral":"#f08080",
-				"lightcyan":"#e0ffff",
-				"lightgoldenrodyellow":"#fafad2",
-				"lightgrey":"#d3d3d3",
-				"lightgreen":"#90ee90",
-				"lightpink":"#ffb6c1",
-				"lightsalmon":"#ffa07a",
-				"lightseagreen":"#20b2aa",
-				"lightskyblue":"#87cefa",
-				"lightslategray":"#778899",
-				"lightsteelblue":"#b0c4de",
-				"lightyellow":"#ffffe0",
-				"lime":"#00ff00",
-				"limegreen":"#32cd32",
-				"linen":"#faf0e6",
-				"magenta":"#ff00ff",
-				"maroon":"#800000",
-				"mediumaquamarine":"#66cdaa",
-				"mediumblue":"#0000cd",
-				"mediumorchid":"#ba55d3",
-				"mediumpurple":"#9370d8",
-				"mediumseagreen":"#3cb371",
-				"mediumslateblue":"#7b68ee",
-				"mediumspringgreen":"#00fa9a",
-				"mediumturquoise":"#48d1cc",
-				"mediumvioletred":"#c71585",
-				"midnightblue":"#191970",
-				"mintcream":"#f5fffa",
-				"mistyrose":"#ffe4e1",
-				"moccasin":"#ffe4b5",
-				"navajowhite":"#ffdead",
-				"navy":"#000080",
-				"oldlace":"#fdf5e6",
-				"olive":"#808000",
-				"olivedrab":"#6b8e23",
-				"orange":"#ffa500",
-				"orangered":"#ff4500",
-				"orchid":"#da70d6",
-				"palegoldenrod":"#eee8aa",
-				"palegreen":"#98fb98",
-				"paleturquoise":"#afeeee",
-				"palevioletred":"#d87093",
-				"papayawhip":"#ffefd5",
-				"peachpuff":"#ffdab9",
-				"peru":"#cd853f",
-				"pink":"#ffc0cb",
-				"plum":"#dda0dd",
-				"powderblue":"#b0e0e6",
-				"purple":"#800080",
-				"red":"#ff0000",
-				"rosybrown":"#bc8f8f",
-				"royalblue":"#4169e1",
-				"saddlebrown":"#8b4513",
-				"salmon":"#fa8072",
-				"sandybrown":"#f4a460",
-				"seagreen":"#2e8b57",
-				"seashell":"#fff5ee",
-				"sienna":"#a0522d",
-				"silver":"#c0c0c0",
-				"skyblue":"#87ceeb",
-				"slateblue":"#6a5acd",
-				"slategray":"#708090",
-				"snow":"#fffafa",
-				"springgreen":"#00ff7f",
-				"steelblue":"#4682b4",
-				"tan":"#d2b48c",
-				"teal":"#008080",
-				"thistle":"#d8bfd8",
-				"tomato":"#ff6347",
-				"turquoise":"#40e0d0",
-				"violet":"#ee82ee",
-				"wheat":"#f5deb3",
-				"white":"#ffffff",
-				"whitesmoke":"#f5f5f5",
-				"yellow":"#ffff00",
-				"yellowgreen":"#9acd32"
-				};
-
-		var c = color.toLowerCase();
-
-		// Return hex color
-		if ( colors[c] ) return colors[c];
-		
-		// Return black if there are no matches
-		// (could return false, but will have to catch that error later)
-		return '#000000';				
-	},
-
-
 	_calculateHeight : function () {
 
 
-		var windowSize = this._getWindowSize();
-		var h = windowSize.height - 50; // Remove 50 for the top chrome.
+			var windowSize = this._getWindowSize();
+			var h = windowSize.height - 55;
 
 
-		// LEGEND/DESCRIPTION HEIGHTS
-		// LEGEND/DESCRIPTION HEIGHTS
+			// LEGEND – SELECTOR HEIGHT (when we're showing one and one legend)
+			// LEGEND – SELECTOR HEIGHT (when we're showing one and one legend)
 
-		// Actual height
-		var legendSelectorHeight = this._multipleLegendInner.offsetHeight;
-		// Height is zero if collapsed (fallback – should provide 0 anyways)
-		if ( this.isCollapsed ) legendSelectorHeight = 0;
+			// Outer height
+			var legendSelectorOuterHeight = this.miniLegend ? 0 : this._multipleLegendInner.offsetHeight;
+
+			// Inner height
+			var legendSelectorInnerHeight = this.miniLegend ? 0 : this._multipleLegendInnerContent.scrollHeight;
+
+			// Visible height
+			if ( legendSelectorOuterHeight > legendSelectorInnerHeight ) {
+				var legendSelectorVisisbleHeight = legendSelectorOuterHeight;
+			} else {
+				var legendSelectorVisisbleHeight = legendSelectorInnerHeight;
+			}
+
+
+			// LEGEND HEIGHT
+			// LEGEND HEIGHT
+
+			// Outer height
+			var legendOuterHeight = this._outer.offsetHeight;
+
+			// Inner height
+			var legendInnerHeight = this._inner.scrollHeight;
+
+			// Visible height
+			// Problem: This is a little buggy if we're only watching
+			// the legend of one layer. Not a biggie, but will fix it.
+			if ( legendOuterHeight > legendInnerHeight ) {
+				var legendBoxVisisbleHeight = legendOuterHeight;
+				// Wu.DomUtil.removeClass(this._inner, 'allow-scrolling');				
+
+			} else {
+				var legendBoxVisisbleHeight = legendInnerHeight;
+				// Wu.DomUtil.addClass(this._inner, 'allow-scrolling');
+			}
+
+	
+			// Total height of legend
+			var legendTotalHeight = legendSelectorInnerHeight + legendInnerHeight;
+
+			// Visible height of legend
+			var legendVisibleHeight = legendBoxVisisbleHeight + legendSelectorVisisbleHeight;
+
+
+
+
+			// LAYER SELECTOR HEIGHTS
+			// LAYER SELECTOR HEIGHTS
+
+			// Check if Layer selector exists
+			if ( app.MapPane._controls.layermenu && app.MapPane._controls.layermenu._innerScroller ) {
+
+				var layermenu = app.MapPane._controls.layermenu._innerScroller;
+				// Height of wrapper
+				var layermenuOuterHeight = layermenu.offsetHeight;
+				// Inner height of scroller content
+				var layermenuInnerHeight = app.MapPane._controls.layermenu._content.scrollHeight;
+
+			// If the layer menu does not exist, set values to zero and declare false
+			} else {
+
+				var layermenu = false;
+				var layermenuOuterHeight = 0;
+				var layermenuInnerHeight = 0;
+
+			}
+
+
+
 		
-		// Height of inner content, including overflow
-		var legendSelectorScrollHeight = this._multipleLegendInnerContent.scrollHeight;
-		// Not fallback - this number has to be set to zero.
-		if ( this.isCollapsed ) legendSelectorScrollHeight = 0;
+			// The content of the LAYER MENU and the LEGEND exceeds the height of
+			// the window. We need to restrict them, by setting max height.
+			if ( (layermenuInnerHeight + legendVisibleHeight) > (h-10) ) {
 
-		// Height of bottom part, with legend
-		var legendContentHeight = this._content.offsetHeight;
+				// .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+				// LEGEND LEGEND LEGEND LEGEND LEGEND LEGEND LEGEND 
+				// .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+				
+				// Layer menu height is higher than 50% ->
+				// restrict legend total height to be more than 50%.
+				if ( layermenuInnerHeight > (h/2) ) {	
+					var legendAllowedHeight = (h/2);
 
-		// Actual height of legend section, with layer name on top. 15 pixels buffer
-		var legendSectionHeight = legendSelectorHeight + legendContentHeight + 15;
-
-
-		// LAYER SELECTOR HEIGHTS
-		// LAYER SELECTOR HEIGHTS
-
-		// Check if Layer selector exists
-		if ( app.MapPane._controls.layermenu && app.MapPane._controls.layermenu._innerScroller ) {
-
-			var layermenu = app.MapPane._controls.layermenu._innerScroller;
-			// Height of wrapper
-			var layermenuHeight = layermenu.offsetHeight;
-			// Inner height of scroller content
-			var layermenuContentHeight = app.MapPane._controls.layermenu._content.scrollHeight;
-
-		// If the layer menu does not exist, set values to zero and declare false
-		} else {
-
-			var layermenu = false;
-			var layermenuHeight = 0;
-			var layermenuContentHeight = 0;
-
-		}
+				// Layer menu height is less than 50% ->
+				// restrict legend to 100% - layermenu height
+				} else {
+					var legendAllowedHeight = h - layermenuInnerHeight;
+				}
 
 
-		// Check if we need scrollers
+				// .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+				// LAYER MENU - LAYER MENU - LAYER MENU - LAYER MENU
+				// .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
 
-		// The height of everything, including scrollers
-		var allScrollHeight = layermenuContentHeight + legendSelectorScrollHeight + legendContentHeight + 15;
-		
-		// Content is higher than screen = we need scrollers
-		if ( allScrollHeight > h ) {
-
-			// Check how much overflow there is
-			// var _diff = allScrollHeight - h;
-			// var _layerOverflow = layermenuContentHeight - layermenuHeight;
-			// var _legendOverflow = legendSelectorScrollHeight - legendSelectorHeight + 8;
-
-			// Calculate max height!
-			var windowHeight = h;
-
-			// Never make legends take more than half of the screen if we need scrollers
-			var maxLegendHeight = Math.floor(h/2 - legendContentHeight - 15);
-			if ( this.isCollapsed ) maxLegendHeight = 0;
-
-			// Calculate max height of layer menu
-			var spaceLeft = h - (maxLegendHeight + legendContentHeight + 15);
-			if ( spaceLeft < h/2 ) spaceLeft = h/2;
-
-			// Set heights
-			if ( layermenu ) layermenu.style.maxHeight = spaceLeft + 'px';
-			this._multipleLegendInner.style.maxHeight = maxLegendHeight + 'px';
+				// Legend total height is higher than 50% ->
+				// restrict legend total height to be more than 50%.
+				if ( legendVisibleHeight > (h/2) ) {	
+					var layersAllowedHeight = (h/2);
+				
+				// Legend total height is less than 50% ->
+				// restrict layers to 100% - legend total height
+				} else {
+					var layersAllowedHeight = h - (legendSelectorOuterHeight + legendOuterHeight + 10);
+				}
 
 
-		} else {
 
-			if ( layermenu ) layermenu.style.maxHeight = 'none';
-			this._multipleLegendInner.style.maxHeight = 'none';			
-		}
+
+				// .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+				// LAYER MENU - LAYER MENU - LAYER MENU - LAYER MENU
+				// .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+
+				
+				// Set layer menu total height
+				if ( layermenu ) {
+					layermenu.style.maxHeight = layersAllowedHeight + 'px';
+				}
+
+
+				// If the legend selector is collapsed, allow full size to legend
+				if ( this.isCollapsed ) {
+					this._outer.style.maxHeight = legendAllowedHeight + 'px';
+					this._inner.style.maxHeight = legendAllowedHeight - 30 + 'px';
+
+				// If top legend selector is open, calculate height.
+				} else {
+
+					// Legend selector inner height...
+					// These two shall share legendAllowedHeight
+					if ( ((legendSelectorVisisbleHeight + legendBoxVisisbleHeight)+2) > legendAllowedHeight) {
+
+						// The boxes are taller than allowed
+						var allowedHeightUnit = legendAllowedHeight/4;
+
+						// Legend box is larger than 3/4 of available space
+						// Force 3/4 of space to legend and 1/4 to legend selector
+						if ( legendBoxVisisbleHeight > (allowedHeightUnit*3) ) {
+							this._multipleLegendInner.style.maxHeight = allowedHeightUnit + 'px';
+							this._outer.style.maxHeight = (allowedHeightUnit*3) + 'px';
+							this._inner.style.maxHeight = (allowedHeightUnit*3) - 30 + 'px';					
+						
+						// Legend box is NOT larger than 3/4 of available space
+						// Remvoe maxHeight from Legend box, 
+						// Give legend selector allowedHeight - legend box height
+						} else {
+							this._multipleLegendInner.style.maxHeight = (legendAllowedHeight - legendBoxVisisbleHeight) + 'px';
+							this._outer.style.maxHeight = legendBoxVisisbleHeight + 'px';
+							this._inner.style.maxHeight = legendBoxVisisbleHeight - 30 + 'px';
+						}
+
+					} else {
+						// The boxes are NOT taller than allowed
+						this._multipleLegendInner.style.maxHeight = h + 'px';
+						this._outer.style.maxHeight = h + 'px';
+						this._inner.style.maxHeight = h - 30 + 'px';
+					}
+				}
+				
+
+				
+			// It's not a crash 
+			// legend and layer selector can be as high as they want
+			} else {
+
+				if ( layermenu ) layermenu.style.maxHeight = h + 'px';
+				this._multipleLegendInner.style.maxHeight = h + 'px';
+				this._outer.style.maxHeight = h + 'px';
+				this._inner.style.maxHeight = h - 30 + 'px';
+
+			}
+
+			// At the very end we set scrollers
+			// If we do it before, we will not get the real numbers,
+			// and it fails every once in a while
+			if ( this._outer.offsetHeight > this._inner.scrollHeight ) {
+				Wu.DomUtil.removeClass(this._inner, 'allow-scrolling');	
+			} else {
+				Wu.DomUtil.addClass(this._inner, 'allow-scrolling');
+			}
+
+
+
+
 	},
 
-	buildAllLegendYo : function () {
+	compactLegend : function () {
+
+		console.log('%c making compactLegend ', 'background: blue; color: white;');
+		// console.log('this.layerCount', this.layerCount);
+		// console.log('this.layers', this.layers);
+
+		var length = 0;
+		for (var k in this.layers) {
+		       length++;
+		}
+
+		
+		if ( length <= 1 ) {
+			console.log('%c remove arrow ', 'background: blue; color: white;');
+			Wu.DomUtil.addClass(this._compactExpand, 'displayNone');
+		} else {
+			console.log('%c add arrow ', 'background: green; color: white;');
+			Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
+		}
+		
+		
+		// if ( this.layerCount <= 1 && this.miniLegend ) {
+		// 	Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
+		// } else {
+		// 	Wu.DomUtil.addClass(this._compactExpand, 'displayNone');
+		// }
+
+
+
+		Wu.DomUtil.addClass(this._multipleLegendOuter, 'displayNone');
+		Wu.DomUtil.addClass(this._singleLegendViewWrapper, 'displayNone');
+		Wu.DomUtil.removeClass(this._compactLegendViewWrapper, 'displayNone');
+		Wu.DomUtil.addClass(this._inner, 'multiview');
+		// Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
+
 		var allLegendHTML = '';
+		var allGradientHTML = '';
+
 		for ( var f in this.layers ) {
 			var layer = this.layers[f]
-			this.buildLegendObject(layer);
-			var legend = this.getLegend(layer);
-			allLegendHTML += legend;
+			var legend = layer.getLegends();
+
+			var title = layer.getTitle();
+			var layerTitle = '<div class="description-control-meta-title">' + title + '</div>';
+			// var layerTitle = '';
+
+			// if ( legend.html && legend.html.length>10 ) allLegendHTML += layerTitle + legend.html;
+			if ( legend.html && legend.html.length>10 ) allLegendHTML += legend.html;
+			if ( legend.gradient ) allGradientHTML += layerTitle + legend.gradient;
+			
+			if ( !legend.html && !legend.gradient ) {
+				// allLegendHTML += layerTitle + 'No legend!';
+			}
+			
 		}
-		this._inner.innerHTML = allLegendHTML;
+
+
+		this._compactLegendInnerScroller.innerHTML = '';
+		this._comactContent = Wu.DomUtil.create('div', 'compact-legends', this._compactLegendInnerScroller, allLegendHTML + allGradientHTML)
+		this.miniLegend = true;
+
 	},
 
 	_getWindowSize : function (argument) {

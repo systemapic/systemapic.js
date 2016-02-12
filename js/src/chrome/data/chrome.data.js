@@ -481,7 +481,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// set feedback
 		tempfile.feedback.innerHTML = error.description;
 		tempfile.percent.innerHTML = 'Upload failed';
-		tempfile.datawrap.style.background = '#F13151';
+		
+
+		Wu.DomUtil.addClass(tempfile.datawrap, 'upload-error');		
+		// tempfile.datawrap.style.background = '#F13151';
 		
 		// close on click
 		Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);

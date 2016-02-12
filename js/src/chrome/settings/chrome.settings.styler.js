@@ -9,6 +9,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 	},
 
+	globesar : false,
+
 	_initialize : function () {
 
 		// init container
@@ -44,15 +46,17 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// active layer
 		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller); // appending to this._midSection
 
-
 		// Create field wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
+
+		this._legendWrapper = Wu.DomUtil.create('dov', 'chrome-legend-wrapper', this._midInnerScroller);
+		// this.initLegends();
+
 		// update style button
-		var buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._midInnerScroller);
+		var buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._container);
 		this._updateStyleButton = Wu.DomUtil.create('div', 'smooth-fullscreen-save update-style', buttonWrapper, 'Update Style');
 		Wu.DomEvent.on(this._updateStyleButton, 'click', this._updateStyle, this);		
-
 
 		// mark inited
 		this._inited = true;
@@ -81,6 +85,28 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// create line styler
 		this._lineStyler = new Wu.Styler.Line(options);
 
+
+		var legendOptions = {			
+			layer     : this._layer,
+			carto     : this._carto,
+			globesar  : this.globesar,
+			container : this._legendWrapper
+			// container : this._fieldsWrapper
+
+		}
+
+		this._legendStyler = new Wu.Legend(legendOptions);
+
+
+		Wu.DomUtil.removeClass(this._legendStyler._legensOuter, 'displayNone');
+
+		// update legend
+		this._legendStyler._updateLegend();
+
+
+
+		// this._updateLegend();
+
 	},
 
 	markChanged : function () {
@@ -89,12 +115,16 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateStyle : function () {
 
+		console.log('%c _updateStyle ', 'background: red; color: white;');
+
 		this._pointStyler.updateStyle();
 		this._polygonStyler.updateStyle();
 		this._lineStyler.updateStyle();
 
-		Wu.DomUtil.removeClass(this._updateStyleButton, 'marked-changed');
+		// this._updateLegend();
+		this._legendStyler._updateLegend();
 
+		Wu.DomUtil.removeClass(this._updateStyleButton, 'marked-changed');
 	},
 	
 	_refresh : function () {
@@ -139,8 +169,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
 
+		// console.log('%c_selectedActiveLayer', 'background: red; color: white; font-size: 18px;');
+
+
 		// clear wrapper content
 		this._fieldsWrapper.innerHTML = '';
+		this._legendWrapper.innerHTML = '';
 
 		// get layer_id
 		this.layerUuid = uuid ? uuid : e.target.value
@@ -163,11 +197,17 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// set local cartoJSON
 		this._carto = style || {};
 
+		// Clear legend objects
+		this.oldLegendObj = false;
+		this.legendObj = false;
+
 		// init style json
 		this._initStyle();
 
 		// Add temp layer
 		this._tempaddLayer();
+
+
 	},
 
 	
@@ -209,6 +249,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// get carto from server
 		app.api.json2carto(options, callback.bind(this));
-	}
+	},
 
-});
+
+ });

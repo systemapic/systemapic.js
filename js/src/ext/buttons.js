@@ -8,6 +8,7 @@ Wu.button = Wu.Class.extend({
 		if ( options.type == 'set' ) 	    this.initSet();
 		if ( options.type == 'setclear' )   this.initSetClear();
 		if ( options.type == 'radio' )	    this.initRadio();
+		if ( options.type == 'input' )      this.initInput();
 		if ( options.type == 'miniInput' )  this.initMiniInput();
 		if ( options.type == 'dropdown')    this.initMiniDropDown();
 		if ( options.type == 'colorball')   this.initColorBall();
@@ -399,6 +400,60 @@ Wu.button = Wu.Class.extend({
 	},
 
 
+	// ┬┌┐┌┌─┐┬ ┬┌┬┐
+	// ││││├─┘│ │ │ 
+	// ┴┘└┘┴  └─┘ ┴ 
+
+	initInput : function  () {
+		
+		var appendTo    = this.options.appendTo,
+		    key         = this.options.id,
+		    fn          = this.options.fn,
+		    value       = this.options.value,
+		    placeholder = this.options.placeholder,
+		    tabindex    = this.options.tabindex,
+		    right       = this.options.right,
+		    className   = this.options.className,
+		    isOn        = this.options.isOn,
+		    allowText   = this.options.allowText;
+
+
+		var _class = 'chrome-field-input ';
+		if ( className ) _class += className;
+
+		// create
+		var input = Wu.DomUtil.createId('input', 'field_input_' + key, appendTo);
+		input.className = _class;
+		input.setAttribute('placeholder', placeholder);
+		input.setAttribute('tabindex', tabindex);
+
+		this.input = input;
+		
+		// set value
+		if (value) input.value = value;
+		if (value == 0) input.value = value;
+
+		// other options
+		if ( !right ) Wu.DomUtil.addClass(input, 'left-input');
+		if ( !isOn  ) Wu.DomUtil.addClass(input, 'left-input-kill');
+
+		// set event
+		// Wu.DomEvent.on(input, 'blur', fn);
+
+		// Force numeric
+		if ( !allowText ) input.onkeypress = this.forceNumeric;
+
+
+		Wu.DomEvent.on(input, 'blur', this.blurInput, this);
+
+		return input;	
+	},
+
+	blurInput : function (e) {
+	
+		this.options.fn(e);
+	},
+
 	// ┌┬┐┬┌┐┌┬  ┬┌┐┌┌─┐┬ ┬┌┬┐
 	// ││││││││  ││││├─┘│ │ │ 
 	// ┴ ┴┴┘└┘┴  ┴┘└┘┴  └─┘ ┴ 
@@ -665,7 +720,7 @@ Wu.button = Wu.Class.extend({
 		if (className) divclass += ' ' + className;
 
 		// Create button
-		var _switch = this._switch= Wu.DomUtil.create('div', divclass, appendTo);
+		var _switch = this._switch = Wu.DomUtil.create('div', divclass, appendTo);
 		_switch.setAttribute('key', id);
 		_switch.id = 'switch_' + id;
 
@@ -677,7 +732,7 @@ Wu.button = Wu.Class.extend({
 		}
 
 		// Add hooks
-		if ( !disabled ) Wu.DomEvent.on(_switch, 'click', this.toggleSwitch, this);		    
+		if ( !disabled ) Wu.DomEvent.on(_switch, 'click', this.toggleSwitch, this);
 
 		return _switch;
 

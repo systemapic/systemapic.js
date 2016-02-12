@@ -1,3 +1,6 @@
+// TODO: not call this one "chart" - simply because it isn't :P
+// ALSO: separate all graph things that is in the pop-up, and have it more "pluggable" (i.e. )
+
 Wu.Popup = {};
 Wu.Popup.Chart = L.Control.extend({
 	includes: L.Mixin.Events,
@@ -5,7 +8,6 @@ Wu.Popup.Chart = L.Control.extend({
 	options: {
 		minWidth: 50,
 		maxWidth: 300,
-		// maxHeight: null,
 		autoPan: true,
 		closeButton: true,
 		offset: [0, 7],
@@ -14,13 +16,8 @@ Wu.Popup.Chart = L.Control.extend({
 		autoPanPaddingBottomRight: L.point(10, 20),
 		keepInView: false,
 		className: '',
-		zoomAnimation: false,
-		defaultPosition : {
-			x : 7,			
-			y : 6
-		}
+		zoomAnimation: false
 	},
-
 
 
 	initialize: function (options) {
@@ -124,18 +121,19 @@ Wu.Popup.Chart = L.Control.extend({
 		return this._content;
 	},
 
-	setContent: function (content) {
+	setContent: function (content, add) {
+
 		this._content = content;
-		this.update();
+		this.update(add);
 		return this;
 	},
 
-	update: function () {
+	update: function (add) {
 		if (!this._map) return;
 
 		this._container.style.visibility = 'hidden';
 
-		this._updateContent();
+		add ? this._addContent() : this._updateContent();
 		this._updatePosition();
 
 		this._container.style.visibility = '';
@@ -152,6 +150,16 @@ Wu.Popup.Chart = L.Control.extend({
 			}
 			this._contentNode.appendChild(this._content);
 		}
+	},
+
+	_addContent : function () {
+		if (!this._content) return;
+
+		if (typeof this._content === 'string') {
+			this._contentNode.appendChild(this._content);
+		} else {
+			this._contentNode.appendChild(this._content);
+		}	
 	},
 
 	_updatePosition: function () {
@@ -277,6 +285,7 @@ Wu.Popup.Chart = L.Control.extend({
 	},
 
 	setPosition : function (position, bottom) {
+
 
 		// set left
 		this._container.style.left = position.x + 'px';

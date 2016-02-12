@@ -583,9 +583,16 @@ Wu.Model.Layer = Wu.Model.extend({
 	_setGridEvents : function (on) {
 		var grid = this.gridLayer;
 		if (!grid || !on) return;
-		grid[on]('mousedown', this._gridOnMousedown, this);
-		grid[on]('mouseup', this._gridOnMouseup, this);
-		grid[on]('click', this._gridOnClick, this);
+
+		var startEvent = 'click';
+		var endEvent = 'mouseup';
+
+		// var startEvent = 'mouseover';
+		// var endEvent = 'mouseleave';		
+
+		grid[on]('mousedown', this._gridOnMousedown, this);		
+		grid[on](endEvent, this._gridOnMouseup, this);	
+		grid[on](startEvent, this._gridOnClick, this);
 	},
 
 	_removeGridEvents : function () {
@@ -730,6 +737,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	},
 
 	_refreshLayer : function (layerUuid) {
+
 		this.layer.setOptions({
 			layerUuid : layerUuid
 		});

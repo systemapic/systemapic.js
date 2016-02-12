@@ -213,8 +213,11 @@ Wu.Invite = Wu.Class.extend({
 		var input = e.target;
 		var email = input.value;
 
+		console.log('_checkUniqueEmail');
+
 		// post to endpoint
-		app.api.uniqueEmail({
+		// app.api.uniqueEmail({
+		this._post('/api/user/checkUniqueEmail', {			
 			email : email
 		}, function (err, result) {
 
@@ -236,8 +239,11 @@ Wu.Invite = Wu.Class.extend({
 		var input = e.target;
 		var username = input.value;
 
+		console.log('_checkUniqueUsername');
+
 		// post to endpoint
-		app.api.uniqueUsername({
+		// app.api.uniqueUsername({
+		this._post('/api/user/checkUniqueUsername', {			
 			username : username
 		}, function (err, result) {
 			var result = Wu.parse(result);

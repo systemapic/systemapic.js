@@ -2,18 +2,11 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 
-		console.log('');
-		console.log('%cinitialize popup', 'background: green; color: white;');
-		// console.log('this', this);
-		// console.log('this._isOpen', this._isOpen);
-		console.log('');
-		console.log('');
-		console.log('');
-
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
 
+		// If we are sampling with polygon (draw)
 		if ( multiPopUp ) {
 
 			// Get pop-up settings
@@ -24,6 +17,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			var content = this.multiPointPopUp(multiPopUp);
 
 
+		// If we are sampling from point (click)
 		} else {
 
 			if (!e) {
@@ -54,33 +48,15 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Open popup
 		this.openPopup(e, multiPopUp);
 
-		// Set open state to true
-		this._isOpen = true;
-
 	},
 
 
 	// Open pop-up
 	openPopup : function (e, multiPopUp) {
-
-		this.createNewPopup(e, multiPopUp);
-
-		// if ( app.MapPane._chart && app.MapPane._chart._isOpen ) {
-		// 	this.updateExistingPopup(e, multiPopUp)
-		// } else {
-		// 	this.createNewPopup(e, multiPopUp)
-		// }
-		
-	},
-
-	createNewPopup : function (e, multiPopUp) {
-
-		console.log('%c createNewPopup ', 'background: red; color: white;');
-
 	
 		if ( this._popup ) return;
 
-		var popup   = this._createPopup(),
+		var popup   = this._createPopup(e),
 		    content = this._popupContent,
 		    map     = app._map,
 		    project = this._project || app.activeProject;
@@ -115,13 +91,21 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	},
 
-	updateExistingPopup : function (e, multiPopUp) {
-	
-		console.log('%c updateExistingPopup ', 'background: blue; color: white;');
-		console.log('this._popupContent', this._popupContent);
 
-		// app.MapPane._chart.setContent('Hello!');
-		// console.log('app.MapPane._chart._popup', app.MapPane._chart._popup);
+	updateExistingPopup : function (options) {
+
+		var popup = options.context._chart._popup;
+
+		var e = options.e;
+		var multiPopUp = options.multiPopUp;
+
+		// Todo: enable popup-settings for draw selection
+		if ( multiPopUp ) return;
+
+		var content = this.singlePopUp(e);
+
+		popup.setContent(content, true);
+
 
 	},
 
@@ -176,9 +160,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		this._popupContent = '';
 		this._popup = null;
 
-		// xoxoxoxoxo
-		app.MapPane._chart._isOpen = false;		
-
 		// remove marker
 		this.popUpMarkerCircle && app._map.removeLayer(this.popUpMarkerCircle);
 
@@ -186,8 +167,9 @@ Wu.Control.Chart = Wu.Control.extend({
 		this._removePopupCloseEvent();
 	},
 	
+
 	// Create leaflet pop-up
-	_createPopup : function () {
+	_createPopup : function (e) {
 
 		// Create smaller pop-up if there are no graphs to show
 		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
@@ -201,7 +183,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		}
 
 
-
 		// create popup
 		var popup = this._popup = Wu.popup({
 			offset : [18, 0],			
@@ -210,9 +191,12 @@ Wu.Control.Chart = Wu.Control.extend({
 			maxWidth : maxWidth,
 			minWidth : minWidth,
 			maxHeight : 350,
-			appendTo : app._appPane // where to put popup
+			appendTo : app._appPane,
+			defaultPosition : {
+				x : 7,			
+				y : 6
+			}					 
 		});
-
 
 		
 		if ( app.isMobile.mobile ) {
@@ -288,7 +272,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		var _chartContainer = this.createChartContainer();
 		var _footer = this.createFooter();
 
-		var content = Wu.DomUtil.create('div', 'popup-inner-content');
+		var content = this._content = Wu.DomUtil.create('div', 'popup-inner-content');
 		content.appendChild(_header);
 		content.appendChild(_chartContainer);
 		content.appendChild(_footer)
