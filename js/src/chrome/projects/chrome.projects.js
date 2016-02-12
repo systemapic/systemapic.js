@@ -21,7 +21,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			download_on : 'Allowed to download data',
 			download_off : 'Not allowed to download data',
 			share_on : 'Allowed to invite others (as spectators)',
-			share_off : 'Not allowed to invite others',
+			share_off : 'Not allowed to invite others'
 		}
 	},
 
@@ -47,7 +47,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var projectsContainer = this._projectsContainer = Wu.DomUtil.create('div', 'chrome-left-container', this._container);
 
 		// Create Title
-		var title = 'Projects <span style="font-weight:400; font-size: 16px; color: gainsboro">(' + _.size(app.Projects) + ')</span> '
+		var title = 'Projects <span style="font-weight:400; font-size: 16px; color: gainsboro">(' + _.size(app.Projects) + ')</span> ';
 		var projectsTitle = Wu.DomUtil.create('div', 'chrome-left-title projects-title', projectsContainer, title);
 
 		// Create NEW button
@@ -270,7 +270,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// pass inputs to triggers
 		var options = {
 			name_input : name_input,
-			name_error : name_error,
+			name_error : name_error
 		};
 
 		// save button trigger
@@ -358,7 +358,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var options = {
 			// name_input : name_input,
 			// name_error : name_error,
-			project : project,
+			project : project
 		};
 
 		// buttons wrapper
@@ -374,7 +374,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		var access = {
 			read : []
-		}
+		};
 
 		this._access.read.forEach(function (v) {
 			access.read.push(v.user.getUuid());
@@ -529,11 +529,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var options = {
 			name_input : name_input,
 			name_error : name_error,
-			project : project,
+			project : project
 		};
 
 		// buttons wrapper
-		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content)
+		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content);
 
 		// save button
 		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', buttonsWrapper, 'Update');
@@ -670,7 +670,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					invite_list_container.style.display = 'block';
 				}
 			}
-		};
+		}
+
 		_.each(allUsers, function (user, index) {
 
 			if (user.getUuid() == app.Account.getUuid()) {
@@ -1110,7 +1111,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		this._logUpdate({
 			access : access,
 			project : project,
-			projectName : projectName,
+			projectName : projectName
 		});
 
 		// reset
@@ -1218,14 +1219,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			description 	: 'Project description',
 			createdByName 	: app.Account.getName(),
 			access 		: access
-		}
+		};
 
 		// set create options
 		var options = {
 			store : store,
 			callback : this._projectCreated,
 			context : this
-		}
+		};
 
 		// create new project with options, and save
 		var project = new Wu.Project(store);
@@ -1354,8 +1355,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var dims = {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
-		}
+		};
 		return dims;
-	},
+	}
 
 });
