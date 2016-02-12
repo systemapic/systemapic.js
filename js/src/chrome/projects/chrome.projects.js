@@ -581,12 +581,28 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		edit : {}
 	},
 
+	_itemsContainers : {
+		read: [],
+		edit: []
+	},
+
+	_checkedUsers : {
+		read: {},
+		edit: {}	
+	},
+
+	_list_item_containers : {
+		read: [],
+		edit: []
+	},
+
 	// todo: refactor into module, var userList = new Wu.Tools.UserList();
 	_createInviteUsersInput : function (options) {
 
 		// invite users
-		var content = options.content || this._fullscreen._content;
-		var container = this._fullscreen._container;
+		var me = this;
+		var content = options.content || me._fullscreen._content;
+		var container = me._fullscreen._container;
 		var project = options.project;
 
 		// label
@@ -624,7 +640,41 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
 			return u.store.firstName;
 		});
-		_.each(allUsers, function (user) {
+		
+		function onKeyUp(e) {
+			var filterUsers = [];
+			var currentIsChecked = false;
+			var key = event.which ? event.which : event.keyCode;
+
+			if (key !== 40 && key !== 38 && key !== 13) {
+				_.forEach(me._itemsContainers[options.type], function (user, index) {
+					if (user.name.toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(user.name) !== -1) {
+						me._itemsContainers[options.type][index].container.style.display = 'none';
+						me._itemsContainers[options.type][index].container.style.backgroundColor = '';
+						me._itemsContainers[options.type][index].current = false;
+					} else {
+						me._itemsContainers[options.type][index].container.style.display = 'block';
+						if (!currentIsChecked) {
+							me._itemsContainers[options.type][index].container.style.backgroundColor = '#DEE7EF';	
+							currentIsChecked = true;
+							me._itemsContainers[options.type][index].current = true;
+						} else {
+							me._itemsContainers[options.type][index].container.style.backgroundColor = '';
+							me._itemsContainers[options.type][index].current = false;
+						}
+						filterUsers.push(user);
+					}
+				});
+
+				if (_.isEmpty(filterUsers)) {
+					invite_list_container.style.display = 'none';
+				} else {
+					invite_list_container.style.display = 'block';
+				}
+			}
+			console.log("KEY UP", me._itemsContainers[options.type]);
+		};
+		_.each(allUsers, function (user, index) {
 
 			// divs
 			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container', monkey_scroll_list);
@@ -638,6 +688,21 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			name_bold.innerHTML = user.getFullName();
 			name_subtle.innerHTML = user.getEmail();
 
+			if (index === 0) {
+				list_item_container.style.backgroundColor = '#DEE7EF';				
+				me._list_item_containers[options.type].push({
+					user: user,
+					list_item_container: list_item_container,
+					current: true
+				});
+			} else {
+				me._list_item_containers[options.type].push({
+					user: user,
+					list_item_container: list_item_container,
+					current: false
+				});
+			}
+
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
 
@@ -645,13 +710,36 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				if (options.type == 'read' && user.getUuid() == app.Account.getUuid()) return;
 
 				// add selected user item to input box
+				me._checkedUsers[options.type][user.getFullName()] = user;
 				this._addUserAccessItem({
 					input : invite_input,
 					user : user,
-					type : options.type
+					type : options.type,
+					checkedUsers : me._checkedUsers[options.type],
+					onKeyUp: onKeyUp
 				});
-					
+
+				invite_input.value = '';
+				onKeyUp();
 			}, this);
+
+			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
+				_.forEach(me._list_item_containers[options.type], function (_list_item_container) {
+					if (_list_item_container.list_item_container != list_item_container) {
+						_list_item_container.list_item_container.style.backgroundColor = '';
+						_list_item_container.current = false;
+					} else {
+						_list_item_container.list_item_container.style.backgroundColor = '#DEE7EF';
+						_list_item_container.current = true;
+					}
+				});
+
+			}, this);
+
+			me._itemsContainers[options.type].push({
+				name: user.getFullName(),
+				container: list_item_container
+			});
 		}, this);
 
 
@@ -659,8 +747,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// input focus, show dropdown
 		Wu.DomEvent.on(invite_input, 'focus', function () {
-			this._closeInviteInputs();
-			invite_list_container.style.display = 'block';
+			me._closeInviteInputs();
+			onKeyUp();
 		}, this);
 
 		// focus input on any click
@@ -673,6 +761,125 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// get which key
 			var key = event.which ? event.which : event.keyCode;
+			var itemContainers = me._list_item_containers[options.type];
+
+			console.log("key DOWN: ", itemContainers);
+			if (key === 38) {
+				_.find(itemContainers, function (_list_item_container, index) {
+					var showedItemIndexs = [];
+					var nearestLessUnchecked = -1;
+
+					_.forEach(itemContainers, function (item, index) {
+						if (item.list_item_container.style.display === 'block') {
+							showedItemIndexs.push(index);
+						}
+					});
+
+					if (_list_item_container.current === true) {
+						itemContainers[index].current = false;
+						itemContainers[index].list_item_container.style.backgroundColor = '';
+
+							if (index > 0 && itemContainers[(index - 1) % (itemContainers.length)] && itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
+								itemContainers[(index - 1) % (itemContainers.length)].current = true;
+								itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+								return true;							
+							} else if (index === 0 && itemContainers[itemContainers.length - 1] && itemContainers[itemContainers.length - 1].list_item_container.style.display === 'block') {
+								itemContainers[itemContainers.length - 1].current = true;
+								itemContainers[itemContainers.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
+								return true;
+							}
+
+							_.find(showedItemIndexs, function (item, itemIndex) {
+								if (item >= (index)) {
+									nearestLessUnchecked = showedItemIndexs[itemIndex - 1];
+									return true;
+								}
+								return false;
+							});
+
+							if (nearestLessUnchecked == undefined) {
+								nearestLessUnchecked = -1;
+							}
+
+							if (nearestLessUnchecked < 0) {
+								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].current = true;
+								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].list_item_container.style.backgroundColor = '#DEE7EF';
+							} else {
+								itemContainers[nearestLessUnchecked].current = true;
+								itemContainers[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+							}
+							return true;
+					}
+					return false;
+				});
+			}
+
+			if (key === 40) {
+				_.find(itemContainers, function (_list_item_container, index) {
+					var showedItemIndexs = [];
+					var nearestMoreUnchecked = -1;
+
+					_.forEach(itemContainers, function (item, index) {
+						if (item.list_item_container.style.display === 'block') {
+							showedItemIndexs.push(index);
+						}
+					});
+
+					if (_list_item_container.current === true) {
+						itemContainers[index].current = false;
+						itemContainers[index].list_item_container.style.backgroundColor = '';
+
+						if (itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
+							itemContainers[(index + 1) % (itemContainers.length)].current = true;
+							itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+							return true;
+						}
+
+						_.find(showedItemIndexs, function (item, itemIndex) {
+							if (item > (index)) {
+								nearestMoreUnchecked = showedItemIndexs[itemIndex];
+								return true;
+							}
+							return false;
+						});
+
+						if (nearestMoreUnchecked < 0) {
+							itemContainers[showedItemIndexs[0]].current = true;
+							itemContainers[showedItemIndexs[0]].list_item_container.style.backgroundColor = '#DEE7EF';
+						} else {
+							itemContainers[nearestMoreUnchecked].current = true;
+							itemContainers[nearestMoreUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+						}
+						return true;
+
+					}
+					return false;
+				});
+			}
+
+			if (key === 13) {
+
+				currentContainer = _.find(me._list_item_containers[options.type], function (_list_item_container, index) {
+					return _list_item_container.current === true;
+				});
+
+				if (currentContainer && currentContainer.user) {
+					if (options.type == 'read' && currentContainer.user.getUuid() == app.Account.getUuid()) return;
+
+					me._checkedUsers[options.type][currentContainer.user.getFullName()] = currentContainer.user;
+					this._addUserAccessItem({
+						input : invite_input,
+						user : currentContainer.user,
+						type : options.type,
+						checkedUsers : me._checkedUsers[options.type],
+						onKeyUp: onKeyUp
+					});
+
+					invite_input.value = '';
+					onKeyUp();
+				}
+
+			}
 
 			// get string length
 			var value = invite_input.value;
@@ -694,6 +901,12 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				// remove last item
 				var popped = this._access[options.type].pop();
 				Wu.DomUtil.remove(popped.user_container);
+				var item = _.find(_.keys(me._checkedUsers[options.type]), function (userName) {
+					return userName == last.user.getFullName(); 
+				});
+
+				delete me._checkedUsers[options.type][item];
+
 			}
 
 			// enter: blur input
@@ -705,6 +918,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		}, this);
 
+		Wu.DomEvent.on(invite_input, 'keyup', onKeyUp, this);
 
 		// close dropdown on any click
 		Wu.DomEvent.on(container, 'click', function (e) {
@@ -717,7 +931,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			if (relevantTarget) this._closeInviteInputs();
 
-		},this);
+		}, this);
 
 		if (project) {
 
@@ -758,7 +972,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	_addUserAccessItem : function (options) {
-
+		var me = this;
 		var invite_input = options.input;
 		var user = options.user;
 
@@ -800,6 +1014,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					return i.user == user;
 				});
 
+				delete options.checkedUsers[user.getFullName()];
+				options.onKeyUp();
 			}, this);
 		} else {
 
@@ -819,10 +1035,17 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var existing = _.find(this._access[otherType], function (i) {
 			return i.user == user;
 		});
+
 		if (existing) {
 
 			// remove div
 			Wu.DomUtil.remove(existing.user_container);
+			
+			var item = _.find(_.keys(me._checkedUsers[otherType]), function (userName) {
+				return userName == user.getFullName(); 
+			});
+
+			delete me._checkedUsers[otherType][item];
 			
 			// remove from array
 			_.remove(this._access[otherType], function (i) {
