@@ -493,7 +493,7 @@ Wu.App = Wu.Class.extend({
 
 		// save hash to server
 		app.api.hashSet({
-			projectUuid : project.getUuid(),
+			project_id : project.getUuid(),
 			hash : {
 				id 	 : Wu.Util.createRandom(6),
 				position : app.MapPane.getPosition(),
