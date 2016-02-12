@@ -67,7 +67,7 @@ Wu.Controller = Wu.Class.extend({
 
 
 		var json = {
-			projectUuid : this._project.getUuid(),
+			project_id : this._project.getUuid(),
 			id : state
 		};
 

@@ -454,7 +454,7 @@ Wu.App = Wu.Class.extend({
 
 		// get a saved setup - which layers are active, position, 
 		app.api.getHash({
-			projectUuid : project.getUuid(),
+			project_id : project.getUuid(),
 			id : id
 		}, callback.bind(this));
 	},
