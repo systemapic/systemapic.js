@@ -12,7 +12,7 @@ Wu.MapPane = Wu.Pane.extend({
 			'measure',
 			'geolocation',
 			'mouseposition',
-			// 'baselayertoggle',
+			'baselayertoggle',
 			// 'cartocss',
 			'draw',
 		]
@@ -437,6 +437,8 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	resetControls : function () {
+
+		console.log('resetControls');
 
 		// remove carto
 		if (this.cartoCss) this.cartoCss.destroy();

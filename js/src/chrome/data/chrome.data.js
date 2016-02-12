@@ -2007,23 +2007,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var baselayers = this._project.getBaselayers();
 
 		// Force array
-		// Todo: this is always array anyways...
 		var _baselayers = _.isArray(baselayers) ? baselayers : [baselayers];
-
 		_baselayers.forEach(function (baselayer) {
 			var uuid = baselayer.uuid;
 			var layer = this._project.getLayer(uuid);
 			layer.disable();
 		}.bind(this))
 
-
 		// Add to map
 		var uuid = e.target.value;
 		var layer = this._project.getLayer(uuid);
 		layer._addTo('baselayer');
 		
-
-
 		// Save to server
 		this._project.setBaseLayer([{
 			uuid : uuid,
