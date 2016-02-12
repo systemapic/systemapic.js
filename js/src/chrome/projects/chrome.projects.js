@@ -12,7 +12,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			options : {
 				share : true,
 				download : true,
-				isPublic : true
+				isPublic : false
 			}
 		},
 		labels : {
@@ -1166,15 +1166,16 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_resetAccess : function () {
 
 		// set default access
-		this._access = {
-			read : [],
-			edit : [],
-			options : {
-				share : true,
-				download : true,
-				isPublic : true
-			}
-		}
+		// this._access = {
+		// 	read : [],
+		// 	edit : [],
+		// 	options : {
+		// 		share : true,
+		// 		download : true,
+		// 		isPublic : true
+		// 	}
+		// }
+		this._access = this.options.defaultAccess;
 
 	},
 	
