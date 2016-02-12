@@ -303,7 +303,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var titleField = Wu.DomUtil.get('field_input_' + key);
 		var title      = titleField ? titleField.value : false;
 
-
 		// If no title, set to false
 		var title = titleField ? titleField.value : false;
 
@@ -323,13 +322,13 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var title = titleField ? titleField.value : false;
 
 		// Save to server
-		this._saveToServer(key, on, title);
+		this._saveToServer(key, on, title, true);
 	},
 
 
 
 
-	_saveToServer : function (key, value, title) {
+	_saveToServer : function (key, value, title, timeseries) {
 
 		if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) {
 			
@@ -341,15 +340,18 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		} else {
 
-			// Check if key is date	
-			var keyIsDate = this._validateDateFormat(key);
-			
-			// If key is date, try to update timeseries
-			if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, value);
-			
-			// If key is not date, or could not be found in time series, go through metafields
-			if ( !timeUpdated || !keyIsDate ) this.updateMeta(key, title, value);
-		
+
+			if ( timeseries ) {
+
+				// Check if key is date	
+				var keyIsDate = this._validateDateFormat(key);
+				
+				// If key is date, try to update timeseries
+				if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, value);
+
+			} else {
+				this.updateMeta(key, title, value);
+			}
 		}
 
 		this._layer.setTooltip(this.tooltipMeta);
@@ -451,7 +453,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	// Splits metadata into "time series" and "meta fields"
 	buildTimeSeries : function (columns) {
 
-
 		var metaData = {
 			title : '',
 			description : false,			
@@ -475,19 +476,24 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 						on    : true
 				}
 
-				timeSeriesCount ++;
+				timeSeriesCount ++;		
+			} 
 
-			// Is not time series
-			} else if ( f.substring(0,7) != 'the_geo' && f != '_columns') {
+
+			// Is not time series, cont them in anyways
+			if ( f.substring(0,7) != 'the_geo' && f != '_columns') {
 				
-				console.log(f);
+				// console.log(f);
+
+				var _on = isTime ? false : true;
 
 				metaData.metaFields[f] = {
 						title : false,
-						on    : true
+						on    : _on
 				};
 
 			}       
+ 
 		}
 
 		// Set time series to true by default

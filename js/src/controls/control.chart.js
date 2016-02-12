@@ -541,6 +541,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Header
 	createHeader : function (options) {
 
+
 		// get vars
 		var headerMeta = options.headerMeta;
 		var layerName  = options.layerName;
@@ -980,7 +981,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		}
 		     
 
-		var isDate = this._validateDateFormat(_key);
+		var isDate = Wu.Tools.validateDateFormat(_key);
 
 		// CREATE DATE SERIES
 		// CREATE DATE SERIES
@@ -1018,14 +1019,15 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// CREATE META FIELDS
 		// CREATE META FIELDS
-		} else {
+		} 
 
-			// Exclude the generated fields
-			if ( _key.substring(0,7) == 'the_geo') return;
 
-			d3array.meta.push([_key, _val])
 
-		}
+		// Exclude the generated fields
+		if ( _key.substring(0,7) == 'the_geo') return;
+		d3array.meta.push([_key, _val])
+
+
 	},
 
 
@@ -1039,26 +1041,5 @@ Wu.Control.Chart = Wu.Control.extend({
 		return layerUuid;		
 	},	
 
-	// OBS! This exists somewhere else too... don't quite remember where.
-	// TODO: move to class.js
-	_validateDateFormat : function (_key) {
-
-
-		var _m = moment(_key,"YYYY-MM-DD");
-		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
-		if ( isDate ) {
-			var m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
-			if ( m != 'Invalid date' ) return m;	
-		}
-
-		var _m = moment(_key,"DD-MM-YYYY");
-		var isDate = _m._pf.charsLeftOver == 0 && _m._pf.unusedTokens.length==0 && _m._pf.unusedInput.length==0 && _m.isValid();
-		if ( isDate ) {
-			var m = moment(_key, ["DDMMYYYY", moment.ISO_8601]).format("DD-MM-YYYY");
-			if ( m != 'Invalid date' ) return m;	
-		}
-
-		return false;
-	},	
 
 })

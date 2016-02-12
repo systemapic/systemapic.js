@@ -115,8 +115,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateStyle : function () {
 
-		console.log('%c _updateStyle ', 'background: red; color: white;');
-
 		this._pointStyler.updateStyle();
 		this._polygonStyler.updateStyle();
 		this._lineStyler.updateStyle();
@@ -168,8 +166,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
-
-		// console.log('%c_selectedActiveLayer', 'background: red; color: white; font-size: 18px;');
 
 
 		// clear wrapper content
@@ -235,8 +231,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// add non-date items
 		for (var k in this._columns) {
-			var isDate = this._validateDateFormat(k);
-			if (!isDate) this._meta.push(k);
+			if ( k.substring(0, 7) != 'the_geo' ) this._meta.push(k);
 		}
 	},
 
