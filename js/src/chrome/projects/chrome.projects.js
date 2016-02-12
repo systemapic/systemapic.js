@@ -635,6 +635,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
 			return u.store.firstName;
 		});
+		var items = me._list_item_containers[options.type];
 		
 		function onKeyUp(e) {
 			var filterUsers = [];
@@ -642,20 +643,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var key = event.which ? event.which : event.keyCode;
 
 			if (key !== 40 && key !== 38 && key !== 13 && key !== 9) {
-				_.forEach(me._list_item_containers[options.type], function (_list_item_container, index) {
+				_.forEach(items, function (_list_item_container, index) {
+					var item_index = items[index];
+					
 					if (_list_item_container.user.getFullName().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(_list_item_container.user.getFullName()) !== -1) {
-						me._list_item_containers[options.type][index].list_item_container.style.display = 'none';
-						me._list_item_containers[options.type][index].list_item_container.style.backgroundColor = '';
-						me._list_item_containers[options.type][index].current = false;
+						item_index.list_item_container.style.display = 'none';
+						item_index.list_item_container.style.backgroundColor = '';
+						item_index.current = false;
 					} else {
-						me._list_item_containers[options.type][index].list_item_container.style.display = 'block';
+						item_index.list_item_container.style.display = 'block';
 						if (!currentIsChecked) {
-							me._list_item_containers[options.type][index].list_item_container.style.backgroundColor = '#DEE7EF';	
+							item_index.list_item_container.style.backgroundColor = '#DEE7EF';	
 							currentIsChecked = true;
-							me._list_item_containers[options.type][index].current = true;
+							item_index.current = true;
 						} else {
-							me._list_item_containers[options.type][index].list_item_container.style.backgroundColor = '';
-							me._list_item_containers[options.type][index].current = false;
+							item_index.list_item_container.style.backgroundColor = '';
+							item_index.current = false;
 						}
 						filterUsers.push(_list_item_container);
 					}
@@ -681,20 +684,19 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container', list_item_container);
 			var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold', name_container);
 			var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
-
 			// set name
 			name_bold.innerHTML = user.getFullName();
 			name_subtle.innerHTML = user.getEmail();
 
 			if (index === 0) {
 				list_item_container.style.backgroundColor = '#DEE7EF';
-				me._list_item_containers[options.type].push({
+				items.push({
 					user: user,
 					list_item_container: list_item_container,
 					current: true
 				});
 			} else {
-				me._list_item_containers[options.type].push({
+				items.push({
 					user: user,
 					list_item_container: list_item_container,
 					current: false
@@ -723,7 +725,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			}, this);
 
 			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
-				_.forEach(me._list_item_containers[options.type], function (_list_item_container) {
+				_.forEach(items, function (_list_item_container) {
 					if (_list_item_container.list_item_container != list_item_container) {
 						_list_item_container.list_item_container.style.backgroundColor = '';
 						_list_item_container.current = false;
@@ -756,30 +758,29 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// get which key
 			var key = event.which ? event.which : event.keyCode;
-			var itemContainers = me._list_item_containers[options.type];
 
 			if (key === 38) {
-				_.find(itemContainers, function (_list_item_container, index) {
+				_.find(items, function (_list_item_container, index) {
 					var showedItemIndexs = [];
 					var nearestLessUnchecked = -1;
 
-					_.forEach(itemContainers, function (item, index) {
+					_.forEach(items, function (item, index) {
 						if (item.list_item_container.style.display === 'block') {
 							showedItemIndexs.push(index);
 						}
 					});
 
 					if (_list_item_container.current === true) {
-						itemContainers[index].current = false;
-						itemContainers[index].list_item_container.style.backgroundColor = '';
+						items[index].current = false;
+						items[index].list_item_container.style.backgroundColor = '';
 
-							if (index > 0 && itemContainers[(index - 1) % (itemContainers.length)] && itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
-								itemContainers[(index - 1) % (itemContainers.length)].current = true;
-								itemContainers[(index - 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+							if (index > 0 && items[(index - 1) % (items.length)] && items[(index - 1) % (items.length)].list_item_container.style.display === 'block') {
+								items[(index - 1) % (items.length)].current = true;
+								items[(index - 1) % (items.length)].list_item_container.style.backgroundColor = '#DEE7EF';
 								return true;							
-							} else if (index === 0 && itemContainers[itemContainers.length - 1] && itemContainers[itemContainers.length - 1].list_item_container.style.display === 'block') {
-								itemContainers[itemContainers.length - 1].current = true;
-								itemContainers[itemContainers.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
+							} else if (index === 0 && items[items.length - 1] && items[items.length - 1].list_item_container.style.display === 'block') {
+								items[items.length - 1].current = true;
+								items[items.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
 								return true;
 							}
 
@@ -796,11 +797,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 							}
 
 							if (nearestLessUnchecked < 0) {
-								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].current = true;
-								itemContainers[showedItemIndexs[showedItemIndexs.length - 1]].list_item_container.style.backgroundColor = '#DEE7EF';
+								items[showedItemIndexs[showedItemIndexs.length - 1]].current = true;
+								items[showedItemIndexs[showedItemIndexs.length - 1]].list_item_container.style.backgroundColor = '#DEE7EF';
 							} else {
-								itemContainers[nearestLessUnchecked].current = true;
-								itemContainers[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+								items[nearestLessUnchecked].current = true;
+								items[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
 							}
 							return true;
 					}
@@ -813,22 +814,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					Wu.DomEvent.stop(e);
 				}
 
-				_.find(itemContainers, function (_list_item_container, index) {
+				_.find(items, function (_list_item_container, index) {
 					var showedItemIndexs = [];
 					var nearestMoreUnchecked = -1;
 
-					_.forEach(itemContainers, function (item, index) {
+					_.forEach(items, function (item, index) {
 						if (item.list_item_container.style.display === 'block') {
 							showedItemIndexs.push(index);
 						}
 					});
 					if (_list_item_container.current === true) {
-						itemContainers[index].current = false;
-						itemContainers[index].list_item_container.style.backgroundColor = '';
+						items[index].current = false;
+						items[index].list_item_container.style.backgroundColor = '';
 
-						if (itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.display === 'block') {
-							itemContainers[(index + 1) % (itemContainers.length)].current = true;
-							itemContainers[(index + 1) % (itemContainers.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+						if (items[(index + 1) % (items.length)].list_item_container.style.display === 'block') {
+							items[(index + 1) % (items.length)].current = true;
+							items[(index + 1) % (items.length)].list_item_container.style.backgroundColor = '#DEE7EF';
 							return true;
 						}
 
@@ -841,11 +842,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 						});
 
 						if (nearestMoreUnchecked < 0) {
-							itemContainers[showedItemIndexs[0]].current = true;
-							itemContainers[showedItemIndexs[0]].list_item_container.style.backgroundColor = '#DEE7EF';
+							items[showedItemIndexs[0]].current = true;
+							items[showedItemIndexs[0]].list_item_container.style.backgroundColor = '#DEE7EF';
 						} else {
-							itemContainers[nearestMoreUnchecked].current = true;
-							itemContainers[nearestMoreUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+							items[nearestMoreUnchecked].current = true;
+							items[nearestMoreUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
 						}
 						return true;
 
