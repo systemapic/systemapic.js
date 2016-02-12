@@ -99,7 +99,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// Layer list container
 	_initLayerListContainer : function () {
 
-		this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer)		
+		this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer);
 
 		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Layers');
 
@@ -220,7 +220,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var dims = {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
-		}
+		};
 		return dims;
 	},
 
@@ -382,7 +382,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			getFiles : function () {
 				return app.Account.getFiles()
 			}
-		}
+		};
 		
 		// Create FILE LIST section, with D3 container
 		for (var f in this.fileProviders ) {
@@ -437,13 +437,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var percent = Wu.DomUtil.create('div', 'file-feedback-percent processing', datawrap);
 
 		// remember
-		this._tempFiles = this._tempFiles || {}
+		this._tempFiles = this._tempFiles || {};
 		this._tempFiles[unique_id] = {
 			feedback : feedback,
 			percent : percent,
 			file : file,
 			datawrap : datawrap
-		}
+		};
 
 		// get file list
 		var file_list = this.fileListContainers.postgis.wrapper;
@@ -528,7 +528,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				var uuid = d.getUuid();
 				if ( this.editingFileName == uuid ) return true;
 				return false;
-			}.bind(this))
+			}.bind(this));
 
 		// EXIT
 		dataListLine
@@ -551,7 +551,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// CREATE FILE ACTION POP-UP (download, delete, etc)
 		this.createFileActionPopUp(dataListLine, library)
 
-
 	},
 
 
@@ -567,13 +566,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var nameContent = 
 			parent
 			.selectAll('.file-meta-content')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		nameContent
 			.enter()
 			.append('div')
-			.classed('file-meta-content', true)
+			.classed('file-meta-content', true);
 
 
 		// Update
@@ -584,7 +583,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 				// User
 				var userId = d.getCreatedBy();
-				var userName = app.Users[userId].getFullName()
+				var userName = app.Users[userId].getFullName();
 
 				_str += '<span class="file-meta-author">' + userName + '</span>';
 
@@ -600,7 +599,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				
 				return _str;
 
-			}.bind(this))
+			}.bind(this));
 
 
 		// Exit
@@ -625,13 +624,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var nameContent = 
 			parent
 			.selectAll('.file-name-content')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		nameContent
 			.enter()
 			.append('div')
-			.classed('file-name-content', true)
+			.classed('file-name-content', true);
 
 
 		// Update
@@ -675,14 +674,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				var uuid = d.getUuid();
 				if ( this.editingFileName == uuid ) return [d];
 				return false;
-			}.bind(this))
+			}.bind(this));
 
 		// Enter
 		nameInput
 			.enter()
 			.append('input')
 			.attr('type', 'text')			
-			.classed('file-name-input', true)
+			.classed('file-name-input', true);
 
 
 		// Update
@@ -750,7 +749,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var popupTrigger = 
 			parent
 			.selectAll('.file-popup-trigger')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		popupTrigger
@@ -763,14 +762,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Update
 		popupTrigger
 			.classed('active', function (d) {
-				var uuid = d.getUuid()
+				var uuid = d.getUuid();
 				if ( uuid == this.showFileActionFor ) return true;
 				return false;
 			}.bind(this))
 			.on('click', function (d) {
 				var uuid = d.getUuid();
 				this.enableFilePopUp(uuid)
-			}.bind(this))	
+			}.bind(this));
 
 
 		// Exit
@@ -786,26 +785,26 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var addTrigger = 
 			parent
 			.selectAll('.file-popup-trigger.add-layer')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		addTrigger
 			.enter()
 			.append('div')	
 			.classed('file-popup-trigger add-layer', true)
-			.html('<i class="fa fa-plus-square add-trigger"></i>Add layer')
+			.html('<i class="fa fa-plus-square add-trigger"></i>Add layer');
 
 
 		// Update
 		addTrigger
 			.classed('active', function (d) {
-				var uuid = d.getUuid()
+				var uuid = d.getUuid();
 				if ( uuid == this.showFileActionFor ) return true;
 				return false;
 			}.bind(this))
 			.on('click', function (file) {
 				file._createLayer(app.activeProject);
-			}.bind(this))	
+			}.bind(this));
 
 
 		// Exit
@@ -829,22 +828,22 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var dataListLineAction = 
 			parent
 			.selectAll('.file-popup')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		dataListLineAction
 			.enter()
 			.append('div')
-			.classed('file-popup', true)
+			.classed('file-popup', true);
 
 
 		// Update
 		dataListLineAction
 			.classed('displayNone', function (d) {
-				var uuid = d.getUuid()
+				var uuid = d.getUuid();
 				if ( uuid == this.showFileActionFor ) return false;
 				return true;
-			}.bind(this))	
+			}.bind(this));
 
 		// Exit
 		dataListLineAction
@@ -872,10 +871,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		    that = this;
 
 		var action = {
-
 			createLayer : {
 				name : 'Add To Project',
-				disabled : !canEdit,
+				disabled : !canEdit
 			},
 			share : {
 				name : 'Share with...', 	// todo: implement sharing of data
@@ -887,13 +885,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			},			
 			download : {
 				name : 'Download',
-				disabled : false,
+				disabled : false
 			},
 			delete : {
 				name : 'Delete',
 				disabled : false
-			},
-		}
+			}
+		};
 
 
 		for (var f in action) {
@@ -905,7 +903,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var fileAction = 
 				parent
 				.selectAll('.' + className)
-				.data(function(d) { return [d] })
+				.data(function(d) { return [d] });
 
 			// Enter
 			fileAction
@@ -1086,7 +1084,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var toggles_wrapper = container;
 
 		// meta info
-		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
+		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta');
 		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Vector');
 		var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
 		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
@@ -1104,7 +1102,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		if (!meta) return;
 
 		// meta info
-		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
+		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta');
 		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
 		var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
 		var bands_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Bands:</span> ' + meta.bands);
@@ -1121,8 +1119,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// nice border box
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var tiles_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Tileset')
-		var generated_tiles_title = Wu.DomUtil.create('div', 'file-option title generated-tiles', toggles_wrapper, 'Generated tile-range')
+		var tiles_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Tileset');
+		var generated_tiles_title = Wu.DomUtil.create('div', 'file-option title generated-tiles', toggles_wrapper, 'Generated tile-range');
 		
 		// zoom levels
 		var zoomlevels_wrapper = Wu.DomUtil.create('div', 'zoomlevels-wrapper', toggles_wrapper);
@@ -1336,7 +1334,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var ralpha_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper9, 'Transparency');
 		// var alpha_input = Wu.DomUtil.create('input', 'invite-input-form alpha-input', toggles_wrapper9);
 		// alpha_input.setAttribute('placeholder', 'Enter color or #hex value');
-		var feedbackText = 'A new layer will be created with the cut color.'
+		var feedbackText = 'A new layer will be created with the cut color.';
 		var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper9, feedbackText);
 		var alphaBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper9);
 		var whiteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', alphaBtnWrap, 'Cut white');
@@ -1402,17 +1400,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// hide fullscreen
 		jss.set('.smooth-fullscreen', {
 			'visibility' : 'hidden',
-			'overflow' : 'hidden',
+			'overflow' : 'hidden'
 		});
 
 		// hide chrome
 		jss.set('.chrome-right', {
-			'visibility' : 'hidden',
+			'visibility' : 'hidden'
 		});
 
 		// hide controls
 		jss.set('.leaflet-control-container', {
-			'visibility' : 'hidden',
+			'visibility' : 'hidden'
 		});
 
 		// show only one element
@@ -1434,7 +1432,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_divs : {
-		users : [],
+		users : []
 	},
 
 	_createInviteUsersInput : function (options) {
@@ -1593,7 +1591,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			if (relevantTarget) this._closeInviteInputs();
 
 		}, this);
-
 		
 	},
 
@@ -1644,7 +1641,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var userNames = [];
 		users.forEach(function (user) {
 			userNames.push(user.user.getFullName());
-		})
+		});
 
 		var names = userNames.join(', ');
 
@@ -1657,7 +1654,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			
 			app.api.shareDataset({
 				dataset : dataset.getUuid(),
-				users : userUuids,
+				users : userUuids
 			}, function (err, result) {
 
 
@@ -1759,8 +1756,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_onTilesetMeta : function (e) {
-
-
 		return;
 
 		var tile_set = e.detail.data;
@@ -1849,10 +1844,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
-
-	
-
-
 	// Save file name
 	saveFileName : function (newName, d, library) {
 
@@ -1862,7 +1853,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.editingFileName = false;
 		this._refreshFiles();
 	},
-
 
 	// ┬┌┐┌┬┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
 	// │││││ │   │  ├─┤└┬┘├┤ ├┬┘└─┐
@@ -1902,7 +1892,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this.layerProviders[provider] = {
 				name : provider,
 				layers : layers
-			}			
+			};
 	       			       		
 			this.layerListContainers[provider] = {};
 
@@ -1958,7 +1948,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var sort = {
 				key : key,
 				layers : []
-			}
+			};
 			for (var l in layers) {
 				var layer = layers[l];
 				if (layer) {
@@ -2057,7 +2047,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var uuid = baselayer.uuid;
 			var layer = this._project.getLayer(uuid);
 			layer.disable();
-		}.bind(this))
+		}.bind(this));
 
 
 		// Add to map
@@ -2176,7 +2166,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			.classed('layer-on-radio-button-container layer-radio', true)
 			.on('click', function(d) {
 				this._toggleRadio(d);
-			}.bind(this))
+			}.bind(this));
 
 
 		// Update
@@ -2197,7 +2187,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				});
 				var enabledByDefault = layermenuItem && layermenuItem.enabled;
 				return enabledByDefault;
-			}.bind(this))
+			}.bind(this));
 
 		// Exit
 		radioButton
@@ -2253,7 +2243,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				var uuid = d.getUuid();
 				var on = this.isLayerOn(uuid);
 				return on;
-			}.bind(this))
+			}.bind(this));
 
 		toggleButton
 			.on('click', function(d) {
@@ -2417,7 +2407,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// Check if layer is on
 	isLayerOn : function (uuid) {
-		var on = false
+		var on = false;
 		this._project.store.layermenu.forEach(function (b) {
 			if ( uuid == b.layer ) { on = true; }
 		}, this);
@@ -2427,7 +2417,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// Check if base layer is on
 	isBaseLayerOn : function (uuid) {
-		var on = false
+		var on = false;
 		this._project.store.baseLayers.forEach(function (b) {
 			if ( uuid == b.uuid ) { on = true; } 
 		}.bind(this));
@@ -2447,13 +2437,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var nameContent = 
 			parent
 			.selectAll('.layer-name-content')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		nameContent
 			.enter()
 			.append('div')
-			.classed('layer-name-content', true)
+			.classed('layer-name-content', true);
 
 
 		// Update
@@ -2475,8 +2465,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Create input field
 		this.createLayerInputField(nameContent, library);
-
-
 	},
 
 	
@@ -2504,7 +2492,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			// .append('textarea')
 			.append('input')
 			.attr('type', 'text')
-			.classed('layer-name-input', true)
+			.classed('layer-name-input', true);
 
 
 		// Update
@@ -2567,25 +2555,25 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var popupTrigger = 
 			parent
 			.selectAll('.file-popup-trigger')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		popupTrigger
 			.enter()
 			.append('div')
-			.classed('file-popup-trigger', true)
+			.classed('file-popup-trigger', true);
 
 		// Update
 		popupTrigger
 			.classed('active', function (d) {
-				var uuid = d.getUuid()
+				var uuid = d.getUuid();
 				if ( uuid == this.showLayerActionFor ) return true;
 				return false;
 			}.bind(this))
 			.on('click', function (d) {
 				var uuid = d.getUuid();
 				this.enableLayerPopup(uuid)
-			}.bind(this))	
+			}.bind(this));
 
 
 		// Exit
@@ -2609,13 +2597,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var dataListLineAction = 
 			parent
 			.selectAll('.file-popup')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		dataListLineAction
 			.enter()
 			.append('div')
-			.classed('file-popup', true)
+			.classed('file-popup', true);
 
 
 		// Update
@@ -2624,7 +2612,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				var uuid = d.getUuid();
 				if ( uuid == this.showLayerActionFor ) return false;
 				return true;
-			}.bind(this))	
+			}.bind(this));
 
 		// Exit
 		dataListLineAction
@@ -2654,7 +2642,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			share : {
 				name : 'Share with...',
-				disabled : false,
+				disabled : false
 			},
 			style : {
 				name : 'Style Layer',
@@ -2666,13 +2654,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			},			
 			download : {
 				name : 'Download',
-				disabled : !canDownload,
+				disabled : !canDownload
 			},
 			delete : {
 				name : 'Delete',
 				disabled : !canEdit
-			},
-		}
+			}
+		};
 
 
 		for (var f in action) {
@@ -2684,7 +2672,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var fileAction = 
 				parent
 				.selectAll('.' + className)
-				.data(function(d) { return [d] })
+				.data(function(d) { return [d] });
 
 			// Enter
 			fileAction
@@ -2696,7 +2684,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				.attr('trigger', f)
 				.html(name)
 				.on('click', function (d) {
-					var trigger = this.getAttribute('trigger')
+					var trigger = this.getAttribute('trigger');
 					that.layerActionTriggered(trigger, d, that, library)
 				});
 
@@ -2795,9 +2783,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			layer: d
 		}});
 
-	},
-
-
-
+	}
 
 });
