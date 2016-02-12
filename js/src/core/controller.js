@@ -67,7 +67,7 @@ Wu.Controller = Wu.Class.extend({
 
 
 		var json = {
-			projectUuid : this._project.getUuid(),
+			project_id : this._project.getUuid(),
 			id : state
 		};
 
@@ -115,7 +115,7 @@ Wu.Controller = Wu.Class.extend({
 
 		// hash object
 		var json = {
-			projectUuid : project.getUuid(),
+			project_id : project.getUuid(),
 			hash : {
 				id 	 : Wu.Util.createRandom(6),
 				position : app.MapPane.getPosition(),
