@@ -1180,7 +1180,7 @@ L.Control.Cartocss = Wu.Control.extend({
 			layerUuid : layer.getUuid()
 		};
 
-		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
+		app.api.createTileLayer(layerJSON, function (err, newLayerJSON) {
 
 			if (err) {
 				return app.feedback.setError({
