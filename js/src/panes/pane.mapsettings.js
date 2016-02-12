@@ -156,7 +156,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			},
 			description : {
 				enable : true,
-				name   : 'Description/legend'
+				name   : 'Description & Legends'
 			},
 			measure : {
 				enable : true,
@@ -168,7 +168,11 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			},
 			geolocation : {
 				enable : true,
-				name   : 'Geo search'				
+				name   : 'Address search'				
+			},
+			baselayertoggle : {
+				enable : true,
+				name   : 'Baselayer toggle'
 			},
 
 			// Inactive
@@ -179,10 +183,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			legends : {
 				enable : false,
 				name   : 'Legend'
-			},
-			baselayertoggle : {
-				enable : true,
-				name   : 'Base layer toggle'
 			},
 			cartocss : {
 				enable : false,

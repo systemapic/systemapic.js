@@ -1628,5 +1628,20 @@ input.target-input.polygon {
 
 
 
-
-
+.leaflet-control-baselayertoggle {
+	left: 5px;
+}
+.leaflet-control-baselayertoggle:after {
+	background-color: #FCFCFC;
+	border-radius: 4px;
+	width: 30px !important;
+	height: 30px !important;
+	background-position: -143px -73px !important;
+	box-shadow: none;
+}
+.leaflet-control-baselayertoggle:hover:after {
+    	background-position: -143px -73px !important;
+}
+.leaflet-draw-section:first-child {
+    margin-top: 14px;
+}
