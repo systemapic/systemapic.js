@@ -1591,7 +1591,7 @@ input.chrome-field-input {
     background: white;
     z-index: 99999999;
     bottom: 7px;
-    padding-top: 35px;
+    padding-top: 25px;
     border-top: 1px solid #ccc;    
     }
 
@@ -1710,3 +1710,77 @@ input.chrome-field-input {
  
     opacity: 1;
  }
+
+
+
+.settingsSelector .button-wrapper {
+        height: 180px;
+}
+
+.save-as-template-button {
+    position: absolute;
+    bottom: 80px;
+    color: #1E638E;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    text-decoration: underline;    
+    cursor: pointer;
+}
+
+.save-as-template-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    top: 0;   
+    padding: 35px;
+    -webkit-transition: top 500ms ease;
+    transition: top 500ms ease;
+}
+
+.hidden-template-dialogue {
+    top: 120px;
+    }
+
+.save-as-template-input-name {
+    border: none;
+    background-color: #DCDCDC;
+    border-radius: 2px;
+    font-size: 17px;
+    padding: 2px;
+    height: 38px;
+    margin-right: 6px;
+    width: 315px;
+    padding-left: 10px;
+    padding-right: 10px;
+    }
+
+.error-template-input {
+    border: 1px solid #C80000;
+}    
+
+.save-as-template-error {
+    color: #C80000;
+    position: absolute;
+    top: 12px;
+}
+
+.save-as-template-OK-button {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    margin: 0;    
+}
+
+.save-as-template-cancel-button {
+     /*position: absolute;*/
+    /*bottom: 80px;*/
+    color: #C80000;
+    /*width: 100%;*/
+    /*text-align: center;*/
+    font-style: italic;
+    text-decoration: underline;    
+    cursor: pointer;   
+}
+
