@@ -38,6 +38,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Get layer object
 		var layer = this._project.getLayer(uuid);
 
+		console.log('meta:', layer.store.metadata);
+		console.log('lyaer: ', layer);
+
 		// Get layer meta
 		var layerMeta = JSON.parse(layer.store.metadata);
 

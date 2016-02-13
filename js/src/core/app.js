@@ -198,7 +198,7 @@ Wu.App = Wu.Class.extend({
 		// create project objects
 		app.Projects = {};
 		app.options.json.projects.forEach(function(store, i, arr) {
-		       app.Projects[store.uuid] = new Wu.Project(store);
+		       	app.Projects[store.uuid] = new Wu.Project(store);
 		});
 	},
 
