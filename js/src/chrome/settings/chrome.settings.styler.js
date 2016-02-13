@@ -154,6 +154,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// Cancel save template
 	_cancelTemplateDialogue : function () {
 		Wu.DomUtil.addClass(this._templateSaverWrapper, 'hidden-template-dialogue');
+		Wu.DomUtil.removeClass(this._templateSaverInput, 'error-template-input');
+
+		this._templateSaverError.innerHTML = '';
+
 		this._templateSaverInput.innerHTML = '';
 		this._templateSaverInput.value = '';
 	},
