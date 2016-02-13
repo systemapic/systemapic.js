@@ -1015,8 +1015,7 @@ Wu.Legend = Wu.Class.extend({
 
 		// Switch to toggle this specific legend on or off
 		var button = new Wu.button({
-
-			id 	     : 'random-vagina',
+			id 	     : 'random-button',
 			type 	     : 'switch',
 			isOn 	     : options.object._isOn,
 			right 	     : true,
@@ -1028,18 +1027,13 @@ Wu.Legend = Wu.Class.extend({
 
 		});
 
-
-
-
-
-
 	},
 
 	globesarSpecificHTML : function (options) {
 
 		if ( !this.options.globesar ) return;
 	
-		var globesarSpecificByLine  ='<div class="info-legend-gradient-bottomline">'
+		var globesarSpecificByLine  ='<div class="info-legend-gradient-bottomline">';
 		    globesarSpecificByLine += '<div id="globesar-specific-legend-container" class="globesar-specific-legend-container">';
 		    globesarSpecificByLine += '<div class="globesar-specific-legend-top">Deformasjon i sikteretning til satellitten</div>';
 		    globesarSpecificByLine += '<div class="globesar-specific-legend-line-container">';

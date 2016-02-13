@@ -89,7 +89,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var legendOptions = {			
 			layer     : this._layer,
 			carto     : this._carto,
-			globesar  : this.globesar,
+			globesar  : this.globesar, 		// todo: remove client name, make truly customizable
 			container : this._legendWrapper
 			// container : this._fieldsWrapper
 

@@ -1,7 +1,5 @@
 Wu.Model.File = Wu.Model.extend({
 
-// Wu.Files = Wu.Class.extend({
-
 	_ : 'file',
 
 	_initialize : function (store) {
@@ -118,6 +116,39 @@ Wu.Model.File = Wu.Model.extend({
 		}.bind(this));
 	},
 
+	// get all templates
+	getStyleTemplates: function () {
+		return this.store.styleTemplates; // array
+	},
+
+	// set all templates
+	setStyleTemplates : function (templates) {
+		this.store.styleTemplates = templates;
+		this.save('styleTemplates');
+	},
+
+	// add template to exisiting array
+	setStyleTemplate : function (template) {
+		this.store.styleTemplates.push(template);
+		this.save('styleTemplates');
+	},
+
+	// get single template based on uuid (or other key)
+	getStyleTemplate : function (uuid) {
+		var template = _.find(this.getStyleTemplates(), function (t) {
+			return t.uuid == uuid;
+		});
+		return template;
+	},
+
+	// // template can look like anything, since it's stored as JSON string, but should contain at least:
+	// var template = {
+	// 	uuid : Wu.Util.guid('style-template'), // "style-template-23424-asddsa-23223-asdasd"
+	// 	timestamp : Date.now(),
+	// 	carto : [object], // should be non-stringified json2carto object
+	// 	createdBy : app.Account.getUuid(), // uuid of user that created template
+	// 	// etc
+	// }
 
 	// setters
 	setName : function (name) {
