@@ -5,11 +5,9 @@ Wu.Resumable = Wu.Class.extend({
 		chunkSize : 2*1024*1024,
 		simultaneousUploads : 5,
 		testChunks : true, 
-		maxFiles : 5,
+		maxFiles : 1,
 		fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw'],
-		// fileTypeErrorCallback : this._fileTypeErrorCallback,
 	},
-
 
 	initialize : function (options) {
 		

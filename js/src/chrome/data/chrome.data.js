@@ -428,7 +428,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// create temp file holder in file list while processing
 	_onFileProcessing : function (e) {
 		var file = e.detail.file;
-
 		var unique_id = file.uniqueIdentifier;
 		var filename = file.fileName;
 		var size = parseInt(file.size / 1000 / 1000) + 'MB';
@@ -548,9 +547,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// CREATE FILE META (date and size)
 		this.createFileMetaContent(dataListLine, library);
 		
-		// FILE AUTHOR
-		// this.createFileAuthor(dataListLine, library);	
-
 		// CREATE POP-UP TRIGGER (the "..." button)
 		this.createFilePopUpTrigger(dataListLine, library);
 

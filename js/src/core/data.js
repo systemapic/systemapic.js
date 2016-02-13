@@ -9,11 +9,20 @@ Wu.Data = Wu.Class.extend({
 
 	_initResumable : function () {
 
+		console.log('init resumable');
+
 		// create resumable
 		this._resumable = new Wu.Resumable({
-			onUploadDone : this._onUploadDone 
+			onUploadDone : this._onUploadDone.bind(this)
 		});
 
+	},
+
+	_refreshResumable : function () {
+		// create resumable
+		this._resumable = new Wu.Resumable({
+			onUploadDone : this._onUploadDone.bind(this)
+		});
 	},
 
 	// serve an upload button with triggers
@@ -49,7 +58,9 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_onUploadDone : function () {
-		console.log('uploadDOne');
+		console.log('uploadDOne', this);
+
+		this._refreshResumable();
 	},
 
 	_setFeedbackImportTime : function (import_time_ms) {

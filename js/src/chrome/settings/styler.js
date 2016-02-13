@@ -50,13 +50,11 @@ Wu.Styler = Wu.Class.extend({
 	_content : {},
 
 	carto : function () {
-		console.log('carto()', this.options.carto[this.type]);
 		return this.options.carto[this.type];
 	},
 
 	setCarto : function (carto) {
 		this.options.carto[this.type] = carto;
-		// carto() Object {enabled: true, color: Object, opacity: Object, pointsize: Object}
 	},
 
 	initialize : function (options) {
