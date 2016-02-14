@@ -9,7 +9,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 	},
 
-	globesar : false,
+	globesar : true,
 
 	_initialize : function () {
 

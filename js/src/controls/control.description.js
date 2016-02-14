@@ -66,18 +66,17 @@ L.Control.Description = Wu.Control.extend({
 		this._compactLegendInnerScroller = Wu.DomUtil.create('div', 'compact-legend-scroll-wrapper', this._compactLegendViewWrapper)
 
 
-
-
 		// Meta
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._metaOuterContainer);
+
+		// Init satellite path container
+		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._metaOuterContainer});
+		
 
 		// Opacity 
 		this._opacityWrapper = Wu.DomUtil.create('div', 'description-opacity-wrapper', this._metaOuterContainer)
 		this._opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._opacityWrapper, 'Opacity:');
 		this._opacityContainer = Wu.DomUtil.create('div', 'description-control-opacity-container', this._opacityWrapper);
-
-		// Init satellite path container
-		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._metaOuterContainer});
 
 		// legend
 		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._singleLegendViewWrapper);
@@ -210,8 +209,6 @@ L.Control.Description = Wu.Control.extend({
 
 	_refreshLayer : function (layer) {
 
-		// console.log('%c _refreshLayer ', 'background: brown; color: white;');
-
 		// get layer
 		this.layers[layer.getUuid()] = layer;
 
@@ -254,8 +251,6 @@ L.Control.Description = Wu.Control.extend({
 
 	_addLayer : function (layer) {
 
-		// console.log('%c _addLayer ', 'background: blue; color: white;');
-
 		this.layers = this.layers || {};
 
 		var layerUuid = layer.getUuid();
@@ -268,8 +263,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_removeLayer : function (layer) {
-
-		// console.log('%c _removeLayer ', 'background: green; color: white;');
 
 		// Delete layer from store
 		var layerUuid = layer.getUuid();
@@ -288,8 +281,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	updateMultiple : function (layerUuid) {
-
-		// console.log('%c updateMultiple ', 'background: pink; color: white;');
 
 		if ( this.miniLegend ) {
 			this.compactLegend();
@@ -359,8 +350,6 @@ L.Control.Description = Wu.Control.extend({
 
 	toggleLegend : function (e) {	
 
-		// console.log('%c toggleLegend ', 'background: hotpink; color: white;');
-
 		var id = e.target.id;
 		var layerUuid = id.slice(10, id.length);
 
@@ -407,12 +396,16 @@ L.Control.Description = Wu.Control.extend({
 
 	setHTMLfromStore : function (uuid) {
 
-
-		// console.error('setHTMLfromStore');
-
 		// get layer
 		var layer = this._project.getLayer(uuid);
 		if (!layer) return;
+
+		// Todo: write as plugin
+		var satellitePos = layer.getSatellitePosition();
+		if ( satellitePos ) {
+			var satellitePos = JSON.parse(satellitePos);
+			this.satelliteAngle.update(satellitePos);
+		}
 
 		var legend = layer.getLegends();
 		if ( legend && !legend.enable ) return;
@@ -492,9 +485,7 @@ L.Control.Description = Wu.Control.extend({
 
 	_createOpacitySlider : function (layer) {
 
-		// console.log('%c _createOpacitySlider ', 'background: pink; color: white;');
-		
-
+	
 		// create slider
 		this._sliderContainer = Wu.DomUtil.create('div', 'opacity-slider', this._opacityContainer);
 		this._slider = noUiSlider.create(this._sliderContainer, {
@@ -511,8 +502,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_updateOpacity : function (values, handle) {
-
-		// console.log('%c _updateOpacity ', 'background: hotpink; color: white;');
 
 		var opacity = parseFloat(values[0]) / 100;
 		var layer = this._slider.layer;		
@@ -815,38 +804,22 @@ L.Control.Description = Wu.Control.extend({
 
 	compactLegend : function () {
 
-		console.log('%c making compactLegend ', 'background: blue; color: white;');
-		// console.log('this.layerCount', this.layerCount);
-		// console.log('this.layers', this.layers);
-
 		var length = 0;
 		for (var k in this.layers) {
 		       length++;
 		}
 
-		
 		if ( length <= 1 ) {
-			console.log('%c remove arrow ', 'background: blue; color: white;');
 			Wu.DomUtil.addClass(this._compactExpand, 'displayNone');
 		} else {
-			console.log('%c add arrow ', 'background: green; color: white;');
 			Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
 		}
 		
-		
-		// if ( this.layerCount <= 1 && this.miniLegend ) {
-		// 	Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
-		// } else {
-		// 	Wu.DomUtil.addClass(this._compactExpand, 'displayNone');
-		// }
-
-
 
 		Wu.DomUtil.addClass(this._multipleLegendOuter, 'displayNone');
 		Wu.DomUtil.addClass(this._singleLegendViewWrapper, 'displayNone');
 		Wu.DomUtil.removeClass(this._compactLegendViewWrapper, 'displayNone');
 		Wu.DomUtil.addClass(this._inner, 'multiview');
-		// Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
 
 		var allLegendHTML = '';
 		var allGradientHTML = '';
