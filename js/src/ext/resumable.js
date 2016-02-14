@@ -151,10 +151,10 @@ Wu.Resumable = Wu.Class.extend({
 
 			var us = Wu.parse(status);
 
-			console.log('uis: ', us);
-
 			// success
 			if (us.processing_success && us.upload_success) {
+
+				// todo
 
 			// error
 			} else if (us.error) {
