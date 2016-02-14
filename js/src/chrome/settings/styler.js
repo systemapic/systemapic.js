@@ -68,6 +68,17 @@ Wu.Styler = Wu.Class.extend({
 
 	_initContainer : function () {
 
+		// Create wrapper
+		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper toggles-wrapper', this.options.container);
+
+		this._refresh();
+
+	},
+
+	_refresh : function () {
+
+		this._wrapper.innerHTML = '';
+
 		// create 
 		this.options.carto[this.type] = this.carto() || {};
 
@@ -75,9 +86,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// Get on/off state
 		var isOn = this.carto().enabled;
-
-		// Create wrapper
-		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper toggles-wrapper', this.options.container);
 
 		// wrapper
 		var line = new Wu.fieldLine({
@@ -99,7 +107,9 @@ Wu.Styler = Wu.Class.extend({
 
 		// toggle
 		this._toggle(isOn);
+
 	},
+
 
 	_switch : function (e, on) {
 
@@ -138,7 +148,7 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 	updateStyle : function () {
-		if (!this._changed) return;
+		// if (!this._changed) return;
 
 		// create carto css
 		this._createCarto(this.options.carto, this._saveCarto.bind(this));

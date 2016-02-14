@@ -198,134 +198,14 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			fn 	    : this._saveMiniBlur.bind(this),		
 		});
 
-
-		// Reference point
-		// Reference point
-		// Reference point
-
-		var referenceLine = new Wu.fieldLine({
-			id       : 'referencepoint',
-			appendTo : wrapper,
-			title    : 'Reference point',
-			input    : false,	
-		});
-
-
-		var range = this.cartoJSON.extras.referencepoint.column;
-		var val   = this.cartoJSON.extras.referencepoint.value;
-		var isOn  = range ? false : true;
-
-		// Dropdown
-		var referenceDropDown = new Wu.button({
-			id 	  : 'referencepoint',
-			type 	  : 'dropdown',
-			right 	  : true,
-			appendTo  : referenceLine.container,
-			fn 	  : this._selectedMiniDropDown.bind(this),
-			array 	  : this.metaFields,
-			selected  : range,
-			reversed  : true,
-			className : 'globesar-extras-ref-point-dropdown'
-		});
-
-
-		// Input
-		var _referencePointInput = new Wu.button({
-			id 	    : 'referencepoint',
-			type 	    : 'miniInput',
-			right 	    : true,
-			isOn        : !isOn,
-			appendTo    : referenceLine.container,
-			value       : val,
-			placeholder : 'value',
-			tabindex    : 3,
-			className   : 'globesar-extras-input',
-			allowText   : true,
-			fn 	    : this._blurRefPointValue.bind(this),
-		});		
-
 	},
 
 
-
-	// ON SELECT MINI DROP DOWN
-	_selectedMiniDropDown : function (e) {
-
-		var key = e.target.getAttribute('key');
-		var fieldName = e.target.value;
-
-		var wrapper = e.target.parentElement;
-
-		var _miniInput = Wu.DomUtil.get('field_mini_input_referencepoint');		
-
-		// UNSELECTING FIELD
-		// UNSELECTING FIELD
-		// UNSELECTING FIELD
-
-		// Clean up if we UNSELECTED field
-		if ( fieldName == this.options.dropdown.staticText || fieldName == this.options.dropdown.staticDivider) {
-
-			this.selectedColumn = false;
-			this.cartoJSON.extras = {
-				referencepoint : false
-			};
-
-
-			Wu.DomUtil.addClass(_miniInput, 'left-mini-kill');
-			Wu.DomUtil.addClass(wrapper, 'full-width');
-
-			return;
-		}
-
-
-		this.selectedColumn = fieldName;
-		this._saveRefPointValue();		
-
-		// SELECTING FIELD
-		// SELECTING FIELD
-		// SELECTING FIELD
-
-		Wu.DomUtil.removeClass(_miniInput, 'left-mini-kill');
-		Wu.DomUtil.removeClass(wrapper, 'full-width');
-
-	},
-
-
-
-	_blurRefPointValue : function (e) {
-
-		this.selectedValue = e.target.value;
-		this._saveRefPointValue();
-
-	},
-
-	_saveRefPointValue : function () {
-
-		var value  = this.selectedValue;
-		var column = this.selectedColumn;
-
-		// If no value
-		if ( !value || value == '' || column == this.options.staticText || column == this.options.staticDivider ) {
-			this.cartoJSON.extras = {
-				referencepoint : false,
-			};
-
-		// Store value
-		} else {
-			this.cartoJSON.extras = {
-				referencepoint : {
-					column : column,
-					value  : value
-				}
-			}
-		}
-
-		this._updateStyle();
-
-	},
 
 	// ON BLUR IN MINI FIELDS
 	_saveMiniBlur : function (e) {
+
+
 
 		var angle = Wu.DomUtil.get('field_mini_input_satelliteAngle').value;
 		var path  = Wu.DomUtil.get('field_mini_input_satellitePath').value;
@@ -337,6 +217,9 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		if ( angle ) this.satpos.angle = angle;
 
 		var satpos = this.satpos;
+
+
+		// console.log('sat pos', this.layer.getSatellitePosition());
 
 		this.layer.setSatellitePosition(JSON.stringify(satpos));
 

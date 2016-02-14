@@ -14,7 +14,6 @@ Wu.satelliteAngle = Wu.Class.extend({
 
 		this.color = '#019688';
 		this._innerContainer = Wu.DomUtil.create('div', 'd3-satellite-wrapper displayNone', this.container);
-		// this._header = Wu.DomUtil.create('div', 'satellite-measurement-geometry', this._innerContainer, 'Measurement geometry');
 
 	},
 
@@ -36,12 +35,13 @@ Wu.satelliteAngle = Wu.Class.extend({
 	},
 
 	initAngle : function (angle) {		
-
-		if ( !angle ) return;
+		
 		if ( this.angleContainer ) {
 			this.angleContainer.innerHTML = '';			
 			this.angleContainer.remove();
 		}
+		if ( !angle && angle != 0 ) return;
+
 		this.angleContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
 		this.angleTitle = Wu.DomUtil.create('div', 'd3-satellite-title', this.angleContainer, 'Målevinkel');
 
@@ -84,22 +84,70 @@ Wu.satelliteAngle = Wu.Class.extend({
 				.attr("stroke", "#999");				
 
 
-                var angleLine = D3angle
+
+		// Line container
+		var lineContainer = D3angle
+				.append('g')
+				.attr('transform', function() {
+					var r = -angle;
+					var x = flip ? width * size : width/2 * size;
+					var y = padding * size;
+					return 'rotate(' + r + ', ' + x + ',' + y + ')';
+				})
+
+
+
+
+
+
+		var angleLine = lineContainer
 				.append("line")
 				.classed('angle-line', true)
+
+				.attr('y1', padding * size)
+				.attr("y2", (height - padding) * size)
+
 				.attr("x1", function () {
 					if ( flip ) return (width + padding) * size;
-						    return padding * size;					
+						    return padding * size;
 				})
-				.attr("y1", padding * size)
+
 				.attr("x2", function () {
-					if ( flip ) return ((width + padding) + angle) * size;
-						    return (angle + padding) * size;
+					if ( flip ) return (width + padding) * size;
+						    return padding * size;
 				})
-				.attr("y2", (height - padding - 1) * size)
+				
 				// styling
 				.attr('stroke-width', 2)
-				.attr('stroke', this.color)
+				.attr('stroke', this.color);
+
+
+		// Arrow head
+		var triangle = lineContainer
+				.append("path")
+				.attr("d", function() {
+
+					var arrowWidth = 5;
+					var arrowHeight = 3;
+
+					var _startX = flip ? ((width + padding) * size) : (padding * size);
+					var _startY = (height - padding) * size + arrowHeight;
+
+					var M = "M" + _startX + ',' + _startY;
+					var L1 = "L" + (_startX + arrowHeight) + ',' + (_startY - arrowWidth);
+					var L2 = "L" + (_startX - arrowHeight) + ',' + (_startY - arrowWidth);
+					return M + L1 + L2 + 'Z';
+				})
+				// style
+				.attr('stroke-width', 0)
+				.attr('stroke', 'none')
+				.attr('fill', this.color);
+
+
+
+
+
+
 
 
 		var startCircle = D3angle
@@ -137,11 +185,13 @@ Wu.satelliteAngle = Wu.Class.extend({
 
 	initCompass : function (path) {		
 
-		if ( !path ) return;
 		if ( this.compassContainer ) {
 			this.compassContainer.innerHTML = '';
 			this.compassContainer.remove();
 		}
+
+		if ( !path && path != 0 ) return;
+
 		this.compassContainer = Wu.DomUtil.createId('div', 'd3-satellite-compass-container', this._innerContainer);		
 		this.compassTitle = Wu.DomUtil.create('div', 'd3-satellite-title', this.compassContainer, 'Satelittkurs');
 
