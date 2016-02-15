@@ -177,6 +177,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			read : []
 		}
 
+
 		// shortcut
 		var content = this._fullscreen._content;
 
@@ -205,7 +206,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
 
 		// create invite input for projects
-		this._createInviteInput({
+		var readInput = this._createInviteInput({
 			type : 'read',
 			label : 'Invite people to view these projects <span class="optional-medium invite">(optional)</span>',
 			content : toggles_wrapper,
@@ -215,7 +216,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		});
 
 		// create invite input
-		this._createInviteInput({
+		var editInput = this._createInviteInput({
 			type : 'edit',
 			label : 'Invite people to edit these projects <span class="optional-medium invite">(optional)</span>',
 			content : toggles_wrapper,
@@ -234,6 +235,17 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// save button trigger
 		Wu.DomEvent.on(closeBtn, 'click', this._fullscreen.close.bind(this._fullscreen), this);
+
+		// add current project to READ
+		this._addAccessItem({
+			input : readInput,
+			project : app.activeProject,
+			type : 'read',
+			trigger : false
+		});
+
+		// close inputs
+		this._closeInviteInputs();
 
 		// create default link
 		this._createShareableInvite();
@@ -625,6 +637,8 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			if (relevantTarget) this._closeInviteInputs();
 
 		},this);
+
+		return invite_input;
 	},
 
 	_closeInviteInputs : function () {
