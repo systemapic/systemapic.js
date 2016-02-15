@@ -188,6 +188,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	createDefaultLayer : function (options, done) {
+		var path = '/api/layers/default';
+		this.post(path, options, done);
+	},
+
 	deleteUser : function (options, done) {
 		var path = '/api/user/delete';
 		this.post(path, options, done);
