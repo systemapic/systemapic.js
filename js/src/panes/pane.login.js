@@ -20,17 +20,20 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._createLogo();
 
 		// login content wrapper
+
 		this._loginInner = Wu.DomUtil.create('div', 'login-inner', this._login_box);
 		this._forgotInner = Wu.DomUtil.create('div', 'login-forgot-inner', this._login_box);
 
 		// description
 		this._descriptionDiv = Wu.DomUtil.create('div', 'login-description', this._loginInner, this._description);
-
+		this.login_form = Wu.DomUtil.create('form', 'login-form', this._loginInner);
+		this.login_form.setAttribute('action', '/api/token');
+		this.login_form.setAttribute('method', 'post');
 		// email input
 		this._email_input = this._createInput({
 			label : 'Email',
 			placeholder : 'name@domain.com',
-			appendTo : this._loginInner,
+			appendTo : this.login_form,
 			type : 'email'
 		});
 
@@ -38,7 +41,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._password_input = this._createInput({
 			label : 'Password',
 			placeholder : 'Enter your password',
-			appendTo : this._loginInner,
+			appendTo : this.login_form,
 			type : 'password'
 		});
 
