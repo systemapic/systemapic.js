@@ -25,6 +25,30 @@ define({ "api": [
         }
       ]
     },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "Admin",
@@ -45,25 +69,6 @@ define({ "api": [
           }
         ]
       }
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "Unauthorized",
-            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
-          "type": "json"
-        }
-      ]
     }
   },
   {
@@ -1281,6 +1286,336 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/project/hash/get",
+    "title": "Get project hash",
+    "name": "Get_hash",
+    "group": "Project",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>Uuid of project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Hash id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Error object</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "hash",
+            "description": "<p>Hash object</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  error: null,\n  hash: {\n    _id: '56bdc6fbc7ec6af66dfc92f0',\n    lastUpdated: '2016-02-12T11:50:19.231Z',\n    created: '2016-02-12T11:50:19.231Z',\n    id: 'some hash id',\n    project: 'some project id',\n    uuid: 'test_mocha_hash',\n    __v: 0,\n    layers: []\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>project_id or project_id or id don't not exist in request body (400)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Not_found",
+            "description": "<p>If hash doesn't exist(404)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['project_id', 'id']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 404: Not found\n{\n   \"error\": {\n\t\t\"message\": \"No such hash.\",\n\t\t\"code\": \"404\"\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Project",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/project/hash/get"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/api/project/hash/set",
+    "title": "Set project hash",
+    "name": "Set_hash",
+    "group": "Project",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>Uuid of project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Bollean",
+            "optional": false,
+            "field": "saveState",
+            "description": "<p>Save prject state flag</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "hash",
+            "description": "<p>Hash object</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Error object</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "hash",
+            "description": "<p>Created hash</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  error: null,\n  hash: {\n    __v: 0,\n    lastUpdated: '2016-02-12T10:22:20.535Z',\n    created: '2016-02-12T10:22:20.535Z',\n    project: 'uuid-mocha-test-project-for-hash-set',\n    createdByName: 'mocha test',\n    createdBy: 'uuid-mocha-test-project',\n    id: 'some id',\n    uuid: 'hash-1225da89-7d03-4df9-981c-804cd119a1f8',\n    _id: '56bdb25c78c5e3cd164f1f1d',\n    layers: ['some layer'],\n    position: {\n      lat: '1',\n      lng: '1',\n      zoom: '1'\n    }\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>project_id or saveState or hash or hash.position or hash.layers or hash.id don't not exist in request body (400)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['project_id', 'saveState', 'hash', 'hash.position', 'hash.layers', 'hash.id']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Project",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/project/hash/set"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/api/project/uploadlogo",
+    "title": "Upload project logo",
+    "name": "Upload_project_logo",
+    "group": "Project",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "image_id",
+            "description": "<p>Image id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "resumableIdentifier",
+            "description": "<p>Resumable identifier</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Error object</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "image",
+            "description": "<p>Image uuid</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "'56bdc6fbc7ec6af66dfc92f0'",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>image_id or resumableIdentifier or id don't not exist in request body (400)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['image_id', 'resumableIdentifier']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Project",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/project/uploadlogo"
+      }
+    ]
+  },
+  {
+    "type": "post",
     "url": "/api/project/addInvites",
     "title": "Add invites",
     "name": "add_invites",
@@ -1575,6 +1910,103 @@ define({ "api": [
     "sampleRequest": [
       {
         "url": "https://dev.systemapic.com/api/project/delete"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/api/project/get/private",
+    "title": "Get private project",
+    "name": "get_private_project",
+    "group": "Project",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>Project id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user_access_token",
+            "description": "<p>User access token</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "JSON",
+            "optional": false,
+            "field": "emptyObject",
+            "description": "<p>Just now it is return empty object</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>project_id or user_access_token don't exist in request body (400)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['project_id', 'user_access_token']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "Project",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/project/get/private"
       }
     ]
   },
@@ -2124,6 +2556,480 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/user/invite/accept",
+    "title": "Accept invite",
+    "name": "Accept_invite",
+    "group": "User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "invite_token",
+            "description": "<p>Invite token (for example 55mRbPA)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "invite",
+            "description": "<p>Accepted invite</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"email\": false,\n    \"access\": {\n        \"edit\": [\n            \"project-ef990c38-f16c-478e-9ed1-65ed2808b070\"\n        ],\n        \"read\": [\n            \"project-65f99b5c-a645-4f3a-8905-9fad85c59c40\",\n            \"project-f7a9dd0b-4113-44a0-8e2d-e0d752f1cc04\",\n            \"project-c72c3d83-ff96-4483-8f39-f942c0187108\"\n        ]\n    },\n    \"token\": \"L9Jfxks\",\n    \"invited_by\": \"user-805dc4a1-2535-41f3-9a1b-af32ad134692\",\n    \"timestamp\": 1455569798000,\n    \"type\": \"link\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/user/invite/accept"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/api/user/inviteToProjects",
+    "title": "Invite user to projects",
+    "name": "Invite_user_to_projects",
+    "group": "User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access",
+            "description": "<p>Access parameter</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Stringy",
+            "optional": false,
+            "field": "link",
+            "description": "<p>Invite link</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "https://dev3.systemapic.com/invite/7Tf7Bc8",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>access does not exist in request body (400)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['access']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/user/inviteToProjects"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/api/user/inviteToProjects",
+    "title": "Invite user to projects",
+    "name": "Invite_user_to_projects",
+    "group": "User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user",
+            "description": "<p>User id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Array",
+            "optional": false,
+            "field": "edit",
+            "description": "<p>Array of project ids which user will be able to edit</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "read",
+            "description": "<p>Array of project ids which user will be able to read</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "error",
+            "description": "<p>error object</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "array",
+            "optional": false,
+            "field": "projects",
+            "description": "<p>error object</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n error: null,\n projects: [{\n   project: 'uuid-mocha-test-project',\n   access: {\n     read: ['second_test-user-uuid'],\n     edit: [],\n     options: {\n       share: true,\n       download: false,\n       isPublic: false\n     }\n   }\n }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>User, edits and reads do not exist in request body (400)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['user']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/user/inviteToProjects"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/api/user/requestContact",
+    "title": "Request contact",
+    "name": "Request_contact",
+    "group": "User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "contact",
+            "description": "<p>User id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "error",
+            "description": "<p>error object</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"error\": null\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>Contact does not exist in request body (400)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['contact']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 404: Not found\n{\n   \"error\": {\n\t\t\"message\": \"No such user.\",\n\t\t\"code\": \"404\"\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/user/requestContact"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/api/user/invite",
+    "title": "Send invite mail",
+    "name": "Send_invite_mail",
+    "group": "User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Array",
+            "optional": false,
+            "field": "emails",
+            "description": "<p>Array of emails</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "customMessage",
+            "description": "<p>Custom message</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "access",
+            "description": "<p>Access object</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "error",
+            "description": "<p>error object</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"error\": null\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Bad_request",
+            "description": "<p>Emails or customMessage or access do not exist in request body (400)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['emails', 'customMessage', 'access']\n\t\t}\n\t}\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/user/invite"
+      }
+    ]
+  },
+  {
+    "type": "post",
     "url": "/api/token",
     "title": "Get access token",
     "name": "access_token",
@@ -2183,15 +3089,31 @@ define({ "api": [
             "group": "Error 4xx",
             "type": "json",
             "optional": false,
-            "field": "Unauthorized",
-            "description": "<p>Missing or invalid information.</p>"
+            "field": "Bad_request",
+            "description": "<p>username and email or password don't exist in request body (400)</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Not_found",
+            "description": "<p>If user doesn't exist(404)</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "Error 401: Unauthorized\n{\n    \"error\": \"Please provide username/email and password.\"\n}",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Missing information. Check out https://docs.systemapic.com/ for details on the API.\",\n\t\t\"code\": \"400\",\n\t\t\"errors\": {\n\t\t\t\"missingRequiredFields\": ['username and email', 'password']\n\t\t}\n\t }\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 404: Not found\n{\n   \"error\": {\n\t\t\"message\": \"No such user.\",\n\t\t\"code\": \"404\"\n\t }\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 400: Bad request\n{\n   \"error\": {\n\t\t\"message\": \"Invalid credentials.\",\n\t\t\"code\": \"400\"\n\t }\n}",
           "type": "json"
         }
       ]
@@ -2224,6 +3146,30 @@ define({ "api": [
         ]
       }
     },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
@@ -2244,25 +3190,6 @@ define({ "api": [
           }
         ]
       }
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "Unauthorized",
-            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
-          "type": "json"
-        }
-      ]
     }
   },
   {
@@ -2408,6 +3335,96 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/user/create",
+    "title": "Create new user",
+    "name": "info",
+    "group": "User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Unique username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "firstname",
+            "description": "<p>First name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "lastname",
+            "description": "<p>Last name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "company",
+            "description": "<p>Company</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "position",
+            "description": "<p>Position in company</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>Email</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>User</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n  \"user\": {\n      lastUpdated: '2016-01-19T12:49:49.076Z',\n      created: '2016-01-19T12:49:48.943Z',\n      ... etc\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/user/create"
+      }
+    ]
+  },
+  {
+    "type": "post",
     "url": "/api/user/info",
     "title": "Get info on authenticated user",
     "name": "info",
@@ -2432,84 +3449,12 @@ define({ "api": [
         }
       ]
     },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "Unauthorized",
-            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
-          "type": "json"
-        },
-        {
-          "title": "Error-Response:",
-          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
-          "type": "json"
-        }
-      ]
-    },
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
     "sampleRequest": [
       {
         "url": "https://dev.systemapic.com/api/user/info"
-      }
-    ],
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "access_token",
-            "description": "<p>A valid access token</p>"
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "post",
-    "url": "/api/token/refresh",
-    "title": "Refresh access token",
-    "name": "refresh_access_token",
-    "group": "User",
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "json",
-            "optional": false,
-            "field": "status",
-            "description": "<p>Access token JSON</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "{\n\t\"access_token\":\"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4\",\n\t\"expires_in\":\"36000\",\n\t\"token_type\":\"Bearer\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "routes/routes.js",
-    "groupTitle": "User",
-    "sampleRequest": [
-      {
-        "url": "https://dev.systemapic.com/api/token/refresh"
       }
     ],
     "parameter": {
@@ -2543,6 +3488,78 @@ define({ "api": [
           "type": "json"
         }
       ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/api/token/refresh",
+    "title": "Refresh access token",
+    "name": "refresh_access_token",
+    "group": "User",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Access token JSON</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n\t\"access_token\":\"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4\",\n\t\"expires_in\":\"36000\",\n\t\"token_type\":\"Bearer\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (401)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/routes.js",
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/api/token/refresh"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
+          }
+        ]
+      }
     }
   },
   {

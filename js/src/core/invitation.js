@@ -12,10 +12,11 @@ Wu.Invite = Wu.Class.extend({
 		// invite store
 		this._invite = options.store || {};
 
-		console.log('this._invite: ', this._invite);
+		// set config
+		this.config = systemapicConfigOptions;
 
 		// set page title
-		document.title = loginConfig.pageTitle;
+		document.title = this.config.portalTitle;
 
 		// init container
 		this._initContainer();
@@ -55,11 +56,11 @@ Wu.Invite = Wu.Class.extend({
 		var logo = Wu.DomUtil.create('div', 'logo', logo_wrap);
 
 		// set image
-		var logo_img = loginConfig.invitationLogo;
+		var logo_img = this.config.invitationLogo;
 		logo.style.backgroundImage = logo_img;
 		
 		// set width
-		var width = loginConfig.loginLogoWidth || 210;
+		var width = this.config.loginLogoWidth || 210;
 		logo.style.width = width + 'px';
 	},
 	
@@ -77,8 +78,6 @@ Wu.Invite = Wu.Class.extend({
 	
 		// wrapper
 		var input_wrapper = Wu.DomUtil.create('form', 'input-wrapper', wrapper);
-		input_wrapper.setAttribute('action', '/login');
-		input_wrapper.setAttribute('method', 'post');
 
 		// email label
 		var email_input = Wu.DomUtil.create('input', 'input', input_wrapper, 'Email Address');
@@ -91,8 +90,6 @@ Wu.Invite = Wu.Class.extend({
 
 		// button
 		var button = Wu.DomUtil.create('button', 'button', input_wrapper, 'Login');
-		button.setAttribute('type', 'submit');
-		button.setAttribute('name', 'login');
 
 		// forgot password
 		var forgotWrapper = Wu.DomUtil.create('div', 'forgot-wrapper', input_wrapper);
@@ -104,9 +101,20 @@ Wu.Invite = Wu.Class.extend({
 			this._rightshader.style.opacity = 0;
 			this._leftshader.style.opacity = 1;
 		}, this);
+
+
+		Wu.DomEvent.on(button, 'click', function (e) {
+			Wu.DomEvent.stop(e);
+
+			// accept invite, login
+			this._loginUser({
+				email : email_input.value,
+				password : password_input.value,
+				invite_token : this._invite.token
+			});
+
+		}, this);
 	},
-
-
 
 	_createRegister : function () {
 
@@ -121,8 +129,6 @@ Wu.Invite = Wu.Class.extend({
 
 		// form
 		var input_wrapper = Wu.DomUtil.create('form', 'input-wrapper-right', wrapper);
-		input_wrapper.setAttribute('action', '/register');
-		input_wrapper.setAttribute('method', 'post');
 
 		// username
 		var username_input = Wu.DomUtil.create('input', 'input firstname', input_wrapper, 'Choose a username');
@@ -171,8 +177,6 @@ Wu.Invite = Wu.Class.extend({
 
 		// submit button
 		var button = this._submitBtn = Wu.DomUtil.create('button', 'button', input_wrapper, 'Sign up');
-		button.setAttribute('type', 'submit');
-		button.setAttribute('type', 'submit');
 		button.disabled = true;
 
 		// enable submit button when privacy policy is accepted
@@ -188,6 +192,22 @@ Wu.Invite = Wu.Class.extend({
 			this._leftshader.style.opacity = 0;
 		}, this);
 
+		Wu.DomEvent.on(button, 'click', function (e) {
+			Wu.DomEvent.stop(e);
+			
+			// create user, accept invite, login
+			this._registerUser({
+				username : username_input.value,
+				email : email_input.value,
+				firstname : firstname_input.value,
+				lastname : lastname_input.value,
+				position : position_input.value,
+				company : company_input.value,
+				password : password_input.value,
+				invite_token : this._invite.token
+			});
+
+		}, this);
 
 		// check unique username
 		Wu.DomEvent.on(username_input, 'keyup', this._checkUniqueUsername, this);
@@ -203,21 +223,76 @@ Wu.Invite = Wu.Class.extend({
 		}.bind(this), 500);
 	},
 
+
+	_loginUser : function (options) {
+
+		// get access token
+		this._getAccessToken(options, function (err, token) {
+			if (err) return console.error(err);
+
+			// add access_token to request
+			options.access_token = token.access_token;
+
+			// accept invite
+			this._inviteUser(options, function (err, invitation) {
+				if (err) return console.error(err);
+
+				// enter portal
+				window.location.href = '/';
+			});
+		}.bind(this));
+
+	},
+
+	// create user, get token, accept invite, login
+	_registerUser : function (options) {
+
+		// create user
+		this._createUser(options, function (err, user) {
+			if (err) return console.error(err);
+
+			// get access token
+			this._getAccessToken(options, function (err, token) {
+				if (err) return console.error(err);
+
+				// add access_token to request
+				options.access_token = token.access_token;
+
+				// accept invite
+				this._inviteUser(options, function (err, invitation) {
+					if (err) return console.error(err);
+
+					// enter portal
+					window.location.href = '/';
+				});
+			}.bind(this));
+		}.bind(this));
+	},
+
+	_getAccessToken : function (options, done) {
+		this._post('/api/token', options, done);
+	},
+
+	_createUser : function (options, done) {
+		this._post('/api/user/create', options, done);
+	},
+
+	_inviteUser : function (options, done) {
+		this._post('/api/user/invite/accept', options, done);
+	},
+
 	checkSubmitBtn : function () {
 		var allgood = (this._uniqueUsername && this._uniqueEmail && this._privacyChecked);
 		this._submitBtn.disabled = !allgood;
 	},
 
 	_checkUniqueEmail : function (e) {
-
 		var input = e.target;
 		var email = input.value;
-
-		console.log('_checkUniqueEmail');
+		if (!email) return;
 
 		// post to endpoint
-		// app.api.uniqueEmail({
-		this._post('/api/user/checkUniqueEmail', {			
+		this._post('/api/user/unique', {			
 			email : email
 		}, function (err, result) {
 
@@ -228,25 +303,21 @@ Wu.Invite = Wu.Class.extend({
 			this.checkSubmitBtn();
 
 			// mark input
-			input.style.backgroundColor = this._uniqueEmail ? 'transparent' : '#FF4545';
+			input.style.backgroundColor = this._uniqueEmail ? 'transparent' : 'rgba(255, 74, 74, 0.45)';
 
 		}.bind(this));
 	},
 
 
 	_checkUniqueUsername : function (e) {
-
 		var input = e.target;
 		var username = input.value;
-
-		console.log('_checkUniqueUsername');
+		if (!username) return;
 
 		// post to endpoint
-		// app.api.uniqueUsername({
-		this._post('/api/user/checkUniqueUsername', {			
+		this._post('/api/user/uniqueUsername', {			
 			username : username
 		}, function (err, result) {
-			var result = Wu.parse(result);
 
 			if (result.error) {
 				console.error('something went worng', result);
@@ -258,7 +329,7 @@ Wu.Invite = Wu.Class.extend({
 				this.checkSubmitBtn();
 
 				// mark input
-				input.style.backgroundColor = this._uniqueUsername ? 'transparent' : '#FF4545';
+				input.style.backgroundColor = this._uniqueUsername ? 'transparent' : 'rgba(255, 74, 74, 0.45)';
 			}
 		}.bind(this));
 	},

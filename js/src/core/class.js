@@ -1636,26 +1636,26 @@ Wu.DomEvent = {
 	    	// Check with Knut Ole :)
 
 	    	// This is the original one...
-		// this._on(obj, types[i], fn, context);
+		this._on(obj, types[i], fn, context);
 
 	    	// This is a fallback for mobile/touch devices...
 
-	    	// App doesn't exist on login page...
-	    	if ( !app ) {
+	    	// // App doesn't exist on login page...
+	    	// if ( !app ) {
 
-	    		this._on(obj, 'click', fn, context);
+	    	// 	this._on(obj, 'click', fn, context);
 
-	    	} else {
+	    	// } else {
 
-		    	if ( app.isMobile && types[i] == 'click') { //  || types[i] == 'mousedown' 
-		    		var type = 'touchstart';
-		    	} else {
-		    		var type = types[i];
-		    	}
+		    // 	if ( app.isMobile && types[i] == 'click') { //  || types[i] == 'mousedown' 
+		    // 		var type = 'touchstart';
+		    // 	} else {
+		    // 		var type = types[i];
+		    // 	}
 
-		    	this._on(obj, type, fn, context);
+		    // 	this._on(obj, type, fn, context);
 
-	    	}
+	    	// }
 
 	    
 	
