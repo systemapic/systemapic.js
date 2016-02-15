@@ -73,8 +73,15 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	createlegends : function (options, done) {
+	createLegends : function (options, done) {
+
+		// return;
+		
+		// console.log('%c createlegends ', 'background: brown: color: white;');
 		var path = '/api/layer/createlegends';
+		// console.log('path', path);
+		// console.log('options', options);
+		
 		this.post(path, options, done);
 	},
 

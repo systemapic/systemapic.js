@@ -10,6 +10,8 @@ Wu.Legend = Wu.Class.extend({
 
 	},
 
+
+
 	// LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR
 	// LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR
 	// LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR
@@ -21,7 +23,10 @@ Wu.Legend = Wu.Class.extend({
 	// LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR
 
 
-	_updateLegend : function () {
+	updateLegend : function () {
+
+		console.log('%c updateLegend ', 'background: hotpink; color: white; font-size: 16px;');
+
 
 		var styleJSON = this.options.carto;
 
@@ -29,26 +34,30 @@ Wu.Legend = Wu.Class.extend({
 		this.buildLegendObject(styleJSON);
 
 		// Rolls out the HTML
-		this.createLegendHTML();
+		this.createLegendStyler();
 
-		// Saves the changes
+		// Saves the changes (object)
 		this.saveLegend();
 
-		// Update legend control on map
-		if ( app.MapPane._controls.description ) {
 
-			// TODO: Only do this if the current legend is OPEN on map!
-			// app.MapPane._controls.description._refreshLayer(this.options.layer);
-		}
+		var layerID = this.options.layer.options.uuid;
+		Wu.Mixin.Events.fire('updateLegend', { detail : { layerUuid : layerID }}); 
+
 
 
 	},
 
+
 	saveLegend : function () {
+
+		// console.log('saveLegend');
+		// console.log('this.legendObj.enable', this.legendObj.enable);
 
 		this.options.layer.setLegends( this.legendObj );
 
 	},
+
+
 
 
 	// BUILD LEGEND OBJECT FROM CARTO JSON
@@ -57,8 +66,9 @@ Wu.Legend = Wu.Class.extend({
 
 	buildLegendObject : function  (styleJSON) {
 
-		// console.log('this.options', this.options.options);
-		// console.log('this.options.carto', this.options.options.carto);
+
+		// console.log('%c buildLegendObject ', 'background: pink; color: white;');
+		// console.log('this.oldLegendObj', this.oldLegendObj);
 
 		var point 	= styleJSON.point,
 		    line 	= styleJSON.line,
@@ -76,6 +86,7 @@ Wu.Legend = Wu.Class.extend({
 			this.oldLegendObj = this.legendObj;
 			var _layerMeta = this.oldLegendObj.layerMeta ? true : false;
 			var _opacitySlider = this.oldLegendObj.opacitySlider ? true : false;
+			var _enable = this.oldLegendObj.enable ? true : false;
 
 		// If legend does not exist, get it from store and save it as "old legend object"
 		} else {
@@ -88,6 +99,7 @@ Wu.Legend = Wu.Class.extend({
 		// Create blank legend object that we populate with data from style json		
 		this.legendObj = {
 
+			enable : _enable,
 			layerMeta : _layerMeta,
 			opacitySlider : _opacitySlider,
 
@@ -232,7 +244,6 @@ Wu.Legend = Wu.Class.extend({
 		}
 
 
-		// shit
 		if ( this.oldLegendObj && this.oldLegendObj.point.all ) {
 			if ( this.oldLegendObj.point.all.name ) {
 				legend.name = this.oldLegendObj.point.all.name;
@@ -274,7 +285,6 @@ Wu.Legend = Wu.Class.extend({
 					operator : operator
 				}
 
-				// shit
 				if ( this.oldLegendObj && this.oldLegendObj.point.target[i] ) {
 					if ( this.oldLegendObj.point.target[i].name ) {
 						legend.name = this.oldLegendObj.point.target[i].name;
@@ -380,7 +390,7 @@ Wu.Legend = Wu.Class.extend({
 
 		}
 
-		// shit
+		
 		if ( this.oldLegendObj && this.oldLegendObj.polygon.all ) {
 			if ( this.oldLegendObj.polygon.all.name ) {
 				legend.name = this.oldLegendObj.polygon.all.name;
@@ -422,7 +432,7 @@ Wu.Legend = Wu.Class.extend({
 					operator : operator
 				}
 
-				// shit
+
 				if ( this.oldLegendObj && this.oldLegendObj.polygon.target[i] ) {
 					if ( this.oldLegendObj.polygon.target[i].name ) {
 						legend.name = this.oldLegendObj.polygon.target[i].name;
@@ -562,7 +572,6 @@ Wu.Legend = Wu.Class.extend({
 
 
 
-		// shit
 		if ( this.oldLegendObj && this.oldLegendObj.line.all ) {
 			if ( this.oldLegendObj.line.all ) {
 				legend.name = this.oldLegendObj.line.all.name;
@@ -604,7 +613,6 @@ Wu.Legend = Wu.Class.extend({
 				}
 
 
-				// shit
 				if ( this.oldLegendObj && this.oldLegendObj.line.target[i] ) {
 					if ( this.oldLegendObj.line.target[i].name ) {
 						legend.name = this.oldLegendObj.line.target[i].name;
@@ -643,6 +651,15 @@ Wu.Legend = Wu.Class.extend({
 		// Where the legends are + the switches for opacity slider and legend meta
 		this._legendContent = Wu.DomUtil.create('div', 'legend-content', this._legendSection);
 
+		// 
+		var styleJSON = this.options.carto;
+
+		// Creates legend object as JSON
+		this.buildLegendObject(styleJSON);
+
+		this.createLegendStyler();
+
+
 	},
 
 	// Clear content when updating
@@ -655,7 +672,11 @@ Wu.Legend = Wu.Class.extend({
 
 	// Create the basic switches, and run the options to create legend for
 	// lines, polygons and points.
-	createLegendHTML : function () {
+	createLegendStyler : function () {
+
+
+		// console.log('%c this.legendObj.enable ', 'background: red; color: white;');
+		// console.log(this.legendObj);
 
 		this.clearLegendContent();
 
@@ -667,11 +688,15 @@ Wu.Legend = Wu.Class.extend({
 		// The top section hold the "Legend" title + on/off switch
 		// This part should always be there
 
-		// If legend does not exist, see if we have it stored
+		// If legend on/off option does not exist, see if we have it stored
 		if ( typeof this.legendObj.enable == 'undefined' ) {
-			// this.legendObj.enable = this.oldLegendObj.enable;
-			this.legendObj.enable = true;
+			if ( this.oldLegendObj ) {
+				this.legendObj.enable = this.oldLegendObj.enable;
+			} else {
+				this.legendObj.enable = true;
+			}
 		}
+
 		var _isOn = this.legendObj.enable;
 
 		// wrapper
@@ -690,6 +715,7 @@ Wu.Legend = Wu.Class.extend({
 			right 	     : true,
 			appendTo     : line.container,
 			fn 	     : this._switchEnableLegend.bind(this),
+			// context      : this
 		});
 
 
@@ -715,9 +741,6 @@ Wu.Legend = Wu.Class.extend({
 			input        : false,
 		});		
 
-
-		// console.log('this.legendObj.layerMeta', this.legendObj.layerMeta);
-		// console.log('this.oldLegendObj', this.oldLegendObj);
 
 		// If layer meta option does not exist, see if we have it stored
 		if ( typeof this.legendObj.layerMeta == 'undefined' ) {
@@ -952,13 +975,6 @@ Wu.Legend = Wu.Class.extend({
 			} else {
 				_legendHTML += '<div class="info-legend-globesar">' + options.bline + '</div>';
 			}
-			
-			// console.log('');
-			// console.log('%c options ', 'background: red; color: white; font-size: 18px;');
-			// console.log(options);
-			// console.log('');
-			// console.log('');
-
 
 			_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
 
@@ -1005,27 +1021,27 @@ Wu.Legend = Wu.Class.extend({
 		var textR    = Wu.DomUtil.create('div', 'globesar-specific-legend-from', leg, 'Fra satellitten');
 
 
-		// Set on to true by default
-		if ( typeof options.object._isOn == 'undefined' ) {
-    			options.object._isOn = true;
-		}
+		// // Set on to true by default
+		// if ( typeof options.object._isOn == 'undefined' ) {
+  		// options.object._isOn = true;
+		// }
 
-		// Put on/off state to wrapper
-		options.object._isOn ? Wu.DomUtil.removeClass(container, 'is-off') : Wu.DomUtil.addClass(container, 'is-off');
+		// // Put on/off state to wrapper
+		// options.object._isOn ? Wu.DomUtil.removeClass(container, 'is-off') : Wu.DomUtil.addClass(container, 'is-off');
 
-		// Switch to toggle this specific legend on or off
-		var button = new Wu.button({
-			id 	     : 'random-button',
-			type 	     : 'switch',
-			isOn 	     : options.object._isOn,
-			right 	     : true,
-			appendTo     : container,
-			fn 	     : this._switchGradientBottom,
-			className    : 'legend-switch',
-			sourceObject : options.object,
-			context      : this
+		// // Switch to toggle this specific legend on or off
+		// var button = new Wu.button({
+		// 	id 	     : 'random-button',
+		// 	type 	     : 'switch',
+		// 	isOn 	     : options.object._isOn,
+		// 	right 	     : true,
+		// 	appendTo     : container,
+		// 	fn 	     : this._switchGradientBottom,
+		// 	className    : 'legend-switch',
+		// 	sourceObject : options.object,
+		// 	context      : this
 
-		});
+		// });
 
 	},
 
@@ -1065,6 +1081,9 @@ Wu.Legend = Wu.Class.extend({
 		var name = e.target.value;
 		this.sourceObject.name = name;
 
+		// Fire change
+		this.context.updateLegend();		
+
 	},
 
 
@@ -1084,22 +1103,53 @@ Wu.Legend = Wu.Class.extend({
 			} else {
 				this.legendObj.opacitySlider = true;
 			}
-		}			
+		}
+
+		// Fire change
+		this.updateLegend();		
+
 	},
 
-	_switchEnableLegend : function  () {
+	_switchEnableLegend : function  (e) {
+
+		// console.log('%c _switchEnableLegend ', 'background: blue; color: white; font-size: 17px;');
 		
+		// console.log('this.legendObj.enable', this.legendObj.enable);
+		
+
 		if ( this.legendObj.enable ) {
-			Wu.DomUtil.addClass(this._legendContent, 'displayNone');
+			// Wu.DomUtil.addClass(this._legendContent, 'displayNone');
 			this.legendObj.enable = false;
 		} else {
-			Wu.DomUtil.removeClass(this._legendContent, 'displayNone');
+			// Wu.DomUtil.removeClass(this._legendContent, 'displayNone');
 			this.legendObj.enable = true;
 		}
 
-		this.saveLegend();
-		this._updateLegend();
+
+		// console.log('this.legendObj.enable', this.legendObj.enable);
+
+		// this.saveLegend();
+		// this.updateLegend();
+		// this.updateLegend();
+		// this.context.updateLegend();
+		this.updateLegend();
 	},
+
+	// _switchEnableLegend : function  () {
+		
+	// 	if ( this.legendObj.enable ) {
+	// 		Wu.DomUtil.addClass(this._legendContent, 'displayNone');
+	// 		this.legendObj.enable = false;
+	// 	} else {
+	// 		Wu.DomUtil.removeClass(this._legendContent, 'displayNone');
+	// 		this.legendObj.enable = true;
+	// 	}
+
+	// 	// this.saveLegend();
+	// 	// this.updateLegend();
+	// 	// this.updateLegend();
+	// 	this.context.updateLegend();
+	// },
 
 	_switchLegend : function () {		
 
@@ -1110,9 +1160,11 @@ Wu.Legend = Wu.Class.extend({
 		} else {
 			Wu.DomUtil.removeClass(this.appendTo, 'is-off');
 			this.sourceObject.isOn = true;
-
-
 		}
+
+		// Fire change
+		this.context.updateLegend();
+
 	},
 
 	_switchGradient : function () {		
@@ -1125,24 +1177,29 @@ Wu.Legend = Wu.Class.extend({
 			this.sourceObject.isOn = true;
 		}
 
+		// Fire change
+		// this.updateLegend();
+		this.context.updateLegend();	
+
+
 
 	},	
 
-	_switchGradientBottom : function () {
+	// _switchGradientBottom : function () {
 
-		this.sourceObject._isOn = false;
+	// 	this.sourceObject._isOn = false;
 
-		if ( this.sourceObject._isOn ) {
-			Wu.DomUtil.addClass(this.appendTo, 'is-off');
-			this.sourceObject._isOn = false;	
-		} else {
-			Wu.DomUtil.removeClass(this.appendTo, 'is-off');
-			this.sourceObject._isOn = true;			
-		}
+	// 	if ( this.sourceObject._isOn ) {
+	// 		Wu.DomUtil.addClass(this.appendTo, 'is-off');
+	// 		this.sourceObject._isOn = false;	
+	// 	} else {
+	// 		Wu.DomUtil.removeClass(this.appendTo, 'is-off');
+	// 		this.sourceObject._isOn = true;			
+	// 	}
 
-		this.sourceObject._isOn = false;	
+	// 	this.sourceObject._isOn = false;	
 		
-	},
+	// },
 
 	// POINTS HTML
 	// POINTS HTML

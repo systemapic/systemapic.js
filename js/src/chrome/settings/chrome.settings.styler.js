@@ -68,7 +68,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	_initStyle : function () {
 
 		this.getLayerMeta();
-
 		this._initTemplates();
 
 
@@ -105,10 +104,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._legendStyler = new Wu.Legend(legendOptions);
 
 		// update legend
-		this._legendStyler._updateLegend();
+		// this._legendStyler._updateLegend();
 
 
-		this._updateStyle();
+		// this._updateStyle();
 
 
 		Wu.DomUtil.removeClass(this._legendStyler._legensOuter, 'displayNone');
@@ -283,20 +282,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}.bind(this));
 	
 
-		// Update point
-		this._pointStyler.setCarto(this._carto.point);
-		this._pointStyler._refresh();
-		this._pointStyler.updateStyle();
 
-		// Update point
-		this._lineStyler.setCarto(this._carto.line);
-		this._lineStyler._refresh();
-		this._lineStyler.updateStyle();
+		this._updateStyle();
 
-		// Update point
-		this._polygonStyler.setCarto(this._carto.polygon);
-		this._polygonStyler._refresh();
-		this._polygonStyler.updateStyle();
+
+
 
 	},
 
@@ -338,12 +328,24 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateStyle : function () {
 
-
+		// Update point
+		this._pointStyler.setCarto(this._carto.point);
+		this._pointStyler._refresh();
 		this._pointStyler.updateStyle();
-		this._polygonStyler.updateStyle();
+
+		// Update point
+		this._lineStyler.setCarto(this._carto.line);
+		this._lineStyler._refresh();
 		this._lineStyler.updateStyle();
 
-		this._legendStyler._updateLegend();
+		// Update point
+		this._polygonStyler.setCarto(this._carto.polygon);
+		this._polygonStyler._refresh();
+		this._polygonStyler.updateStyle();
+
+		// Update legend
+		this._legendStyler.updateLegend();
+
 
 		Wu.DomUtil.removeClass(this._updateStyleButton, 'marked-changed');
 	},
@@ -392,7 +394,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
 
-
 		// clear wrapper content
 		this._fieldsWrapper.innerHTML = '';
 		this._legendWrapper.innerHTML = '';
@@ -405,10 +406,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// return if no layer
 		if (!this._layer || !this._layer.isPostGIS()) return;
-
-
-		// this.clearBuggyFiles();
-
 
 		// remember layer for other tabs
 		this._storeActiveLayerUuid(this.layerUuid);		
