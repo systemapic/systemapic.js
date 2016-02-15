@@ -23,13 +23,14 @@ Wu.Socket = Wu.Class.extend({
 	},
 
 	sendUserEvent : function (options) {
+		console.log('sendUserEvent', options);
 		// defaults
 		options.user = options.user || app.Account.getFullName();
 		options.timestamp = options.timestamp || Date.now();
 
 		// send event
 		var socket = this._socket;
-		app.Socket.send('get_server_stats');
+		app.Socket.send('user_event', options);
 	},
 
 	send : function (channel, options, callback) {
