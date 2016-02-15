@@ -38,9 +38,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Get layer object
 		var layer = this._project.getLayer(uuid);
 
-		console.log('meta:', layer.store.metadata);
-		console.log('lyaer: ', layer);
-
 		// Get layer meta
 		var layerMeta = JSON.parse(layer.store.metadata);
 
@@ -404,8 +401,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	
 	_refreshFiles : function () {
-
-		console.log('refresh Files');
 
 		// FILES
 		for (var p in this.fileProviders) {
@@ -1597,7 +1592,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_closeInviteInputs : function () {
-		console.log('closee');
 	},
 
 	_closeInviteInputs : function () {
@@ -2244,7 +2238,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		toggleButton
 			.on('click', function(d) {
-				console.log('click toggle layer');
 				this.toggleLayer(d);
 			}.bind(this));		
 
@@ -2357,7 +2350,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// TOGGLE LAYERS
 	
 	toggleLayer : function (layer) {
-		console.log('toggleLayer', layer);
 		var uuid = layer.getUuid();
 		var on = this.isLayerOn(uuid);
 		on ? this.removeLayer(layer) : this.addLayer(layer);

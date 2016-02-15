@@ -264,15 +264,6 @@ Wu.Model.File = Wu.Model.extend({
 
 	_fileDeleted : function (result, layers) {
 
-		console.log('_fileDeleted', arguments);
-
-		// catch error
-		// if (result.error || !result.success) return console.error(result.error || 'No success deleting!');
-
-
-		console.log('%c _fileDeleted', 'background: blue; color: white;');
-		console.log('result', result);
-
 		// update user locally
 		app.Account.removeFile(this.getUuid());
 
@@ -280,7 +271,6 @@ Wu.Model.File = Wu.Model.extend({
 		this._removeLayersLocally(layers);
 
 		// fire event
-		console.log('firing!');
 		Wu.Mixin.Events.fire('fileDeleted', {detail : {
 			fileUuid : this.getUuid()
 		}});
@@ -536,9 +526,6 @@ Wu.Model.File = Wu.Model.extend({
 
 	cutRasterColor : function (options, callback) {
 
-		console.log('opitons', options)
-
-
 		// request layer with cut
 		this._requestDefaultRasterLayer({
 			file : this,
@@ -568,13 +555,8 @@ Wu.Model.File = Wu.Model.extend({
 
 
 	_createDefaultLayer : function (project, callback) {
-
-		console.log('isVector', this.isVector());
-		console.log('isRaster', this.isRaster());
-
 		this.isVector() && this._createDefaultVectorLayer(project, callback);
 		this.isRaster() && this._createDefaultRasterLayer(project, callback);
-		
 	},
 
 	isVector : function () {
@@ -601,9 +583,6 @@ Wu.Model.File = Wu.Model.extend({
 		    project = options.project;
 
 		var cutColor = options.cutColor || false;
-
-		console.log('cutColor', cutColor);
-
 
 		var layerJSON = {
 			"geom_column": "the_geom_3857",
@@ -698,8 +677,6 @@ Wu.Model.File = Wu.Model.extend({
 
 	_requestDefaultVectorLayer : function (options, done) {
 
-		console.log('rdvl', options)
-
 		var file = options.file,
 		    file_id = file.getUuid(),
 		    project = options.project,
@@ -734,8 +711,6 @@ Wu.Model.File = Wu.Model.extend({
 			}
 			var layer = Wu.parse(layerJSON);
 
-			console.log('c l', layer);
-
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
 				data : {
@@ -750,8 +725,6 @@ Wu.Model.File = Wu.Model.extend({
 
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
-
-				console.log('l mod', layerModel);
 
 				// refresh Sidepane Options
 				var layer = project.addLayer(layerModel);
@@ -830,7 +803,6 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	setMetadata : function (metadata) {
-		console.log('setmeta', metadata);
 		if (this.store.data.raster) {
 			this.store.data.raster.metadata = JSON.stringify(metadata);
 			return this.save('data');

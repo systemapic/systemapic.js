@@ -9,8 +9,6 @@ Wu.Data = Wu.Class.extend({
 
 	_initResumable : function () {
 
-		console.log('init resumable');
-
 		// create resumable
 		this._resumable = new Wu.Resumable({
 			onUploadDone : this._onUploadDone.bind(this)
@@ -58,8 +56,6 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_onUploadDone : function () {
-		console.log('uploadDOne', this);
-
 		this._refreshResumable();
 	},
 
@@ -94,8 +90,6 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_gotFile : function (fileObject) {
-
-		console.log('Imported file:', fileObject);
 
 		var fileStore = fileObject.file;
 		var layer = fileObject.layer;

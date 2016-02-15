@@ -250,18 +250,21 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_refreshTemplates : function () {
 
+		this.templates = [];
+
 		// Get file ID
 		var fileId = this._layer.store.file;
 
 		// Get file
 		var file = app.Account.getFile(fileId);		
 
+		if (!file) return;
+
+
 		// Get all styling templates
 		var styleTemplates = file.getStyleTemplates();
 
-		this.templates = [];
-
-		if ( !styleTemplates ) return;
+		if (!styleTemplates) return;
 
 		styleTemplates.forEach(function (t) {
 			var tJ = JSON.parse(t);

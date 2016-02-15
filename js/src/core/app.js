@@ -320,8 +320,6 @@ Wu.App = Wu.Class.extend({
 		var hotlink = hotlink || window.hotlink;
 		app.hotlink = Wu.parse(hotlink);
 
-		console.log('app.hotlink', app.hotlink);
-
 		// return if no hotlink
 		if (_.isEmpty(app.hotlink)) return false;
 
