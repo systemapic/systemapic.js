@@ -365,7 +365,7 @@ Wu.Project = Wu.Class.extend({
 			keywords 	: this.store.keywords, 
 			position 	: this.store.position,
 			access		: this.store.access
-		}
+		};
 
 		// send request to API		
  		app.api.createProject(options, callback.bind(opts.context));
@@ -385,7 +385,7 @@ Wu.Project = Wu.Class.extend({
 		// var project = this;
 		var options = { 
 			    'pid' : this.store.uuid,
-			    'projectUuid' : this.store.uuid,
+			    'projectUuid' : this.store.uuid
 		};
 		
 		var callback = callback || this._deleted;
@@ -834,9 +834,9 @@ Wu.Project = Wu.Class.extend({
 
 	getSlugs : function () {
 		var slugs = {
-			project : this.store.slug,
+			project : this.store.slug
 			// client : this.getClient().getSlug()
-		}
+		};
 		return slugs;
 	},
 
@@ -974,7 +974,7 @@ Wu.Project = Wu.Class.extend({
 
 	setSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
-		slug = slug.replace(/\W/g, '')
+		slug = slug.replace(/\W/g, '');
 		slug = Wu.Util.stripAccents(slug);
 		this.store.slug = slug;
 		
@@ -991,19 +991,19 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setBoundsSW : function (bounds) {
-		this.store.bounds = this.store.bounds || {}
+		this.store.bounds = this.store.bounds || {};
 		this.store.bounds.southWest = bounds;
 		this._update('bounds');		
 	},
 
 	setBoundsNE : function (bounds) {
-		this.store.bounds = this.store.bounds || {}
+		this.store.bounds = this.store.bounds || {};
 		this.store.bounds.northEast = bounds;
 		this._update('bounds');
 	},
 
 	setBoundsZoomMin : function (zoomMin) {
-		this.store.bounds = this.store.bounds || {}
+		this.store.bounds = this.store.bounds || {};
 		this.store.bounds.zoomMin = zoomMin;
 		this._update('bounds');
 	},
@@ -1050,8 +1050,8 @@ Wu.Project = Wu.Class.extend({
 				    	uuid 	: file.uuid,       // optional
 					type 	: file.type,
 					url 	: url
-				}
-				sources.push(source)
+				};
+				sources.push(source);
 			}
 		}, this);
 		return sources;
@@ -1074,7 +1074,7 @@ Wu.Project = Wu.Class.extend({
 			    	uuid 	: file.uuid,    // optional
 				type 	: file.type,
 				url 	: url
-			}
+			};
 
 			sources.push(source)
 		
@@ -1321,22 +1321,6 @@ Wu.Project = Wu.Class.extend({
 
 		// false: not createdBy and not editor
 		return false;
-	},
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-})
+});
