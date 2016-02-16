@@ -912,9 +912,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayer : function (item) {
 
-		// console.log('%c toggleLayer', 'background: red; color: white;');		
-		
-		// xoxoxoxoxoxoxoxoxo
+		// console.log('%c toggleLayer', 'background: red; color: white;');
 
 		if (this.editMode) return;
 

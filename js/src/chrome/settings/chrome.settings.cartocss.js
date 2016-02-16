@@ -399,6 +399,8 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		// hide others
 		this.hideAll();
 
+		this.showing = true;
+
 		// show this
 		this._container.style.display = 'block';
 

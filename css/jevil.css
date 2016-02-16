@@ -1505,7 +1505,12 @@ input.chrome-field-input {
 }
 
 .info-legend-container {
-    width: 216px;
+    /*width: 216px;*/
+
+    width: 207px;
+    left: 5px;
+    position: relative;    
+
     display: inline-block;
     vertical-align: top;
 

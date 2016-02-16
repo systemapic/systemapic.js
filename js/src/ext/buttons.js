@@ -432,6 +432,7 @@ Wu.button = Wu.Class.extend({
 		// set value
 		if (value) input.value = value;
 		if (value == 0) input.value = value;
+		if (!value) input.value = placeholder;
 
 		// other options
 		if ( !right ) Wu.DomUtil.addClass(input, 'left-input');
@@ -486,6 +487,9 @@ Wu.button = Wu.Class.extend({
 		// set value
 		if (value) miniInput.value = value;
 		if (value == 0) miniInput.value = value;
+
+		// console.log('miniInput value => ', value);
+		// if (!value) miniInput.value = 1;		
 
 		// other options
 		if ( !right ) Wu.DomUtil.addClass(miniInput, 'left-mini');
