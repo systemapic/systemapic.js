@@ -65,7 +65,6 @@ Wu.Styler = Wu.Class.extend({
 		// init container
 		this._initContainer();
 
-
 	},
 
 
@@ -684,7 +683,7 @@ Wu.Styler = Wu.Class.extend({
 		if ( !value ) value = 1.2;
 
 		// save carto
-		this.carto().width.staticVal = value;
+		this.carto().width.staticVal = valuew;
 
 		// mark changed
 		this.markChanged();

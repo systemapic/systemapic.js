@@ -21,6 +21,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// shortcut
 		this._shortcut();
+		
 	},
 	
 	_shortcut : function () {
@@ -387,6 +388,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// hide others
 		this.hideAll();
+		
+		this.showing = true;
 
 		// show this
 		this._container.style.display = 'block';

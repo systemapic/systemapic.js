@@ -46,6 +46,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		// hide by default
 		this._hide();
 
+		// add events
+		this._addEvents();
 
 		app.Tools = app.Tools || {};
 		app.Tools.SettingsSelector = this;
