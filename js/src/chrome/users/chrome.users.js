@@ -122,7 +122,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			Wu.DomUtil.addClass(emailMessageWrap, 'hideme');
 			Wu.DomUtil.addClass(messageBoxWrap, 'showme');
 			this._customMessage.focus();
-
 		}, this);
 
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
@@ -236,7 +235,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		Wu.DomEvent.on(closeBtn, 'click', this._fullscreen.close.bind(this._fullscreen), this);
 
 		// add current project to READ
-
 		this._checkedProjects['read'][app.activeProject.getTitle()] = app.activeProject;
 		this._addAccessItem({
 			input : readInput,
@@ -272,9 +270,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 	},
 
 	_addedProject : function (options) {
-
 		this._createShareableInvite();
-
 		this._removeClipFeedback();
 	},
 
@@ -499,7 +495,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		});
 	},
 
-	_closeFullscreen : function () {
+	_onCloseFullscreen : function () {
 		this._checkedProjects = {
 			read: {},
 			edit: {}
@@ -512,7 +508,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	_createInviteInput : function (options) {
 
-		var me = this;
+		// var me = this;
 		// invite users
 		var content = options.content || this._fullscreen._content;
 		var container = this._fullscreen._container;
@@ -552,7 +548,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var allProjects = _.sortBy(_.toArray(app.Projects), function (u) {
 			return u.getTitle().toLowerCase();
 		});
-		var items = me._list_item_containers[options.type];
+		var items = this._list_item_containers[options.type];
 
 		function onKeyUp(e) {
 			var filterProjects = [];
@@ -564,7 +560,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 					var item_index = items[index];
 					
 					if (_list_item_container.project.getTitle().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 
-						|| _.keys(me._checkedProjects[options.type]).indexOf(_list_item_container.project.getTitle()) !== -1) {
+						|| _.keys(this._checkedProjects[options.type]).indexOf(_list_item_container.project.getTitle()) !== -1) {
 						item_index.list_item_container.style.display = 'none';
 						item_index.list_item_container.style.backgroundColor = '';
 						item_index.current = false;
@@ -580,7 +576,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 						}
 						filterProjects.push(_list_item_container);
 					}
-				});
+				}.bind(this));
 
 				if (_.isEmpty(filterProjects)) {
 					invite_list_container.style.display = 'none';
@@ -588,7 +584,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 					invite_list_container.style.display = 'block';
 				}
 			}
-		}
+		};
 
 		_.each(allProjects, function (project, index) {
 
@@ -632,15 +628,15 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
 
-				me._checkedProjects[options.type][project.getTitle()] = project;
+				this._checkedProjects[options.type][project.getTitle()] = project;
 				// add selected project item to input box
 				this._addAccessItem({
 					input : invite_input,
 					project : project,
 					type : options.type,
 					trigger : options.trigger,
-					checkedProjects : me._checkedProjects[options.type],
-					onKeyUp: onKeyUp
+					checkedProjects : this._checkedProjects[options.type],
+					onKeyUp: onKeyUp.bind(this)
 				});
 
 				// optional callback
@@ -651,7 +647,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				}
 
 				invite_input.value = '';
-				onKeyUp();
+				onKeyUp.call(this);
 			}, this);
 
 			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
@@ -671,13 +667,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// input focus, show dropdown
 		Wu.DomEvent.on(invite_input, 'focus', function () {
-			me._closeInviteInputs();
-			onKeyUp();
+			this._closeInviteInputs();
+			onKeyUp.call(this);
 		}, this);
-		// Wu.DomEvent.on(invite_input, 'focus', function () {
-		// 	this._closeInviteInputs();
-		// 	invite_list_container.style.display = 'block';
-		// }, this);
+		
 
 		// focus input on any click
 		Wu.DomEvent.on(invite_input_container, 'click', function () {
@@ -788,22 +781,22 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 			if (key === 13) {
 
-				currentContainer = _.find(me._list_item_containers[options.type], function (_list_item_container, index) {
+				currentContainer = _.find(this._list_item_containers[options.type], function (_list_item_container, index) {
 					return _list_item_container.current === true;
 				});
 
 				if (currentContainer && currentContainer.project) {
-					me._checkedProjects[options.type][currentContainer.project.getTitle()] = currentContainer.project;
-					me._addAccessItem({
+					this._checkedProjects[options.type][currentContainer.project.getTitle()] = currentContainer.project;
+					this._addAccessItem({
 						input : invite_input,
 						project : currentContainer.project,
 						type : options.type,
 						trigger : options.trigger,
-						checkedProjects : me._checkedProjects[options.type],
-						onKeyUp: onKeyUp
+						checkedProjects : this._checkedProjects[options.type],
+						onKeyUp: onKeyUp.bind(this)
 					});
 					invite_input.value = '';
-					onKeyUp();
+					onKeyUp.call(this);
 				}
 
 			}
@@ -823,10 +816,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				var last = _.last(this._access[options.type]);
 				var popped = this._access[options.type].pop();
 				Wu.DomUtil.remove(popped.user_container);
-				var item = _.find(_.keys(me._checkedProjects[options.type]), function (projectTitle) {
+				var item = _.find(_.keys(this._checkedProjects[options.type]), function (projectTitle) {
 					return projectTitle == last.project.getTitle();
 				});
-				delete me._checkedProjects[options.type][item];
+				delete this._checkedProjects[options.type][item];
 
 				// optional callback
 				if (options.trigger) {
@@ -918,7 +911,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 					project : false
 				});
 			}
-			options.onKeyUp();
+			options.onKeyUp.call(this);
 		}, this);
 
 		// add to array
@@ -938,11 +931,11 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			// remove div
 			Wu.DomUtil.remove(existing.user_container);
 			
-			var item = _.find(_.keys(me._checkedProjects[otherType]), function (projectTitle) {
+			var item = _.find(_.keys(this._checkedProjects[otherType]), function (projectTitle) {
 				return projectTitle == project.getTitle(); 
 			});
 
-			delete me._checkedProjects[otherType][item];
+			delete this._checkedProjects[otherType][item];
 			
 			// remove from array
 			_.remove(this._access[otherType], function (i) {
