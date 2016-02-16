@@ -291,6 +291,7 @@ Wu.Api = Wu.Class.extend({
 			done && done(err, response);
 		});
 	},
+
 	_post : function (path, json, done, context, baseurl) {
 		var http = new XMLHttpRequest();
 		var url = baseurl || Wu.Util._getServerUrl();
@@ -314,7 +315,7 @@ Wu.Api = Wu.Class.extend({
 				}
 			}
 
-		}
+		};
 
 		// add access_token to request
 		var access_token = app.tokens ? app.tokens.access_token : null;
@@ -325,4 +326,46 @@ Wu.Api = Wu.Class.extend({
 		// send
 		http.send(send_json);
 	},
+
+	get : function (path, options, done) {
+		this._get(path, JSON.stringify(options), function (err, response) {
+			done && done(err, response);
+		});
+	},
+
+	_get : function (path, json, done, context, baseurl) {
+		var http = new XMLHttpRequest();
+		var url = baseurl || Wu.Util._getServerUrl();
+		url += path;
+
+		// open
+		http.open("GET", url, true);
+
+		// set json header
+		http.setRequestHeader('Content-type', 'application/json');
+
+		// response
+		http.onreadystatechange = function() {
+			if (http.readyState == 4) {
+				if (http.status == 200) {
+					done && done(null, http.responseText);
+				} else {
+					console.log('http.status: ', http.status);
+					console.log('httP', http);
+					done && done(http.status, http.responseText);
+				}
+			}
+		};
+
+		// add access_token to request
+		var options = _.isString(json) ? Wu.parse(json) : json;
+
+		options.access_token = app.tokens ? app.tokens.access_token : null;
+
+		var send_json = Wu.stringify(options);
+
+		// send
+		http.send(send_json);
+	}
+
 });
