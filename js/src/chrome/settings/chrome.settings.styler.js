@@ -30,7 +30,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_initContainer : function () {
 
-		// create container
+		// Create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane styler', this.options.appendTo);
 	},
 
@@ -43,10 +43,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._midOuterScroller 	= Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);		
 		this._midInnerScroller 	= Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
 
-		// active layer
+		// Active layer
 		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller); // appending to this._midSection
 
-		// Create field wrapper
+		// Style settings wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// Legends wrapper
@@ -55,21 +55,38 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// update style button
 		this._buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._container);
 		this._updateStyleButton = Wu.DomUtil.create('div', 'smooth-fullscreen-save update-style', this._buttonWrapper, 'Update Style');
+
+		// Event for click button
 		Wu.DomEvent.on(this._updateStyleButton, 'click', this._updateStyle, this);		
 
+		// Ability to save styling as a template
+		this._initTemplateContent();
 
-		this._initSaveTemplate();
-
-		// mark inited
+		// Mark inited
 		this._inited = true;
 	},
 
 
 	_initStyle : function () {
 
+		// this.clearBuggyFiles();
+
+		// Get layer meta
 		this.getLayerMeta();
+
+		// Init styling templates
 		this._initTemplates();
 
+		// Init styling options
+		this._initStylingOptions();
+
+		// Init legend options
+		this._initLegendOptions();
+
+
+	},
+
+	_initStylingOptions : function () {
 
 		var options = {
 			carto 	: this._carto,
@@ -91,28 +108,22 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// create line styler
 		this._lineStyler = new Wu.Styler.Line(options);
 
+	},
+
+	_initLegendOptions : function () {
 
 		var legendOptions = {			
 			layer     : this._layer,
 			carto     : this._carto,
 			globesar  : this.globesar, 		// todo: remove client name, make truly customizable
 			container : this._legendWrapper
-			// container : this._fieldsWrapper
-
 		}
 
 		this._legendStyler = new Wu.Legend(legendOptions);
 
-		// update legend
-		// this._legendStyler._updateLegend();
 
-
-		// this._updateStyle();
-
-
-		Wu.DomUtil.removeClass(this._legendStyler._legensOuter, 'displayNone');
-
-
+		Wu.DomUtil.removeClass(this._legendStyler._legensOuter, 'displayNone');		
+	
 	},
 
 
@@ -121,13 +132,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// *********************************************************** //
 
 	// Inits Save Template HTML
-	_initSaveTemplate : function () {
+	_initTemplateContent : function () {
 
 		// Save template stuff
 		this._saveAsTemplateButton = Wu.DomUtil.create('div', 'save-as-template-button', this._buttonWrapper, 'Save as template');
 		this._templateSaverWrapper = Wu.DomUtil.create('div', 'save-as-template-wrapper hidden-template-dialogue', this._buttonWrapper);
 		this._templateSaverError = Wu.DomUtil.create('div', 'save-as-template-error', this._templateSaverWrapper);
 		this._templateSaverInput = Wu.DomUtil.create('input', 'save-as-template-input-name', this._templateSaverWrapper);
+		this._templateSaverInput.setAttribute('tabindex', -1);
 		this._templateSaverInput.setAttribute('placeholder', 'template name')
 		this._templateSaverInput.setAttribute('type', 'text');
 		this._templateSaverOK = Wu.DomUtil.create('div', 'save-as-template-OK-button smooth-fullscreen-save', this._templateSaverWrapper, 'OK');
@@ -207,7 +219,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.removeClass(this._templateSaverInput, 'error-template-input');
 		Wu.DomUtil.addClass(this._templateSaverWrapper, 'hidden-template-dialogue');
 
-		this.createStyleTemplate(name);
+		this.saveStyleTemplate(name);
 
 	},
 
@@ -225,7 +237,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', this._fieldsWrapper);
 		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
 
-
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
 		option.innerHTML = 'Select styling templates';
@@ -238,8 +249,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
 			option.value = template.uuid;
 			option.innerHTML = template.name;
-		});	
-
+		});
 
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectTemplate, this); // todo: mem leak?
@@ -274,29 +284,31 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_selectTemplate : function (e) {		
 
-
 		var selected = e.target.value;
+
 
 		this.templates.forEach(function (template) {
 			if ( template.uuid == selected ) {
 				this._carto = template.carto;
+				this._legend = template.legend;
 				return;
 			}
 		}.bind(this));
-	
 
+		this._updateStyle(true);
 
-		this._updateStyle();
+		this._pointStyler._refresh();
+		this._lineStyler._refresh();
+		this._polygonStyler._refresh();		
 
-
-
-
+		// this._refresh();
 	},
 
 
 
 
-	createStyleTemplate : function (name) {
+	saveStyleTemplate : function (name) {
+
 
 		// Get file ID
 		var fileId = this._layer.store.file;
@@ -309,6 +321,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		   uuid : Wu.Util.guid('style-template'),
 		   timestamp : Date.now(),
 		   carto : this._carto,
+		   legend : this._layer.store.legends,
 		   createdBy : app.Account.getUuid(),
 		   name : name
 		}
@@ -324,37 +337,45 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// ******************************************************************* //
 
 
-
+	// Marks button to changed state
 	markChanged : function () {
 		Wu.DomUtil.addClass(this._updateStyleButton, 'marked-changed');
 	},
 
-	_updateStyle : function () {
+	// Unmarks button to changed state
+	unmarkChanged : function () {
+		Wu.DomUtil.removeClass(this._updateStyleButton, 'marked-changed');
+	},
+
+	// Update style
+	_updateStyle : function (newLegend) {
 
 		// Update point
 		this._pointStyler.setCarto(this._carto.point);
-		this._pointStyler._refresh();
 		this._pointStyler.updateStyle();
 
 		// Update point
 		this._lineStyler.setCarto(this._carto.line);
-		this._lineStyler._refresh();
 		this._lineStyler.updateStyle();
 
 		// Update point
 		this._polygonStyler.setCarto(this._carto.polygon);
-		this._polygonStyler._refresh();
 		this._polygonStyler.updateStyle();
 
 		// Update legend
-		this._legendStyler.updateLegend();
+		// this._legendStyler.updateLegend();
 
+		var refresh = newLegend ? this._legend : false;
+		this._legendStyler.refreshLegend(refresh);
+		// this._legendStyler.refreshLegend(this._legend);
 
-		Wu.DomUtil.removeClass(this._updateStyleButton, 'marked-changed');
+		// Unmark changed
+		this.unmarkChanged();
+
+		
 	},
 
 
-	
 	_refresh : function () {
 		this._flush();
 		this._initLayout();
@@ -477,8 +498,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 
-	// This function is to clear up files I've fucked up in the making.
-	// In theory you'll never need it :P
 	clearBuggyFiles : function () {
 
 		// Get file ID
