@@ -12,7 +12,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		// shortcut
 		app.Tools = app.Tools || {};
-		app.Tools.Tooltip = this;
+		app.Tools.Tooltip = this;		
 		
 	},
 
@@ -63,6 +63,8 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		// hide others
 		this.hideAll();
+
+		this.showing = true;
 
 		// show this
 		this._container.style.display = 'block';

@@ -128,8 +128,6 @@ L.Control.Description = Wu.Control.extend({
 
 	_legendIsBeingUpdated : function (e) {
 
-		console.log('%c _legendIsBeingUpdated ', 'background: brown; color: white;');
-
 		// If we are showing all legends at once!
 		if ( this.miniLegend ) {
 
@@ -418,9 +416,6 @@ L.Control.Description = Wu.Control.extend({
 
 	setHTMLfromStore : function (uuid) {
 
-		console.log('setHTMLfromStore');
-
-
 		this.legendUuid = uuid;
 
 		// get layer
@@ -428,8 +423,14 @@ L.Control.Description = Wu.Control.extend({
 		if (!layer) return;
 
 		var legend = layer.getLegends();
+
+		// Create legend if there are none
+		if ( !legend ) {
+			this.createLegend(layer);
+			var legend = layer.getLegends();
+		}
+
 		if ( legend && !legend.enable ) {
-		
 			legend.layerMeta = false;
 			legend.opacitySlider = false;
 			legend.gradient = false;
@@ -481,22 +482,45 @@ L.Control.Description = Wu.Control.extend({
 		}
 
 
-		if ( !legend ) {
-
-
-			console.error('No legend!');
-			this.setLegendHTML('Create legend in Styler');
-
-
-			// Wu.Mixin.Events.fire('noLegend', { detail : { layerUuid : uuid }}); 
-
-		}		
-
-
+		
 
 	},
 
-	// xoxoxoxox
+
+	createLegend : function (layer) {
+
+		var styleJSON = JSON.parse(layer.store.style);
+
+		var legendObj = Wu.Tools.Legend.buildLegendObject(styleJSON, layer, false);
+		var legendArray = Wu.Tools.Legend.getLegendArray(legendObj.point, legendObj.line, legendObj.polygon);
+
+		var legendHTML = '';
+		var gradientHTML = '';
+
+		legendArray.forEach(function (l) {
+			
+			if ( l.gradient ) {
+				gradientHTML += Wu.Tools.Legend.gradientLegendHTML(l);
+			} else {
+				legendHTML += Wu.Tools.Legend.eachLegendHTML(l);
+			}
+			
+		}.bind(this));
+
+		legendObj.html = legendHTML;
+		legendObj.gradient = gradientHTML;
+
+
+		legendObj.enable = true;
+		legendObj.layerMeta = true;
+		legendObj.opacitySlider = true;
+		legendObj.layerName = layer.getTitle();
+
+		// Save legend
+		layer.setLegends( legendObj );
+
+	},
+
 	setMetaTitle : function (title) {
 		this._metaTitle.innerHTML = title;
 	},
