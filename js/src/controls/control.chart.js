@@ -94,6 +94,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	updateExistingPopup : function (options) {
 
+
 		var popup = options.context._chart._popup;
 
 		var e = options.e;
@@ -237,6 +238,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Create "normal" pop-up content without time series
 	_createPopupContent : function (e) {
 
+		this.popupSettings = e.layer.getTooltip();
 
 		var c3Obj = {
 			data : e.data,
@@ -257,6 +259,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		}
 
 		this._c3Obj = this.createC3dataObj(c3Obj);
+	
 
 		var headerOptions = {
 			headerMeta 	: this._c3Obj.d3array.meta,
@@ -283,6 +286,8 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 	singleC3PopUp : function (e) {
+
+
 
 		var c3Obj = {
 			data : e.data,

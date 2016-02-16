@@ -52,11 +52,9 @@ Wu.Tooltip = Wu.Class.extend({
 		this._isActive() ? this.on() : this.off();
 	},
 
-	on : function () { 				
-		return;
-		// console.error('tooltip on!'); // todo optimize: too many event registered?
+	on : function () {
 
-		// console.log('on tips!', this.tips);
+		return;
 
 		// create tooltip
 		this.tips.forEach(function (t) {
