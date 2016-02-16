@@ -357,8 +357,6 @@ Wu.MapPane = Wu.Pane.extend({
 		var map = app._map;
 		var bounds = this._project.getBounds();
 
-		console.log('bounds:', bounds, this._project.getName());
-
 		if (!bounds) {
 			this.clearBounds();
 			return;
@@ -393,8 +391,6 @@ Wu.MapPane = Wu.Pane.extend({
 		var nullBounds = L.latLngBounds(southWest, northEast);
 
 		// set bounds to project
-		console.log('clreaBounds!');
-		// this._project.setBounds(noBounds);
 		app.activeProject.setBounds(noBounds);
 		app._map.setMaxBounds(nullBounds);
 	},
@@ -525,8 +521,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	resetControls : function () {
-
-		console.log('resetControls');
 
 		// remove carto
 		if (this.cartoCss) this.cartoCss.destroy();

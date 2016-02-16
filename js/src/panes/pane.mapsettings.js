@@ -274,8 +274,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		// If no bounds
 		if ( !bounds ) return false;
 
-		console.log('bounds: ', bounds);
-
 		var maxZoom      = bounds.maxZoom;
 		var minZoom      = bounds.minZoom;
 		var northEastLat = bounds.northEast.lat;

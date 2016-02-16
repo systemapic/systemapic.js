@@ -398,8 +398,6 @@ Wu.Project = Wu.Class.extend({
 
 	_deleted : function (err, response) {
 
-		console.log('_deleted', arguments);
-
 		var result = Wu.parse(response);
 
 		if (!result.deleted) return console.error('Error deleting project.');
@@ -990,7 +988,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setBounds : function (bounds) {
-		console.log('project setBounds: ', bounds);
 		this.store.bounds = bounds;
 		this._update('bounds');
 	},
@@ -1124,10 +1121,8 @@ Wu.Project = Wu.Class.extend({
 
 
 	enableD3popup : function () {
-		console.log('enable d3popup');
 	},
 	disableD3popup : function () {
-		console.log('disable d3popup');
 	},
 
 
