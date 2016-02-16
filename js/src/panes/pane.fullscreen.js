@@ -58,6 +58,7 @@ Wu.Fullscreen = Wu.Evented.extend({
 		// close trigger		
 		Wu.DomEvent.off(this._closer, 'click', this.destroy, this);
 
+
 		// add esc key trigger for close fullscreen
 		this._removeEscapeKey();
 	},
@@ -77,6 +78,7 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 		var closeCallback = this.options.closeCallback;
 		closeCallback && closeCallback();
+		Wu.Mixin.Events.fire('closeFullscreen');
 
 		return false;
 	},

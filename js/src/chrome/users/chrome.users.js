@@ -14,6 +14,8 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// init content
 		this._initContent();
 
+		// listen up
+		this._listen();
 	},
 
 	_initContainer : function () {
@@ -38,6 +40,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		this._inviteButton = Wu.DomUtil.create('div', 'chrome-left-invite-users', this._container, '+ Invite People');
 		Wu.DomEvent.on(this._inviteButton, 'click', this._openInvite, this);
 
+	},
+
+	_listen : function () {
+		Wu.Mixin.Events.on('closeFullscreen',   this._closeFullscreen, this);
 	},
 
 	_createEmailInput : function (content) {
@@ -495,6 +501,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		app.feedback.setMessage({
 			title : 'Invites sent!'
 		});
+	},
+
+	_closeFullscreen : function () {
+		this._checkedProjects = {
+			read: {},
+			edit: {}
+		}
 	},
 
 	_createInviteInput : function (options) {
