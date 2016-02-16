@@ -391,6 +391,16 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		email : {}
 	},
 
+	_checkedProjects : {
+		read: {},
+		edit: {}	
+	},
+
+	_list_item_containers : {
+		read: [],
+		edit: []
+	},
+
 	_sendInvites : function (e) {
 
 		var emails = [];
@@ -489,6 +499,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	_createInviteInput : function (options) {
 
+		var me = this;
 		// invite users
 		var content = options.content || this._fullscreen._content;
 		var container = this._fullscreen._container;
@@ -528,7 +539,45 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var allProjects = _.sortBy(_.toArray(app.Projects), function (u) {
 			return u.getTitle().toLowerCase();
 		});
-		_.each(allProjects, function (project) {
+		var items = me._list_item_containers[options.type];
+
+		function onKeyUp(e) {
+			var filterProjects = [];
+			var currentIsChecked = false;
+			var key = event.which ? event.which : event.keyCode;
+
+			if (key !== 40 && key !== 38 && key !== 13 && key !== 9) {
+				_.forEach(items, function (_list_item_container, index) {
+					var item_index = items[index];
+					
+					if (_list_item_container.project.getTitle().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 
+						|| _.keys(me._checkedProjects[options.type]).indexOf(_list_item_container.project.getTitle()) !== -1) {
+						item_index.list_item_container.style.display = 'none';
+						item_index.list_item_container.style.backgroundColor = '';
+						item_index.current = false;
+					} else {
+						item_index.list_item_container.style.display = 'block';
+						if (!currentIsChecked) {
+							item_index.list_item_container.style.backgroundColor = '#DEE7EF';
+							currentIsChecked = true;
+							item_index.current = true;
+						} else {
+							item_index.list_item_container.style.backgroundColor = '';
+							item_index.current = false;
+						}
+						filterProjects.push(_list_item_container);
+					}
+				});
+
+				if (_.isEmpty(filterProjects)) {
+					invite_list_container.style.display = 'none';
+				} else {
+					invite_list_container.style.display = 'block';
+				}
+			}
+		}
+
+		_.each(allProjects, function (project, index) {
 
 			// get access
 			var access = project.getAccess();
@@ -552,15 +601,33 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			// set name
 			name_bold.innerHTML = project.getTitle();
 
+			if (index === 0) {
+				list_item_container.style.backgroundColor = '#DEE7EF';
+				items.push({
+					project: project,
+					list_item_container: list_item_container,
+					current: true
+				});
+			} else {
+				items.push({
+					project: project,
+					list_item_container: list_item_container,
+					current: false
+				});
+			}
+
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
 
+				me._checkedProjects[options.type][project.getTitle()] = project;
 				// add selected project item to input box
 				this._addAccessItem({
 					input : invite_input,
 					project : project,
 					type : options.type,
-					trigger : options.trigger
+					trigger : options.trigger,
+					checkedProjects : me._checkedProjects[options.type],
+					onKeyUp: onKeyUp
 				});
 
 				// optional callback
@@ -569,16 +636,35 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 						project : project
 					});
 				}
-					
+
+				invite_input.value = '';
+				onKeyUp();
+			}, this);
+
+			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
+				_.forEach(items, function (_list_item_container) {
+					if (_list_item_container.list_item_container != list_item_container) {
+						_list_item_container.list_item_container.style.backgroundColor = '';
+						_list_item_container.current = false;
+					} else {
+						_list_item_container.list_item_container.style.backgroundColor = '#DEE7EF';
+						_list_item_container.current = true;
+					}
+				});
+
 			}, this);
 		}, this);
 
 
 		// input focus, show dropdown
 		Wu.DomEvent.on(invite_input, 'focus', function () {
-			this._closeInviteInputs();
-			invite_list_container.style.display = 'block';
+			me._closeInviteInputs();
+			onKeyUp();
 		}, this);
+		// Wu.DomEvent.on(invite_input, 'focus', function () {
+		// 	this._closeInviteInputs();
+		// 	invite_list_container.style.display = 'block';
+		// }, this);
 
 		// focus input on any click
 		Wu.DomEvent.on(invite_input_container, 'click', function () {
@@ -590,6 +676,124 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 			// get which key
 			var key = event.which ? event.which : event.keyCode;
+
+			if (key === 38) {
+				_.find(items, function (_list_item_container, index) {
+					var showedItemIndexs = [];
+					var nearestLessUnchecked = -1;
+
+					_.forEach(items, function (item, index) {
+						if (item.list_item_container.style.display === 'block') {
+							showedItemIndexs.push(index);
+						}
+					});
+
+					if (_list_item_container.current === true) {
+						items[index].current = false;
+						items[index].list_item_container.style.backgroundColor = '';
+
+							if (index > 0 && items[(index - 1) % (items.length)] && items[(index - 1) % (items.length)].list_item_container.style.display === 'block') {
+								items[(index - 1) % (items.length)].current = true;
+								items[(index - 1) % (items.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+								return true;							
+							} else if (index === 0 && items[items.length - 1] && items[items.length - 1].list_item_container.style.display === 'block') {
+								items[items.length - 1].current = true;
+								items[items.length - 1].list_item_container.style.backgroundColor = '#DEE7EF';
+								return true;
+							}
+
+							_.find(showedItemIndexs, function (item, itemIndex) {
+								if (item >= (index)) {
+									nearestLessUnchecked = showedItemIndexs[itemIndex - 1];
+									return true;
+								}
+								return false;
+							});
+
+							if (nearestLessUnchecked == undefined) {
+								nearestLessUnchecked = -1;
+							}
+
+							if (nearestLessUnchecked < 0) {
+								items[showedItemIndexs[showedItemIndexs.length - 1]].current = true;
+								items[showedItemIndexs[showedItemIndexs.length - 1]].list_item_container.style.backgroundColor = '#DEE7EF';
+							} else {
+								items[nearestLessUnchecked].current = true;
+								items[nearestLessUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+							}
+							return true;
+					}
+					return false;
+				});
+			}
+
+			if (key === 40 || key === 9) {
+				if (key === 9) {
+					Wu.DomEvent.stop(e);
+				}
+
+				_.find(items, function (_list_item_container, index) {
+					var showedItemIndexs = [];
+					var nearestMoreUnchecked = -1;
+
+					_.forEach(items, function (item, index) {
+						if (item.list_item_container.style.display === 'block') {
+							showedItemIndexs.push(index);
+						}
+					});
+					if (_list_item_container.current === true) {
+						items[index].current = false;
+						items[index].list_item_container.style.backgroundColor = '';
+
+						if (items[(index + 1) % (items.length)].list_item_container.style.display === 'block') {
+							items[(index + 1) % (items.length)].current = true;
+							items[(index + 1) % (items.length)].list_item_container.style.backgroundColor = '#DEE7EF';
+							return true;
+						}
+
+						_.find(showedItemIndexs, function (item, itemIndex) {
+							if (item > (index)) {
+								nearestMoreUnchecked = showedItemIndexs[itemIndex];
+								return true;
+							}
+							return false;
+						});
+
+						if (nearestMoreUnchecked < 0) {
+							items[showedItemIndexs[0]].current = true;
+							items[showedItemIndexs[0]].list_item_container.style.backgroundColor = '#DEE7EF';
+						} else {
+							items[nearestMoreUnchecked].current = true;
+							items[nearestMoreUnchecked].list_item_container.style.backgroundColor = '#DEE7EF';
+						}
+						return true;
+
+					}
+					return false;
+				});
+			}
+
+			if (key === 13) {
+
+				currentContainer = _.find(me._list_item_containers[options.type], function (_list_item_container, index) {
+					return _list_item_container.current === true;
+				});
+
+				if (currentContainer && currentContainer.project) {
+					me._checkedProjects[options.type][currentContainer.project.getTitle()] = currentContainer.project;
+					me._addAccessItem({
+						input : invite_input,
+						project : currentContainer.project,
+						type : options.type,
+						trigger : options.trigger,
+						checkedProjects : me._checkedProjects[options.type],
+						onKeyUp: onKeyUp
+					});
+					invite_input.value = '';
+					onKeyUp();
+				}
+
+			}
 
 			// get string length
 			var value = invite_input.value;
@@ -603,8 +807,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			if (key == 8 && value.length == 0 && this._access[options.type].length) {
 
 				// remove last item
+				var last = _.last(this._access[options.type]);
 				var popped = this._access[options.type].pop();
 				Wu.DomUtil.remove(popped.user_container);
+				var item = _.find(_.keys(me._checkedProjects[options.type]), function (projectTitle) {
+					return projectTitle == last.project.getTitle();
+				});
+				delete me._checkedProjects[options.type][item];
 
 				// optional callback
 				if (options.trigger) {
@@ -615,7 +824,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			}
 
 			// enter: blur input
-			if (key == 13) {
+			if (key == 13 || key == 27) {
 				invite_input.blur();
 				invite_input.value = '';
 				this._closeInviteInputs();
@@ -623,6 +832,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		}, this);
 
+		Wu.DomEvent.on(invite_input, 'keyup', onKeyUp, this);
 
 		// close dropdown on any click
 		Wu.DomEvent.on(container, 'click', function (e) {
@@ -651,10 +861,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 	},
 
 	_addAccessItem : function (options) {
-
+		var me = this;
 		var invite_input = options.input;
 		var project = options.project;
 
+		if (!project) {
+			return;
+		}
 		// focus input
 		invite_input.focus();
 
@@ -685,14 +898,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			_.remove(this._access[options.type], function (i) {
 				return i.project == project;
 			});
-
+			delete options.checkedProjects[project.getTitle()];
 			// optional callback
 			if (options.trigger) {
 				options.trigger({
 					project : false
 				});
 			}
-
+			options.onKeyUp();
 		}, this);
 
 		// add to array
@@ -706,10 +919,17 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var existing = _.find(this._access[otherType], function (i) {
 			return i.project == project;
 		});
+
 		if (existing) {
 
 			// remove div
 			Wu.DomUtil.remove(existing.user_container);
+			
+			var item = _.find(_.keys(me._checkedProjects[otherType]), function (projectTitle) {
+				return projectTitle == project.getTitle(); 
+			});
+
+			delete me._checkedProjects[otherType][item];
 			
 			// remove from array
 			_.remove(this._access[otherType], function (i) {
