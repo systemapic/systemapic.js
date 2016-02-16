@@ -43,7 +43,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 	},
 
 	_listen : function () {
-		Wu.Mixin.Events.on('closeFullscreen',   this._closeFullscreen, this);
+		Wu.Mixin.Events.on('closeFullscreen', this._closeFullscreen, this);
 	},
 
 	_createEmailInput : function (content) {
@@ -243,11 +243,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		Wu.DomEvent.on(closeBtn, 'click', this._fullscreen.close.bind(this._fullscreen), this);
 
 		// add current project to READ
+
+		this._checkedProjects['read'][app.activeProject.getTitle()] = app.activeProject;
 		this._addAccessItem({
 			input : readInput,
 			project : app.activeProject,
 			type : 'read',
-			trigger : false
+			trigger : false,
+			checkedProjects : this._checkedProjects['read'],
 		});
 
 		// close inputs
@@ -507,7 +510,11 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		this._checkedProjects = {
 			read: {},
 			edit: {}
-		}
+		};
+		this._list_item_containers = {
+			read: [],
+			edit: []
+		};
 	},
 
 	_createInviteInput : function (options) {
