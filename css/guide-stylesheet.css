@@ -336,7 +336,8 @@
 
 /* Ceralized caption above legend */
 /* ... "Velocity in mm per. year" */
-.info-legend-globesar {
+.info-legend-globesar,
+.info-legend-header {
     	position: absolute;
     	top: -18px;
     	width: 100%;
@@ -348,6 +349,7 @@
 
 /* Legend description container */
 /* ... line under legend explaining if dot is moving towards or from satellite */
+.info-legend-gradient-bottomline,
 .info-legend-gradient-bottomline {
 	height: auto;
 	font-size: 10px;
@@ -356,19 +358,22 @@
 	}
 
 /* Container holding Globesar specific legend information */
-.globesar-specific-legend-container {
+.globesar-specific-legend-container,
+.legend-gradient-footer {
 	margin-top: 4px;
 	}
 
 /* The part with the text "Deformasjon i sikteretning til satellitten" */	
-.globesar-specific-legend-top {
+.globesar-specific-legend-top,
+.legend-gradient-footer-top {
     	text-align: center;
     	position: relative;
     	top: 3px;
 	}
 
 /* Container for arrow line under legend*/
-.globesar-specific-legend-line-container {
+.globesar-specific-legend-line-container,
+.legend-gradient-footer-line-container {
     	height: 6px;
     	padding-left: 6px;
     	padding-right: 6px;
@@ -377,7 +382,8 @@
 	}
 
 /* Horizontal line */
-.globesar-specific-legend-line {
+.globesar-specific-legend-line,
+.legend-gradient-footer-line {
     	height: 1px;
     	position: relative;
     	top: 5px;
@@ -386,15 +392,22 @@
 
 /* Left and right arrow at the end of line under legend */
 .globesar-specific-legend-arrow-left,
-.globesar-specific-legend-arrow-right {
+.globesar-specific-legend-arrow-right,
+
+.legend-gradient-footer-arrow-left,
+.legend-gradient-footer-arrow-right {
     	width: 10px;
     	height: 9px;
     	position: absolute;
     	overflow: hidden;
 	}
 
+
 .globesar-specific-legend-arrow-left:before,
-.globesar-specific-legend-arrow-right:before {
+.globesar-specific-legend-arrow-right:before,	
+
+.legend-gradient-footer-arrow-left:before,
+.legend-gradient-footer-arrow-right:before {
 	content: '';
 	width: 9px;
 	height: 9px;
@@ -405,24 +418,29 @@
 	top: 0px;
 	}
 
-.globesar-specific-legend-arrow-left:before {
+.globesar-specific-legend-arrow-left:before,
+.legend-gradient-footer-arrow-left:before {
 	left: 7px;
 	}
 
-.globesar-specific-legend-arrow-right:before {
+.globesar-specific-legend-arrow-right:before,
+.legend-gradient-footer-arrow-right:before {
 	left: -6px;
 	}
 
-.globesar-specific-legend-arrow-left {
+.globesar-specific-legend-arrow-left,
+.legend-gradient-footer-arrow-left {
 	left: -1px;
 	}
 
-.globesar-specific-legend-arrow-right {
+.globesar-specific-legend-arrow-right,
+.legend-gradient-footer-arrow-right {
 	right: -4px;
 	}
 
 /* Little line showing the middle of the line under legend */ 
-.globesar-specific-legend-middle-line {
+.globesar-specific-legend-middle-line,
+.legend-gradient-footer-middle-line {
     	height: 9px;
     	width: 1px;
     	background: #6066B3;
@@ -432,13 +450,11 @@
 
 /* The "Mot satellitten" and "Fra satellitten" text under legend info line */
 .globesar-specific-legend-toward,
-.globesar-specific-legend-from {
+.globesar-specific-legend-from,
+
+.legend-gradient-footer-toward,
+.legend-gradient-footer-from {
 	width: 49%;
 	text-align: center;
 	display: inline-block;
 	}
-
-
-.tour-terms-button-container {
-
-}

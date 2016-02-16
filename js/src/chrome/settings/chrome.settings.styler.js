@@ -264,7 +264,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var fileId = this._layer.store.file;
 
 		// Get file
-		var file = app.Account.getFile(fileId);		
+		var file = app.Account.getFile(fileId);
+
+		if ( !file ) return;
 
 		// Get all styling templates
 		var styleTemplates = file.getStyleTemplates();

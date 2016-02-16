@@ -391,7 +391,7 @@ Wu.Legend = Wu.Class.extend({
 		var gradientInfoWrapper = Wu.DomUtil.create('div', 'info-legend-frame', gradientWrapper);
 		var gradientInfoMinVal = Wu.DomUtil.create('div', 'info-legend-val info-legend-min-val', gradientInfoWrapper, minVal);
 
-		var gradientInfoLegend = Wu.DomUtil.create('div', 'info-legend-globesar', gradientInfoWrapper, bline);
+		var gradientInfoLegend = Wu.DomUtil.create('div', 'info-legend-header', gradientInfoWrapper, bline);
 		
 		var gradientInfoMaxVal = Wu.DomUtil.create('div', 'info-legend-val info-legend-max-val', gradientInfoWrapper, maxVal);
 		var gradientLegend = Wu.DomUtil.create('div', 'info-legend-gradient-container', gradientInfoWrapper)
@@ -418,8 +418,6 @@ Wu.Legend = Wu.Class.extend({
 			context      : this
 		});
 
-
-		// Globesar specific stuff
 		this.gradientBottom(options);
 
 
@@ -429,24 +427,24 @@ Wu.Legend = Wu.Class.extend({
 
 	gradientBottom : function (options) {
 
-		if ( !this.isGlobesar ) return;
+		if ( !app.options.customizations ) return;
 
 
 		var container = Wu.DomUtil.create('div', 'legend-each-container', this._legendContent);
 		    container.style.paddingLeft = 0;		
 
 		var cont     = Wu.DomUtil.create('div', 'info-legend-gradient-bottomline', container);
-		var leg      = Wu.DomUtil.create('div', 'globesar-specific-legend-container', cont);
-		    leg.id   = 'globesar-specific-legend-container';
-		var top      = Wu.DomUtil.create('div', 'globesar-specific-legend-top', leg, 'Deformasjon i sikteretning til satellitten')
-		var lineCont = Wu.DomUtil.create('div', 'globesar-specific-legend-line-container', leg);
-		var line     = Wu.DomUtil.create('div', 'globesar-specific-legend-line', lineCont);
-		var arrowL   = Wu.DomUtil.create('div', 'globesar-specific-legend-arrow-left', lineCont);
-		var arrowR   = Wu.DomUtil.create('div', 'globesar-specific-legend-arrow-right', lineCont);
-		var midLine  = Wu.DomUtil.create('div', 'globesar-specific-legend-middle-line', lineCont);
+		var leg      = Wu.DomUtil.create('div', 'legend-gradient-footer', cont);
+		    leg.id   = 'legend-gradient-footer';
+		var top      = Wu.DomUtil.create('div', 'legend-gradient-footer-top', leg, 'Deformasjon i sikteretning til satellitten')
+		var lineCont = Wu.DomUtil.create('div', 'legend-gradient-footer-line-container', leg);
+		var line     = Wu.DomUtil.create('div', 'legend-gradient-footer-line', lineCont);
+		var arrowL   = Wu.DomUtil.create('div', 'legend-gradient-footer-arrow-left', lineCont);
+		var arrowR   = Wu.DomUtil.create('div', 'legend-gradient-footer-arrow-right', lineCont);
+		var midLine  = Wu.DomUtil.create('div', 'legend-gradient-footer-middle-line', lineCont);
 
-		var textL    = Wu.DomUtil.create('div', 'globesar-specific-legend-toward', leg, 'Mot satellitten');
-		var textR    = Wu.DomUtil.create('div', 'globesar-specific-legend-from', leg, 'Fra satellitten');
+		var textL    = Wu.DomUtil.create('div', 'legend-gradient-footer-toward', leg, 'Mot satellitten');
+		var textR    = Wu.DomUtil.create('div', 'legend-gradient-footer-from', leg, 'Fra satellitten');
 
 
 	},
@@ -1152,7 +1150,6 @@ Wu.Tools.Legend = {
 	// **************************************************************************
 	// **************************************************************************
 
-	isGlobesar : false,
 
 	getLegendArray : function (points, lines, polygons) {
 
@@ -1623,10 +1620,10 @@ Wu.Tools.Legend = {
 			_legendHTML += '<div class="info-legend-frame">';
 			_legendHTML += '<div class="info-legend-val info-legend-min-val">' + minVal + '</div>';
 
-			if ( this.isGlobesar ) { 
-				_legendHTML += '<div class="info-legend-globesar">' + 'Velocity in mm pr. year' + '</div>';
+			if ( app.options.customizations ) { 
+				_legendHTML += '<div class="info-legend-header">' + 'Velocity in mm pr. year' + '</div>';
 			} else {
-				_legendHTML += '<div class="info-legend-globesar">' + bline + '</div>';
+				_legendHTML += '<div class="info-legend-header">' + bline + '</div>';
 			}
 
 			_legendHTML += '<div class="info-legend-val info-legend-max-val">' + maxVal + '</div>';
@@ -1636,7 +1633,7 @@ Wu.Tools.Legend = {
 			_legendHTML += '</div>';
 			_legendHTML += '</div>';
 
-			return _legendHTML + this.globesarSpecificHTML();
+			return _legendHTML + this.gradientFooterHTML();
 
 		}
 
@@ -1645,29 +1642,28 @@ Wu.Tools.Legend = {
 	},
 
 
-	globesarSpecificHTML : function () {
+	gradientFooterHTML : function () {
 
-		if ( !this.isGlobesar ) return '';
+		if ( !app.options.customizations ) return '';
 	
-		var globesarSpecificByLine  ='<div class="info-legend-gradient-bottomline">';
-		    globesarSpecificByLine += '<div id="globesar-specific-legend-container" class="globesar-specific-legend-container">';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-top">Deformasjon i sikteretning til satellitten</div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-line-container">';
+		var gradientFooter  ='<div class="info-legend-gradient-bottomline">';
+		    gradientFooter += '<div id="legend-gradient-footer" class="legend-gradient-footer">';
+		    gradientFooter += '<div class="legend-gradient-footer-top">Deformasjon i sikteretning til satellitten</div>';
+		    gradientFooter += '<div class="legend-gradient-footer-line-container">';
 
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-line"></div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-arrow-left"></div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-arrow-right"></div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-middle-line"></div>';
-    		    globesarSpecificByLine += '</div>';
+		    gradientFooter += '<div class="legend-gradient-footer-line"></div>';
+		    gradientFooter += '<div class="legend-gradient-footer-arrow-left"></div>';
+		    gradientFooter += '<div class="legend-gradient-footer-arrow-right"></div>';
+		    gradientFooter += '<div class="legend-gradient-footer-middle-line"></div>';
+    		    gradientFooter += '</div>';
 
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-toward">Mot satellitten</div>';
-		    globesarSpecificByLine += '<div class="globesar-specific-legend-from">Fra satellitten</div>';
+		    gradientFooter += '<div class="legend-gradient-footer-toward">Mot satellitten</div>';
+		    gradientFooter += '<div class="legend-gradient-footer-from">Fra satellitten</div>';
     		    
-		    globesarSpecificByLine += '</div>';
-		    globesarSpecificByLine += '</div>';
+		    gradientFooter += '</div>';
+		    gradientFooter += '</div>';
 
-		// this.legendObj.gradient += globesarSpecificByLine;
-		return globesarSpecificByLine;
+		return gradientFooter;
 
 	},
 
