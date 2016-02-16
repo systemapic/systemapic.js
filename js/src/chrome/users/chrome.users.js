@@ -47,8 +47,8 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		var options = {
 			label : 'Email Address',
-			sublabel : 'email',
-		}
+			sublabel : 'email'
+		};
 
 		// label
 		var invite_label = options.label;
@@ -62,7 +62,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// input box
 		var invite_input = Wu.DomUtil.create('input', 'invite-email-input-form', invite_input_container);
-		invite_input.setAttribute('placeholder', 'name@domain.com')
+		invite_input.setAttribute('placeholder', 'name@domain.com');
 		var invite_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
 
 		// remember
@@ -83,14 +83,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// create fullscreen
 		this._fullscreen = new Wu.Fullscreen({
 			title : '<span style="font-weight:200;">Invite people to Systemapic</span>',
-			innerClassName : 'smooth-fullscreen-inner invite',
+			innerClassName : 'smooth-fullscreen-inner invite'
 		});
 
 		// clear invitations
 		this._access = {
 			edit : [],
 			read : []
-		}
+		};
 		this._emails = [];
 
 		// shortcut
@@ -168,14 +168,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// create fullscreen
 		this._fullscreen = new Wu.Fullscreen({
 			title : '<span style="font-weight:200;">Invite people to Systemapic</span>',
-			innerClassName : 'smooth-fullscreen-inner invite',
+			innerClassName : 'smooth-fullscreen-inner invite'
 		});
 
 		// clear invitations
 		this._access = {
 			edit : [],
 			read : []
-		}
+		};
 
 
 		// shortcut
@@ -255,7 +255,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		this._shareLinkInput.focus();
 		this._shareLinkInput.select();
 		var copied = document.execCommand('copy');
-		var text = copied ? 'Link copied to the clipboard!' : 'Your browser doesn\'t support this. Please copy manually.'
+		var text = copied ? 'Link copied to the clipboard!' : 'Your browser doesn\'t support this. Please copy manually.';
 		this._setClipFeedback(text);
 	},
 
@@ -317,14 +317,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// create fullscreen
 		this._fullscreen = new Wu.Fullscreen({
 			title : '<span style="font-weight:200;">Invite ' + user.getFullName() + ' to projects</span>',
-			innerClassName : 'smooth-fullscreen-inner invite',
+			innerClassName : 'smooth-fullscreen-inner invite'
 		});
 
 		// clear invitations
 		this._access = {
 			edit : [],
 			read : []
-		}
+		};
 
 		// shortcut
 		var content = this._fullscreen._content;
@@ -493,7 +493,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// set feedback 
 		app.feedback.setMessage({
-			title : 'Invites sent!',
+			title : 'Invites sent!'
 		});
 	},
 
@@ -939,8 +939,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	},
 
-
-
 	refreshUserList : function (data) {
 
 		// if (this.openUserCard) this.addGhost();
@@ -956,7 +954,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			.enter()
 			.append('div')
 			.classed('chrome-user', true)
-			.classed('chrome-left-itemcontainer', true)
+			.classed('chrome-left-itemcontainer', true);
 
 		// UPDATE
 		eachUser
@@ -965,7 +963,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			})
 			.classed('project-contact', function (d) {
 				return !d.isContact();
-			})		
+			});
 
 		// EXIT
 		eachUser
@@ -1002,7 +1000,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				// if user is not a contact
 				var a = d.isContact() ? [d] : [];
 				return a;
-			})
+			});
 
 		// Enter
 		nameContent
@@ -1010,7 +1008,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			.append('i')
 			.classed('contact-invite-icon', true)
 			.classed('fa', true)
-			.classed('fa-arrow-circle-right', true)
+			.classed('fa-arrow-circle-right', true);
 			
 
 		// Update
@@ -1027,9 +1025,9 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			.html(function (d) {
 				var tooltipWidth = 123 + 'px';
 				var tooltipText = 'Invite to projects';
-				var innerHTML = '<div class="absolute"><div class="project-tooltip contact-invite-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>'
+				var innerHTML = '<div class="absolute"><div class="project-tooltip contact-invite-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>';
 				return innerHTML;
-			})
+			});
 		// Exit
 		nameContent
 			.exit()
@@ -1047,7 +1045,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				// if user is not a contact
 				var a = d.isContact() ? [] : [d];
 				return a;
-			})
+			});
 
 		// Enter
 		nameContent
@@ -1055,7 +1053,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			.append('i')
 			.classed('contact-list-icon', true)
 			.classed('fa', true)
-			.classed('fa-user-plus', true)
+			.classed('fa-user-plus', true);
 			
 
 		// Update
@@ -1070,9 +1068,9 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			.html(function (d) {
 				var tooltipWidth = 110 + 'px';
 				var tooltipText = 'Add as contact';
-				var innerHTML = '<div class="absolute"><div class="project-tooltip contact-add-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>'
+				var innerHTML = '<div class="absolute"><div class="project-tooltip contact-add-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>';
 				return innerHTML;
-			})
+			});
 		// Exit
 		nameContent
 			.exit()
@@ -1090,13 +1088,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var nameContent = 
 			parent
 			.selectAll('.chrome-left-item-name')
-			.data(function(d) { return [d] })
+			.data(function(d) { return [d] });
 
 		// Enter
 		nameContent
 			.enter()
 			.append('div')
-			.classed('chrome-left-item-name', true)
+			.classed('chrome-left-item-name', true);
 
 		// Update
 		nameContent
@@ -1182,7 +1180,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var dims = {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
-		}
+		};
 		return dims;
 	},
 
@@ -1194,12 +1192,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// remove self
 		_.remove(data, function (d) {
 			return d.getUuid() == app.Account.getUuid();
-		})
+		});
 
 		// Init user list
 		this.refreshUserList(data);			
-	},
-
-
+	}
 
 });
