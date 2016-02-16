@@ -228,7 +228,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_shortenTitle : function (title) {
 		var maxLength = this._getMaxTitleLength();
-		console.log('maxLength', maxLength);
 		if (!title || !_.isString(title) || title.length <= maxLength) return title;
 		var cutString = title.substring(0, maxLength-1) + '...';
 		return cutString;
@@ -236,17 +235,17 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_getMaxTitleLength : function () {
 		var screenSize = Wu.Util.getWindowSize();
-		console.log('screenSize.width', screenSize.width);
 		if (screenSize.width < 1120) return 15;
 		if (screenSize.width < 1280) return 20;
 		if (screenSize.width < 1320) return 25;
 		if (screenSize.width < 1360) return 30;
 		if (screenSize.width < 1421) return 35;
+		if (screenSize.width < 1821) return 50;
+		if (screenSize.width < 2221) return 70; // guessing, todo: test on large screen
 		return 100;
 	},
 
 	_onWindowResize : function () {
-		console.log('window resize');
 		this._setProjectTitle();
 	},
 
