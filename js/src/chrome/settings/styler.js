@@ -265,7 +265,7 @@ Wu.Styler = Wu.Class.extend({
 			isOn        : isOn,
 			appendTo    : line.container,
 			value       : value,
-			placeholder : 'auto',
+			placeholder : 1,
 			tabindex    : this.tabindex++,
 			fn 	    : this._updateOpacity.bind(this), // blur event, not click
 		});
@@ -377,7 +377,7 @@ Wu.Styler = Wu.Class.extend({
 			isOn        : isOn,
 			appendTo    : line.container,
 			value       : val,
-			placeholder : 'auto',
+			placeholder : 1.2,
 			tabindex    : this.tabindex++,
 			fn 	    : this._updatePointsize.bind(this),
 		});
@@ -437,7 +437,7 @@ Wu.Styler = Wu.Class.extend({
 			isOn        : isOn,
 			appendTo    : line.container,
 			value       : val,
-			placeholder : 'auto',
+			placeholder : 1.2,
 			tabindex    : this.tabindex++,
 			fn 	    : this._updateWidth.bind(this),
 		});
@@ -679,9 +679,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// Get field 
 		var inputField = this._content[this.type].width.input.input;
+		var value = inputField.value;
+
+		if ( !value ) value = 1.2;
 
 		// save carto
-		this.carto().width.staticVal = inputField.value;
+		this.carto().width.staticVal = value;
 
 		// mark changed
 		this.markChanged();
@@ -696,6 +699,8 @@ Wu.Styler = Wu.Class.extend({
 	_updateOpacity : function (e) {
 
 		var value = parseFloat(e.target.value);
+
+		if ( !value ) value = 1;
 		
 		// Get field 
 		var inputField = this._content[this.type].opacity.input.input;
@@ -728,6 +733,8 @@ Wu.Styler = Wu.Class.extend({
 	_updatePointsize : function (e) {
 
 		var value = parseFloat(e.target.value);
+
+		if ( !value ) value = 1.2;
 
 		// Get field 
 		var inputField = this._content[this.type].pointsize.input.input;

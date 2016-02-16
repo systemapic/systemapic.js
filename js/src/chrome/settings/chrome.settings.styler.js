@@ -139,6 +139,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._templateSaverWrapper = Wu.DomUtil.create('div', 'save-as-template-wrapper hidden-template-dialogue', this._buttonWrapper);
 		this._templateSaverError = Wu.DomUtil.create('div', 'save-as-template-error', this._templateSaverWrapper);
 		this._templateSaverInput = Wu.DomUtil.create('input', 'save-as-template-input-name', this._templateSaverWrapper);
+		this._templateSaverInput.setAttribute('tabindex', -1);
 		this._templateSaverInput.setAttribute('placeholder', 'template name')
 		this._templateSaverInput.setAttribute('type', 'text');
 		this._templateSaverOK = Wu.DomUtil.create('div', 'save-as-template-OK-button smooth-fullscreen-save', this._templateSaverWrapper, 'OK');
