@@ -1,37 +1,29 @@
 Wu.Controller = Wu.Class.extend({
 
 	initialize : function () {
-
 		this._listen();
 	},
 
 	_listen : function () {
-
 		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
 		Wu.Mixin.Events.on('appReady', this._appReady, this);
-		
-		
 	},
 
 	_appReady : function () {
 
-		var domain = app.options.servers.portal;
+		if (app.options.settings.guide) {
 
-		// globesar guide
-		if (_.contains(domain, 'globesar')) {
-
-			// run globesar 
-			this._initGlobesar();
+			// init guide
+			this._initGuide();
 		}
-
-		// alert(app._map._container.offsetWidth);
-
 	},
 
-	_initGlobesar : function () {
+	_initGuide : function () {
+
+		var isPublic = app.Account.isPublic();
 
 		// start guide if public
-		if (app.Account.isPublic()) {
+		if (isPublic) {
 			setTimeout(function () {
 				this._guide = new Wu.Guide();
 				this._guide.start();
@@ -39,8 +31,8 @@ Wu.Controller = Wu.Class.extend({
 		}
 
 		// remove systeampic logo in corner if public
-		if (app.Account.isPublic()) {
-			app.MapPane._attributionControl.removeAttribution('<a class="systemapic-attribution-logo" href="https://systemapic.com" target="_blank"><img src="../images/systemapic-attribution-logo-white.png"></a>');
+		if (isPublic && app.options.removeSystemapicAttribution) {
+			app.MapPane._attributionControl.removeAttribution(app.options.systemapicAttribution);
 		}
 
 	},
