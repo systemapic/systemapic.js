@@ -227,10 +227,27 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 	_shortenTitle : function (title) {
-		var maxLength = 15;
+		var maxLength = this._getMaxTitleLength();
+		console.log('maxLength', maxLength);
 		if (!title || !_.isString(title) || title.length <= maxLength) return title;
 		var cutString = title.substring(0, maxLength-1) + '...';
 		return cutString;
+	},
+
+	_getMaxTitleLength : function () {
+		var screenSize = Wu.Util.getWindowSize();
+		console.log('screenSize.width', screenSize.width);
+		if (screenSize.width < 1120) return 15;
+		if (screenSize.width < 1280) return 20;
+		if (screenSize.width < 1320) return 25;
+		if (screenSize.width < 1360) return 30;
+		if (screenSize.width < 1421) return 35;
+		return 100;
+	},
+
+	_onWindowResize : function () {
+		console.log('window resize');
+		this._setProjectTitle();
 	},
 
 	_setPortalLogo : function () {

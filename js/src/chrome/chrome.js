@@ -32,6 +32,8 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('tileset_meta',  	 this._onTilesetMeta, this);
 		Wu.Mixin.Events.on('generatedTiles',  	 this._onGeneratedTiles, this);
 		Wu.Mixin.Events.on('closeFullscreen', 	 this._onCloseFullscreen, this);
+
+		Wu.DomEvent.on(window, 'resize', _.throttle(this._onWindowResize, 1000), this);
 	},
 
 	_projectSelected : function (e) {
@@ -105,5 +107,6 @@ Wu.Chrome = Wu.Class.extend({
 	_onGeneratedTiles : function () {},
 	_onTilesetMeta : function () {},
 	_onCloseFullscreen : function () {},
+	_onWindowResize : function () {},
 
 });
