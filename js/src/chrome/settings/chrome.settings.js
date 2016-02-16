@@ -1,10 +1,13 @@
 Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_initialize : function () {
+	
 	},
+
 
 	initLayout : function () {
 	},
+
 
 	_addEvents : function () {
 
@@ -14,7 +17,24 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		}
 
 		Wu.DomEvent.on(window, 'resize', this._windowResize, this);
+
+
+		Wu.Mixin.Events.on('layerSelected', this._refreshTab, this);
+
 	},
+
+	_refreshTab : function (e) {
+
+		var uuid = e.detail.layer.getUuid();
+		this._storeActiveLayerUuid(uuid);
+
+		// refresh
+		if ( this.showing ) this.show();
+		
+		
+		
+	},
+
 
 	_removeEvents : function () {
 		Wu.DomEvent.off(window, 'resize', this._windowResize, this);
@@ -34,6 +54,8 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	show : function () {
 		if (!this._inited) this._initLayout();
+
+		this.showing = true;		
 
 		// hide others
 		this.hideAll();
@@ -58,6 +80,8 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			var tab = tabs[t];
 			tab.hide();
 		}
+
+		this.showing = false;
 
 		// Hides the "add folder" in layer menu
 		this._hideLayerEditor();

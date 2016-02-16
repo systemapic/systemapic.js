@@ -12,6 +12,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 		// add events
 		this._addEvents();
+		
 	},
 
 	_initContainer : function () {
