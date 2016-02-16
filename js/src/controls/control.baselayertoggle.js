@@ -13,7 +13,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		// create div
 		var className = 'leaflet-control-baselayertoggle';
 		var container = this._container = L.DomUtil.create('div', className);
-
 		return container;
 	},
 
@@ -28,8 +27,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	},
 
 	addTo: function (map) {
-
-		console.log('addTo');
 
 		this._map = map;
 
@@ -53,6 +50,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	},
 	_show : function () {
 		this._container.style.display = 'block';
+		this._refresh();
 	},
 	_hide : function () {
 		this._container.style.display = 'none';
@@ -100,7 +98,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
 
 		// build menu
-		// var baseLayers = this._project.getBaselayers() || [];
 		var baseLayers = this._getBaselayers();
 
 		baseLayers.forEach(function (b) {
@@ -223,7 +220,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	},
 
 	toggle : function () {
-		
 		this._isOpen ? this.collapse() : this.expand();
 
 		// Google Analytics event tracking
