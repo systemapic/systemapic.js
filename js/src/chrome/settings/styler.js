@@ -683,7 +683,7 @@ Wu.Styler = Wu.Class.extend({
 		if ( !value ) value = 1.2;
 
 		// save carto
-		this.carto().width.staticVal = valuew;
+		this.carto().width.staticVal = value;
 
 		// mark changed
 		this.markChanged();
