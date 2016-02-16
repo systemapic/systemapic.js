@@ -357,8 +357,12 @@ Wu.MapPane = Wu.Pane.extend({
 		var map = app._map;
 		var bounds = this._project.getBounds();
 
-		if (!bounds) return;
+		console.log('bounds:', bounds, this._project.getName());
 
+		if (!bounds) {
+			this.clearBounds();
+			return;
+		}
 		var southWest = L.latLng(bounds.southWest.lat, bounds.southWest.lng);
    		var northEast = L.latLng(bounds.northEast.lat, bounds.northEast.lng);
     		var maxBounds = L.latLngBounds(southWest, northEast);
@@ -367,6 +371,90 @@ Wu.MapPane = Wu.Pane.extend({
 		map.setMaxBounds(maxBounds);
 		map.options.minZoom = bounds.minZoom;
 		map.options.maxZoom = bounds.maxZoom > 19 ? 19 : bounds.maxZoom;
+	},
+
+	_clearBounds : function () {
+		// clear current bounds
+		var noBounds = {
+			northEast : {
+				lat : '90',
+				lng : '180'
+			},
+
+			southWest : {
+				lat : '-90',
+				lng : '-180'
+			},
+			minZoom : '1',
+			maxZoom : '20'
+		}
+		var southWest = L.latLng(noBounds.southWest.lat, noBounds.southWest.lng);
+		var northEast = L.latLng(noBounds.northEast.lat, noBounds.northEast.lng);
+		var nullBounds = L.latLngBounds(southWest, northEast);
+
+		// set bounds to project
+		console.log('clreaBounds!');
+		// this._project.setBounds(noBounds);
+		app.activeProject.setBounds(noBounds);
+		app._map.setMaxBounds(nullBounds);
+	},
+
+	clearBounds : function () {
+		
+		// get actual Project object
+		var project = Wu.app.activeProject;
+		var map = Wu.app._map;
+
+		var nullBounds = {
+			northEast : {
+				lat : '90',
+				lng : '180'
+			},
+
+			southWest : {
+				lat : '-90',
+				lng : '-180'
+			},
+			minZoom : '1',
+			maxZoom : '20'
+		}
+
+		// set bounds to project
+		project.setBounds(nullBounds);
+
+		// enforce
+		this.enforceBounds();
+
+		// no bounds
+		map.setMaxBounds(false);
+	},		
+
+	enforceBounds : function () {
+		var project = app.activeProject;
+		var map     = app._map;
+
+		// get values
+		var bounds = project.getBounds();
+
+		if (bounds) {
+			var southWest   = L.latLng(bounds.southWest.lat, bounds.southWest.lng);
+	   		var northEast 	= L.latLng(bounds.northEast.lat, bounds.northEast.lng);
+	    		var maxBounds 	= L.latLngBounds(southWest, northEast);
+			var minZoom 	= bounds.minZoom;
+			var maxZoom 	= bounds.maxZoom;
+
+	    		if (bounds == this._nullBounds) {
+	    			map.setMaxBounds(false);
+	    		} else {
+	    			map.setMaxBounds(maxBounds);
+	    		}
+			
+			// set zoom
+			map.options.minZoom = minZoom;
+			map.options.maxZoom = maxZoom;	
+		}
+		
+		map.invalidateSize();
 	},
 	
 	addEditableLayer : function (map) {

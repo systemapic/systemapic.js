@@ -985,7 +985,12 @@ Wu.Project = Wu.Class.extend({
 		this._setUrl();
 	},
 
+	clearBounds : function () {
+
+	},
+
 	setBounds : function (bounds) {
+		console.log('project setBounds: ', bounds);
 		this.store.bounds = bounds;
 		this._update('bounds');
 	},
