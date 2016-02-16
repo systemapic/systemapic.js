@@ -13,24 +13,25 @@ Wu.Chrome = Wu.Class.extend({
 	},      
 
 	_listen : function () {
-		Wu.Mixin.Events.on('projectSelected', 	this._projectSelected, this);
-		Wu.Mixin.Events.on('projectDeleted',  	this._onProjectDeleted, this);
-		Wu.Mixin.Events.on('editEnabled',     	this._editEnabled, this);
-		Wu.Mixin.Events.on('editDisabled',    	this._editDisabled, this);
-		Wu.Mixin.Events.on('layerEnabled',    	this._layerEnabled, this);
-		Wu.Mixin.Events.on('layerDisabled',   	this._layerDisabled, this);
-		Wu.Mixin.Events.on('fileImported',    	this._onFileImported, this);
-		Wu.Mixin.Events.on('fileDeleted',     	this._onFileDeleted, this);
-		Wu.Mixin.Events.on('layerAdded',      	this._onLayerAdded, this);
-		Wu.Mixin.Events.on('layerEdited',     	this._onLayerEdited, this);
-		Wu.Mixin.Events.on('layerDeleted',    	this._onLayerDeleted, this);
-		Wu.Mixin.Events.on('closeMenuTabs',   	this._onCloseMenuTabs, this);
-		Wu.Mixin.Events.on('fileProcessing',  	this._onFileProcessing, this);
-		Wu.Mixin.Events.on('processingProgress',  this._onProcessingProgress, this);
-		Wu.Mixin.Events.on('processingError',  	this._onProcessingError, this);
-		Wu.Mixin.Events.on('tileCount',  	this._onTileCount, this);
-		Wu.Mixin.Events.on('tileset_meta',  	this._onTilesetMeta, this);
-		Wu.Mixin.Events.on('generatedTiles',  	this._onGeneratedTiles, this);
+		Wu.Mixin.Events.on('projectSelected', 	 this._projectSelected, this);
+		Wu.Mixin.Events.on('projectDeleted',  	 this._onProjectDeleted, this);
+		Wu.Mixin.Events.on('editEnabled',     	 this._editEnabled, this);
+		Wu.Mixin.Events.on('editDisabled',    	 this._editDisabled, this);
+		Wu.Mixin.Events.on('layerEnabled',    	 this._layerEnabled, this);
+		Wu.Mixin.Events.on('layerDisabled',   	 this._layerDisabled, this);
+		Wu.Mixin.Events.on('fileImported',    	 this._onFileImported, this);
+		Wu.Mixin.Events.on('fileDeleted',     	 this._onFileDeleted, this);
+		Wu.Mixin.Events.on('layerAdded',      	 this._onLayerAdded, this);
+		Wu.Mixin.Events.on('layerEdited',     	 this._onLayerEdited, this);
+		Wu.Mixin.Events.on('layerDeleted',    	 this._onLayerDeleted, this);
+		Wu.Mixin.Events.on('closeMenuTabs',   	 this._onCloseMenuTabs, this);
+		Wu.Mixin.Events.on('fileProcessing',  	 this._onFileProcessing, this);
+		Wu.Mixin.Events.on('processingProgress', this._onProcessingProgress, this);
+		Wu.Mixin.Events.on('processingError',  	 this._onProcessingError, this);
+		Wu.Mixin.Events.on('tileCount',  	 this._onTileCount, this);
+		Wu.Mixin.Events.on('tileset_meta',  	 this._onTilesetMeta, this);
+		Wu.Mixin.Events.on('generatedTiles',  	 this._onGeneratedTiles, this);
+		Wu.Mixin.Events.on('closeFullscreen', 	 this._onCloseFullscreen, this);
 	},
 
 	_projectSelected : function (e) {
@@ -51,12 +52,6 @@ Wu.Chrome = Wu.Class.extend({
 		var width = app._appPane.offsetWidth;
 
 		if (!rightChrome || !leftChrome) return;
-
-		// // both open
-		// if (leftChrome._isOpen && rightChrome._isOpen) {
-		// 	left = left + leftChrome.options.defaultWidth;
-		// 	width = width - leftChrome.options.defaultWidth - rightChrome.options.defaultWidth;
-		// }
 
 		// only left open
 		if (leftChrome._isOpen && !rightChrome._isOpen) {
@@ -80,20 +75,9 @@ Wu.Chrome = Wu.Class.extend({
 
 		// set size
 		var map = app._map.getContainer();
-		// map.style.left = left + 'px';
-		// map.style.width = width + 'px';
-
-		// css exp
-		// styler
-		// var isStyler = (rightChrome && rightChrome._currentTab && rightChrome._currentTab._ == 'settingsSelector' && rightChrome._isOpen);
-
 		app._map._controlCorners.topleft.style.left = left + 'px';
-		// app._map._controlCorners.bottomleft.style.left = isStyler ? '0px' : left + 'px';
 		app._map._controlCorners.bottomleft.style.left = left + 'px';
 
-
-		// update leaflet map
-		// app._map.invalidateSize();
 	},
 
 	
@@ -120,6 +104,6 @@ Wu.Chrome = Wu.Class.extend({
 	_onTileCount : function () {},
 	_onGeneratedTiles : function () {},
 	_onTilesetMeta : function () {},
-
+	_onCloseFullscreen : function () {},
 
 });
