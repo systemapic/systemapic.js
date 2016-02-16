@@ -113,7 +113,6 @@ Wu.Guide = Wu.Evented.extend({
 		// Event listnener
 		Wu.DomEvent.on(this._termsButtonOK, 'click', this._closeTerms, this);
 
-
 		// Time with CSS transitions
 		setTimeout(function() {
 			Wu.DomUtil.addClass(this._welcomeOuterContainer, 'displayNone');
@@ -338,14 +337,14 @@ Wu.Guide = Wu.Evented.extend({
 
 
 	addEvents : function () {
-		Wu.DomEvent.on(this._welcomeButtonStart, 'click', this.close, this);
+		Wu.DomEvent.on(this._welcomeButtonStart, 'click', this._clickClose, this);
 		Wu.DomEvent.on(this._welcomeButtonTour, 'click', this._initTour, this);
 		Wu.DomEvent.on(this._termsButton, 'click', this._initTerms, this);
 		Wu.DomEvent.on(window, 'keydown', this._keyDown, this);
 	},
 
 	removeEvents : function () {
-		Wu.DomEvent.off(this._welcomeButtonStart, 'click', this.close, this);
+		Wu.DomEvent.off(this._welcomeButtonStart, 'click', this._clickClose, this);
 		Wu.DomEvent.off(this._welcomeButtonTour, 'click', this._initTour, this);
 		Wu.DomEvent.off(this._termsButton, 'click', this._initTerms, this);
 		Wu.DomEvent.off(window, 'keydown', this._keyDown, this);
@@ -358,17 +357,15 @@ Wu.Guide = Wu.Evented.extend({
 		}
 	},
 
-	// abort : function (e) {
-	// 	console.error('remove me!');
-	// 	e && Wu.DomEvent.stop(e);
+	_clickClose : function (e) {
+		// set cookie
+		var ok = Cookies.set('guide', 'seen', { expires: 7 });
 
-	// 	this._container.remove();
-	// 	this._container = null;
-
-	// 	this._bg.remove();
-	// 	this._bg = null;
+		console.log('set cookie', ok);
 		
-	// },
+		// close
+		this.close(e);
+	},
 
 	close : function (e) {
 		e && Wu.DomEvent.stop(e);
