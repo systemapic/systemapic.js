@@ -25,6 +25,8 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_refreshTab : function (e) {
 
+		if ( !e.detail.layer ) return;
+		
 		var uuid = e.detail.layer.getUuid();
 		this._storeActiveLayerUuid(uuid);
 

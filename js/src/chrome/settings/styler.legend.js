@@ -8,6 +8,12 @@ Wu.Legend = Wu.Class.extend({
 
 		this.initLegends();
 
+		// Set satellite view option
+		if ( app.options.customizations && app.options.customizations.satelliteView ) {
+			this.satelliteView = true
+		}
+		
+
 	},
 
 
@@ -427,7 +433,7 @@ Wu.Legend = Wu.Class.extend({
 
 	gradientBottom : function (options) {
 
-		if ( !app.options.customizations ) return;
+		if ( !this.satelliteView ) return;
 
 
 		var container = Wu.DomUtil.create('div', 'legend-each-container', this._legendContent);
@@ -1620,7 +1626,7 @@ Wu.Tools.Legend = {
 			_legendHTML += '<div class="info-legend-frame">';
 			_legendHTML += '<div class="info-legend-val info-legend-min-val">' + minVal + '</div>';
 
-			if ( app.options.customizations ) { 
+			if ( this.satelliteView ) {
 				_legendHTML += '<div class="info-legend-header">' + 'Velocity in mm pr. year' + '</div>';
 			} else {
 				_legendHTML += '<div class="info-legend-header">' + bline + '</div>';
@@ -1644,7 +1650,7 @@ Wu.Tools.Legend = {
 
 	gradientFooterHTML : function () {
 
-		if ( !app.options.customizations ) return '';
+		if ( !this.satelliteView ) return '';
 	
 		var gradientFooter  ='<div class="info-legend-gradient-bottomline">';
 		    gradientFooter += '<div id="legend-gradient-footer" class="legend-gradient-footer">';
