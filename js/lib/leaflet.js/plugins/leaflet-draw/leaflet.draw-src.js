@@ -10,7 +10,7 @@
  * Leaflet.draw assumes that you have already included the Leaflet library.
  */
 
-L.drawVersion = '0.2.4-dev';
+L.drawVersion = '0.2.5-dev';
 
 L.drawLocal = {
 	draw: {
@@ -125,7 +125,7 @@ L.Draw.Feature = L.Handler.extend({
 	},
 
 	enable: function () {
-		if (this._enabled) { return; }
+		if (this._enabled) { return this.disable(); }
 
 		L.Handler.prototype.enable.call(this);
 
