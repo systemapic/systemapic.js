@@ -219,13 +219,19 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setProjectTitle : function () {
 
-		// get client & project names
-		this._projectTitleName = this._project.getHeaderTitle();
+		// get project name, make sure it's not too long
+		this._projectTitleName = this._shortenTitle(this._project.getHeaderTitle());
 
 		// set project title
 		this._projectTitle.innerHTML = this._projectTitleName.camelize();
 	},
 
+	_shortenTitle : function (title) {
+		var maxLength = 15;
+		if (!title || !_.isString(title) || title.length <= maxLength) return title;
+		var cutString = title.substring(0, maxLength-1) + '...';
+		return cutString;
+	},
 
 	_setPortalLogo : function () {
 	},
