@@ -64,7 +64,10 @@ Wu.Styler = Wu.Class.extend({
 
 		// init container
 		this._initContainer();
+
+
 	},
+
 
 	_initContainer : function () {
 
@@ -148,7 +151,8 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 	updateStyle : function () {
-		// if (!this._changed) return;
+
+		if (!this._changed) return;		
 
 		// create carto css
 		this._createCarto(this.options.carto, this._saveCarto.bind(this));
@@ -1135,6 +1139,7 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 	_updateLayer : function (options, done) {
+
 		var css = options.css,
 		    layer = options.layer,
 		    file_id = layer.getFileUuid(),
@@ -1188,7 +1193,7 @@ Wu.Styler = Wu.Class.extend({
 
 		}.bind(this));
 
-	},	
+	},
 
 	_convertToFiveColors : function (colorArray) {
 

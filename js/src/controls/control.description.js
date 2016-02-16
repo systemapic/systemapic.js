@@ -90,6 +90,8 @@ L.Control.Description = Wu.Control.extend({
 
 		// add event hooks
 		this._addHooks();
+
+		this._listeners();
 	},
 
 	_addHooks : function () {
@@ -117,6 +119,34 @@ L.Control.Description = Wu.Control.extend({
 
 
 	},
+
+	_listeners : function () {
+
+		Wu.Mixin.Events.on('updateLegend', this._legendIsBeingUpdated, this)
+
+	},
+
+	_legendIsBeingUpdated : function (e) {
+
+		console.log('%c _legendIsBeingUpdated ', 'background: brown; color: white;');
+
+		// If we are showing all legends at once!
+		if ( this.miniLegend ) {
+
+			this.compactLegend();
+			return;
+		}
+
+		// If we are showing one and one legend
+		var layerID = e.detail.layerUuid;
+		if ( layerID == this.legendUuid ) {
+			this.setHTMLfromStore(layerID);
+		}
+
+
+
+	},
+
 	
 	_isActive : function () {
 		if (!this._project) return false;
@@ -190,14 +220,6 @@ L.Control.Description = Wu.Control.extend({
 		// show
 		this._show();
 
-	},
-
-	_onLayerStyleEdited   : function (e) {
-
-		return;
-
-		// var layer = e.detail.layer;
-		// this._refreshLayer(layer);
 	},
 
 	_addTo : function () {
@@ -396,9 +418,24 @@ L.Control.Description = Wu.Control.extend({
 
 	setHTMLfromStore : function (uuid) {
 
+		console.log('setHTMLfromStore');
+
+
+		this.legendUuid = uuid;
+
 		// get layer
 		var layer = this._project.getLayer(uuid);
 		if (!layer) return;
+
+		var legend = layer.getLegends();
+		if ( legend && !legend.enable ) {
+		
+			legend.layerMeta = false;
+			legend.opacitySlider = false;
+			legend.gradient = false;
+			legend.html = '';
+		}
+
 
 		// Todo: write as plugin
 		var satellitePos = layer.getSatellitePosition();
@@ -406,9 +443,6 @@ L.Control.Description = Wu.Control.extend({
 			var satellitePos = JSON.parse(satellitePos);
 			this.satelliteAngle.update(satellitePos);
 		}
-
-		var legend = layer.getLegends();
-		if ( legend && !legend.enable ) return;
 
 		// Title
 		var title = layer.getTitle();
@@ -438,7 +472,7 @@ L.Control.Description = Wu.Control.extend({
 
 		// Legend
 		if ( legend.html && legend.html.length>10 && !legend.gradient ) {
-			this.setLegendHTML(legend.html);		
+			this.setLegendHTML(legend.html);
 		} else if ( legend.gradient ) {
 			var grad = legend.html + legend.gradient;
 			this.setLegendHTML(grad);
@@ -449,10 +483,13 @@ L.Control.Description = Wu.Control.extend({
 
 		if ( !legend ) {
 
-			this.setLegendHTML('No leged!');
-			return;
 
-			// this._layer.setLegends( this.legendObj );
+			console.error('No legend!');
+			this.setLegendHTML('Create legend in Styler');
+
+
+			// Wu.Mixin.Events.fire('noLegend', { detail : { layerUuid : uuid }}); 
+
 		}		
 
 
@@ -530,11 +567,6 @@ L.Control.Description = Wu.Control.extend({
 		this._legendContainer.innerHTML = HTML;
 	},
 
-	// setDescriptionHTML : function (text) {
-	// 	if ( !text || text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
-	// 	if ( this.isCollapsed ) Wu.DomUtil.addClass(this._description, 'displayNone');
-	// 	this._description.innerHTML = text;
-	// },
 
 	// HELPERS HELPERS HELPERS
 	_parseStartEndDate : function (meta) {

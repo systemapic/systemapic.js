@@ -508,13 +508,27 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	createLegends : function (callback) {
 
-		// get layer feature values for this layer
-		var json = JSON.stringify({
-			fileUuid : this.getFileUuid(),
-			cartoid : this.getCartoid()
-		});
+		console.log('%c createLegends ', 'background: green; color: white;');
+		var layerID = this._getLayerUuid();
+		console.log('layerID', layerID);
+		var accessToken = app.tokens.access_token;
 
-		app.api.createlegends(json, callback)
+		// get layer feature values for this layer
+		var options = {
+			// fileUuid : this.getFileUuid(),
+			layerUuid : layerID,
+			accessToken : accessToken
+			// legendJson : this.getLegedJson()
+			// cartoid : this.getCartoid()
+		};
+
+		app.api.createLegends(options, callback)
+	},
+
+	getLegedJson : function () {
+
+		return this.store.legend;
+
 	},
 
 
@@ -705,10 +719,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		// update layer option
 		this._refreshLayer(layerUuid);
 
-		// fire event
-		Wu.Mixin.Events.fire('layerStyleEdited', { detail : {
-			layer : this
-		}}); 
 	},
 
 	_getLayerUuid : function () {
