@@ -1345,7 +1345,7 @@ input.chrome-field-input {
 
 .description-opacity-wrapper {
     padding-top: 10px;
-    padding-bottom: 15px;
+    padding-bottom: 0px;
 }
 
 .description-control-opacity-title {

@@ -1680,3 +1680,20 @@ input.target-input.polygon {
 .leaflet-control-baselayertoggle.open:after {
     background-color: white;
 }
+
+
+
+.opacity-slider {
+	width: 150px;
+	left: 50px;
+	position: relative;
+	top: -20px;
+}
+.description-control-legend-container {
+    margin-top: 5px;
+}
+
+
+
+
+
