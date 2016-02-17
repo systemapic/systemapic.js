@@ -381,18 +381,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		});
 
 		this.sortOptions.style.display = 'none';
-
-		// this.sortByNameButton = Wu.DomUtil.create('span', 'files-sort-by-name sort-button', this.sortMenu, 'Name');
-		// this.sortByModifiedButton = Wu.DomUtil.create('span', 'files-sort-by-modified sort-button reverse', this.sortMenu, 'Modified');
-		// this.sortBySizeButton = Wu.DomUtil.create('span', 'files-sort-by-size sort-button', this.sortMenu, 'Size');
-
-		// Wu.DomEvent.on(this.sortByNameButton, 'click', this._onSortByNameClick, this);
-		// Wu.DomEvent.on(this.sortByModifiedButton, 'click', this._onSortByModifiedClick, this);
-		// Wu.DomEvent.on(this.sortBySizeButton, 'click', this._onSortByNameSizeClick, this);
-
-		// this.reverseNameSort = true;
-		// this.reverseModifiedSort = false;
-		// this.reverseSizeSort = true;
 	},
 
 	_toggleSortOrder : function (e, isOn) {
@@ -434,57 +422,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		});
 
 		this._onSortSelectClick();
-	},
-
-	_onSortByNameClick : function (e) {
-		Wu.DomEvent.stop(e);
-		this.reverseNameSort = !this.reverseNameSort;
-		this.reverseModifiedSort = true;
-		this.reverseSizeSort = true;
-
-		var toggleClass = Wu.DomUtil.hasClass(this.sortByNameButton, 'reverse') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
-		toggleClass(this.sortByNameButton, 'reverse');
-		Wu.DomUtil.removeClass(this.sortByModifiedButton, 'reverse');
-		Wu.DomUtil.removeClass(this.sortBySizeButton, 'reverse');
-
-		this._refreshFiles({
-			sortBy: 'name', 
-			reverse: this.reverseNameSort
-		});
-	},
-
-	_onSortByModifiedClick : function (e) {
-		Wu.DomEvent.stop(e);
-		this.reverseModifiedSort = !this.reverseModifiedSort;
-		this.reverseNameSort = true;
-		this.reverseSizeSort = true;
-
-		var toggleClass = Wu.DomUtil.hasClass(this.sortByModifiedButton, 'reverse') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
-		toggleClass(this.sortByModifiedButton, 'reverse');
-		Wu.DomUtil.removeClass(this.sortByNameButton, 'reverse');
-		Wu.DomUtil.removeClass(this.sortBySizeButton, 'reverse');
-
-		this._refreshFiles({
-			sortBy: 'lastUpdated', 
-			reverse: this.reverseModifiedSort
-		});
-	},
-
-	_onSortByNameSizeClick : function (e) {
-		Wu.DomEvent.stop(e);
-		this.reverseSizeSort = !this.reverseSizeSort;
-		this.reverseNameSort = true;
-		this.reverseModifiedSort = true;
-
-		var toggleClass = Wu.DomUtil.hasClass(this.sortBySizeButton, 'reverse') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
-		toggleClass(this.sortBySizeButton, 'reverse');
-		Wu.DomUtil.removeClass(this.sortByModifiedButton, 'reverse');
-		Wu.DomUtil.removeClass(this.sortByNameButton, 'reverse');
-
-		this._refreshFiles({
-			sortBy: 'dataSize', 
-			reverse: this.reverseSizeSort
-		});
 	},
 
 	// When clicking on container, close popups
