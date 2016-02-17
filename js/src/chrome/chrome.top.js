@@ -20,7 +20,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);
 
 		// css experiment
-		this._menuButton.innerHTML = '<i class="top-button fa fa-bars"></i>';		
+		// this._menuButton.innerHTML = '<i class="top-button fa fa-bars"></i>';
+		this._menuButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-projects-and-users"></i>';
+
 
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
