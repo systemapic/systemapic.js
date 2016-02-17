@@ -50,7 +50,9 @@ L.Control.Layermenu = Wu.Control.extend({
 	            project_dependent : false
 	        });
 
-	        this._layerButton.innerHTML = '<i class="top-button fa fa-bars"></i> <span class="layer-button-text">Layers</div>';
+	        // this._layerButton.innerHTML = '<i class="top-button fa fa-bars"></i> <span class="layer-button-text">Layers</div>';
+	        this._layerButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-layers"></i> <span class="layer-button-text">Layers</div>';
+	        
 	        
 
 	},

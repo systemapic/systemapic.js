@@ -10,7 +10,7 @@ Wu.Legend = Wu.Class.extend({
 
 		// Set satellite view option
 		if ( app.options.customizations && app.options.customizations.satelliteView ) {
-			this.satelliteView = true
+			this.satelliteView = true;
 		}
 		
 
@@ -274,9 +274,9 @@ Wu.Legend = Wu.Class.extend({
 		legendArray.forEach(function (l) {
 			
 			if ( l.gradient ) {
-				gradientHTML += Wu.Tools.Legend.gradientLegendHTML(l);
+				gradientHTML += Wu.Tools.Legend.gradientLegendHTML(l, this.satelliteView);
 			} else {
-				legendHTML += Wu.Tools.Legend.eachLegendHTML(l);
+				legendHTML += Wu.Tools.Legend.eachLegendHTML(l, this.satelliteView);
 			}
 			
 		}.bind(this));
@@ -1597,7 +1597,7 @@ Wu.Tools.Legend = {
 
 
 
-	gradientLegendHTML : function (options) {
+	gradientLegendHTML : function (options, satelliteView) {
 
 		var layerName = options.layerName;
 		var gradientStyle = options.style;
@@ -1626,7 +1626,7 @@ Wu.Tools.Legend = {
 			_legendHTML += '<div class="info-legend-frame">';
 			_legendHTML += '<div class="info-legend-val info-legend-min-val">' + minVal + '</div>';
 
-			if ( this.satelliteView ) {
+			if ( satelliteView ) {
 				_legendHTML += '<div class="info-legend-header">' + 'Velocity in mm pr. year' + '</div>';
 			} else {
 				_legendHTML += '<div class="info-legend-header">' + bline + '</div>';
@@ -1639,18 +1639,20 @@ Wu.Tools.Legend = {
 			_legendHTML += '</div>';
 			_legendHTML += '</div>';
 
-			return _legendHTML + this.gradientFooterHTML();
+			return _legendHTML + this.gradientFooterHTML(satelliteView);
 
 		}
 
 		return '';
 
+
+
 	},
 
 
-	gradientFooterHTML : function () {
+	gradientFooterHTML : function (satelliteView) {
 
-		if ( !this.satelliteView ) return '';
+		if ( !satelliteView ) return '';
 	
 		var gradientFooter  ='<div class="info-legend-gradient-bottomline">';
 		    gradientFooter += '<div id="legend-gradient-footer" class="legend-gradient-footer">';
