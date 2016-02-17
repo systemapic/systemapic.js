@@ -125,6 +125,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._listContainer);
 
 		// Containers
+		this._filesContainerHeader = Wu.DomUtil.create('div', 'files-container-header', this._listContainer);
 		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._listContainer);
 	},
 
@@ -297,6 +298,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Upload button
 		this._initUploadButton();
+		this._initFilterFilesInput();
+		this._initSortButtons();
 
 		// layer title
 		var projectName = this._project.getTitle();
@@ -324,6 +327,165 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
 	},
 
+	_initSortButtons : function () {
+		var sortType = {
+			'name': 'name',
+			'date': 'lastUpdated',
+			'size': 'dataSize'
+		};
+
+		this.reverse = true;
+
+		if (this.sortMenu) {
+			return;
+		}
+
+		this.sortMenu = Wu.DomUtil.create('div', 'files-sort-menu', this._filesContainerHeader);
+		this.sortSelect = Wu.DomUtil.create('div', 'files-sort-select', this._filesContainerHeader, 'Sort');
+		this.expendedContaner = Wu.DomUtil.create('div', 'expended-container', this._filesContainerHeader);
+		this.searchInputWraper = Wu.DomUtil.create('div', 'files-search-input-wraper', this._filesContainerHeader);
+
+		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper)
+		
+		this.searchInput = Wu.DomUtil.create('input', 'files-search-input', this.searchInputWraper);
+		this.searchInput.placeholder = 'sort: data';
+
+		Wu.DomEvent.on(this.sortSelect, 'click', this._onSortSelectClick, this);
+
+		this.sortOptions = Wu.DomUtil.create('div', 'files-sort-options', this.expendedContaner);
+
+		_.forEach(_.keys(sortType), function (type) {
+			var option = Wu.DomUtil.create('div', 'sort-option', this.sortOptions);
+			option.innerHTML = 'Sort by ' + type;
+
+			Wu.DomEvent.on(option, 'click', function (e) {
+				Wu.DomEvent.stop(e);
+				this.searchInput.placeholder = 'sort: ' + type;
+				this._sortFiles(sortType[type]);
+			}, this);
+		}.bind(this));
+
+		this.sortOrderWraper = Wu.DomUtil.create('div', 'files-sort-order-switch-wraper', this.sortOptions);
+
+		var sort_order_toggle_label = Wu.DomUtil.create('div', 'sort-order-label');
+
+		this.orderSwitch = new Wu.button({
+			id: 'order-switch',
+			type: 'switch',
+			isOn: this.reverse,
+			right: false,
+			disabled: false,
+			appendTo: this.sortOrderWraper,
+			fn: this._toggleSortOrder.bind(this),
+			className: 'sort-order-switch'
+		});
+
+		this.sortOptions.style.display = 'none';
+
+		// this.sortByNameButton = Wu.DomUtil.create('span', 'files-sort-by-name sort-button', this.sortMenu, 'Name');
+		// this.sortByModifiedButton = Wu.DomUtil.create('span', 'files-sort-by-modified sort-button reverse', this.sortMenu, 'Modified');
+		// this.sortBySizeButton = Wu.DomUtil.create('span', 'files-sort-by-size sort-button', this.sortMenu, 'Size');
+
+		// Wu.DomEvent.on(this.sortByNameButton, 'click', this._onSortByNameClick, this);
+		// Wu.DomEvent.on(this.sortByModifiedButton, 'click', this._onSortByModifiedClick, this);
+		// Wu.DomEvent.on(this.sortBySizeButton, 'click', this._onSortByNameSizeClick, this);
+
+		// this.reverseNameSort = true;
+		// this.reverseModifiedSort = false;
+		// this.reverseSizeSort = true;
+	},
+
+	_toggleSortOrder : function (e, isOn) {
+		isOn ? this.reverse = false : this.reverse = true;
+		if (e) {
+			Wu.DomEvent.stop(e);
+		}
+	},
+
+	_onSortSelectClick : function (e) {
+		this.sortOptions.style.display === 'none' ? this.sortOptions.style.display = 'block' : this.sortOptions.style.display = 'none';
+
+		var toggleClass = Wu.DomUtil.hasClass(this.sortSelect, 'expanded') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
+		toggleClass(this.sortSelect, 'expanded');
+		if (e) {
+			Wu.DomEvent.stop(e);
+		}
+	},
+
+	_initFilterFilesInput : function () {
+		// if (this.filterFiles) {
+		// 	return;
+		// }
+
+		// this.filterFiles = Wu.DomUtil.create('div', 'files-filter-menu', this._filesContainerHeader);
+
+		// this.filterFilesInput = Wu.DomUtil.create('input', 'files-filter-input-form', this.filterFiles);
+		// Wu.DomEvent.on(invite_input, 'keyup', this._onKeyup, this);
+	},
+
+	_onKeyup : function (e) {
+		this.filterFilesInput.value.toLowerCase();
+	},
+
+	_sortFiles : function (type) {
+		this._refreshFiles({
+			sortBy: type,
+			reverse: this.reverse
+		});
+
+		this._onSortSelectClick();
+	},
+
+	_onSortByNameClick : function (e) {
+		Wu.DomEvent.stop(e);
+		this.reverseNameSort = !this.reverseNameSort;
+		this.reverseModifiedSort = true;
+		this.reverseSizeSort = true;
+
+		var toggleClass = Wu.DomUtil.hasClass(this.sortByNameButton, 'reverse') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
+		toggleClass(this.sortByNameButton, 'reverse');
+		Wu.DomUtil.removeClass(this.sortByModifiedButton, 'reverse');
+		Wu.DomUtil.removeClass(this.sortBySizeButton, 'reverse');
+
+		this._refreshFiles({
+			sortBy: 'name', 
+			reverse: this.reverseNameSort
+		});
+	},
+
+	_onSortByModifiedClick : function (e) {
+		Wu.DomEvent.stop(e);
+		this.reverseModifiedSort = !this.reverseModifiedSort;
+		this.reverseNameSort = true;
+		this.reverseSizeSort = true;
+
+		var toggleClass = Wu.DomUtil.hasClass(this.sortByModifiedButton, 'reverse') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
+		toggleClass(this.sortByModifiedButton, 'reverse');
+		Wu.DomUtil.removeClass(this.sortByNameButton, 'reverse');
+		Wu.DomUtil.removeClass(this.sortBySizeButton, 'reverse');
+
+		this._refreshFiles({
+			sortBy: 'lastUpdated', 
+			reverse: this.reverseModifiedSort
+		});
+	},
+
+	_onSortByNameSizeClick : function (e) {
+		Wu.DomEvent.stop(e);
+		this.reverseSizeSort = !this.reverseSizeSort;
+		this.reverseNameSort = true;
+		this.reverseModifiedSort = true;
+
+		var toggleClass = Wu.DomUtil.hasClass(this.sortBySizeButton, 'reverse') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
+		toggleClass(this.sortBySizeButton, 'reverse');
+		Wu.DomUtil.removeClass(this.sortByModifiedButton, 'reverse');
+		Wu.DomUtil.removeClass(this.sortByNameButton, 'reverse');
+
+		this._refreshFiles({
+			sortBy: 'dataSize', 
+			reverse: this.reverseSizeSort
+		});
+	},
 
 	// When clicking on container, close popups
 	_closeActionPopUps : function (e) {
@@ -354,9 +516,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		this._refreshFiles();
 		this._refreshLayers();
-	},	
-
-
+	},
 
 	_initFileLists : function () {
 
@@ -400,17 +560,23 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},	
 
 	
-	_refreshFiles : function () {
-
+	_refreshFiles : function (options) {
+		options = options || {};
 		// FILES
 		for (var p in this.fileProviders) {
 			var provider = this.fileProviders[p];
 			var files = provider.getFiles();
+			var sortBy = options.sortBy || 'lastUpdated'
+			var reverse = options.reverse;
 
 			// get file list, sorted by last updated
 			provider.data = _.sortBy(_.toArray(files), function (f) {
-				return f.store.lastUpdated;
-			}).reverse();
+				return f.store[sortBy];
+			});
+
+			if (reverse !== true) {
+				provider.data = provider.data.reverse();
+			}
 
 			// containers
 			var D3container = this.fileListContainers[p].D3container;
