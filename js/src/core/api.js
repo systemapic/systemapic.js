@@ -74,14 +74,7 @@ Wu.Api = Wu.Class.extend({
 	},
 
 	createLegends : function (options, done) {
-
-		// return;
-		
-		// console.log('%c createlegends ', 'background: brown: color: white;');
 		var path = '/api/layer/createlegends';
-		// console.log('path', path);
-		// console.log('options', options);
-		
 		this.post(path, options, done);
 	},
 
@@ -136,12 +129,17 @@ Wu.Api = Wu.Class.extend({
 	},
 
 	dbFetchArea : function (options, done) {
-		var path = '/api/db/fetchArea';
+		var path = '/v2/query/polygon';
 		this.post(path, options, done);
 	},
 
 	dbFetch : function (options, done) {
-		var path = '/api/db/fetch';
+		var path = '/v2/query/point';
+		this.post(path, options, done);
+	},
+
+	fetchHistogram : function (options, done) {
+		var path = '/v2/query/histogram';
 		this.post(path, options, done);
 	},
 
@@ -191,7 +189,7 @@ Wu.Api = Wu.Class.extend({
 	},
 
 	createTileLayer : function (options, done) {
-		var path = '/api/db/createLayer';
+		var path = '/v2/tiles/create';
 		this.post(path, options, done);
 	},
 
@@ -210,10 +208,7 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	fetchHistogram : function (options, done) {
-		var path = '/api/db/fetchHistogram';
-		this.post(path, options, done);
-	},
+	
 
 	accessSetrolemember : function (options, done) {
 		var path = '/api/access/setrolemember';

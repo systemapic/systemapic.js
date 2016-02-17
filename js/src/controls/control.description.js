@@ -489,7 +489,8 @@ L.Control.Description = Wu.Control.extend({
 
 	createLegend : function (layer) {
 
-		var styleJSON = JSON.parse(layer.store.style);
+		var styleJSON = Wu.parse(layer.store.style);
+		if (!styleJSON) return;
 
 		var legendObj = Wu.Tools.Legend.buildLegendObject(styleJSON, layer, false);
 		var legendArray = Wu.Tools.Legend.getLegendArray(legendObj.point, legendObj.line, legendObj.polygon);
