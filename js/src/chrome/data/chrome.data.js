@@ -298,7 +298,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Upload button
 		this._initUploadButton();
-		this._initFilterFilesInput();
 		this._initSortButtons();
 
 		// layer title
@@ -334,7 +333,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			'size': 'dataSize'
 		};
 
-		this.reverse = true;
+		this.reverse = false;
 
 		if (this.sortMenu) {
 			return;
@@ -348,7 +347,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper)
 		
 		this.searchInput = Wu.DomUtil.create('input', 'files-search-input', this.searchInputWraper);
-		this.searchInput.placeholder = 'sort: data';
+		this.searchInput.placeholder = 'sort: date';
+		this.currentSort = 'lastUpdated';
+
+		Wu.DomEvent.on(this.searchInput, 'keyup', this._onKeyup, this);
 
 		Wu.DomEvent.on(this.sortSelect, 'click', this._onSortSelectClick, this);
 
@@ -361,7 +363,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			Wu.DomEvent.on(option, 'click', function (e) {
 				Wu.DomEvent.stop(e);
 				this.searchInput.placeholder = 'sort: ' + type;
-				this._sortFiles(sortType[type]);
+				this.currentSort = sortType[type];
+				this._sortFiles();
 			}, this);
 		}.bind(this));
 
@@ -384,7 +387,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_toggleSortOrder : function (e, isOn) {
-		isOn ? this.reverse = false : this.reverse = true;
+		isOn ? this.reverse = true : this.reverse = false;
 		if (e) {
 			Wu.DomEvent.stop(e);
 		}
@@ -400,24 +403,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}
 	},
 
-	_initFilterFilesInput : function () {
-		// if (this.filterFiles) {
-		// 	return;
-		// }
-
-		// this.filterFiles = Wu.DomUtil.create('div', 'files-filter-menu', this._filesContainerHeader);
-
-		// this.filterFilesInput = Wu.DomUtil.create('input', 'files-filter-input-form', this.filterFiles);
-		// Wu.DomEvent.on(invite_input, 'keyup', this._onKeyup, this);
-	},
-
 	_onKeyup : function (e) {
-		this.filterFilesInput.value.toLowerCase();
+		this._refreshFiles({
+			sortBy: this.currentSort,
+			reverse: this.reverse,
+			filter: this.searchInput.value.toLowerCase()
+		});
 	},
 
 	_sortFiles : function (type) {
 		this._refreshFiles({
-			sortBy: type,
+			sortBy: this.currentSort,
 			reverse: this.reverse
 		});
 
