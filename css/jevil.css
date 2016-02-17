@@ -1136,7 +1136,7 @@ input.chrome-field-input {
     }
 
 #app {
-    min-width: auto !important;
+    /*min-width: auto !important;*/
     }
 
 .chrome.chrome-container.chrome-top {
@@ -1789,3 +1789,13 @@ input.chrome-field-input {
     cursor: pointer;   
 }
 
+
+
+.d3-satellite-wrapper {
+    height: auto;
+}
+
+.layer-list-container-layer-list .data-list-line {
+    width: 383px;
+
+}
