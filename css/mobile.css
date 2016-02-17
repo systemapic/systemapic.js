@@ -3,6 +3,7 @@
 #app {
 	min-width: 0px !important;
 	overflow: hidden !important;
+    	min-width: auto !important;	
 	}
 
 .chrome-button.datalib,
