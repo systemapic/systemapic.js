@@ -413,6 +413,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		if (e) {
 			Wu.DomEvent.stop(e);
 		}
+		this._refreshFiles();
 	},
 
 	_onSortSelectClick : function (e) {
