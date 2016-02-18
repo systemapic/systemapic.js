@@ -1793,7 +1793,7 @@ input.chrome-field-input {
 .files-container-header {
     white-space: nowrap;
     width: 100%;
-    padding: 20px 30px;
+    padding: 20px 30px 0px;
     position: relative;
 }
 

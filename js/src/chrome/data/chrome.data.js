@@ -297,7 +297,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Upload button
 		this._initUploadButton();
-		this._initSortButtons();
+		
+		if (_.toArray(this.fileProviders.postgis.getFiles()).length >= 10) {
+			this._filesContainerHeader.style.display = 'block';
+			this._initSortButtons();
+		} else {
+			this._filesContainerHeader.style.display = 'none';
+			if (this.searchInput) {
+				this.searchInput.value = '';
+			}
+		}
 
 		// layer title
 		var projectName = this._project.getTitle();
@@ -509,7 +518,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this.fileListContainers[f].D3container = d3.select(this.fileListContainers[f].fileList);
 		}
 
-	},	
+	},
 
 	
 	_refreshFiles : function (options) {
