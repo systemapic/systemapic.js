@@ -402,8 +402,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	
 	_refreshFiles : function () {
 
+		console.error('_refreshFiles');
+
+		console.log(this.fileProviders['postgis']);
+
 		// FILES
 		for (var p in this.fileProviders) {
+
+			
+
 			var provider = this.fileProviders[p];
 			var files = provider.getFiles();
 
