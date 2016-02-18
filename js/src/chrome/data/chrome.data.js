@@ -92,7 +92,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// close event
 		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
-
 	},
 
 
@@ -384,6 +383,20 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		});
 
 		this.sortOptions.style.display = 'none';
+
+		// close dropdown on any click
+		Wu.DomEvent.on(app._appPane, 'click', function (e) {
+
+			// only if target == self
+			var relevantTarget = e.target == this.expendedContaner || e.target == this.sortOptions || e.target == this.sortOrderWraper;
+			if (!relevantTarget) this._closeSortSelect();
+
+		}, this);
+
+		Wu.DomEvent.on(this._filesContainerHeader, 'click', function (e) {
+			this._closeSortSelect();
+			Wu.DomEvent.stop(e);
+		}, this);
 	},
 
 	_toggleSortOrder : function (e, isOn) {
@@ -403,6 +416,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}
 	},
 
+	_closeSortSelect : function () {
+		this.sortOptions.style.display = 'none';
+		Wu.DomUtil.removeClass(this.sortSelect, 'expanded');
+	},
+
 	_onKeyup : function (e) {
 		this._refreshFiles({
 			sortBy: this.currentSort,
@@ -414,7 +432,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_sortFiles : function (type) {
 		this._refreshFiles({
 			sortBy: this.currentSort,
-			reverse: this.reverse
+			reverse: this.reverse,
+			filter: this.searchInput.value.toLowerCase()
 		});
 
 		this._onSortSelectClick();
@@ -500,13 +519,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// FILES
 		for (var p in this.fileProviders) {
-
-			
-
 			var provider = this.fileProviders[p];
 			var files = provider.getFiles();
 			var sortBy = options.sortBy || 'lastUpdated'
-			var reverse = options.reverse;
+			var reverse = options.reverse || this.reverse || false;
+			var filter = options.filter || this.searchInput && this.searchInput.value && this.searchInput.value.toLowerCase() || '';
+
+			if (filter) {
+				provider.data = _.filter(_.toArray(files), function (file) {
+					return file.store.name.indexOf(filter) !== -1
+				});
+				files = provider.data;
+			}
 
 			// get file list, sorted by last updated
 			provider.data = _.sortBy(_.toArray(files), function (f) {
