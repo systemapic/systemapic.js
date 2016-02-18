@@ -536,7 +536,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			if (filter) {
 				provider.data = _.filter(_.toArray(files), function (file) {
-					return file.store.name.indexOf(filter) !== -1
+					return file.store.name.toLowerCase().indexOf(filter) !== -1
 				});
 				files = provider.data;
 			}
