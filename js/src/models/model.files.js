@@ -690,8 +690,8 @@ Wu.Model.File = Wu.Model.extend({
 		var cutColor = options.cutColor || false;
 
 		var layerJSON = {
-			"geom_column": "the_geom_3857",
-			"geom_type": "geometry",
+			"geom_column": "rast",
+			"geom_type": "raster",
 			"raster_band": "",
 			"srid": "",
 			"affected_tables": "",
@@ -699,8 +699,8 @@ Wu.Model.File = Wu.Model.extend({
 			"attributes": "",
 			"access_token": app.tokens.access_token,
 			"cartocss_version": "2.0.1",
-			// "cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
-			// "sql": "(SELECT * FROM " + file_id + ") as sub",
+			"cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
+			"sql": "(SELECT * FROM " + file_id + ") as sub",
 			"file_id": file_id,
 			"return_model" : true,
 			"projectUuid" : project.getUuid(),
