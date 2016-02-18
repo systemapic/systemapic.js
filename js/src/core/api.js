@@ -354,7 +354,7 @@ Wu.Api = Wu.Class.extend({
 
 	hashSet : function (options, done) {
 		// var path = '/api/project/hash/set';
-		var path = '/v2/hashes/create';
+		var path = '/v2/hashes/set';
 		this.post(path, options, done);
 	},
 
