@@ -7,7 +7,12 @@ L.Control.Description = Wu.Control.extend({
 		position : 'bottomright' 
 	},
 
+	
 	onAdd : function (map) {
+
+		if ( app.options.customizations && app.options.customizations.satelliteView ) {
+			this.satelliteView = true;
+		}
 
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
@@ -21,8 +26,7 @@ L.Control.Description = Wu.Control.extend({
 
 		this._content = Wu.DomUtil.create('div', 'description-control-content', container);
 
-		this._outer = Wu.DomUtil.create('div', 'description-control-content-box', this._content);
-	
+		this._outer = Wu.DomUtil.create('div', 'description-control-content-box', this._content);	
 
 		return container; // turns into this._container on return
 	},
@@ -416,6 +420,7 @@ L.Control.Description = Wu.Control.extend({
 
 	setHTMLfromStore : function (uuid) {
 
+
 		this.legendUuid = uuid;
 
 		// get layer
@@ -489,7 +494,8 @@ L.Control.Description = Wu.Control.extend({
 
 	createLegend : function (layer) {
 
-		var styleJSON = JSON.parse(layer.store.style);
+		var styleJSON = Wu.parse(layer.store.style);
+		if (!styleJSON) return;
 
 		var legendObj = Wu.Tools.Legend.buildLegendObject(styleJSON, layer, false);
 		var legendArray = Wu.Tools.Legend.getLegendArray(legendObj.point, legendObj.line, legendObj.polygon);
@@ -500,9 +506,9 @@ L.Control.Description = Wu.Control.extend({
 		legendArray.forEach(function (l) {
 			
 			if ( l.gradient ) {
-				gradientHTML += Wu.Tools.Legend.gradientLegendHTML(l);
+				gradientHTML += Wu.Tools.Legend.gradientLegendHTML(l, this.satelliteView);
 			} else {
-				legendHTML += Wu.Tools.Legend.eachLegendHTML(l);
+				legendHTML += Wu.Tools.Legend.eachLegendHTML(l, this.satelliteView);
 			}
 			
 		}.bind(this));

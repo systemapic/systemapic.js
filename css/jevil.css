@@ -1137,7 +1137,7 @@ input.chrome-field-input {
     }
 
 #app {
-    min-width: auto !important;
+    /*min-width: auto !important;*/
     }
 
 .chrome.chrome-container.chrome-top {
@@ -1909,6 +1909,7 @@ input.chrome-field-input {
     position: absolute;
     top: 0;
 }
+
 .chrome-switch-container.sort-order-switch:after{
     content: 'Descending';
     font-size: 12px;
@@ -1918,80 +1919,11 @@ input.chrome-field-input {
     top: 0;
 }
 
-/*.files-container-header .files-sort-menu .sort-button {
-    width: auto;
-    background: #3C4759;
-    padding: 9px 20px 9px 9px;
-    border-radius: 4px;
-    color: white;    
-    text-align: center;
-    font-weight: 700;
-    cursor: pointer;
-    line-height: 1;
-    margin: 0 5px;
-    border: 1px solid #3C4759;
-    position: relative;
-}
-
-.files-container-header .files-sort-menu .sort-button:hover {
-    background: #F9F9F9;
-    color: #3F4652;
-    border: 1px solid gainsboro;
-    padding-top: 8px;
-    padding-bottom: 8px;
-}
-
-.files-container-header .files-sort-menu .sort-button:after {
-    position: absolute;
-    top: 50%;
-    right: 5px;
-    display: block;
-    width: 0;
-    height: 0;
-    margin-top: -3px;
-    border-color: white transparent transparent transparent;
-    border-style: solid;
-    border-width: 5px 5px 0 5px;
-    content: ' ';
-}
-
-.files-container-header .files-sort-menu .sort-button:hover:after {
-    border-color: #3F4652 transparent transparent transparent;
-}
-
-.files-container-header .files-sort-menu .reverse.sort-button:after {
-    border-color: transparent transparent white transparent;
-    border-width: 0 5px 5px 5px;
-}
-
-.files-container-header .files-sort-menu .reverse.sort-button:hover:after {
-    border-color: transparent transparent #3F4652 transparent;
-}
-
-.files-filter-menu {
-    display: inline-block;
-    width: 32%;
-    padding-right: 5px;
+.d3-satellite-wrapper {
     height: auto;
-    cursor: text;
-    padding-left: 3px;
-    border: 1px solid red;
-    height: auto;
-    border: 1px solid #DCDCDC;
-    border-radius: 3px;
-    color: #4A4A4A;
-    background: white;
-}
-.files-filter-menu input.files-filter-input-form {
-    height: 37px;
-    font-size: 16px;
-    font-family: 'Open Sans', serif;
-    color: #4A4A4A;
-    width: 100%;
-    border: none;
 }
 
-.files-sort-menu {
-    display: inline-block;
-    width: 68%;
-}*/
+.layer-list-container-layer-list .data-list-line {
+    width: 383px;
+
+}

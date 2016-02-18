@@ -275,7 +275,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		};
 
 		// create layer on server
-		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
+		app.api.createTileLayer(layerJSON, function (err, newLayerJSON) {
 			if (err) {
 				app.feedback.setError({
 					title : 'Something went wrong',
