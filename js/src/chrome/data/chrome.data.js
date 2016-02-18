@@ -338,7 +338,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var sortType = {
 			'name': 'name',
 			'date': 'lastUpdated',
-			'size': 'dataSize'
+			'size': 'dataSize',
+			'created by':'createdBy'
 		};
 
 		this.reverse = false;
