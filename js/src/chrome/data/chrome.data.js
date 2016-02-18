@@ -338,8 +338,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var sortType = {
 			'name': 'name',
 			'date': 'lastUpdated',
-			'size': 'dataSize',
-			'created by':'createdBy'
+			'size': 'dataSize'
 		};
 
 		this.reverse = false;
@@ -537,13 +536,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			if (filter) {
 				provider.data = _.filter(_.toArray(files), function (file) {
-					return file.store.name.toLowerCase().indexOf(filter) !== -1
+					return file.store.name.toLowerCase().indexOf(filter) !== -1 || app.Users[file.store.createdBy].getFullName().toLowerCase().indexOf(filter) !== -1;
 				});
 				files = provider.data;
 			}
 
 			// get file list, sorted by last updated
 			provider.data = _.sortBy(_.toArray(files), function (f) {
+				if (sortBy === 'dataSize') {
+					return parseInt(f.store[sortBy]);
+				}
+
 				return f.store[sortBy];
 			});
 
@@ -665,7 +668,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		dataListLine
 			.classed('editingFileName', function (d) {
 				var uuid = d.getUuid();
-				if ( this.editingFileName == uuid ) return true;
+				if ( this.editingFileName == uuid ) {
+					return true;
+				}
+
 				return false;
 			}.bind(this));
 
