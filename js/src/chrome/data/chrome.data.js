@@ -530,7 +530,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		for (var p in this.fileProviders) {
 			var provider = this.fileProviders[p];
 			var files = provider.getFiles();
-			var sortBy = options.sortBy || 'lastUpdated'
+			var sortBy = options.sortBy || this.currentSort || 'lastUpdated'
 			var reverse = options.reverse || this.reverse || false;
 			var filter = options.filter || this.searchInput && this.searchInput.value && this.searchInput.value.toLowerCase() || '';
 
