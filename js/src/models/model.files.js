@@ -685,6 +685,7 @@ Wu.Model.File = Wu.Model.extend({
 
 		var file = options.file,
 		    file_id = file.getUuid(),
+		    defaultCartocss = options.defaultCartocss,
 		    project = options.project;
 
 		var cutColor = options.cutColor || false;
