@@ -719,6 +719,13 @@ Wu.Model.File = Wu.Model.extend({
 			}
 
 			var layer = Wu.parse(layerJSON);
+			if ( ! layer.options )
+			{
+				return app.feedback.setError({
+					title : 'Unexpected layerJSON',
+					description : layerJSON
+				});
+			}
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
