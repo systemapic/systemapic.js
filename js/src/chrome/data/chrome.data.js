@@ -38,6 +38,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Get layer object
 		var layer = this._project.getLayer(uuid);
 
+		if	( ! layer.store.metadata ) {
+			app.feedback.setError({
+						title : 'Missing metadata',
+						description : 'layer ' + uuid + ' has no associated metadata'
+					});
+			layer.store.metadata = {}
+		}
+
 		// Get layer meta
 		var layerMeta = JSON.parse(layer.store.metadata);
 
