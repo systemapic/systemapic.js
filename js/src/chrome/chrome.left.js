@@ -25,21 +25,11 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-left', app._appPane);
 
-
-
-		// Outer container
-		// this._outerContainer = Wu.DomUtil.create('div', 'chrome chrome-container chrome-left', app._appPane);
-
 		// Outer scroller
 		this._outerScroller = Wu.DomUtil.create('div', 'chrome-left-outer-scroller', this._container);
 
 		// Inner scroller
 		this._innerScroller = Wu.DomUtil.create('div', 'chrome-left-inner-scroller', this._outerScroller);
-
-
-
-
-
 
 		// holder for all tabs
 		this._tabs = {};

@@ -1695,5 +1695,7 @@ input.target-input.polygon {
 
 
 
-
+.public-private-project-switch.switch-on {
+	background-color: rgba(50, 234, 100, 0.74) !important;
+}
 

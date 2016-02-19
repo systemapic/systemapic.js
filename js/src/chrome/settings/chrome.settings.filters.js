@@ -194,7 +194,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		};
 
 		// create layer on server
-		app.api.createLayer(layerJSON, function (err, newLayerJSON) {
+		app.api.createTileLayer(layerJSON, function (err, newLayerJSON) {
 			if (err) {
 				return app.feedback.setError({
 					title : 'Something went wrong',

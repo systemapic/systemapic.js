@@ -20,7 +20,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);
 
 		// css experiment
-		this._menuButton.innerHTML = '<i class="top-button fa fa-bars"></i>';		
+		// this._menuButton.innerHTML = '<i class="top-button fa fa-bars"></i>';
+		this._menuButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-projects-and-users"></i>';
 
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
@@ -219,13 +220,35 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setProjectTitle : function () {
 
-		// get client & project names
-		this._projectTitleName = this._project.getHeaderTitle();
+		// get project name, make sure it's not too long
+		this._projectTitleName = this._shortenTitle(this._project.getHeaderTitle());
 
 		// set project title
 		this._projectTitle.innerHTML = this._projectTitleName.camelize();
 	},
 
+	_shortenTitle : function (title) {
+		var maxLength = this._getMaxTitleLength();
+		if (!title || !_.isString(title) || title.length <= maxLength) return title;
+		var cutString = title.substring(0, maxLength-1) + '...';
+		return cutString;
+	},
+
+	_getMaxTitleLength : function () {
+		var screenSize = Wu.Util.getWindowSize();
+		if (screenSize.width < 1120) return 15;
+		if (screenSize.width < 1280) return 20;
+		if (screenSize.width < 1320) return 25;
+		if (screenSize.width < 1360) return 30;
+		if (screenSize.width < 1421) return 35;
+		if (screenSize.width < 1821) return 50;
+		if (screenSize.width < 2221) return 70; // guessing, todo: test on large screen
+		return 100;
+	},
+
+	_onWindowResize : function () {
+		this._setProjectTitle();
+	},
 
 	_setPortalLogo : function () {
 	},

@@ -996,11 +996,12 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
-		    token 	= '?access_token=' + app.tokens.access_token,
-		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+		    access_token 	= '?access_token=' + app.tokens.access_token;
+		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		var layerUuid = this._getLayerUuid();
-		var url = app.options.servers.subdomain + 'overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
+		// var url = app.options.servers.subdomain + 'overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
+		var url = app.options.servers.tiles.uri + '{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
