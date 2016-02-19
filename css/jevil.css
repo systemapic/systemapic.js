@@ -1927,3 +1927,66 @@ input.chrome-field-input {
     width: 383px;
 
 }
+
+.chrome-menu-button {
+    font-size: 23px;
+    padding-top: 4px;
+    padding-left: 9px;    
+}
+
+
+.chrome-button.layer {
+    padding-top: 4px;    
+}
+
+.chrome-button.layer .systemapic-icons {
+    font-size: 18px;
+    position: relative;
+    top: 4px;
+}
+
+
+.leaflet-control-baselayertoggle:after {
+    content: 'l';
+    font-family: 'systemapic-icons';
+    font-style: normal;
+    font-weight: 500;
+    background-image: none;
+    font-size: 18px;
+    padding-top: 2px;
+}
+
+.baselayertoggle-list {
+    left: 26px;
+    top: -15px;    
+}
+
+
+.leaflet-control-search .search-button,
+.leaflet-control-search .search-button:hover {
+    background-image: none !important;
+}
+
+.leaflet-control-search .search-button:after {
+    content: "\f002";
+    font: normal normal normal 14px/1 FontAwesome;
+    font-style: normal;
+    font-weight: 500;
+    background-image: none;
+    font-size: 18px;
+    padding-top: 2px;
+    color: black;
+    position: relative;
+    right: 6px;
+    top: 5px;
+}
+
+.leaflet-draw-toolbar a:before {
+    content: 's';
+    font-family: 'systemapic-icons';
+    font-style: normal;
+    font-weight: 500;
+    background-image: none;
+    font-size: 24px;
+    top: 2px;    
+}

@@ -2,6 +2,7 @@
 
 #app {
 	min-width: 0px !important;
+	max-width: auto !important;
 	overflow: hidden !important;
     	min-width: auto !important;	
 	}
@@ -21,7 +22,10 @@
 .description-control-opacity-container,
 .c3-footer-dates,
 .chrome-button.layer.rounded-layer-button .layer-button-text,
-.leaflet-draw.leaflet-control {
+.leaflet-draw.leaflet-control,
+
+.leaflet-control-search.leaflet-control,
+.leaflet-control-baselayertoggle.leaflet-control {
 	display: none !important;
 	}
 
@@ -187,3 +191,33 @@
 .description-multiple-toggle-wrapper {
     background: white;
 }
+
+
+.legend-collapsed-mobile {
+    background: white;
+    padding: 6px;
+    position: relative;
+    right: 44px;
+    width: 134px;
+    float: right;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 900;
+    border-radius: 4px;
+}
+
+
+.rounded-layer-button .systemapic-icons {
+    font-size: 28px !important;
+    top: -5px !important;
+}
+
+
+
+.leflet-container.leaflet-popup.leaflet-zoom-hide.tiny-pop-up {
+	max-width: 97% !important;
+	min-width: 97% !important;
+}
+
+
+
