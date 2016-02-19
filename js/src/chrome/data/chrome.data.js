@@ -736,10 +736,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				_str += '- <span class="file-meta-date">' + date + '</span>';
 
 				// Size
-				var bytes = d.getStore().dataSize;
-
-				console.log('bytes', bytes);
-								
+				var bytes = d.getStore().dataSize;				
 				var size = Wu.Util.bytesToSize(bytes);
 				_str += ' – <span class="file-meta-size">' + size + '</span>';
 				
