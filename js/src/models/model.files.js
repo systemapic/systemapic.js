@@ -673,7 +673,8 @@ Wu.Model.File = Wu.Model.extend({
 		
 		var options = {
 			file : this,
-			project : project,
+			defaultCartocss : '#layer { raster-opacity:1.0 }', // TODO tweak a default CSS for raster
+			project : project
 		}
 
 		// create layer on server
