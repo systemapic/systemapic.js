@@ -43,7 +43,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 						title : 'Missing metadata',
 						description : 'layer ' + uuid + ' has no associated metadata'
 					});
-			layer.store.metadata = {}
+			layer.store.metadata = '{}';
 		}
 
 		// Get layer meta
