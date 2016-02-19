@@ -13,9 +13,6 @@
 }
 
 
-
-
-
 .systemapic-icons {
 	font-family: 'systemapic-icons';
 	font-style: normal;
@@ -24,6 +21,12 @@
 
 .systemapic-icon-projects-and-users:before {
 	content: 'd';
+
+    /*font-family: 'systemapic-icons';*/
+    font-size: 22px;
+    position: relative;
+    top: -2px;
+    left: -1px;    
 }
 
 .systemapic-icon-layers:before {
