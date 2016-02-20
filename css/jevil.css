@@ -347,17 +347,15 @@ input.chrome-field-input {
 
 
 .chrome-upload-button {
-    position: relative;
-    width: auto;
-    margin: 0;
+    position: absolute;
+    width: 100%;
     right: 0;
     left: 0;
     float: right;
-    top: -34px;
-    padding-left: 8px 20px;
+    top: 0;
     padding-right: 20px;
     background: #3C4759;
-    border: 1px solid #3C4759;    
+    border: 1px solid #3C4759;
 }
 
 .chrome-upload-button:hover {
@@ -719,7 +717,8 @@ input.chrome-field-input {
 
 .smooth-fullscreen-inner.invite {
     /*overflow: hidden;*/
-    overflow: scroll;
+    /*overflow: scroll;*/
+    padding-bottom: 550px
     }
 
 .no-layers {
@@ -807,7 +806,12 @@ input.chrome-field-input {
     }
 
 .chrome-data-scroller {
-    width: 443px;
+    /*width: 443px;*/
+
+    width: 463px;
+    padding-right: 20px !important;
+    overflow-x: hidden;
+    overflow-y: scroll;    
     }
 
 .layer-name-content {
@@ -885,7 +889,8 @@ input.chrome-field-input {
     }
 
 .upload-button-container {
-    padding-right: 30px;
+    /*padding-right: 30px;*/
+    right: 30px;
     }
 
 .file-list-container-file-list .data-list-line:nth-child(odd) {
@@ -1226,7 +1231,8 @@ input.chrome-field-input {
     padding-right: 0;
     width: 301px;
     /*max-height: 310px;*/
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;    
     }
 
 .leaflet-right .leaflet-control-description {
@@ -1259,7 +1265,8 @@ input.chrome-field-input {
 
 .description-multiple-toggle-inner {
     /*max-height: 110px;*/
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
     width: 301px;
     padding-top: 4px;
     padding-bottom: 4px;
@@ -1661,7 +1668,8 @@ input.chrome-field-input {
 
 */
 .description-control-inner.allow-scrolling {
-    overflow-x: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
     /*padding-bottom: 35px;*/
 }
 
@@ -1989,4 +1997,50 @@ input.chrome-field-input {
     background-image: none;
     font-size: 24px;
     top: 2px;    
+}
+
+
+
+
+
+
+
+
+.file-popup-trigger.add-layer {
+    /*float: right;*/
+    position: absolute;
+    right: 11px;
+    left: auto;
+    /*background: red !important;*/
+}
+
+
+.file-name-content {
+    padding-right: 62px;    
+}
+
+.chrome-upload-button {
+    top: auto;
+}
+
+.leaflet-right.leaflet-top {
+    top: auto;
+}
+
+
+.layer-list-container .file-popup-trigger {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+}
+
+
+.smooth-fullscreen-inner.invite {
+
+}
+
+
+.data-list-line.processing, 
+.data-list-line.processing:hover {
+    background: #3C4759 !important;
 }
