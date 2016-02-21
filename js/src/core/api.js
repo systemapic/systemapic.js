@@ -435,48 +435,6 @@ Wu.Api = Wu.Class.extend({
 	},
 
 	
-	
-
-	// setrolemember : function (options, done) {
-	// 	var path = '/api/access/super/setrolemember';
-	// 	this.post(path, options, done);
-	// },
-
-	// portalSetrolemember : function (options, done) {
-	// 	var path = '/api/access/portal/setrolemember';
-	// 	this.post(path, options, done);
-	// },
-
-	
-
-	
-	// clientNew : function (options, done) {
-	// 	var path = '/api/client/new';
-	// 	this.post(path, options, done);
-	// },
-
-	// clientDelete : function (options, done) {
-	// 	var path = '/api/client/delete';
-	// 	this.post(path, options, done);
-	// },
-
-	
-
-	
-
-	// accessSetrolemember : function (options, done) {
-	// 	var path = '/api/access/setrolemember';
-	// 	this.post(path, options, done);
-	// },
-
-	
-
-	// clientUpdate : function (options, done) {
-	// 	var path = '/api/client/update';
-	// 	this.post(path, options, done);
-	// },
-
-	
 	// helper fn's
 	post : function (path, options, done) {
 		this._post(path, JSON.stringify(options), function (err, response) {

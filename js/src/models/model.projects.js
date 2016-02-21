@@ -15,7 +15,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	_initObjects : function () {
-		this.initRoles();
+		// this.initRoles();
 		this.initFiles();
 		this.initLayers();
 	},
