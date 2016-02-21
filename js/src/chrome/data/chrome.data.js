@@ -1163,11 +1163,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				file : file
 			});
 
-			// tileset box
-			this._createTilesetBox({
-				container : content,
-				file : file
-			});
+			// // tileset box 	// removed since we're going with pg_rasters
+			// this._createTilesetBox({
+			// 	container : content,
+			// 	file : file
+			// });
 
 			// transparency box
 			this._createTransparencyBox({
