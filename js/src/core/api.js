@@ -473,15 +473,26 @@ Wu.Api = Wu.Class.extend({
 		});
 	},
 
-	_get : function (path, json, done, context, baseurl) {
+	_get : function (path, options, done, context, baseurl) {
 		var http = new XMLHttpRequest();
 		var url = baseurl || Wu.Util._getServerUrl();
 		url += path;
 
 		// add access_token
-		var added_token = _.contains(path, '?') ? '&' : '?';
-		added_token += 'access_token=' + app.tokens.access_token;	
-		url += added_token;
+		if (app && app.tokens) {
+			var added_token = _.contains(path, '?') ? '&' : '?';
+			added_token += 'access_token=' + app.tokens.access_token;	
+			url += added_token;
+		}
+
+		// add options to query
+		var options = _.isObject(options) ? options : Wu.parse(options);
+		if (!_.isEmpty(options)) {
+			_.each(options, function (value, key) {
+				// encode and add
+				url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+			});
+		}
 
 		// open
 		http.open("GET", url, true);
@@ -499,7 +510,6 @@ Wu.Api = Wu.Class.extend({
 				}
 			}
 		};
-
 		
 		// send
 		http.send();
