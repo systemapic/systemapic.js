@@ -14,7 +14,8 @@ Wu.Api = Wu.Class.extend({
 	getPortal : function (done) {
 		// var path = '/api/portal';	// TODO: GET request
 		var path = '/v2/portal';
-		this.post(path, {}, done);
+		// this.post(path, {}, done);
+		this.get(path, {}, done);
 	},
 
 
@@ -485,6 +486,11 @@ Wu.Api = Wu.Class.extend({
 		var url = baseurl || Wu.Util._getServerUrl();
 		url += path;
 
+		// add access_token
+		var added_token = _.contains(path, '?') ? '&' : '?';
+		added_token += 'access_token=' + app.tokens.access_token;	
+		url += added_token;
+
 		// open
 		http.open("GET", url, true);
 
@@ -502,13 +508,9 @@ Wu.Api = Wu.Class.extend({
 			}
 		};
 
-		// add access_token to request
-		var options = _.isString(json) ? Wu.parse(json) : json;
-		options.access_token = app.tokens ? app.tokens.access_token : null;
-		var send_json = Wu.stringify(options);
-
+		
 		// send
-		http.send(send_json);
+		http.send();
 	}
 
 });
