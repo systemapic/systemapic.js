@@ -270,15 +270,15 @@ Wu.Invite = Wu.Class.extend({
 	},
 
 	_getAccessToken : function (options, done) {
-		this._post('/api/token', options, done);
+		this._get('/v2/users/token', options, done);
 	},
 
 	_createUser : function (options, done) {
-		this._post('/api/user/create', options, done);
+		this._post('/v2/users/create', options, done);
 	},
 
 	_inviteUser : function (options, done) {
-		this._post('/api/user/invite/accept', options, done);
+		this._post('/v2/users/invite/accept', options, done);
 	},
 
 	checkSubmitBtn : function () {
@@ -292,7 +292,7 @@ Wu.Invite = Wu.Class.extend({
 		if (!email) return;
 
 		// post to endpoint
-		this._post('/api/user/unique', {			
+		this._post('/v2/users/email/unique', {			
 			email : email
 		}, function (err, result) {
 
@@ -315,7 +315,7 @@ Wu.Invite = Wu.Class.extend({
 		if (!username) return;
 
 		// post to endpoint
-		this._post('/api/user/uniqueUsername', {			
+		this._post('/v2/users/username/unique', {			
 			username : username
 		}, function (err, result) {
 
@@ -347,6 +347,47 @@ Wu.Invite = Wu.Class.extend({
 		}
 		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
 		http.send(json);
+	},
+
+	_get : function (endpoint, options, done) {
+		var http = new XMLHttpRequest();
+		var url = window.location.origin + endpoint;
+
+		// add options to query
+		url = this._addQueryOptions(url, options);
+
+		// open
+		http.open("GET", url, true);
+
+		// set json header
+		http.setRequestHeader('Content-type', 'application/json');
+
+		// response
+		http.onreadystatechange = function() {
+			if (http.readyState == 4) {
+				if (http.status == 200) {
+					done && done(null, http.responseText);
+				} else {
+					done && done(http.status, http.responseText);
+				}
+			}
+		};
+		
+		// send
+		http.send();
+	},
+
+	_addQueryOptions : function (url, options) {
+		var options = options || {};
+		options = _.isObject(options) ? options : Wu.parse(options);
+		if (!_.isEmpty(options)) {
+			_.forOwn(options, function (value, key) {
+				// encode and add
+				url += _.contains(url, '?') ? '&' : '?';
+				url += encodeURIComponent(key) + '=' + encodeURIComponent(value);
+			});
+		}
+		return url;
 	},
 
 });
