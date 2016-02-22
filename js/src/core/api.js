@@ -478,19 +478,14 @@ Wu.Api = Wu.Class.extend({
 		var url = baseurl || Wu.Util._getServerUrl();
 		url += path;
 
-		// add access_token
-		if (app && app.tokens) {
-			var added_token = _.contains(path, '?') ? '&' : '?';
-			added_token += 'access_token=' + app.tokens.access_token;	
-			url += added_token;
-		}
-
 		// add options to query
 		var options = _.isObject(options) ? options : Wu.parse(options);
+		options.access_token = (app && app.tokens) ? app.tokens.access_token : null;
 		if (!_.isEmpty(options)) {
-			_.each(options, function (value, key) {
+			_.forOwn(options, function (value, key) {
 				// encode and add
-				url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+				url += _.contains(url, '?') ? '&' : '?';
+				url += encodeURIComponent(key) + '=' + encodeURIComponent(value);
 			});
 		}
 
