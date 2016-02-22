@@ -196,9 +196,6 @@ Wu.Project = Wu.Class.extend({
 		// set settings
 		this.refreshSettings();
 		
-		// update color theme
-		this.setColorTheme();
-
 		// update project in sidepane
 		if (this._menuItem) this._menuItem.update();
 	},
@@ -214,9 +211,6 @@ Wu.Project = Wu.Class.extend({
 		// set settings
 		this.refreshSettings();
 		
-		// update color theme
-		this.setColorTheme();
-
 		// update project in sidepane
 		if (this._menuItem) this._menuItem.update();
 	},
@@ -441,23 +435,6 @@ Wu.Project = Wu.Class.extend({
 		project = null;
 		delete project;
 
-	},
-
-	saveColorTheme : function () {
-		
-		// save color theme to project 
-		this.colorTheme = savedCSS;
-		this._update('colorTheme');
-	},
-
-	setColorTheme : function () {
-		if (!this.colorTheme) return;
-
-		// set global color
-		savedCSS = this.colorTheme;
-
-		// inject
-		Wu.Util.setColorTheme();
 	},
 
 	removeMapboxAccount : function (account) {
