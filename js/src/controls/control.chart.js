@@ -628,9 +628,9 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 			if ( _val ) {
-				var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
-				var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
-				var metaVal = Wu.DomUtil.create('div', 'c3-header-metaval', metaPair, _val);
+				var metaPair = Wu.DomUtil.create('div', 'tableRow c3-header-metapair metapair-' + c, container);
+				var metaKey = Wu.DomUtil.create('div', 'tableCell c3-header-metakey', metaPair, title);
+				var metaVal = Wu.DomUtil.create('div', 'tableCell c3-header-metaval', metaPair, _val);
 			}
 
 		}.bind(this));

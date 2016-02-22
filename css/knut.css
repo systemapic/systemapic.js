@@ -1739,6 +1739,16 @@ input.target-input.polygon {
     	width: 100px !important;
 }
 .small-pop-up .c3-header-metaval {
-	display: inline-block !important;
+	/*display: inline-block !important;*/
    	font-size: 14px !important;
+}
+
+.tableRow {
+	display: table-row !important;
+	padding-top: 4px !important;
+}
+.tableCell {
+	display: table-cell !important;
+	padding-top: 4px !important;
+	word-break: break-word !important;
 }
