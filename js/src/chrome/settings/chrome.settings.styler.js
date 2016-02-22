@@ -54,7 +54,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._legendWrapper = Wu.DomUtil.create('dov', 'chrome-legend-wrapper', this._midInnerScroller);
 
 		// update style button
-		this._buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._container);
+		this._buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper displayNone', this._container);
 		this._updateStyleButton = Wu.DomUtil.create('div', 'smooth-fullscreen-save update-style', this._buttonWrapper, 'Update Style');
 
 		// Event for click button
@@ -329,6 +329,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// Update style
 	_updateStyle : function (newLegend) {
 
+
 		// Update point
 		this._pointStyler.setCarto(this._carto.point);
 		this._pointStyler.updateStyle();
@@ -392,6 +393,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
+
+		Wu.DomUtil.removeClass(this._buttonWrapper, 'displayNone');
 
 		// clear wrapper content
 		this._fieldsWrapper.innerHTML = '';
