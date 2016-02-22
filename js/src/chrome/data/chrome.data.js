@@ -2097,8 +2097,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 					}
 				}
 			}
+
 			results.push(sort);
 		}, this);
+
+
 
 		this.numberOfProviders = results.length;
 		return results;
@@ -2142,7 +2145,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// Do not allow postgis layers to be in the baselayer dropdown
 			if ( provider.key == "postgis" ) return;
-			if ( provider.key == "raster" ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
+			if ( provider.key == "raster"  ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
 
 			// Get each provider (mapbox, google, etc)
 			provider.layers.forEach(function(layer) {
@@ -2167,6 +2170,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			}.bind(this))
 		}.bind(this));
 
+
+		// Create selct option for no baselayer
+		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
+		if ( this._project.store.baseLayers.length == 0 ) option.selected = true;
+
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
 
@@ -2189,6 +2197,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Add to map
 		var uuid = e.target.value;
+
+		if ( uuid == 'NONE' ) {
+			this._project.setBaseLayer([]);
+			return;
+		}
+
 		var layer = this._project.getLayer(uuid);
 		layer._addTo('baselayer');
 		
@@ -2550,11 +2564,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// Check if base layer is on
 	isBaseLayerOn : function (uuid) {
+
+
 		var on = false;
 		this._project.store.baseLayers.forEach(function (b) {
 			if ( uuid == b.uuid ) { on = true; } 
 		}.bind(this));
 		return on;
+
 	},
 
 

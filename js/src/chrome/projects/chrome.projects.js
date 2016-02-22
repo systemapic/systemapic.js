@@ -115,11 +115,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// add project name
 		projectTitle += project.getName();
 
+
 		// if public, add globe icon + tooltip
 		if (project.isPublic()) {
 			var tooltipText = 'Public';
 			var tooltipWidth = this.options.publicTooltipWidth + 'px';
 			projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
+		
+		} else {
+
+			var editorsNo = project.store.access.edit.length;
+			var readersNo = project.store.access.read.length;
+			var usersNo   = editorsNo + readersNo;
+
+			var userCount = '<span class="user-counter">' + usersNo + '</span>';
+			projectTitle += userCount;
+
 		}
 
 		// set title
