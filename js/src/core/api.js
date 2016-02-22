@@ -1,13 +1,5 @@
 Wu.Api = Wu.Class.extend({
 
-
-
-
-
-
-
-
-
 	// PORTAL
 
 
@@ -53,13 +45,13 @@ Wu.Api = Wu.Class.extend({
 	getProject : function (options, done) {
   		// var path = '/api/project/get/public';
   		var path = '/v2/projects/public';		// todo: GET request
-		this.post(path, options, done)
+		this.get(path, options, done)
   	},
 
   	getPrivateProject : function (options, done) {
   		// var path = '/api/project/get/private';
   		var path = '/v2/projects/private';
-		this.post(path, options, done)
+		this.get(path, options, done)
   	},
 
   	addFileToTheProject : function (options, done) {
@@ -86,13 +78,13 @@ Wu.Api = Wu.Class.extend({
 	auth : function (done) {
 		// var path = '/api/user/session';		// TODO: GET request
 		var path = '/v2/users/session';
-		this.post(path, {}, done);
+		this.get(path, {}, done);
 	},
 
 	getTokenFromPassword : function (options, done) {	// TODO: GET request
 		// var path = '/api/token';
 		var path = '/v2/users/token';
-		this.post(path, options, done);
+		this.get(path, options, done);
 	},
 
 	deleteUser : function (options, done) {
@@ -150,7 +142,7 @@ Wu.Api = Wu.Class.extend({
 		// var path = '/api/invite/link';
 		// var path = '/v2/invites/link';
 		var path = '/v2/users/invite/link';
-		this.post(path, options, done);
+		this.get(path, options, done);
 	},
 
 	inviteToProjects : function (options, done) {
@@ -198,7 +190,7 @@ Wu.Api = Wu.Class.extend({
   	fileGetLayers : function (options, done) {
 		// var path = '/api/file/getLayers';
 		var path = '/v2/data/layers';			// TODO: GET request
-		this.post(path, options, done);
+		this.get(path, options, done);
 	},
 
 	downloadDataset : function (options, done) {
@@ -238,7 +230,7 @@ Wu.Api = Wu.Class.extend({
 	getCartocss : function (options, done) {
 		// var path = '/api/layers/cartocss/get';
 		var path = '/v2/layers/carto/get';		// TODO: GET request
-		this.post(path, options, done);
+		this.get(path, options, done);
 	},
 
 	json2carto : function (options, done) {
@@ -350,7 +342,7 @@ Wu.Api = Wu.Class.extend({
 	getHash : function (options, done) {
 		// var path = '/api/project/hash/get';
 		var path = '/v2/hashes/get';		// todo: GET request
-		this.post(path, options, done);
+		this.get(path, options, done);
 	},
 
 	hashSet : function (options, done) {
@@ -402,7 +394,7 @@ Wu.Api = Wu.Class.extend({
 	analyticsGet : function (options, done) {
 		// var path = '/api/analytics/get';
 		var path = '/v2/log/get';		// todo: GET request
-		this.post(path, options, done);
+		this.get(path, options, done);
 	},
 
 
