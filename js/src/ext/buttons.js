@@ -444,7 +444,6 @@ Wu.button = Wu.Class.extend({
 		// Force numeric
 		if ( !allowText ) input.onkeypress = this.forceNumeric;
 
-
 		Wu.DomEvent.on(input, 'blur', this.blurInput, this);
 
 		return input;	

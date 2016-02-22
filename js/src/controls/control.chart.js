@@ -2,6 +2,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 
+
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
@@ -32,6 +33,10 @@ Wu.Control.Chart = Wu.Control.extend({
 			var content = this.singlePopUp(e);
 
 		}
+
+		// Return if disabled
+		if ( typeof this.popupSettings.enable == 'undefined' ) this.popupSettings.enable = true;
+		if ( !this.popupSettings.enable ) return;
 
 		// clear old popup
 		this._popup = null;

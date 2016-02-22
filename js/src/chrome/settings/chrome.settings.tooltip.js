@@ -109,8 +109,11 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		// Init title
 		this.initTitle();
 
-		// Init description
-		this.initDescription();
+		// // Init description
+		// this.initDescription();
+
+		// Init enable/disable
+		this.initDisable();		
 
 		// Initialize fields
 		this.initFields();
@@ -144,6 +147,40 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	initDescription : function () {
 	},
 
+	initDisable : function () {
+
+		// Wrapper
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)		
+		
+		// Header
+		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Enable');
+		// var headerExtra = Wu.DomUtil.create('span', 'chrome-content-header-gray', header, ' (auto detected)');
+
+		if ( typeof this.tooltipMeta.enable == 'undefined' ) {
+			this.tooltipMeta.enable = true;
+		}
+
+		// Enable/disable switch
+		// Enable/disable switch
+		// Enable/disable switch
+
+		var enableDisableLine = new Wu.fieldLine({
+			id       : 'enable',
+			appendTo : sectionWrapper,
+			title    : 'Enable pop-up',
+			input    : false,
+		});		
+
+		var timeSeriesSwitch = new Wu.button({
+			id 	 : 'enable-pop-up',
+			type 	 : 'switch',
+			isOn 	 : this.tooltipMeta.enable,
+			right 	 : false,
+			appendTo : enableDisableLine.container,
+			fn 	 : this._saveEnableSwitch.bind(this),
+		});
+
+	},
 
 	// Init meta fields and time series
 	initFields : function () {
@@ -266,6 +303,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		this.tooltipMeta.title = e.target.value;
 		this._layer.setTooltip(this.tooltipMeta);
+
 	},
 
 	// Saves tiny input to right
@@ -327,6 +365,12 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		this._saveToServer(key, on, title, true);
 	},
 
+	_saveEnableSwitch : function (e, on) {
+
+		this.tooltipMeta.enable = on;
+		this._layer.setTooltip(this.tooltipMeta);
+
+	},
 
 
 

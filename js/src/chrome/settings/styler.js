@@ -344,7 +344,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// Get stores states
 		var isOn   = (this.carto().pointsize.column === false)
-		var val    = this.carto().pointsize.staticVal || 1.2;
+		var val    = this.carto().pointsize.staticVal || 5;
 		var column = this.carto().pointsize.column;
 		var minMax = this.carto().pointsize.range;
 
