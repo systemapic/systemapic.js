@@ -20,12 +20,9 @@ L.Control.Description = Wu.Control.extend({
 
 		// Wrapper for multiple layers
 		this._multipleLegendOuter = Wu.DomUtil.create('div', 'description-multiple-toggle-wrapper', container);
-
 		this._multipleLegendInner = Wu.DomUtil.create('div', 'description-multiple-toggle-inner', this._multipleLegendOuter);
 		this._multipleLegendInnerContent = Wu.DomUtil.create('div', 'description-multiple-toggle-inner-content', this._multipleLegendInner);
-
 		this._content = Wu.DomUtil.create('div', 'description-control-content', container);
-
 		this._outer = Wu.DomUtil.create('div', 'description-control-content-box', this._content);	
 
 		return container; // turns into this._container on return
@@ -42,9 +39,8 @@ L.Control.Description = Wu.Control.extend({
 		// header
 		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
 
-		// xoxoxoxoxoxo 
+		// toggle
 		this._toggle = Wu.DomUtil.create('div', 'description-control-minimize', this._multipleLegendOuter, '<i class="fa fa-arrow-down"></i>');
-
 
 		// SINGLE LEGEND VIEW WRAPPER
 		this._singleLegendViewWrapper = Wu.DomUtil.create('div', 'single-legend-view-wrapper', this._inner);
@@ -57,18 +53,12 @@ L.Control.Description = Wu.Control.extend({
 			
 		// Description box title
 		this._metaTitle = Wu.DomUtil.create('div', 'description-control-meta-title', this._singleLegendViewWrapper);
-
 		this._metaOuterContainer = Wu.DomUtil.create('div', 'description-meta-outer-container', this._singleLegendViewWrapper);
-
 
 		// COMPACT LEGEND VIEW WRAPPER		
 		this._compactLegendViewWrapper = Wu.DomUtil.create('div', 'compact-legend-view-wrapper displayNone', this._inner);
-		
 		this._compactExpand = Wu.DomUtil.create('div', 'compact-legends-expand displayNone', this._outer, '<i class="fa fa-arrow-up"></i>');
-		Wu.DomEvent.on(this._compactExpand, 'click', this.toggle, this);
-
 		this._compactLegendInnerScroller = Wu.DomUtil.create('div', 'compact-legend-scroll-wrapper', this._compactLegendViewWrapper)
-
 
 		// Meta
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._metaOuterContainer);
@@ -76,7 +66,6 @@ L.Control.Description = Wu.Control.extend({
 		// Init satellite path container
 		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._metaOuterContainer});
 		
-
 		// Opacity 
 		this._opacityWrapper = Wu.DomUtil.create('div', 'description-opacity-wrapper', this._metaOuterContainer)
 		this._opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._opacityWrapper, 'Opacity:');
@@ -87,14 +76,12 @@ L.Control.Description = Wu.Control.extend({
 
 		// copyright
 		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, '');
-		
-		// add tooltip
-		// app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
-			       
+
+		// If mobile: enable complete collapse of legend
+		this._legendCollapsed = Wu.DomUtil.create('div', 'legend-collapsed-mobile displayNone', this._container, 'Legend');
 
 		// add event hooks
 		this._addHooks();
-
 		this._listeners();
 	},
 
@@ -102,7 +89,12 @@ L.Control.Description = Wu.Control.extend({
 		
 		if ( app.isMobile ) {
 			// Toggle while clicking on the container on toch devices
-			Wu.DomEvent.on(this._container, 'click', this.toggle, this);
+			Wu.DomEvent.on(this._container, 'click', this.closeMobile, this);
+			Wu.DomEvent.on(this._legendCollapsed, 'click', this.openMobile, this)
+			Wu.DomEvent.on(this._legendCollapsed, 'click',  Wu.DomEvent.stop, this);
+			Wu.DomEvent.on(this._legendCollapsed, 'onscroll scroll mousewheel', Wu.DomEvent.stopPropagation, this);
+
+			
 		} else {
 			// collapsers
 			Wu.DomEvent.on(this._toggle, 'click', this.toggle, this);
@@ -115,40 +107,40 @@ L.Control.Description = Wu.Control.extend({
 
 		Wu.DomEvent.on(this._inner, 'onscroll scroll mousewheel', Wu.DomEvent.stopPropagation, this);
 
+		Wu.DomEvent.on(this._compactExpand, 'click', this.toggle, this);
 
-
-
-		// xoxoxoxoxo
 		Wu.DomEvent.on(this._toggeOpener, 'click', this.toggleOpen, this);
 
 
 	},
 
+	closeMobile : function () {
+		Wu.DomUtil.addClass(this._inner, 'displayNone');
+		Wu.DomUtil.removeClass(this._legendCollapsed, 'displayNone');
+	},
+
+	openMobile : function () {
+		Wu.DomUtil.removeClass(this._inner, 'displayNone');
+		Wu.DomUtil.addClass(this._legendCollapsed, 'displayNone');
+	},
+
 	_listeners : function () {
-
 		Wu.Mixin.Events.on('updateLegend', this._legendIsBeingUpdated, this)
-
 	},
 
 	_legendIsBeingUpdated : function (e) {
 
 		// If we are showing all legends at once!
 		if ( this.miniLegend ) {
-
-			this.compactLegend();
-			return;
+			return this.compactLegend();
 		}
 
 		// If we are showing one and one legend
 		var layerID = e.detail.layerUuid;
-		if ( layerID == this.legendUuid ) {
+		if (layerID == this.legendUuid) {
 			this.setHTMLfromStore(layerID);
 		}
-
-
-
 	},
-
 	
 	_isActive : function () {
 		if (!this._project) return false;
@@ -307,8 +299,12 @@ L.Control.Description = Wu.Control.extend({
 	updateMultiple : function (layerUuid) {
 
 		if ( this.miniLegend ) {
+			this.compactLegend();			
+		}
+
+		if ( app.isMobile ) {
 			this.compactLegend();
-			// return;
+			return;
 		}
 
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
@@ -569,9 +565,14 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_updateOpacity : function (values, handle) {
-
+		var styler = app.Chrome.Top._buttons.settingsSelector.options.context;
 		var opacity = parseFloat(values[0]) / 100;
-		var layer = this._slider.layer;		
+		var layer = this._slider.layer;	
+
+		layer && layer.setOpacity(opacity);
+
+		// only save opacity if styler is open
+		if (!styler._isOpen) return;
 
 		// set value on layer
 		layer && layer.saveOpacity(opacity);
@@ -694,6 +695,7 @@ L.Control.Description = Wu.Control.extend({
 			}
 
 
+
 			// LEGEND HEIGHT
 			// LEGEND HEIGHT
 
@@ -714,6 +716,12 @@ L.Control.Description = Wu.Control.extend({
 				var legendBoxVisisbleHeight = legendInnerHeight;
 				// Wu.DomUtil.addClass(this._inner, 'allow-scrolling');
 			}
+
+
+			// if ( app.isMobile ) {
+			// 	legendSelectorVisisbleHeight = 0;
+			// 	legendSelectorInnerHeight = 0;
+			// }
 
 	
 			// Total height of legend
@@ -874,7 +882,8 @@ L.Control.Description = Wu.Control.extend({
 		if ( length <= 1 ) {
 			Wu.DomUtil.addClass(this._compactExpand, 'displayNone');
 		} else {
-			Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
+
+			if ( !app.isMobile ) Wu.DomUtil.removeClass(this._compactExpand, 'displayNone');
 		}
 		
 

@@ -1645,6 +1645,8 @@ Wu.Tools.Legend = {
 
 		return '';
 
+
+
 	},
 
 

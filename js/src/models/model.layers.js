@@ -266,7 +266,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	saveOpacity : function (opacity) {
 
 		// set
-		this.setOpacity(opacity);
+		// this.setOpacity(opacity);
 
 		// save if editable
 		var project = app.activeProject;

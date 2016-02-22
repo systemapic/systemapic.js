@@ -70,8 +70,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_initStyle : function () {
 
-		// this.clearBuggyFiles();
-
 		// Get layer meta
 		this.getLayerMeta();
 
@@ -83,7 +81,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Init legend options
 		this._initLegendOptions();
-
 
 	},
 
@@ -124,13 +121,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 		Wu.DomUtil.removeClass(this._legendStyler._legensOuter, 'displayNone');		
-	
 	},
-
-
-	// *********************************************************** //
-	// * SAVE TEMPLATE SAVE TEMPLATE SAVE TEMPLATE SAVE TEMPLATE * //
-	// *********************************************************** //
 
 	// Inits Save Template HTML
 	_initTemplateContent : function () {
@@ -169,7 +160,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.removeClass(this._templateSaverInput, 'error-template-input');
 
 		this._templateSaverError.innerHTML = '';
-
 		this._templateSaverInput.innerHTML = '';
 		this._templateSaverInput.value = '';
 	},
@@ -198,30 +188,27 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}.bind(this));
 
 
-		if ( !error ) {
-			this._saveTemplate(val);
-		}
+		if (error) return;
+		
+		// save
+		this._saveTemplate(val);
 
 	},
 
 
 	// Save template error message
 	_templateSaveError : function (message) {
-		
 		this._templateSaverError.innerHTML = message;
 		Wu.DomUtil.addClass(this._templateSaverInput, 'error-template-input');
-
 	},
 
 	// Do save template
 	_saveTemplate : function (name) {
-		
 		this._templateSaverError.innerHTML = '';
 		Wu.DomUtil.removeClass(this._templateSaverInput, 'error-template-input');
 		Wu.DomUtil.addClass(this._templateSaverWrapper, 'hidden-template-dialogue');
 
 		this.saveStyleTemplate(name);
-
 	},
 
 	// *************************************************************** //
@@ -268,10 +255,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Get file
 		var file = app.Account.getFile(fileId);
 
-		if ( !file ) return;
-
 		if (!file) return;
-
 
 		// Get all styling templates
 		var styleTemplates = file.getStyleTemplates();
@@ -304,14 +288,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._lineStyler._refresh();
 		this._polygonStyler._refresh();		
 
-		// this._refresh();
 	},
 
-
-
-
 	saveStyleTemplate : function (name) {
-
 
 		// Get file ID
 		var fileId = this._layer.store.file;
@@ -335,9 +314,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		file.setStyleTemplate(templateStr);
 
 	},
-
-
-	// ******************************************************************* //
 
 
 	// Marks button to changed state
@@ -365,19 +341,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._polygonStyler.setCarto(this._carto.polygon);
 		this._polygonStyler.updateStyle();
 
-		// Update legend
-		// this._legendStyler.updateLegend();
-
 		var refresh = newLegend ? this._legend : false;
 		this._legendStyler.refreshLegend(refresh);
-		// this._legendStyler.refreshLegend(this._legend);
 
 		// Unmark changed
 		this.unmarkChanged();
-
 		
 	},
-
 
 	_refresh : function () {
 		this._flush();
@@ -459,7 +429,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._tempaddLayer();
 
 	},
-
 
 	
 	// Get all metafields	
