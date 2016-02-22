@@ -591,6 +591,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		edit: []
 	},
 
+	_onCloseFullscreen : function () {
+		this._access.read = [];
+		this._access.edit = [];
+	},
+
 	// todo: refactor into module, var userList = new Wu.Tools.UserList();
 	_createInviteUsersInput : function (options) {
 
@@ -944,11 +949,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				projectAccess[options.type].forEach(function(userUuid) {
 
 					var user = app.Users[userUuid];
-
+					me._checkedUsers[options.type][user.getFullName()] = user;
 					user && this._addUserAccessItem({
 						input : invite_input,
 						user : user,
-						type : options.type
+						checkedUsers : this._checkedUsers[options.type],
+						type : options.type,
+						onKeyUp: onKeyUp
 					});
 					
 				}, this);
@@ -985,6 +992,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var existing = _.find(this._access[options.type], function (i) {
 			return i.user == user;
 		});
+
 		if (existing) return;
 
 		// insert user box in input area
