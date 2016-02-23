@@ -126,6 +126,8 @@ L.Control.Description = Wu.Control.extend({
 
 	_listeners : function () {
 		Wu.Mixin.Events.on('updateLegend', this._legendIsBeingUpdated, this)
+		Wu.Mixin.Events.on('phantomjs', this.compactLegend, this);
+
 	},
 
 	_legendIsBeingUpdated : function (e) {
