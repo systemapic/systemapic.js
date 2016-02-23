@@ -53,6 +53,8 @@ Wu.PhantomJS = Wu.Class.extend({
 	develop : function (view) {
 
 		this.ping('developing!');
+		this.ping(view);
+
 
 		// parse if string
 		if (_.isString(view)) view = Wu.parse(view);
@@ -61,11 +63,14 @@ Wu.PhantomJS = Wu.Class.extend({
 		var position = view.position;
 		var layers = view.layers;
 
+		this.ping(project_id);
+		this.ping(view);
+
 		if (!project_id) return this.ping('no project_id');
 		if (!position) return this.ping('no position');
 
 		// request project from server
-		app.api.getProjectById({
+		app.api.getPrivateProject({
 			project_id : project_id,
 		}, function (err, project_json) {
 			if (!project_json) return this.ping('error: empty project');
@@ -80,6 +85,8 @@ Wu.PhantomJS = Wu.Class.extend({
 			// import project to portal
 			app._importProject(project_store, function (err, project) {
 				if (err) return this.ping('error: err importing project');
+
+				// feedback
 				this.ping('project name: ' + project.getName());
 				this.ping('project createdBy: ' + project.getCreatedByUsername());
 				
@@ -127,20 +134,27 @@ Wu.PhantomJS = Wu.Class.extend({
 
 						var stillLoading = app._map._tileLayersToLoad;
 
-						if (stillLoading <= 0) {
-							this.ping('layers to load: ' + stillLoading);
-							this.ping('ready');
-							clearInterval(waiting);
-						} 
+						// feedback
 						this.ping('layers to load: ' + stillLoading);
-					
+
+						// ready!
+						if (stillLoading <= 0) {
+
+							// kill interval
+							clearInterval(waiting);
+
+							// wait an extra second
+							setTimeout(function () {
+
+								// alert phantom we're ready!
+								this.ping('ready');
+
+							}.bind(this), 1000);
+						} 
 					}.bind(this), 300);
-
-
 				}.bind(this), 1000);
 			}.bind(this));
 		}.bind(this));
-
 	},
 
 	// todo: move hashes to own script

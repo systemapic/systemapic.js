@@ -400,7 +400,7 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	utilSnapshot : function (options, done) {
+	snap : function (options, done) {
 		// var path = '/api/util/snapshot';
 		var path = '/v2/static/screen';
 		this.post(path, options, done);

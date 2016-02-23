@@ -200,6 +200,9 @@ Wu.App = Wu.Class.extend({
 		app.options.json.projects.forEach(function(store, i, arr) {
 		       	app.Projects[store.uuid] = new Wu.Project(store);
 		});
+
+		// phantomjs
+		app.phantomjs = new Wu.PhantomJS();
 	},
 
 	_initChrome : function () {
@@ -439,170 +442,170 @@ Wu.App = Wu.Class.extend({
 		// app.StatusPane.setSaveStatus(delay);
 	},
 
-	// todo: move hashes to own script
-	_initHash : function (hash, project) {
+	// // todo: move hashes to own script
+	// _initHash : function (hash, project) {
 
-		// get hash values from server,
-		app.getHash(hash, project, app._renderHash);
-		return true;
-	},
+	// 	// get hash values from server,
+	// 	app.getHash(hash, project, app._renderHash);
+	// 	return true;
+	// },
 
-	// get saved hash
-	getHash : function (id, project, callback) {
+	// // get saved hash
+	// getHash : function (id, project, callback) {
 
-		// get a saved setup - which layers are active, position, 
-		app.api.getHash({
-			project_id : project.getUuid(),
-			id : id
-		}, callback.bind(this));
-	},
+	// 	// get a saved setup - which layers are active, position, 
+	// 	app.api.getHash({
+	// 		project_id : project.getUuid(),
+	// 		id : id
+	// 	}, callback.bind(this));
+	// },
 
-	_renderHash : function (context, json) {
+	// _renderHash : function (context, json) {
 
-		// parse
-		var result = JSON.parse(json); 
+	// 	// parse
+	// 	var result = JSON.parse(json); 
 
-		// handle errors
-		if (result.error) console.log('error?', result.error);
+	// 	// handle errors
+	// 	if (result.error) console.log('error?', result.error);
 
-		// set vars
-		var hash = result.hash;
-		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
-		var project = app.Projects[projectUuid];
+	// 	// set vars
+	// 	var hash = result.hash;
+	// 	var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
+	// 	var project = app.Projects[projectUuid];
 
-		// select project
-		project.selectProject();
+	// 	// select project
+	// 	project.selectProject();
 
-		// set position
-		app.MapPane.setPosition(hash.position);
-	},
+	// 	// set position
+	// 	app.MapPane.setPosition(hash.position);
+	// },
 
-	// save a hash 
-	setHash : function (callback, project) {
+	// // save a hash 
+	// setHash : function (callback, project) {
 
-		// get active layers
-		var active = app.MapPane.getControls().layermenu._getActiveLayers();
-		var layers = _.map(active, function (l) {
-			return l.item.layer;
-		});
+	// 	// get active layers
+	// 	var active = app.MapPane.getControls().layermenu._getActiveLayers();
+	// 	var layers = _.map(active, function (l) {
+	// 		return l.item.layer;
+	// 	});
 
-		// get project;
-		var project = project || app.activeProject;
+	// 	// get project;
+	// 	var project = project || app.activeProject;
 
-		// save hash to server
-		app.api.hashSet({
-			project_id : project.getUuid(),
-			hash : {
-				id 	 : Wu.Util.createRandom(6),
-				position : app.MapPane.getPosition(),
-				layers 	 : layers 			// layermenuItem uuids, todo: order as z-index
-			}
-		}, callback, this);
+	// 	// save hash to server
+	// 	app.api.hashSet({
+	// 		project_id : project.getUuid(),
+	// 		hash : {
+	// 			id 	 : Wu.Util.createRandom(6),
+	// 			position : app.MapPane.getPosition(),
+	// 			layers 	 : layers 			// layermenuItem uuids, todo: order as z-index
+	// 		}
+	// 	}, callback, this);
 
-	},
+	// },
 
 
-	// todo: move phantom to own script.. app.phantomjs = new Wu.PhantomJS()
-	phantomJS : function (args) {
-		var projectUuid = args.projectUuid,
-	   	    hash    	= args.hash,
-	   	    isThumb     = args.thumb;
+	// // todo: move phantom to own script.. app.phantomjs = new Wu.PhantomJS()
+	// phantomJS : function (args) {
+	// 	var projectUuid = args.projectUuid,
+	//    	    hash    	= args.hash,
+	//    	    isThumb     = args.thumb;
 
-	   	// return if no project
-	   	if (!projectUuid) return false;
+	//    	// return if no project
+	//    	if (!projectUuid) return false;
 
-	   	// set hash for phantom
-	   	this._phantomHash = hash;
+	//    	// set hash for phantom
+	//    	this._phantomHash = hash;
 
-		// get project
-		var project = app.Projects[projectUuid];
+	// 	// get project
+	// 	var project = app.Projects[projectUuid];
 		
-		// return if no such project
-		if (!project) return false;
+	// 	// return if no such project
+	// 	if (!project) return false;
 
-		// check for hash
-		if (hash) {
+	// 	// check for hash
+	// 	if (hash) {
 
-			// select project
-			project.selectProject();
+	// 		// select project
+	// 		project.selectProject();
 
-			// set position
-			app.MapPane.setPosition(hash.position);
+	// 		// set position
+	// 		app.MapPane.setPosition(hash.position);
 
-			setTimeout(function () {
+	// 		setTimeout(function () {
 
-				// deselect all default layers
-				var map = app._map;
-				var lm = app.MapPane.getControls().layermenu;
-				var activeLayers = lm._getActiveLayers();
-				activeLayers.forEach(function (al) {
-					al.layer.remove(map);
-				});
+	// 			// deselect all default layers
+	// 			var map = app._map;
+	// 			var lm = app.MapPane.getControls().layermenu;
+	// 			var activeLayers = lm._getActiveLayers();
+	// 			activeLayers.forEach(function (al) {
+	// 				al.layer.remove(map);
+	// 			});
 
-				// set layers
-				hash.layers.forEach(function (layerUuid) { 	
+	// 			// set layers
+	// 			hash.layers.forEach(function (layerUuid) { 	
 										
-					// add layer
-					var layer = project.getLayer(layerUuid);
+	// 				// add layer
+	// 				var layer = project.getLayer(layerUuid);
 
-					// if in layermenu
-					var bases = project.getBaselayers();
-					var base = _.find(bases, function (b) {
-						return b.uuid == layerUuid;
-					});
+	// 				// if in layermenu
+	// 				var bases = project.getBaselayers();
+	// 				var base = _.find(bases, function (b) {
+	// 					return b.uuid == layerUuid;
+	// 				});
 
-					if (base) {
-						// add as baselayer
-						layer.add('baselayer'); 
-					} else {
-						layer.add();
-					}
+	// 				if (base) {
+	// 					// add as baselayer
+	// 					layer.add('baselayer'); 
+	// 				} else {
+	// 					layer.add();
+	// 				}
 					
-				}, this);
+	// 			}, this);
 
-			}.bind(this), 2000);
+	// 		}.bind(this), 2000);
 
 
-		}
+	// 	}
 
-		// add phantomJS stylesheet		
-		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
+	// 	// add phantomJS stylesheet		
+	// 	isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
 
-		app._isPhantom = true;
+	// 	app._isPhantom = true;
 
-	},
+	// },
 	
-	_setPhantomArgs : function (args) {
-		app._phantomArgs = args;
-	},
+	// _setPhantomArgs : function (args) {
+	// 	app._phantomArgs = args;
+	// },
 	
-	phantomReady : function () {
-		if (!app.activeProject) return false;
+	// phantomReady : function () {
+	// 	if (!app.activeProject) return false;
 
-		var hashLayers = _.size(app._phantomHash.layers),
-		    baseLayers = _.size(app.activeProject.getBaselayers()),
-		    numLayers = hashLayers + baseLayers;
+	// 	var hashLayers = _.size(app._phantomHash.layers),
+	// 	    baseLayers = _.size(app.activeProject.getBaselayers()),
+	// 	    numLayers = hashLayers + baseLayers;
 
-		// check if ready for screenshot
-		if (!app._loaded || !app._loading) return false;
+	// 	// check if ready for screenshot
+	// 	if (!app._loaded || !app._loading) return false;
 
-		// if no layers, return
-		if (numLayers == 0) return true;
+	// 	// if no layers, return
+	// 	if (numLayers == 0) return true;
 
-		// if not loaded, return
-		if (app._loaded.length == 0 ) return false; 
+	// 	// if not loaded, return
+	// 	if (app._loaded.length == 0 ) return false; 
 
-		// if all layers loaded
-		if (app._loaded.length == numLayers) return true;
+	// 	// if all layers loaded
+	// 	if (app._loaded.length == numLayers) return true;
 
-		// not yet
-		return false;
-	},
+	// 	// not yet
+	// 	return false;
+	// },
 
-	// phantomjs: loaded layers
-	_loaded : [],
+	// // phantomjs: loaded layers
+	// _loaded : [],
 
-	_loading : [],
+	// _loading : [],
 
 	// todo: move to own script
 	detectMobile : function() {
