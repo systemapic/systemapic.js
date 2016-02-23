@@ -19,7 +19,13 @@ Wu.Share = Wu.Pane.extend({
 			permission : 'share_project',
 			checked : true,
 			enabled : true
-		}]
+		}],
+
+		text : {
+			screenshot : 'Create screenshot',
+			invite : 'Invite others to project',
+			creating : 'Creating screenshot...'
+		}
 	},
 
 	initialize : function (options) {
@@ -114,7 +120,7 @@ Wu.Share = Wu.Pane.extend({
 		if (this._sharePDFInput) Wu.DomUtil.remove(this._sharePDFInput);
 		if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
 		
-		this._shareInviteButton.innerHTML = 'Invite users...';
+		this._shareInviteButton.innerHTML = this.options.text.invite;
 		Wu.DomUtil.removeClass(this._shareDropdown, 'wide-share');
 
 		// mark button inactive
@@ -130,8 +136,8 @@ Wu.Share = Wu.Pane.extend({
 
 
 	_fillTitles : function () {
-		this._shareImageButton.innerHTML = 'Share Image';
-		this._shareInviteButton.innerHTML = 'Invite to project';
+		this._shareImageButton.innerHTML = this.options.text.screenshot;
+		this._shareInviteButton.innerHTML = this.options.text.invite;
 	},
 
 	_clearTitles : function () {
@@ -179,7 +185,7 @@ Wu.Share = Wu.Pane.extend({
 		app.ProgressBar.timedProgress(3000);
 
 		// set feedback
-		this._setFeedback('Creating snapshot...');
+		this._setFeedback(this.options.text.creating);
 	},
 
 	openImage : function (context, file, c) {
@@ -211,105 +217,11 @@ Wu.Share = Wu.Pane.extend({
 
 	},
 
-	_shareLink : function () {
-
-		// create hash, callback
-		app.setHash(function (context, hash) {
-
-			// open input box
-			this._createLinkView(hash);
-
-		}.bind(this));
-
-	},
-
-	_createLinkView : function (result) {
-
-		var link = Wu.parse(result);
-		var shareLink = window.location.href + '/' + link.hash.id;
-
-		this._insertShareLink(shareLink);
-	},
-
-	_insertShareLink : function (url) {
-
-		if (this._shareLinkInput) Wu.DomUtil.remove(this._shareLinkInput);
-
-		// create wrapper
-		this._shareLinkWrapper = Wu.DomUtil.create('div', 'share-link-wrapper');
-
-		// title
-		var titleDiv = Wu.DomUtil.create('div', 'share-copy-link-title', this._shareLinkWrapper, 'Copy sharelink:');
-
-		// create input
-		this._shareLinkInput = Wu.DomUtil.create('input', 'share-input', this._shareLinkWrapper);
-		this._shareLinkInput.value = url;
-
-		// add to dom
-		this._shareDropdown.appendChild(this._shareLinkWrapper);
-
-		// select content of input
-		this._shareLinkInput.select();
-
-		this._clearTitles();
-
-	},
+	
 
 	_shareInvite : function () {
-
 		app.Chrome.Left._tabs.projects.openShare()
 		this._close();
-
 	},
-
-	_getPermissions : function () {
-		var p = [];
-
-		this._checkboxes.forEach(function (c) {
-			var div = c._switch;
-			var value = c.value;
-			var checked = div.getAttribute('state');
-			if (checked == 'true') p.push(value);
-		});
-
-		return p;
-	},
-
-
-	_getInviteLink : function (permissions, callback) {
-
-		// get default permissions
-		var plucked = _.pluck(_.where(this.options.permissions, { 'checked' : true }), 'permission');
-		var permissions = permissions || plucked;
-
-		var options = {
-			project_id : this._project.getUuid(),
-			project_name : this._project.getTitle(),
-			access_type : 'view',
-			permissions : permissions
-		}
-
-		// slack
-		app.Analytics.onInvite(options);
-
-		// get invite link
-		Wu.post('/api/invite/link', JSON.stringify(options), callback);
-	},
-
-
-	_toggleInviteType : function () {
-
-		var type = this._inviteTypeToggle.innerHTML;
-
-		if (type == 'view') {
-			this._inviteTypeToggle.innerHTML = 'edit';
-		}
-
-		if (type == 'edit') {
-			this._inviteTypeToggle.innerHTML = 'view';
-		}
-	},
-
-	
 
 });
