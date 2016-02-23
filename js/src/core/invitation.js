@@ -262,7 +262,7 @@ Wu.Invite = Wu.Class.extend({
 		privacy_checkbox.id = 'privacy-checkbox';
 		var privacy_label = document.createElement('label')
 		privacy_label.htmlFor = 'privacy-checkbox';
-		privacy_label.innerHTML = 'I have read and agree to Systemapic\'s <a href="privacy-policy" target="_blank">Terms and Conditions</a>';
+		privacy_label.innerHTML = 'I have read and agree to Systemapic\'s <a href="/privacy-policy" target="_blank">Terms and Conditions</a>';
 		input_wrapper.appendChild(privacy_label);
 
 		// submit button
