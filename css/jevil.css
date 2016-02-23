@@ -752,6 +752,9 @@ input.chrome-field-input {
     position: relative;
     line-height: 1;
     top: 1px;
+    max-width: 217px;
+    overflow: hidden;
+    /*word-break: break-word;*/
     }
 
 .legend-each-color {

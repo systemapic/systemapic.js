@@ -1,7 +1,8 @@
-@font-face {
+/*@font-face {
     font-family: 'Helvetica neue';
     src: url(phantomfont/Open_Sans/OpenSans-Light.ttf);
-	}
+}*/
+
 
 .leaflet-top.leaflet-left,
 .leaflet-control-layermenu.leaflet-control,
@@ -28,7 +29,10 @@
 .description-control-header-toggle,
 .leaflet-control-mouseposition.leaflet-control,
 .chrome.chrome-container.chrome-right,
-.chrome.chrome-container.chrome-left {
+.chrome.chrome-container.chrome-left,
+.chrome-button.account,
+.cpu-wrapper,
+.compact-legends-expand {
 	display: none !important;
 	visibility: none;
 	opacity: 0;
@@ -36,4 +40,16 @@
 
 .chrome-buttons {
 	left: 0 !important;
-	}	
+	}
+
+.leaflet-control-scale-line {
+    	background: white;
+    	color: black;	
+	}
+
+.description-control-content-box, 
+.leaflet-popup-content-wrapper, 
+.description-multiple-toggle-wrapper {
+	background: white;
+	}
+
