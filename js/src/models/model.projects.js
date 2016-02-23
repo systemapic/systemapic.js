@@ -339,9 +339,6 @@ Wu.Project = Wu.Class.extend({
 			description : result.error
 		});
 
-		// set status
-		app.setSaveStatus();
-
 		Wu.Mixin.Events.fire('projectChanged', { detail : {
 			projectUuid : this.getUuid()
 		}});

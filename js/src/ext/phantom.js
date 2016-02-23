@@ -37,10 +37,7 @@ Wu.PhantomJS = Wu.Class.extend({
 			layers : layers
 		}
 
-		console.log('view:', view);
-
 		app.api.snap(view, function (err, result) {
-			console.log('saveView:', err, result);
 			callback(err, result);
 		});
 
@@ -298,97 +295,4 @@ Wu.PhantomJS = Wu.Class.extend({
 	_loading : [],
 
 
-	// // called from server-side phantomJS script
-	// setView : function (options, done) {
-
-		// console.log('PhantomJSXXXXXX', options);
-
-		// window.callPhantom({text: 'project.name', options : options});
-
-
-		// setInterval(function () {
-		// 	app.phantomListen && app.phantomListen(options);
-		// 	if (typeof window.callPhantom == "Function") {
-		// 		window.callPhantom({type: "loadFinished"});
-		// 	}
-		// }, 300);
-
-		// if (typeof window.callPhantom == "Function") {
-		// 	window.callPhantom({type: "loadFinished"});
-		// }
-
-		// // request project from server
-		// app.api.getPrivateProject({
-		// 	project_id : options.project_id,
-		// 	user_access_token : options.user_access_token,
-		// }, function (err, project_json) {
-			
-		// 	// if (err) return app._login('Please log in to view this private project.');
-		// 	console.log('err, project_json', err, project_json);
-
-		// 	var project_store = Wu.parse(project_json);
-
-		// 	// import project
-		// 	app._importProject(project_store, function (err, project) {
-		// 		app._setProject(project);
-
-		// 		setTimeout(function () {
-
-		// 			// call phantom
-		// 			window.callPhantom({text: project.name});
-					
-		// 		}, 1000);
-		// 	});
-		// });
-	// },
-
-// 	finishOffPage : function callback(){
-//     if (typeof window.callPhantom == "Function") {
-//         window.callPhantom({type: "loadFinished"});
-//     }
-// });
 });
-
-
-// Wu.PhantomJS = Wu.Class.extend({
-
-
-// 	// called from server-side phantomJS script
-// 	get : function (options, done) {
-
-// 		console.log('PhantomJSXXXXXX', options);
-
-// 		// request project from server
-// 		app.api.getPrivateProject({
-// 			project_id : options.project_id,
-// 			user_access_token : options.user_access_token,
-// 		}, function (err, project_json) {
-// 			// if (err) return app._login('Please log in to view this private project.');
-// 			console.log('err, project_json', err, project_json);
-
-// 			var project_store = Wu.parse(project_json);
-
-// 			// import project
-// 			app._importProject(project_store, function (err, project) {
-// 				app._setProject(project);
-
-// 				setTimeout(function () {
-
-// 					// call phantom
-// 					window.callPhantom({text: project.name});
-					
-// 				}, 1000);
-// 			});
-// 		});
-
-
-
-		
-
-// 	},
-
-
-
-
-
-// });
