@@ -1,7 +1,12 @@
+#map {
+	display: none;
+}
+
 @font-face {
     font-family: 'Helvetica neue';
     src: url(phantomfont/Open_Sans/OpenSans-Light.ttf);
 	}
+
 
 .leaflet-top.leaflet-left,
 .leaflet-control-layermenu.leaflet-control,
