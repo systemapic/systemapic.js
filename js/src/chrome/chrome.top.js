@@ -220,6 +220,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setProjectTitle : function () {
 
+		if ( !this._project ) return;
+
 		// get project name, make sure it's not too long
 		this._projectTitleName = this._shortenTitle(this._project.getHeaderTitle());
 
