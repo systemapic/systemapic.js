@@ -86,9 +86,18 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setBaseLayer : function (layer) {
+
 		this.store.baseLayers = layer;
 		this._update('baseLayers');
 	},
+
+	setBackgroundColor : function (hex) {
+		
+		if ( !this.store.colorTheme ) this.store.colorTheme = {};
+		this.store.colorTheme.backgroundColor = hex;
+		
+		this._update('colorTheme');
+	},	
 
 	createOSMLayer : function (callback) {
 
@@ -301,6 +310,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setMapboxAccount : function (store) {
+		
 		// full project store
 		this.store = store;
 
@@ -586,6 +596,14 @@ Wu.Project = Wu.Class.extend({
 
 	getBaselayers : function () {
 		return this.store.baseLayers;
+	},
+
+	// getColorTheme : function () {
+	// 	return JSON.parse(this.store.colorTheme);
+	// },
+
+	getBackgroundColor : function () {
+		return this.store.colorTheme;
 	},
 
 	getLayermenuLayers : function () {
