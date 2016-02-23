@@ -20,7 +20,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			public_project : 'Anyone with a link can access project',
 			download_on : 'Allowed to download data',
 			download_off : 'Not allowed to download data',
-			share_on : 'Allowed to invite others (as spectators)',
+			share_on : 'Allowed to invite others (as viewers)',
 			share_off : 'Not allowed to invite others'
 		}
 	},
@@ -115,11 +115,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// add project name
 		projectTitle += project.getName();
 
+
 		// if public, add globe icon + tooltip
 		if (project.isPublic()) {
 			var tooltipText = 'Public';
 			var tooltipWidth = this.options.publicTooltipWidth + 'px';
 			projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
+		
+		} else {
+
+			var editorsNo = project.store.access.edit.length;
+			var readersNo = project.store.access.read.length;
+			var usersNo   = editorsNo + readersNo;
+
+			var userCount = '<span class="user-counter">' + usersNo + '</span>';
+			projectTitle += userCount;
+
 		}
 
 		// set title
@@ -437,16 +448,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		name_input.value = project.getName();
 		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
 
+
 		// pretty wrapper
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+		this._userShareWrapper = {
+			read : toggles_wrapper
+		};
+
 
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'read',
-			label : 'Spectators of project',
+			label : 'Viewers',
 			content : toggles_wrapper,
 			container : this._fullscreen._inner,
-			sublabel : 'Spectators have read-only access to the project',
+			sublabel : 'Viewers have read-only access to the project',
 			project : project
 		});
 
@@ -498,10 +515,12 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
 
+		this._userShareWrapper.edit = toggles_wrapper;
+
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'edit',
-			label : 'Editors of project',
+			label : 'Editors',
 			content : toggles_wrapper,
 			container : this._fullscreen._inner,
 			sublabel : 'Editors can edit the project',
@@ -545,6 +564,20 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			Wu.DomEvent.on(delBtn, 'click', this._deleteProject.bind(this, options), this);
 		}
 		
+		// hide share if public
+		if (project.isPublic()) {
+			this._hideUserShare();
+		} else {
+			this._showUserShare();
+		}
+	},
+
+	_hideUserShare : function () {
+		Wu.DomUtil.addClass(this._userShareWrapper.read, 'displayNone');
+	},
+
+	_showUserShare : function () {
+		Wu.DomUtil.removeClass(this._userShareWrapper.read, 'displayNone');
 	},
 
 	_toggleShare : function (toggle, e, isOn) {
@@ -568,12 +601,18 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	_togglePrivatePublic : function (toggle, e, isPublic) {
-	
+
 		// set label
 		toggle.innerHTML = isPublic ? this.options.labels.public_project : this.options.labels.private_project;
 
 		// save setting
 		this._access.options.isPublic = isPublic;
+
+		if (isPublic) {
+			this._hideUserShare();
+		} else {
+			this._showUserShare();
+		}
 	},
 
 	_divs : {
@@ -589,6 +628,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_list_item_containers : {
 		read: [],
 		edit: []
+	},
+
+	_onCloseFullscreen : function () {
+		this._access.read = [];
+		this._access.edit = [];
 	},
 
 	// todo: refactor into module, var userList = new Wu.Tools.UserList();
@@ -944,11 +988,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				projectAccess[options.type].forEach(function(userUuid) {
 
 					var user = app.Users[userUuid];
-
+					me._checkedUsers[options.type][user.getFullName()] = user;
 					user && this._addUserAccessItem({
 						input : invite_input,
 						user : user,
-						type : options.type
+						checkedUsers : this._checkedUsers[options.type],
+						type : options.type,
+						onKeyUp: onKeyUp
 					});
 					
 				}, this);
@@ -985,6 +1031,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var existing = _.find(this._access[options.type], function (i) {
 			return i.user == user;
 		});
+
 		if (existing) return;
 
 		// insert user box in input area
@@ -1176,7 +1223,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// 	}
 		// }
 		this._access = this.options.defaultAccess;
-
 	},
 	
 	_createProject : function (options) {
@@ -1246,8 +1292,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				
 			// add to global store
 			app.Projects[store.uuid] = project;
-
-			console.log('new project store: ', store);
 
 			// update project store
 			project.setNewStore(store);

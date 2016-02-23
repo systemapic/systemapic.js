@@ -2,6 +2,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 
+
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
@@ -32,6 +33,10 @@ Wu.Control.Chart = Wu.Control.extend({
 			var content = this.singlePopUp(e);
 
 		}
+
+		// Return if disabled
+		if ( typeof this.popupSettings.enable == 'undefined' ) this.popupSettings.enable = true;
+		if ( !this.popupSettings.enable ) return;
 
 		// clear old popup
 		this._popup = null;
@@ -628,9 +633,9 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 			if ( _val ) {
-				var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
-				var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
-				var metaVal = Wu.DomUtil.create('div', 'c3-header-metaval', metaPair, _val);
+				var metaPair = Wu.DomUtil.create('div', 'tableRow c3-header-metapair metapair-' + c, container);
+				var metaKey = Wu.DomUtil.create('div', 'tableCell c3-header-metakey', metaPair, title);
+				var metaVal = Wu.DomUtil.create('div', 'tableCell c3-header-metaval', metaPair, _val);
 			}
 
 		}.bind(this));

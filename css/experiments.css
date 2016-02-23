@@ -641,6 +641,7 @@
     margin-top: 30px;
     color: #616161;
     font-weight: 500;
+    /*padding-bottom: 100px;*/
 }
 
 .smooth-fullscreen-inner.invite {
@@ -649,7 +650,7 @@
     /* top: 120px; */
     position: relative;
     padding: 20px;
-    overflow-y: scroll;
+    /*overflow-y: scroll;*/
     padding-top: 120px;
     height: 100%;
     padding-bottom: 120px;

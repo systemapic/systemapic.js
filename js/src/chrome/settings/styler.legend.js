@@ -10,7 +10,7 @@ Wu.Legend = Wu.Class.extend({
 
 		// Set satellite view option
 		if ( app.options.customizations && app.options.customizations.satelliteView ) {
-			this.satelliteView = true
+			this.satelliteView = true;
 		}
 		
 
@@ -274,9 +274,9 @@ Wu.Legend = Wu.Class.extend({
 		legendArray.forEach(function (l) {
 			
 			if ( l.gradient ) {
-				gradientHTML += Wu.Tools.Legend.gradientLegendHTML(l);
+				gradientHTML += Wu.Tools.Legend.gradientLegendHTML(l, this.satelliteView);
 			} else {
-				legendHTML += Wu.Tools.Legend.eachLegendHTML(l);
+				legendHTML += Wu.Tools.Legend.eachLegendHTML(l, this.satelliteView);
 			}
 			
 		}.bind(this));
@@ -389,6 +389,7 @@ Wu.Legend = Wu.Class.extend({
 		var minVal = options.gradient.minVal;
 		var maxVal = options.gradient.maxVal;
 		var bline = options.gradient.bline;
+		var gradientName = object.name ? object.name : bline;
 
 		var container = Wu.DomUtil.create('div', 'legend-each-container', this._legendContent);
 		    container.style.paddingLeft = 0;
@@ -397,8 +398,24 @@ Wu.Legend = Wu.Class.extend({
 		var gradientInfoWrapper = Wu.DomUtil.create('div', 'info-legend-frame', gradientWrapper);
 		var gradientInfoMinVal = Wu.DomUtil.create('div', 'info-legend-val info-legend-min-val', gradientInfoWrapper, minVal);
 
-		var gradientInfoLegend = Wu.DomUtil.create('div', 'info-legend-header', gradientInfoWrapper, bline);
+		// Switch to toggle this specific legend on or off
+		var input = new Wu.button({
+			id 	     : 'gradient-header',
+			type 	     : 'input',
+			isOn 	     : true,
+			right 	     : true,
+			appendTo     : gradientInfoWrapper,
+			fn 	     : this._saveGradientHeader,
+			className    : 'info-legend-header',
+			sourceObject : options.object,
+			allowText    : true,
+			placeholder  : gradientName,
+			context      : this
+		});
+
+		Wu.DomEvent.on(input.input, 'keydown', this.checkKey);		    
 		
+
 		var gradientInfoMaxVal = Wu.DomUtil.create('div', 'info-legend-val info-legend-max-val', gradientInfoWrapper, maxVal);
 		var gradientLegend = Wu.DomUtil.create('div', 'info-legend-gradient-container', gradientInfoWrapper)
 		    gradientLegend.setAttribute('style', gradientStyle);
@@ -426,9 +443,8 @@ Wu.Legend = Wu.Class.extend({
 
 		this.gradientBottom(options);
 
-
-
 	},
+
 
 
 	gradientBottom : function (options) {
@@ -475,9 +491,22 @@ Wu.Legend = Wu.Class.extend({
 		this.sourceObject.name = name;
 
 		// Fire change
-		this.context.updateLegend();		
+		this.context.updateLegend();	
 
 	},
+
+
+	_saveGradientHeader : function (e) {
+
+		var value = e.target.value;
+		this.sourceObject.name = value;
+		// console.log('this.sourceObject.gradient', this.sourceObject.gradient);
+
+		this.context.updateLegend();
+
+
+	},
+
 
 
 	_switch : function (e) {
@@ -1323,7 +1352,8 @@ Wu.Tools.Legend = {
 				gradient : {
 					minVal     : minVal,
 					maxVal     : maxVal,
-					bline      : column,					
+					bline      : column,
+					// name       : column				
 				}
 			});	
 		}		
@@ -1546,7 +1576,8 @@ Wu.Tools.Legend = {
 				gradient : {
 					minVal     : minVal,
 					maxVal     : maxVal,
-					bline      : column,					
+					bline      : column,
+					// name       : column					
 				}
 			});	
 		}
@@ -1597,7 +1628,7 @@ Wu.Tools.Legend = {
 
 
 
-	gradientLegendHTML : function (options) {
+	gradientLegendHTML : function (options, satelliteView) {
 
 		var layerName = options.layerName;
 		var gradientStyle = options.style;
@@ -1605,6 +1636,7 @@ Wu.Tools.Legend = {
 		var minVal = options.gradient.minVal;
 		var maxVal = options.gradient.maxVal;
 		var bline = options.gradient.bline;
+		var gradientName = object.name ? object.name : bline;
 
 
 
@@ -1626,10 +1658,10 @@ Wu.Tools.Legend = {
 			_legendHTML += '<div class="info-legend-frame">';
 			_legendHTML += '<div class="info-legend-val info-legend-min-val">' + minVal + '</div>';
 
-			if ( this.satelliteView ) {
+			if ( satelliteView ) {
 				_legendHTML += '<div class="info-legend-header">' + 'Velocity in mm pr. year' + '</div>';
 			} else {
-				_legendHTML += '<div class="info-legend-header">' + bline + '</div>';
+				_legendHTML += '<div class="info-legend-header">' + gradientName + '</div>';
 			}
 
 			_legendHTML += '<div class="info-legend-val info-legend-max-val">' + maxVal + '</div>';
@@ -1639,18 +1671,20 @@ Wu.Tools.Legend = {
 			_legendHTML += '</div>';
 			_legendHTML += '</div>';
 
-			return _legendHTML + this.gradientFooterHTML();
+			return _legendHTML + this.gradientFooterHTML(satelliteView);
 
 		}
 
 		return '';
 
+
+
 	},
 
 
-	gradientFooterHTML : function () {
+	gradientFooterHTML : function (satelliteView) {
 
-		if ( !this.satelliteView ) return '';
+		if ( !satelliteView ) return '';
 	
 		var gradientFooter  ='<div class="info-legend-gradient-bottomline">';
 		    gradientFooter += '<div id="legend-gradient-footer" class="legend-gradient-footer">';
