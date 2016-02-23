@@ -689,8 +689,6 @@ L.Control.Cartocss = Wu.Control.extend({
 
 	_saveLegends : function () {
 
-		app.setSaveStatus(1000);
-
 		// get legends array
 		var legends = this._layer.getLegends();
 
@@ -982,9 +980,6 @@ L.Control.Cartocss = Wu.Control.extend({
 			// do the save
 			that._saveTooltipMeta();
 
-			// set status
-			app.setSaveStatus()
-	
 		}, 1000);
 
 	},

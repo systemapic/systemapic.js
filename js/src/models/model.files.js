@@ -218,7 +218,6 @@ Wu.Model.File = Wu.Model.extend({
 			}});
   		}); 
 
-		app.setSaveStatus();
 	},
 
 

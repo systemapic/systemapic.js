@@ -1620,10 +1620,10 @@ input.target-input.polygon {
 
 /*DEBUG!!!*/
 /*disable screenshot for beta until working*/
-.chrome-button.share {
+/*.chrome-button.share {
 	display: none;
 }
-
+*/
 
 
 
@@ -1743,11 +1743,11 @@ input.target-input.polygon {
    	font-size: 14px !important;
 }
 
-.tableRow {
+.small-pop-up .tableRow {
 	display: table-row !important;
 	padding-top: 4px !important;
 }
-.tableCell {
+.small-pop-up .tableCell {
 	display: table-cell !important;
 	padding-top: 4px !important;
 	word-break: break-word !important;

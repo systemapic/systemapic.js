@@ -121,7 +121,7 @@ Wu.Controller = Wu.Class.extend({
 		};
 
 		// save hash to server
-		app.api.hashSet(json, function (err, response) {
+		app.api.setHash(json, function (err, response) {
 
 			if (err) {
 				return app.feedback.setError({
