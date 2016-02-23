@@ -25,7 +25,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// shortcut
 		app.Tools = app.Tools || {};
-		app.Tools.DataLibrary = this;	
+		app.Tools.DataLibrary = this;
+
 	},
 
 	_onLayerAdded : function (options) {
@@ -108,6 +109,30 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// base layers
 		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Background layer');
 		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListWrapper);
+
+		// Background color selector
+		this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);		
+
+
+
+		// console.log('this._project', this._project);
+		// console.log('app.activeProject', app.activeProject);
+
+		// this._colorSelector = new Wu.button({
+		// 	id 	 : 'background-color',
+		// 	type 	 : 'colorball',
+		// 	right    : true,
+		// 	isOn 	 : true,
+		// 	appendTo : this._colorSelectorWrapper,
+		// 	fn       : this._updateColor.bind(this),
+		// 	value    : '#000',
+		// 	colors   : '',
+		// 	className: 'target-color-box'
+		// });	
+
+		// this._colorSelectorTitle = Wu.DomUtil.create('div', 'base-layer-color-title', this._colorSelectorWrapper, 'Background color');
+
+
 
 		// Lines
 		this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListWrapper);		
@@ -2117,7 +2142,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 	_initBaseLayerList : function () {
-		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
+
+		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false);
+		
 	},
 
 	_refreshBaseLayerList : function () {
@@ -2129,6 +2156,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		if (this._project.isEditable()) {
 			this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
 		}
+
+		// init color selector
+		this._initColorSelector();
 	},
 
 	_initLayout_activeLayers : function (title, subtitle, container, layers) {
@@ -2173,7 +2203,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Create selct option for no baselayer
 		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
-		if ( this._project.store.baseLayers.length == 0 ) option.selected = true;
+		if ( this._project.store.baseLayers.length == 0 ) {
+			option.selected = true;
+			this._enableColorSelector();
+		} else {
+			this._disableColorSelector();
+		}
 
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
@@ -2200,8 +2235,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		if ( uuid == 'NONE' ) {
 			this._project.setBaseLayer([]);
+			this._enableColorSelector();
 			return;
 		}
+
+
+		this._disableColorSelector();
+		
 
 		var layer = this._project.getLayer(uuid);
 		layer._addTo('baselayer');
@@ -2212,6 +2252,53 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			zIndex : 1,
 			opacity : 1
 		}]);
+	},
+
+	_initColorSelector : function () {
+
+
+		this._colorSelectorWrapper.innerHTML = '';
+
+		// Get color
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#000';		
+
+		// Create color selector
+		this._colorSelector = new Wu.button({
+			id 	 : 'background-color',
+			type 	 : 'colorball',
+			right    : true,
+			isOn 	 : true,
+			appendTo : this._colorSelectorWrapper,
+			fn       : this._updateColor.bind(this),
+			value    : bgc,
+			colors   : '',
+			className: 'target-color-box'
+		});	
+
+		// Create color selector title
+		this._colorSelectorTitle = Wu.DomUtil.create('div', 'base-layer-color-title', this._colorSelectorWrapper, 'Background color');
+
+	},
+
+	_enableColorSelector : function () {
+
+		// Show wrapper
+		Wu.DomUtil.removeClass(this._colorSelectorWrapper, 'displayNone');
+		
+	},
+
+	_disableColorSelector : function () {
+
+		// Hide wrapper
+		Wu.DomUtil.addClass(this._colorSelectorWrapper, 'displayNone');
+
+	},
+
+	_updateColor : function (hex, key, wrapper) {
+
+		app.MapPane._container.style.background = hex;
+		this._project.setBackgroundColor(hex);
+
 	},
 
 
