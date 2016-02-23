@@ -1,5 +1,10 @@
 Wu.Api = Wu.Class.extend({
 
+
+	initialize : function (options) {
+		Wu.setOptions(this, options);
+	},
+
 	// PORTAL
 
 
@@ -99,6 +104,12 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	createUser: function (options, done) {
+		// var path = '/api/user/update';
+		var path = '/v2/users/create';
+		this.post(path, options, done);
+	},
+
 	uniqueEmail: function (options, done) {
 		// var path = '/api/user/uniqueEmail';
 		var path = '/v2/users/email/unique';
@@ -143,6 +154,11 @@ Wu.Api = Wu.Class.extend({
 		// var path = '/v2/invites/link';
 		var path = '/v2/users/invite/link';
 		this.get(path, options, done);
+	},
+
+	acceptInvite : function (options, done) {
+		var path = '/v2/users/invite/accept';
+		this.post(path, options, done);
 	},
 
 	inviteToProjects : function (options, done) {
@@ -416,7 +432,7 @@ Wu.Api = Wu.Class.extend({
 
 	_post : function (path, json, done, context, baseurl) {
 		var http = new XMLHttpRequest();
-		var url = baseurl || Wu.Util._getServerUrl();
+		var url = baseurl || this.options.url || Wu.Util._getServerUrl();
 		url += path;
 
 		// open
@@ -454,7 +470,7 @@ Wu.Api = Wu.Class.extend({
 
 	_get : function (path, options, done, context, baseurl) {
 		var http = new XMLHttpRequest();
-		var url = baseurl || Wu.Util._getServerUrl();
+		var url = baseurl || this.options.url || Wu.Util._getServerUrl();
 		url += path;
 
 		// add options to query

@@ -5,7 +5,7 @@ Wu.Reset = Wu.Class.extend({
 		message : 'Please create a strong password',
 		sent : 'Please check your email for further instructions.',
 		button : 'Reset',
-		api : '/reset/password'
+		api : '/v2/users/password'
 	},
 
 	initialize : function (options) {

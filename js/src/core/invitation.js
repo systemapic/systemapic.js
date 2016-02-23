@@ -15,6 +15,11 @@ Wu.Invite = Wu.Class.extend({
 		// set config
 		this.config = systemapicConfigOptions;
 
+		// set api
+		this.api = new Wu.Api({url : window.location.origin });
+
+		console.log('this.api', this.api);
+
 		// set page title
 		document.title = this.config.portalTitle;
 
@@ -252,8 +257,11 @@ Wu.Invite = Wu.Class.extend({
 			if (err) return console.error(err);
 
 			// get access token
-			this._getAccessToken(options, function (err, token) {
+			this._getAccessToken(options, function (err, response) {
 				if (err) return console.error(err);
+
+				// parse
+				var token = Wu.parse(response);
 
 				// add access_token to request
 				options.access_token = token.access_token;
@@ -270,15 +278,18 @@ Wu.Invite = Wu.Class.extend({
 	},
 
 	_getAccessToken : function (options, done) {
-		this._get('/v2/users/token', options, done);
+		// this._get('/v2/users/token', options, done);
+		this.api.getTokenFromPassword(options, done);
 	},
 
 	_createUser : function (options, done) {
-		this._post('/v2/users/create', options, done);
+		// this._post('/v2/users/create', options, done);
+		this.api.createUser(options, done);
 	},
 
 	_inviteUser : function (options, done) {
-		this._post('/v2/users/invite/accept', options, done);
+		// this._post('/v2/users/invite/accept', options, done);
+		this.api.acceptInvite(options, done);
 	},
 
 	checkSubmitBtn : function () {
@@ -292,7 +303,8 @@ Wu.Invite = Wu.Class.extend({
 		if (!email) return;
 
 		// post to endpoint
-		this._post('/v2/users/email/unique', {			
+		// this._post('/v2/users/email/unique', {	
+		this.api.uniqueEmail({		
 			email : email
 		}, function (err, result) {
 
@@ -315,7 +327,8 @@ Wu.Invite = Wu.Class.extend({
 		if (!username) return;
 
 		// post to endpoint
-		this._post('/v2/users/username/unique', {			
+		// this._post('/v2/users/username/unique', {
+		this.api.uniqueUsername({			
 			username : username
 		}, function (err, result) {
 
