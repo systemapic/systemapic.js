@@ -16,9 +16,7 @@ Wu.Invite = Wu.Class.extend({
 		this.config = systemapicConfigOptions;
 
 		// set api
-		this.api = new Wu.Api({url : window.location.origin });
-
-		console.log('this.api', this.api);
+		this.api = new Wu.Api({ url : window.location.origin });
 
 		// set page title
 		document.title = this.config.portalTitle;
@@ -96,10 +94,15 @@ Wu.Invite = Wu.Class.extend({
 		// button
 		var button = Wu.DomUtil.create('button', 'button', input_wrapper, 'Login');
 
-		// forgot password
+		// // forgot password
+		// var forgotWrapper = Wu.DomUtil.create('div', 'forgot-wrapper', input_wrapper);
+		// var forgotLink = Wu.DomUtil.create('a', 'forgot-link', forgotWrapper, 'Forgot your password?');
+		// forgotLink.setAttribute('href', 'https://' + window.location.host + '/forgot');
+
 		var forgotWrapper = Wu.DomUtil.create('div', 'forgot-wrapper', input_wrapper);
-		var forgotLink = Wu.DomUtil.create('a', 'forgot-link', forgotWrapper, 'Forgot your password?');
-		forgotLink.setAttribute('href', 'https://' + window.location.host + '/forgot');
+		var forgotLink = Wu.DomUtil.create('div', 'forgot-link', forgotWrapper, 'Forgot your password?');
+
+		Wu.DomEvent.on(forgotLink, 'click', this._openForgotPassword, this);
 
 		// shader
 		Wu.DomEvent.on(wrapper, 'mouseenter', function () {
@@ -120,6 +123,88 @@ Wu.Invite = Wu.Class.extend({
 
 		}, this);
 	},
+
+	_openForgotPassword : function () {
+
+		// hide login
+		// Wu.DomUtil.addClass(this._central, 'displayNone');
+		this._centralWrapper.style.display = 'none';
+
+		this._forgotInner = Wu.DomUtil.create('div', 'forgot-wrapper', this._container);
+
+		// add buttons
+		this._forgotDescriptionDiv = Wu.DomUtil.create('div', 'forgot-description', this._forgotInner, 'Request password reset');
+
+		// add input
+		this._forgot_input = this._createInput({
+			label : 'Email',
+			placeholder : 'Enter your email',
+			appendTo : this._forgotInner,
+			type : 'email'
+		});
+
+		// buttons wrapper
+		this._forgotButtons = Wu.DomUtil.create('div', 'login-buttons-wrapper', this._forgotInner);
+
+		// button
+		this._resetBtn = Wu.DomUtil.create('div', 'button', this._forgotButtons, 'Reset');
+		
+		// cancel button
+		this._forgotCancelBtn = Wu.DomUtil.create('div', 'button', this._forgotButtons, 'Cancel');
+
+		// events
+		Wu.DomEvent.on(this._forgotCancelBtn, 'click', this._closeForgot, this);
+		Wu.DomEvent.on(this._resetBtn, 'click', this.requestReset, this);
+
+		// set height
+		// this._login_box.style.height = '340px';
+	},
+
+	_closeForgot : function () {
+		Wu.DomUtil.remove(this._forgotInner);
+		this._centralWrapper.style.display = 'block';
+	},
+
+	requestReset : function () {
+		var email = this._forgot_input.value;
+
+		app.api.resetPassword({
+			email : email
+		}, function (err, result) {
+			if (err) console.error(err);
+
+			// close window
+			// this._closeForgot();
+
+			this._forgot_input.style.display = 'none';
+			this._forgotDescriptionDiv.innerHTML = 'Please check your email to reset password.'
+
+
+		}.bind(this));
+	},
+
+	_createInput : function (options) {
+
+		var appendTo = options.appendTo;
+		var label = options.label;
+		var type = options.type;
+		var placeholder = options.placeholder;
+
+		
+		// container
+		var invite_container = Wu.DomUtil.create('div', 'invite-container narrow', appendTo);
+		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
+		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+
+		// input box
+		var invite_input = Wu.DomUtil.create('input', 'input', invite_input_container);
+		// var invite_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', appendTo);
+		if (type) invite_input.setAttribute('type', type);
+		if (placeholder) invite_input.setAttribute('placeholder', placeholder);
+
+		return invite_input;
+	},
+
 
 	_createRegister : function () {
 
@@ -232,8 +317,11 @@ Wu.Invite = Wu.Class.extend({
 	_loginUser : function (options) {
 
 		// get access token
-		this._getAccessToken(options, function (err, token) {
+		this._getAccessToken(options, function (err, response) {
 			if (err) return console.error(err);
+
+			// parse
+			var token = Wu.parse(response);
 
 			// add access_token to request
 			options.access_token = token.access_token;
@@ -278,17 +366,14 @@ Wu.Invite = Wu.Class.extend({
 	},
 
 	_getAccessToken : function (options, done) {
-		// this._get('/v2/users/token', options, done);
 		this.api.getTokenFromPassword(options, done);
 	},
 
 	_createUser : function (options, done) {
-		// this._post('/v2/users/create', options, done);
 		this.api.createUser(options, done);
 	},
 
 	_inviteUser : function (options, done) {
-		// this._post('/v2/users/invite/accept', options, done);
 		this.api.acceptInvite(options, done);
 	},
 
@@ -303,13 +388,16 @@ Wu.Invite = Wu.Class.extend({
 		if (!email) return;
 
 		// post to endpoint
-		// this._post('/v2/users/email/unique', {	
 		this.api.uniqueEmail({		
 			email : email
 		}, function (err, result) {
+			if (err) return console.error(err);
+
+			// parse
+			var response = Wu.parse(result);
 
 			// remember
-			this._uniqueEmail = result.unique;
+			this._uniqueEmail = response.unique;
 
 			// mark submit button disabled/enabled
 			this.checkSubmitBtn();
@@ -327,23 +415,25 @@ Wu.Invite = Wu.Class.extend({
 		if (!username) return;
 
 		// post to endpoint
-		// this._post('/v2/users/username/unique', {
 		this.api.uniqueUsername({			
 			username : username
 		}, function (err, result) {
+			if (err) console.error(err);
 
-			if (result.error) {
-				console.error('something went worng', result);
-			} else {
-				// remember
-				this._uniqueUsername = result.unique;
+			// parse
+			var response = Wu.parse(result);
 
-				// mark submit button disabled/enabled
-				this.checkSubmitBtn();
+			// return if error
+			if (response.error) return console.error('something went worng', response);
+			
+			// remember
+			this._uniqueUsername = response.unique;
 
-				// mark input
-				input.style.backgroundColor = this._uniqueUsername ? 'transparent' : 'rgba(255, 74, 74, 0.45)';
-			}
+			// mark submit button disabled/enabled
+			this.checkSubmitBtn();
+
+			// mark input
+			input.style.backgroundColor = this._uniqueUsername ? 'transparent' : 'rgba(255, 74, 74, 0.45)';
 		}.bind(this));
 	},
 

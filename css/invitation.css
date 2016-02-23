@@ -179,6 +179,7 @@ body {
     text-align: center;
     margin-top: 20px;
     z-index: 1;
+    margin: auto;
 }
 .forgot-link {
     font-size: 12px;
@@ -186,6 +187,12 @@ body {
     position: relative;
     text-align: center;
     margin-left: auto;
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+.forgot-description {
+	padding: 20px;
 }
 
 label {

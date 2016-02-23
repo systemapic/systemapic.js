@@ -58,7 +58,7 @@ Wu.Reset = Wu.Class.extend({
 		var logo_wrap = Wu.DomUtil.create('div', 'logo-wrap', this._container);
 
 		// logo
-		var logo_img = window.systemapicConfigOptions.logos.invitationLogo;
+		var logo_img = window.systemapicConfigOptions.logos.clientLogo;
 		logo_wrap.style.backgroundImage = logo_img.backgroundImage;
     		logo_wrap.style.backgroundRepeat = "no-repeat";
     		logo_wrap.style.backgroundPosition = "center";

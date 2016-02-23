@@ -455,7 +455,7 @@ Wu.Api = Wu.Class.extend({
 		// add access_token to request
 		var access_token = app.tokens ? app.tokens.access_token : null;
 		var options = _.isString(json) ? Wu.parse(json) : json;
-		options.access_token = access_token;
+		options.access_token = options.access_token || access_token;
 		var send_json = Wu.stringify(options);
 
 		// send
