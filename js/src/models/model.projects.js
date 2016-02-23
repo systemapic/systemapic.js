@@ -86,9 +86,18 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setBaseLayer : function (layer) {
+
 		this.store.baseLayers = layer;
 		this._update('baseLayers');
 	},
+
+	setBackgroundColor : function (hex) {
+		
+		if ( !this.store.colorTheme ) this.store.colorTheme = {};
+		this.store.colorTheme.backgroundColor = hex;
+		
+		this._update('colorTheme');
+	},	
 
 	createOSMLayer : function (callback) {
 
@@ -197,7 +206,7 @@ Wu.Project = Wu.Class.extend({
 		this.refreshSettings();
 		
 		// update color theme
-		this.setColorTheme();
+		// this.setColorTheme();
 
 		// update project in sidepane
 		if (this._menuItem) this._menuItem.update();
@@ -215,7 +224,7 @@ Wu.Project = Wu.Class.extend({
 		this.refreshSettings();
 		
 		// update color theme
-		this.setColorTheme();
+		// this.setColorTheme();
 
 		// update project in sidepane
 		if (this._menuItem) this._menuItem.update();
@@ -307,6 +316,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setMapboxAccount : function (store) {
+		
 		// full project store
 		this.store = store;
 
@@ -443,22 +453,22 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	saveColorTheme : function () {
+	// saveColorTheme : function () {
 		
-		// save color theme to project 
-		this.colorTheme = savedCSS;
-		this._update('colorTheme');
-	},
+	// 	// save color theme to project 
+	// 	this.colorTheme = savedCSS;
+	// 	this._update('colorTheme');
+	// },
 
-	setColorTheme : function () {
-		if (!this.colorTheme) return;
+	// setColorTheme : function () {
+	// 	if (!this.colorTheme) return;
 
-		// set global color
-		savedCSS = this.colorTheme;
+	// 	// set global color
+	// 	savedCSS = this.colorTheme;
 
-		// inject
-		Wu.Util.setColorTheme();
-	},
+	// 	// inject
+	// 	Wu.Util.setColorTheme();
+	// },
 
 	removeMapboxAccount : function (account) {
 		var removed = _.remove(this.store.connectedAccounts.mapbox, function (m) {	// todo: include access token
@@ -611,6 +621,14 @@ Wu.Project = Wu.Class.extend({
 
 	getBaselayers : function () {
 		return this.store.baseLayers;
+	},
+
+	// getColorTheme : function () {
+	// 	return JSON.parse(this.store.colorTheme);
+	// },
+
+	getBackgroundColor : function () {
+		return this.store.colorTheme;
 	},
 
 	getLayermenuLayers : function () {
