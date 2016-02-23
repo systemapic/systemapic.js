@@ -47,10 +47,12 @@ Wu.PhantomJS = Wu.Class.extend({
 		Wu.Mixin.Events.fire('phantomjs', { detail : message });
 	},
 	
-	develop : function (view) {
+	develop : function (view) {		
 
 		this.ping('developing!');
 		this.ping(view);
+
+		this.phantomStyle();
 
 
 		// parse if string
@@ -153,6 +155,20 @@ Wu.PhantomJS = Wu.Class.extend({
 			}.bind(this));
 		}.bind(this));
 	},
+
+	phantomStyle : function () {
+
+		// app.MapPane._controls.description.compactLegend()
+
+
+		this._styletag = Wu.DomUtil.get("styletag");
+
+		// append darktheme stylesheet
+		var phantom = document.createElement("link");
+		phantom.rel = 'stylesheet';
+		phantom.href = app.options.servers.portal + 'css/phantomJS.css';
+		this._styletag.appendChild(phantom);
+	},		
 
 	// todo: move hashes to own script
 	initHash : function (hash, project) {
