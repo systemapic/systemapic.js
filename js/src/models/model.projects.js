@@ -93,9 +93,7 @@ Wu.Project = Wu.Class.extend({
 
 	setBackgroundColor : function (hex) {
 		
-		if ( !this.store.colorTheme ) this.store.colorTheme = {};
-		this.store.colorTheme.backgroundColor = hex;
-		
+		this.store.colorTheme = hex;
 		this._update('colorTheme');
 	},	
 
@@ -336,6 +334,7 @@ Wu.Project = Wu.Class.extend({
 	
 
 	_save : function (options) {
+
 		// save to server                                       	
 		app.api.updateProject(options, this._saved.bind(this)); 
 	},
