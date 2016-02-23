@@ -205,12 +205,6 @@ Wu.Project = Wu.Class.extend({
 		// set settings
 		this.refreshSettings();
 		
-<<<<<<< HEAD
-		// update color theme
-		// this.setColorTheme();
-
-=======
->>>>>>> master
 		// update project in sidepane
 		if (this._menuItem) this._menuItem.update();
 	},
