@@ -646,20 +646,21 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var error = e.detail;
 		var uniqueIdentifier = error.uniqueIdentifier;
 
+		console.error('error:', error);
+
 		// get temp file divs
 		var tempfile = this._tempFiles[uniqueIdentifier];
 
 		// set feedback
-		tempfile.feedback.innerHTML = error.description;
+		var feedbackText = _.isObject(error.description) ? 'Error code: ' + error.description.code : error.description;
+		tempfile.feedback.innerHTML = feedbackText;
 		tempfile.percent.innerHTML = 'Upload failed';
 		
-
+		// add error class
 		Wu.DomUtil.addClass(tempfile.datawrap, 'upload-error');		
-		// tempfile.datawrap.style.background = '#F13151';
 		
 		// close on click
 		Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);
-
 	},
 
 
