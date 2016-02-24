@@ -73,7 +73,8 @@ Wu.Data = Wu.Class.extend({
 
 		var xhr = new XMLHttpRequest();
 		var fd = new FormData();
-		var url = app.options.servers.portal + 'api/upload/get';
+		// var url = app.options.servers.portal + 'api/upload/get';
+		var url = app.options.servers.portal + 'v2/data/import';
 		url += '?fileUuid=' + file_id;
 		url += '&access_token=' + app.tokens.access_token;
 

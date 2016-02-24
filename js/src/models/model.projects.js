@@ -15,7 +15,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	_initObjects : function () {
-		this.initRoles();
+		// this.initRoles();
 		this.initFiles();
 		this.initLayers();
 	},
@@ -86,9 +86,16 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setBaseLayer : function (layer) {
+
 		this.store.baseLayers = layer;
 		this._update('baseLayers');
 	},
+
+	setBackgroundColor : function (hex) {
+		
+		this.store.colorTheme = hex;
+		this._update('colorTheme');
+	},	
 
 	createOSMLayer : function (callback) {
 
@@ -196,9 +203,6 @@ Wu.Project = Wu.Class.extend({
 		// set settings
 		this.refreshSettings();
 		
-		// update color theme
-		this.setColorTheme();
-
 		// update project in sidepane
 		if (this._menuItem) this._menuItem.update();
 	},
@@ -214,9 +218,6 @@ Wu.Project = Wu.Class.extend({
 		// set settings
 		this.refreshSettings();
 		
-		// update color theme
-		this.setColorTheme();
-
 		// update project in sidepane
 		if (this._menuItem) this._menuItem.update();
 	},
@@ -307,6 +308,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setMapboxAccount : function (store) {
+		
 		// full project store
 		this.store = store;
 
@@ -332,6 +334,7 @@ Wu.Project = Wu.Class.extend({
 	
 
 	_save : function (options) {
+
 		// save to server                                       	
 		app.api.updateProject(options, this._saved.bind(this)); 
 	},
@@ -344,9 +347,6 @@ Wu.Project = Wu.Class.extend({
 			title : "Could not update project", 
 			description : result.error
 		});
-
-		// set status
-		app.setSaveStatus();
 
 		Wu.Mixin.Events.fire('projectChanged', { detail : {
 			projectUuid : this.getUuid()
@@ -443,23 +443,6 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	saveColorTheme : function () {
-		
-		// save color theme to project 
-		this.colorTheme = savedCSS;
-		this._update('colorTheme');
-	},
-
-	setColorTheme : function () {
-		if (!this.colorTheme) return;
-
-		// set global color
-		savedCSS = this.colorTheme;
-
-		// inject
-		Wu.Util.setColorTheme();
-	},
-
 	removeMapboxAccount : function (account) {
 		var removed = _.remove(this.store.connectedAccounts.mapbox, function (m) {	// todo: include access token
 			return m == account;
@@ -518,7 +501,8 @@ Wu.Project = Wu.Class.extend({
 			project_id : this.getUuid()
 		};
 
-		app.api.deleteLayer('/api/layers/delete', JSON.stringify(options), function (err, response) {
+		// app.api.deleteLayer('/api/layers/delete', JSON.stringify(options), function (err, response) {
+		app.api.deleteLayer(options, function (err, response) {
 			if (err) {
 				return app.feedback.setError({
 					title : 'Something went wrong',
@@ -611,6 +595,14 @@ Wu.Project = Wu.Class.extend({
 
 	getBaselayers : function () {
 		return this.store.baseLayers;
+	},
+
+	// getColorTheme : function () {
+	// 	return JSON.parse(this.store.colorTheme);
+	// },
+
+	getBackgroundColor : function () {
+		return this.store.colorTheme;
 	},
 
 	getLayermenuLayers : function () {
@@ -833,7 +825,6 @@ Wu.Project = Wu.Class.extend({
 	getSlugs : function () {
 		var slugs = {
 			project : this.store.slug
-			// client : this.getClient().getSlug()
 		};
 		return slugs;
 	},
@@ -1027,63 +1018,6 @@ Wu.Project = Wu.Class.extend({
 		return console.error('remove files, needs to be rewritten with new Wu.Data');
 	},
 
-	getGrandeFiles : function () {
-		var files = this.getFiles();
-		var sources = this._formatGrandeFiles(files);
-		return sources;
-	},
-
-	getGrandeImages : function () {
-		var files = this.getFiles();
-		var images = this._formatGrandeImages(files);
-		return images;
-	},
-
-	// format images for Grande plugin
-	_formatGrandeImages : function (files) {
-		var sources = [];
-		files.forEach(function (file) {
-			if (file.type == 'image') {
-				var thumbnail 	= '/pixels/' + file.uuid + '?width=75&height=50' + '&access_token=' + app.tokens.access_token;
-				var url 	= '/pixels/' + file.uuid + '?width=200&height=200' + '&access_token=' + app.tokens.access_token;
-				var source = {
-				    	title 	: file.name, 	// title
-				    	thumbnail : thumbnail,  // optional. url to image
-				    	uuid 	: file.uuid,       // optional
-					type 	: file.type,
-					url 	: url
-				};
-				sources.push(source);
-			}
-		}, this);
-		return sources;
-	},
-
-	// format files for Grande plugin
-	_formatGrandeFiles : function (files) {
-		var sources = [];
-		files.forEach(function (file) {
-
-			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' + '&access_token=' + app.tokens.access_token : '';
-			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
-			var url = prefix + file.uuid + '&access_token=' + app.tokens.access_token;// + suffix
-
-			//url += '?access_token=' + app.tokens.access_token;
-
-			var source = {
-			    	title 	: file.name, 	// title
-			    	thumbnail : thumbnail,  // optional. url to image
-			    	uuid 	: file.uuid,    // optional
-				type 	: file.type,
-				url 	: url
-			};
-
-			sources.push(source)
-		
-		}, this);
-		return sources;
-	},
-
 	refreshSettings : function () {
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
@@ -1119,12 +1053,10 @@ Wu.Project = Wu.Class.extend({
 		app.Tooltip.deactivate();
 	},
 
-
 	enableD3popup : function () {
 	},
 	disableD3popup : function () {
 	},
-
 
 	enableScreenshot : function () {
 		// app.SidePane.Share.enableScreenshot();
@@ -1189,57 +1121,6 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	// CXX – Now this is all over the place... see sidepane.project.js > makeNewThumbnail() etc...
-	createProjectThumb : function () {
-
-		// Set the grinding wheel until logo is updated
-		this.setTempLogo();
-
-		app.setHash(function (ctx, hash) {
-			var obj = JSON.parse(hash);
-
-			obj.dimensions = {
-				height : 233,
-				width : 350
-			};
-
-			// get snapshot from server
-			app.api.createThumb(obj, this.createdProjectThumb);
-
-		}.bind(this), this);
-	},
-
-
-	createdProjectThumb : function(context, json) {
-
-		// parse results
-		var result = JSON.parse(json),
-		    image = result.cropped ,
-		    fileUuid = result.fileUuid,
-		    path = '/images/' + image;
-
-		// Store new logo paths
-		context.setLogo(path); 		// trigger server-save
-		context.setHeaderLogo(path); 	// triggers server-save
-
-		context._menuItem.logo.style.backgroundImage = 'url(' + context._getPixelLogo(path) + ')';
-		context.setTempLogo(); 
-
-		// Set logo in header pane
-		if (context == app.activeProject) {
-			app.HeaderPane.addedLogo(image); // triggers this.setHeaderLogo -- triggers save
-		}
-	},
-
-	setThumbCreated : function (bool) {
-		this.store.thumbCreated = bool;
-		this._update('thumbCreated');
-	},
-
-	getThumbCreated : function () {
-		return this.store.thumbCreated;
-	},	
-
 	setTempLogo : function () {
 		this._sidePaneLogoContainer.src = app.options.logos.projectDefault;
 	},
@@ -1250,7 +1131,6 @@ Wu.Project = Wu.Class.extend({
 		return url;
 	},
 
-
 	selectProject : function () {
 
 		// select project
@@ -1258,15 +1138,6 @@ Wu.Project = Wu.Class.extend({
 			projectUuid : this.getUuid()
 		}});
 	},
-
-
-
-
-
-	/////
-	//// ACCESS
-	///
-	//
 
 	isPublic : function () {
 		var access = this.getAccess();
@@ -1285,7 +1156,6 @@ Wu.Project = Wu.Class.extend({
 		return !!isPublic;
 	},
 
-
 	createdBy : function () {
 		return this.store.createdBy;
 	},
@@ -1301,7 +1171,7 @@ Wu.Project = Wu.Class.extend({
 		// true: if user is listed as editor
 		if (_.contains(access.read, user.getUuid())) return true;
 
-		// false: not createdBy and not editor
+		// no access
 		return false;
 	},
 
@@ -1319,7 +1189,7 @@ Wu.Project = Wu.Class.extend({
 		// true: if user is super
 		if (app.Account.isSuper()) return true; 
 
-		// false: not createdBy and not editor
+		// no access
 		return false;
 	}
 

@@ -218,7 +218,6 @@ Wu.Model.File = Wu.Model.extend({
 			}});
   		}); 
 
-		app.setSaveStatus();
 	},
 
 
@@ -279,7 +278,7 @@ Wu.Model.File = Wu.Model.extend({
 
 	_removeLayersLocally : function (layers) {
 
-		layers.forEach(function (layer) {
+		_.isArray(layers) && layers.forEach(function (layer) {
 
 			// find project 
 			var project = _.find(app.Projects, function (p) {
@@ -287,7 +286,7 @@ Wu.Model.File = Wu.Model.extend({
 			});
 
 			// remove layer
-			project.removeLayer(layer);
+			project && project.removeLayer(layer);
 		});
 
 		// fire event

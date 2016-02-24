@@ -25,7 +25,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// shortcut
 		app.Tools = app.Tools || {};
-		app.Tools.DataLibrary = this;	
+		app.Tools.DataLibrary = this;
+
 	},
 
 	_onLayerAdded : function (options) {
@@ -100,7 +101,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// close event
 		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
-
 	},
 
 
@@ -118,6 +118,30 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Background layer');
 		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListWrapper);
 
+		// Background color selector
+		this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);		
+
+
+
+		// console.log('this._project', this._project);
+		// console.log('app.activeProject', app.activeProject);
+
+		// this._colorSelector = new Wu.button({
+		// 	id 	 : 'background-color',
+		// 	type 	 : 'colorball',
+		// 	right    : true,
+		// 	isOn 	 : true,
+		// 	appendTo : this._colorSelectorWrapper,
+		// 	fn       : this._updateColor.bind(this),
+		// 	value    : '#000',
+		// 	colors   : '',
+		// 	className: 'target-color-box'
+		// });	
+
+		// this._colorSelectorTitle = Wu.DomUtil.create('div', 'base-layer-color-title', this._colorSelectorWrapper, 'Background color');
+
+
+
 		// Lines
 		this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListWrapper);		
 
@@ -133,6 +157,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._listContainer);
 
 		// Containers
+		this._filesContainerHeader = Wu.DomUtil.create('div', 'files-container-header', this._listContainer);
 		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._listContainer);
 	},
 
@@ -305,6 +330,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Upload button
 		this._initUploadButton();
+		
+		if (_.toArray(this.fileProviders.postgis.getFiles()).length >= 10) {
+			this._filesContainerHeader.style.display = 'block';
+			this._initSortButtons();
+		} else {
+			this._filesContainerHeader.style.display = 'none';
+			if (this.searchInput) {
+				this.searchInput.value = '';
+			}
+		}
 
 		// layer title
 		var projectName = this._project.getTitle();
@@ -332,6 +367,120 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
 	},
 
+	_initSortButtons : function () {
+		var sortType = {
+			'name': 'name',
+			'date': 'lastUpdated',
+			'size': 'dataSize'
+		};
+
+		this.reverse = false;
+
+		if (this.sortMenu) {
+			return;
+		}
+
+		this.sortMenu = Wu.DomUtil.create('div', 'files-sort-menu', this._filesContainerHeader);
+		this.sortSelect = Wu.DomUtil.create('div', 'files-sort-select', this._filesContainerHeader, 'Sort');
+		this.expendedContaner = Wu.DomUtil.create('div', 'expended-container', this._filesContainerHeader);
+		this.searchInputWraper = Wu.DomUtil.create('div', 'files-search-input-wraper', this._filesContainerHeader);
+
+		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper)
+		
+		this.searchInput = Wu.DomUtil.create('input', 'files-search-input', this.searchInputWraper);
+		this.searchInput.placeholder = 'sort: date';
+		this.currentSort = 'lastUpdated';
+
+		Wu.DomEvent.on(this.searchInput, 'keyup', this._onKeyup, this);
+
+		Wu.DomEvent.on(this.sortSelect, 'click', this._onSortSelectClick, this);
+
+		this.sortOptions = Wu.DomUtil.create('div', 'files-sort-options', this.expendedContaner);
+
+		_.forEach(_.keys(sortType), function (type) {
+			var option = Wu.DomUtil.create('div', 'sort-option', this.sortOptions);
+			option.innerHTML = 'Sort by ' + type;
+
+			Wu.DomEvent.on(option, 'click', function (e) {
+				Wu.DomEvent.stop(e);
+				this.searchInput.placeholder = 'sort: ' + type;
+				this.currentSort = sortType[type];
+				this._sortFiles();
+			}, this);
+		}.bind(this));
+
+		this.sortOrderWraper = Wu.DomUtil.create('div', 'files-sort-order-switch-wraper', this.sortOptions);
+
+		var sort_order_toggle_label = Wu.DomUtil.create('div', 'sort-order-label');
+
+		this.orderSwitch = new Wu.button({
+			id: 'order-switch',
+			type: 'switch',
+			isOn: this.reverse,
+			right: false,
+			disabled: false,
+			appendTo: this.sortOrderWraper,
+			fn: this._toggleSortOrder.bind(this),
+			className: 'sort-order-switch'
+		});
+
+		this.sortOptions.style.display = 'none';
+
+		// close dropdown on any click
+		Wu.DomEvent.on(app._appPane, 'click', function (e) {
+
+			// only if target == self
+			var relevantTarget = e.target == this.expendedContaner || e.target == this.sortOptions || e.target == this.sortOrderWraper;
+			if (!relevantTarget) this._closeSortSelect();
+
+		}, this);
+
+		Wu.DomEvent.on(this._filesContainerHeader, 'click', function (e) {
+			this._closeSortSelect();
+			Wu.DomEvent.stop(e);
+		}, this);
+	},
+
+	_toggleSortOrder : function (e, isOn) {
+		isOn ? this.reverse = true : this.reverse = false;
+		if (e) {
+			Wu.DomEvent.stop(e);
+		}
+		this._refreshFiles();
+	},
+
+	_onSortSelectClick : function (e) {
+		this.sortOptions.style.display === 'none' ? this.sortOptions.style.display = 'block' : this.sortOptions.style.display = 'none';
+
+		var toggleClass = Wu.DomUtil.hasClass(this.sortSelect, 'expanded') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
+		toggleClass(this.sortSelect, 'expanded');
+		if (e) {
+			Wu.DomEvent.stop(e);
+		}
+	},
+
+	_closeSortSelect : function () {
+		this.sortOptions.style.display = 'none';
+		Wu.DomUtil.removeClass(this.sortSelect, 'expanded');
+	},
+
+	_onKeyup : function (e) {
+		this._refreshFiles({
+			sortBy: this.currentSort,
+			reverse: this.reverse,
+			filter: this.searchInput.value.toLowerCase()
+		});
+	},
+
+	_sortFiles : function (type) {
+		this._refreshFiles({
+			sortBy: this.currentSort,
+			reverse: this.reverse,
+			filter: this.searchInput.value.toLowerCase()
+		});
+
+		this._onSortSelectClick();
+	},
 
 	// When clicking on container, close popups
 	_closeActionPopUps : function (e) {
@@ -362,9 +511,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		this._refreshFiles();
 		this._refreshLayers();
-	},	
-
-
+	},
 
 	_initFileLists : function () {
 
@@ -405,27 +552,39 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this.fileListContainers[f].D3container = d3.select(this.fileListContainers[f].fileList);
 		}
 
-	},	
+	},
 
 	
-	_refreshFiles : function () {
-
-		console.error('_refreshFiles');
-
-		console.log(this.fileProviders['postgis']);
+	_refreshFiles : function (options) {
+		options = options || {};
 
 		// FILES
 		for (var p in this.fileProviders) {
-
-			
-
 			var provider = this.fileProviders[p];
 			var files = provider.getFiles();
+			var sortBy = options.sortBy || this.currentSort || 'lastUpdated'
+			var reverse = options.reverse || this.reverse || false;
+			var filter = options.filter || this.searchInput && this.searchInput.value && this.searchInput.value.toLowerCase() || '';
+
+			if (filter) {
+				provider.data = _.filter(_.toArray(files), function (file) {
+					return file.store.name.toLowerCase().indexOf(filter) !== -1 || app.Users[file.store.createdBy].getFullName().toLowerCase().indexOf(filter) !== -1;
+				});
+				files = provider.data;
+			}
 
 			// get file list, sorted by last updated
 			provider.data = _.sortBy(_.toArray(files), function (f) {
-				return f.store.lastUpdated;
-			}).reverse();
+				if (sortBy === 'dataSize') {
+					return parseInt(f.store[sortBy]);
+				}
+
+				return f.store[sortBy];
+			});
+
+			if (reverse !== true) {
+				provider.data = provider.data.reverse();
+			}
 
 			// containers
 			var D3container = this.fileListContainers[p].D3container;
@@ -541,7 +700,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		dataListLine
 			.classed('editingFileName', function (d) {
 				var uuid = d.getUuid();
-				if ( this.editingFileName == uuid ) return true;
+				if ( this.editingFileName == uuid ) {
+					return true;
+				}
+
 				return false;
 			}.bind(this));
 
@@ -1034,11 +1196,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				file : file
 			});
 
-			// tileset box
-			this._createTilesetBox({
-				container : content,
-				file : file
-			});
+			// // tileset box 	// removed since we're going with pg_rasters
+			// this._createTilesetBox({
+			// 	container : content,
+			// 	file : file
+			// });
 
 			// transparency box
 			this._createTransparencyBox({
@@ -1968,8 +2130,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 					}
 				}
 			}
+
 			results.push(sort);
 		}, this);
+
+
 
 		this.numberOfProviders = results.length;
 		return results;
@@ -1985,7 +2150,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 	_initBaseLayerList : function () {
-		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
+
+		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false);
+		
 	},
 
 	_refreshBaseLayerList : function () {
@@ -1997,6 +2164,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		if (this._project.isEditable()) {
 			this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
 		}
+
+		// init color selector
+		this._initColorSelector();
 	},
 
 	_initLayout_activeLayers : function (title, subtitle, container, layers) {
@@ -2013,7 +2183,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// Do not allow postgis layers to be in the baselayer dropdown
 			if ( provider.key == "postgis" ) return;
-			if ( provider.key == "raster" ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
+			if ( provider.key == "raster"  ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
 
 			// Get each provider (mapbox, google, etc)
 			provider.layers.forEach(function(layer) {
@@ -2038,6 +2208,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			}.bind(this))
 		}.bind(this));
 
+
+		// Create selct option for no baselayer
+		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
+		if ( this._project.store.baseLayers.length == 0 ) {
+			option.selected = true;
+			this._enableColorSelector();
+		} else {
+			this._disableColorSelector();
+		}
+
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
 
@@ -2060,6 +2240,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Add to map
 		var uuid = e.target.value;
+
+		if ( uuid == 'NONE' ) {
+			this._project.setBaseLayer([]);
+			this._enableColorSelector();
+			return;
+		}
+
+
+		this._disableColorSelector();
+		
+
 		var layer = this._project.getLayer(uuid);
 		layer._addTo('baselayer');
 		
@@ -2069,6 +2260,53 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			zIndex : 1,
 			opacity : 1
 		}]);
+	},
+
+	_initColorSelector : function () {
+
+
+		this._colorSelectorWrapper.innerHTML = '';
+
+		// Get color
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#000';		
+
+		// Create color selector
+		this._colorSelector = new Wu.button({
+			id 	 : 'background-color',
+			type 	 : 'colorball',
+			right    : true,
+			isOn 	 : true,
+			appendTo : this._colorSelectorWrapper,
+			fn       : this._updateColor.bind(this),
+			value    : bgc,
+			colors   : '',
+			className: 'target-color-box'
+		});	
+
+		// Create color selector title
+		this._colorSelectorTitle = Wu.DomUtil.create('div', 'base-layer-color-title', this._colorSelectorWrapper, 'Background color');
+
+	},
+
+	_enableColorSelector : function () {
+
+		// Show wrapper
+		Wu.DomUtil.removeClass(this._colorSelectorWrapper, 'displayNone');
+		
+	},
+
+	_disableColorSelector : function () {
+
+		// Hide wrapper
+		Wu.DomUtil.addClass(this._colorSelectorWrapper, 'displayNone');
+
+	},
+
+	_updateColor : function (hex, key, wrapper) {
+
+		app.MapPane._container.style.background = hex;
+		this._project.setBackgroundColor(hex);
+
 	},
 
 
@@ -2421,11 +2659,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// Check if base layer is on
 	isBaseLayerOn : function (uuid) {
+
+
 		var on = false;
 		this._project.store.baseLayers.forEach(function (b) {
 			if ( uuid == b.uuid ) { on = true; } 
 		}.bind(this));
 		return on;
+
 	},
 
 

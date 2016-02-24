@@ -1,7 +1,7 @@
 Wu.Resumable = Wu.Class.extend({
 
 	options : {
-		target : '/api/data/upload/chunked',
+		target : '/v2/data/import/chunked',
 		chunkSize : 2*1024*1024,
 		simultaneousUploads : 5,
 		testChunks : true, 

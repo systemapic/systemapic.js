@@ -50,7 +50,9 @@ L.Control.Layermenu = Wu.Control.extend({
 	            project_dependent : false
 	        });
 
-	        this._layerButton.innerHTML = '<i class="top-button fa fa-bars"></i> <span class="layer-button-text">Layers</div>';
+	        // this._layerButton.innerHTML = '<i class="top-button fa fa-bars"></i> <span class="layer-button-text">Layers</div>';
+	        this._layerButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-layers"></i> <span class="layer-button-text">Layers</div>';
+	        
 	        
 
 	},
@@ -406,7 +408,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!this._editSwitchContainer) return;
 
 		this._editSwitchContainer.innerHTML = '';
-		this._editSwitchContainer.remove();
+		Wu.DomUtil.remove(this._editSwitchContainer);
 		this._editSwitchContainer = null;
 
 		Wu.DomUtil.removeClass(this._innerContainer, 'enable-edit-mode');

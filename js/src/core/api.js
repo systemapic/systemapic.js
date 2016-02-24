@@ -1,12 +1,9 @@
 Wu.Api = Wu.Class.extend({
 
 
-
-
-
-
-
-
+	initialize : function (options) {
+		Wu.setOptions(this, options);
+	},
 
 	// PORTAL
 
@@ -14,7 +11,8 @@ Wu.Api = Wu.Class.extend({
 	getPortal : function (done) {
 		// var path = '/api/portal';	// TODO: GET request
 		var path = '/v2/portal';
-		this.post(path, {}, done);
+		// this.post(path, {}, done);
+		this.get(path, {}, done);
 	},
 
 
@@ -51,14 +49,14 @@ Wu.Api = Wu.Class.extend({
 
 	getProject : function (options, done) {
   		// var path = '/api/project/get/public';
-  		var path = '/v2/projects/public';		// todo: GET request
-		this.post(path, options, done)
+  		var path = '/v2/projects/public';		
+		this.get(path, options, done)
   	},
 
   	getPrivateProject : function (options, done) {
   		// var path = '/api/project/get/private';
   		var path = '/v2/projects/private';
-		this.post(path, options, done)
+		this.get(path, options, done)
   	},
 
   	addFileToTheProject : function (options, done) {
@@ -83,15 +81,15 @@ Wu.Api = Wu.Class.extend({
 
 
 	auth : function (done) {
-		// var path = '/api/user/session';		// TODO: GET request
+		// var path = '/api/user/session';		
 		var path = '/v2/users/session';
-		this.post(path, {}, done);
+		this.get(path, {}, done);
 	},
 
-	getTokenFromPassword : function (options, done) {	// TODO: GET request
+	getTokenFromPassword : function (options, done) {
 		// var path = '/api/token';
 		var path = '/v2/users/token';
-		this.post(path, options, done);
+		this.get(path, options, done);
 	},
 
 	deleteUser : function (options, done) {
@@ -106,9 +104,15 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	createUser: function (options, done) {
+		// var path = '/api/user/update';
+		var path = '/v2/users/create';
+		this.post(path, options, done);
+	},
+
 	uniqueEmail: function (options, done) {
 		// var path = '/api/user/uniqueEmail';
-		var path = '/v2/users/email/unique';	// todo: refactor, just check if user email
+		var path = '/v2/users/email/unique';
 		this.post(path, options, done);
 	},
 
@@ -120,8 +124,8 @@ Wu.Api = Wu.Class.extend({
 
 	requestContact : function (options, done) {
 		// var path = '/api/user/requestContact';
-		// var path = '/v2/contacts/request';			// todo: move to /users/
-		var path = '/v2/users/contacts/request';			// todo: move to /users/
+		// var path = '/v2/contacts/request';			
+		var path = '/v2/users/contacts/request';
 		this.post(path, options, done);
 	},
 	
@@ -149,6 +153,11 @@ Wu.Api = Wu.Class.extend({
 		// var path = '/api/invite/link';
 		// var path = '/v2/invites/link';
 		var path = '/v2/users/invite/link';
+		this.get(path, options, done);
+	},
+
+	acceptInvite : function (options, done) {
+		var path = '/v2/users/invite/accept';
 		this.post(path, options, done);
 	},
 
@@ -177,8 +186,8 @@ Wu.Api = Wu.Class.extend({
 
 
 	shareDataset : function (options, done) {
-		// var path = '/api/dataset/share'; // todo: fix api names, organize
-		var path = '/v2/data/share'; // todo: fix api names, organize
+		// var path = '/api/dataset/share'; 
+		var path = '/v2/data/share';
 		this.post(path, options, done);
 	},
 
@@ -196,7 +205,7 @@ Wu.Api = Wu.Class.extend({
 
   	fileGetLayers : function (options, done) {
 		// var path = '/api/file/getLayers';
-		var path = '/v2/data/layers';			// TODO: GET request
+		var path = '/v2/data/layers';
 		this.post(path, options, done);
 	},
 
@@ -236,8 +245,9 @@ Wu.Api = Wu.Class.extend({
 
 	getCartocss : function (options, done) {
 		// var path = '/api/layers/cartocss/get';
-		var path = '/v2/layers/carto/get';		// TODO: GET request
-		this.post(path, options, done);
+		// var path = '/v2/layers/carto/get';	
+		var path = '/v2/layers/carto';		
+		this.get(path, options, done);
 	},
 
 	json2carto : function (options, done) {
@@ -319,42 +329,20 @@ Wu.Api = Wu.Class.extend({
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-	// CARTO
-
-
-
-
-
-
-
-
-
-
-
-
 	// HASHES
 	
 	
 	getHash : function (options, done) {
 		// var path = '/api/project/hash/get';
-		var path = '/v2/hashes/get';		// todo: GET request
-		this.post(path, options, done);
+		// var path = '/v2/hashes/get';		
+		var path = '/v2/hashes';		
+		this.get(path, options, done);
 	},
 
-	hashSet : function (options, done) {
+	setHash : function (options, done) {
 		// var path = '/api/project/hash/set';
-		var path = '/v2/hashes/set';
+		// var path = '/v2/hashes/set';
+		var path = '/v2/hashes';
 		this.post(path, options, done);
 	},
 
@@ -400,8 +388,8 @@ Wu.Api = Wu.Class.extend({
 
 	analyticsGet : function (options, done) {
 		// var path = '/api/analytics/get';
-		var path = '/v2/log/get';		// todo: GET request
-		this.post(path, options, done);
+		var path = '/v2/log';
+		this.get(path, options, done);
 	},
 
 
@@ -428,53 +416,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	utilSnapshot : function (options, done) {
+	snap : function (options, done) {
 		// var path = '/api/util/snapshot';
 		var path = '/v2/static/screen';
 		this.post(path, options, done);
 	},
-
-	
-	
-
-	// setrolemember : function (options, done) {
-	// 	var path = '/api/access/super/setrolemember';
-	// 	this.post(path, options, done);
-	// },
-
-	// portalSetrolemember : function (options, done) {
-	// 	var path = '/api/access/portal/setrolemember';
-	// 	this.post(path, options, done);
-	// },
-
-	
-
-	
-	// clientNew : function (options, done) {
-	// 	var path = '/api/client/new';
-	// 	this.post(path, options, done);
-	// },
-
-	// clientDelete : function (options, done) {
-	// 	var path = '/api/client/delete';
-	// 	this.post(path, options, done);
-	// },
-
-	
-
-	
-
-	// accessSetrolemember : function (options, done) {
-	// 	var path = '/api/access/setrolemember';
-	// 	this.post(path, options, done);
-	// },
-
-	
-
-	// clientUpdate : function (options, done) {
-	// 	var path = '/api/client/update';
-	// 	this.post(path, options, done);
-	// },
 
 	
 	// helper fn's
@@ -486,7 +432,7 @@ Wu.Api = Wu.Class.extend({
 
 	_post : function (path, json, done, context, baseurl) {
 		var http = new XMLHttpRequest();
-		var url = baseurl || Wu.Util._getServerUrl();
+		var url = baseurl || this.options.url || Wu.Util._getServerUrl();
 		url += path;
 
 		// open
@@ -509,7 +455,7 @@ Wu.Api = Wu.Class.extend({
 		// add access_token to request
 		var access_token = app.tokens ? app.tokens.access_token : null;
 		var options = _.isString(json) ? Wu.parse(json) : json;
-		options.access_token = access_token;
+		options.access_token = options.access_token || access_token;
 		var send_json = Wu.stringify(options);
 
 		// send
@@ -522,10 +468,13 @@ Wu.Api = Wu.Class.extend({
 		});
 	},
 
-	_get : function (path, json, done, context, baseurl) {
+	_get : function (path, options, done, context, baseurl) {
 		var http = new XMLHttpRequest();
-		var url = baseurl || Wu.Util._getServerUrl();
+		var url = baseurl || this.options.url || Wu.Util._getServerUrl();
 		url += path;
+
+		// add options to query
+		url = this._addQueryOptions(url, options);
 
 		// open
 		http.open("GET", url, true);
@@ -543,14 +492,23 @@ Wu.Api = Wu.Class.extend({
 				}
 			}
 		};
-
-		// add access_token to request
-		var options = _.isString(json) ? Wu.parse(json) : json;
-		options.access_token = app.tokens ? app.tokens.access_token : null;
-		var send_json = Wu.stringify(options);
-
+		
 		// send
-		http.send(send_json);
-	}
+		http.send();
+	},
+
+	_addQueryOptions : function (url, options) {
+		var options = options || {};
+		options = _.isObject(options) ? options : Wu.parse(options);
+		options.access_token = (app && app.tokens) ? app.tokens.access_token : null;
+		if (!_.isEmpty(options)) {
+			_.forOwn(options, function (value, key) {
+				// encode and add
+				url += _.contains(url, '?') ? '&' : '?';
+				url += encodeURIComponent(key) + '=' + encodeURIComponent(value);
+			});
+		}
+		return url;
+	},
 
 });

@@ -347,17 +347,16 @@ input.chrome-field-input {
 
 
 .chrome-upload-button {
-    position: relative;
-    width: auto;
-    margin: 0;
+    position: absolute;
+    width: 100%;
     right: 0;
     left: 0;
     float: right;
-    top: -34px;
-    padding-left: 20px;
+    top: 0;
     padding-right: 20px;
     background: #3C4759;
-    }
+    border: 1px solid #3C4759;
+}
 
 .chrome-upload-button:hover {
     background: #F9F9F9;
@@ -718,7 +717,8 @@ input.chrome-field-input {
 
 .smooth-fullscreen-inner.invite {
     /*overflow: hidden;*/
-    overflow: scroll;
+    /*overflow: scroll;*/
+    padding-bottom: 550px
     }
 
 .no-layers {
@@ -752,6 +752,9 @@ input.chrome-field-input {
     position: relative;
     line-height: 1;
     top: 1px;
+    max-width: 217px;
+    overflow: hidden;
+    /*word-break: break-word;*/
     }
 
 .legend-each-color {
@@ -806,7 +809,12 @@ input.chrome-field-input {
     }
 
 .chrome-data-scroller {
-    width: 443px;
+    /*width: 443px;*/
+
+    width: 463px;
+    padding-right: 20px !important;
+    overflow-x: hidden;
+    overflow-y: scroll;    
     }
 
 .layer-name-content {
@@ -884,7 +892,8 @@ input.chrome-field-input {
     }
 
 .upload-button-container {
-    padding-right: 30px;
+    /*padding-right: 30px;*/
+    right: 30px;
     }
 
 .file-list-container-file-list .data-list-line:nth-child(odd) {
@@ -1225,7 +1234,8 @@ input.chrome-field-input {
     padding-right: 0;
     width: 301px;
     /*max-height: 310px;*/
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;    
     }
 
 .leaflet-right .leaflet-control-description {
@@ -1258,7 +1268,8 @@ input.chrome-field-input {
 
 .description-multiple-toggle-inner {
     /*max-height: 110px;*/
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
     width: 301px;
     padding-top: 4px;
     padding-bottom: 4px;
@@ -1660,7 +1671,8 @@ input.chrome-field-input {
 
 */
 .description-control-inner.allow-scrolling {
-    overflow-x: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
     /*padding-bottom: 35px;*/
 }
 
@@ -1789,7 +1801,157 @@ input.chrome-field-input {
     cursor: pointer;   
 }
 
+.files-container-header {
+    white-space: nowrap;
+    width: 100%;
+    padding: 20px 30px 0px;
+    position: relative;
+}
 
+.files-sort-select {
+    display: inline-block;
+    width: 20%;
+    text-align: center;
+    font-size: 16px;
+    padding: 5px 25px 5px 10px;
+    background-color: #F4F4F4;
+    border: 1px solid #D0D0D0;
+    border-radius: 4px 0px 0px 4px;
+    font-weight: bold;
+    position: relative;
+    cursor: pointer;
+}
+
+.files-sort-select:after {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    display: block;
+    width: 0;
+    height: 0;
+    margin-top: -3px;
+    border-color: #3F4652 transparent transparent transparent;
+    border-style: solid;
+    border-width: 5px 5px 0 5px;
+    content: ' ';
+}
+
+
+.files-sort-select.expanded {
+    background-color: #DDD;
+}
+
+
+.files-sort-select.expanded:after {
+    /*border-color: transparent transparent #3F4652 transparent;*/
+    /*border-width: 0 5px 5px 5px;*/
+}
+
+.files-search-input-wraper {
+    display: inline-block;
+    width: 80%;
+    position: relative;
+    height: 34px;
+    font-size: 16px;
+    font-family: 'Open Sans', serif;
+    color: #4A4A4A;
+    border: 1px solid #D0D0D0;
+    border-left: none;
+    border-radius: 0px 4px 4px 0px;
+}
+
+.files-search-input-wraper i.fa.fa-search.search-files {
+    position: absolute;
+    top: 25%;
+    left: 10px;
+    color: #CECECE;
+}
+
+.files-search-input-wraper input.files-search-input {
+    height: 100%;
+    width: 100%;
+    font-size: 16px;
+    border: none;
+    border-radius: 0px 4px 4px 0px;
+    padding-left: 30px;
+}
+
+.files-container-header .expended-container {
+    position: absolute;
+    z-index: 100;
+    width: 40%;
+    height: auto;
+}
+
+.files-sort-options {
+    position: relative;
+    margin: 5px 5px 5px 0;
+    background-color: white;
+    /*border: 1px solid #E0E0E0;*/
+    border-radius: 4px;
+    box-shadow: 0 0 3px 0 rgba(0,0,0,0.3);
+    padding-top: 9px;
+    padding-bottom: 9px;    
+}
+
+.files-sort-options .sort-option {
+    /*padding: 10px;*/
+    padding: 6px;
+    padding-left: 20px;    
+    cursor: pointer;
+}
+
+.files-sort-options .sort-option:hover {
+    background-color: #F6F6F6;    
+}
+
+.files-sort-order-switch-wraper {
+    padding: 10px;
+    position: relative;
+}
+
+.chrome-switch-container.sort-order-switch {
+    float: none;
+    position: inherit;
+    top: 0;
+    margin: 0 15px;
+    width: 96px;
+    margin: 0px 20px;
+
+    height: 20px;
+    background: #CCC;
+    color: white;    
+}
+
+.chrome-switch-container.sort-order-switch:before {
+    left: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;  
+}
+
+.chrome-switch-container.sort-order-switch.switch-on:before {
+    left: 79px;
+}
+
+.chrome-switch-container.sort-order-switch.switch-on:after{
+    content: 'Ascending';
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    left: 12px;
+    position: absolute;
+    top: 3px;
+}
+
+.chrome-switch-container.sort-order-switch:after{
+    content: 'Descending';
+    font-size: 11px;
+    font-weight: 600;
+    left: 23px;
+    position: absolute;
+    top: 3px;
+}
 
 .d3-satellite-wrapper {
     height: auto;
@@ -1799,3 +1961,205 @@ input.chrome-field-input {
     width: 383px;
 
 }
+
+.chrome-menu-button {
+    font-size: 23px;
+    padding-top: 4px;
+    padding-left: 9px;    
+}
+
+
+.chrome-button.layer {
+    padding-top: 4px;    
+}
+
+.chrome-button.layer .systemapic-icons {
+    font-size: 18px;
+    position: relative;
+    top: 4px;
+}
+
+
+.leaflet-control-baselayertoggle:after {
+    content: 'l';
+    font-family: 'systemapic-icons';
+    font-style: normal;
+    font-weight: 500;
+    background-image: none;
+    font-size: 18px;
+    padding-top: 2px;
+}
+
+.baselayertoggle-list {
+    left: 26px;
+    top: -15px;    
+}
+
+
+.leaflet-control-search .search-button,
+.leaflet-control-search .search-button:hover {
+    background-image: none !important;
+}
+
+.leaflet-control-search .search-button:after {
+    content: "\f002";
+    font: normal normal normal 14px/1 FontAwesome;
+    font-style: normal;
+    font-weight: 500;
+    background-image: none;
+    font-size: 18px;
+    padding-top: 2px;
+    color: black;
+    position: relative;
+    right: 6px;
+    top: 5px;
+}
+
+.leaflet-draw-toolbar a:before {
+    content: 's';
+    font-family: 'systemapic-icons';
+    font-style: normal;
+    font-weight: 500;
+    background-image: none;
+    font-size: 24px;
+    top: 2px;    
+}
+
+
+
+
+
+
+
+
+.file-popup-trigger.add-layer {
+    /*float: right;*/
+    position: absolute;
+    right: 11px;
+    left: auto;
+    /*background: red !important;*/
+}
+
+
+.file-name-content {
+    padding-right: 62px;    
+}
+
+.chrome-upload-button {
+    top: auto;
+}
+
+.leaflet-right.leaflet-top {
+    top: auto;
+    }
+
+.layer-list-container .file-popup-trigger {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    }
+
+.data-list-line.processing, 
+.data-list-line.processing:hover {
+    background: #3C4759 !important;
+    }
+
+.user-counter {
+    margin-left: 7px;
+    background: #DDD;
+    border-radius: 10px;
+    position: relative;
+    padding-left: 4px;
+    padding-right: 4px;
+    color: white;
+    font-weight: 900;
+    font-size: 10px;
+    text-align: center;
+    line-height: 1;
+    }
+
+.active-project .user-counter {
+    background: white;
+    color: #3C4759;    
+    }
+ 
+.info-legend-header {
+    border: none;
+    background: transparent;
+    padding-left: 10px;
+    padding-right: 10px;    
+    }
+
+
+
+
+.base-layer-color-selector-wrapper {
+    margin-top: 10px;    
+    }
+
+.base-layer-color-selector-wrapper .chrome-color-ball.target-color-box {
+    width: 80px;
+    height: 32px; 
+    display: inline-block;
+    vertical-align: top;   
+    }
+
+.base-layer-color-title {
+    display: inline-block;
+    vertical-align: top;
+    line-height: 2.2;
+    font-weight: 600;
+    margin-left: 10px;
+}    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+
+
+.small-pop-up .c3-header-metapair {
+    height: auto;
+    border: none;
+    box-shadow: none;
+    border-bottom: none !important;
+    margin-bottom: 4px; 
+}
+
+.small-pop-up .c3-header-metakey {
+    margin-right: 6px;
+    font-size: 15px !important;
+    margin-bottom: 0px;
+        margin-top: 5px;
+        color: #777;
+        font-weight: 400;    
+}
+
+.small-pop-up .c3-header-metaval {
+    padding: 0;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px !important;
+    font-weight: 400;
+    line-height: 1.4;       
+}
+
+.tableCell {
+    display: block !important;
+}*/

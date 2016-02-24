@@ -29,6 +29,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this.login_form = Wu.DomUtil.create('form', 'login-form', this._loginInner);
 		this.login_form.setAttribute('action', '/api/token');
 		this.login_form.setAttribute('method', 'post');
+		
 		// email input
 		this._email_input = this._createInput({
 			label : 'Email',
