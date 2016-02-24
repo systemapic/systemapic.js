@@ -411,6 +411,10 @@ Wu.Model.File = Wu.Model.extend({
 		return meta.geometry_type;
 	},
 
+	getGeometryType : function () {
+		return this._getGeometryType();
+	},
+
 	_getDefaultStyling : function () {
 
 		// get geom type
