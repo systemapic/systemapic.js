@@ -26,7 +26,7 @@ Wu.PhantomJS = Wu.Class.extend({
 		var active = app.MapPane.getControls().layermenu._getActiveLayers();
 		var layers = _.map(active, function (l) {
 			return l.item.layer;
-		})
+		});
 
 		// get project;
 		var project = project || app.activeProject;
@@ -35,7 +35,7 @@ Wu.PhantomJS = Wu.Class.extend({
 			project_id : project.getUuid(),
 			position : app.MapPane.getPosition(),
 			layers : layers
-		}
+		};
 
 		app.api.snap(view, function (err, result) {
 			callback(err, result);
@@ -65,14 +65,36 @@ Wu.PhantomJS = Wu.Class.extend({
 		this.ping(project_id);
 		this.ping(view);
 
-		if (!project_id) return this.ping('no project_id');
-		if (!position) return this.ping('no position');
+		if (!project_id) {
+			return this.ping(JSON.stringify({
+				error: {
+					message: 'no project_id',
+					code: 400
+				}
+			}));
+		}
+
+		if (!position) {
+			return this.ping(JSON.stringify({
+				error: {
+					message: 'no position',
+					code: 400
+				}
+			}));	
+		}
 
 		// request project from server
 		app.api.getPrivateProject({
 			project_id : project_id,
 		}, function (err, project_json) {
-			if (!project_json) return this.ping('error: empty project');
+			if (!project_json || !JSON.parse(project_json).uuid) {
+				return this.ping(JSON.stringify({
+					error: {
+						message: 'error: empty project',
+						code: 404
+					}
+				}));
+			}
 			if (err) {
 				this.ping('error: err getting project, err:' + err);
 				return app._login('Please log in to view this private project.');
