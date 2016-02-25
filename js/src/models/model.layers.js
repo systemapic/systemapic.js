@@ -1011,8 +1011,7 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 			fileUuid: fileUuid,
 			layerUuid : layerUuid,
 			subdomains : subdomains,
-			maxRequests : 0,
-			tms : true
+			maxRequests : 0
 		});
 	},
 
