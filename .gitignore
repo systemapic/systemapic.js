@@ -2,3 +2,5 @@ dist/*
 style.min.css
 local/*
 images/portal-logo.png
+css/style.min.css
+css/style.css
