@@ -39,6 +39,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Get layer object
 		var layer = this._project.getLayer(uuid);
 
+		if	( ! layer.store.metadata ) {
+			app.feedback.setError({
+						title : 'Missing metadata',
+						description : 'layer ' + uuid + ' has no associated metadata'
+					});
+			layer.store.metadata = '{}';
+		}
+
 		// Get layer meta
 		var layerMeta = JSON.parse(layer.store.metadata);
 
@@ -638,20 +646,21 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var error = e.detail;
 		var uniqueIdentifier = error.uniqueIdentifier;
 
+		console.error('error:', error);
+
 		// get temp file divs
 		var tempfile = this._tempFiles[uniqueIdentifier];
 
 		// set feedback
-		tempfile.feedback.innerHTML = error.description;
+		var feedbackText = _.isObject(error.description) ? 'Error code: ' + error.description.code : error.description;
+		tempfile.feedback.innerHTML = feedbackText;
 		tempfile.percent.innerHTML = 'Upload failed';
 		
-
+		// add error class
 		Wu.DomUtil.addClass(tempfile.datawrap, 'upload-error');		
-		// tempfile.datawrap.style.background = '#F13151';
 		
 		// close on click
 		Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);
-
 	},
 
 

@@ -411,6 +411,10 @@ Wu.Model.File = Wu.Model.extend({
 		return meta.geometry_type;
 	},
 
+	getGeometryType : function () {
+		return this._getGeometryType();
+	},
+
 	_getDefaultStyling : function () {
 
 		// get geom type
@@ -673,7 +677,8 @@ Wu.Model.File = Wu.Model.extend({
 		
 		var options = {
 			file : this,
-			project : project,
+			defaultCartocss : '#layer { raster-opacity:1.0 }', // TODO tweak a default CSS for raster
+			project : project
 		}
 
 		// create layer on server
@@ -685,13 +690,14 @@ Wu.Model.File = Wu.Model.extend({
 
 		var file = options.file,
 		    file_id = file.getUuid(),
+		    defaultCartocss = options.defaultCartocss,
 		    project = options.project;
 
 		var cutColor = options.cutColor || false;
 
 		var layerJSON = {
-			"geom_column": "the_geom_3857",
-			"geom_type": "geometry",
+			"geom_column": "rast",
+			"geom_type": "raster",
 			"raster_band": "",
 			"srid": "",
 			"affected_tables": "",
@@ -699,8 +705,8 @@ Wu.Model.File = Wu.Model.extend({
 			"attributes": "",
 			"access_token": app.tokens.access_token,
 			"cartocss_version": "2.0.1",
-			// "cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
-			// "sql": "(SELECT * FROM " + file_id + ") as sub",
+			"cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
+			"sql": "(SELECT * FROM " + file_id + ") as sub",
 			"file_id": file_id,
 			"return_model" : true,
 			"projectUuid" : project.getUuid(),
@@ -717,6 +723,13 @@ Wu.Model.File = Wu.Model.extend({
 			}
 
 			var layer = Wu.parse(layerJSON);
+			if ( ! layer.options )
+			{
+				return app.feedback.setError({
+					title : 'Unexpected layerJSON',
+					description : layerJSON
+				});
+			}
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
