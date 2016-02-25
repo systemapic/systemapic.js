@@ -568,10 +568,14 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// filter event (throttled)
 		this._chart.on('filtered', function (chart, filter) {
 
+			console.log('filtered: ', chart, filter);
+
 			if (!filter) return this._registerFilter(false);
 
 			// round buckets
 			var buckets = [Math.round(filter[0]), Math.round(filter[1])];
+
+			console.log('buckets', buckets);
 
 			// apply sql filter, create new layer, etc.
 			this._registerFilter(column, buckets, histogram);
@@ -648,6 +652,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		var max = m.freq;
 
+		console.log('_getYAxisTicks', histogram, m, max);
+
 		// five ticks
 		var num_ticks = 3;
 		var ticks = [];
@@ -682,6 +688,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		function nearest(n, v) {
 			n = n / v;
 			n = Math.ceil(n) * v;
+			console.log('nearest: ', n);
 			return n;
 		}
 
@@ -770,7 +777,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			// debug stop, prevent infinite loop just in case
 			if (n > 100) bucket = true;
 		}
-
 		return bucket;
 	},
 
@@ -784,8 +790,9 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var range_min = Math.round(bucket_min.range_min * 100)/100;
 		var range_max = Math.round(bucket_max.range_max * 100)/100;
 
+
 		var b = {
-			min : range_min,
+			min : _.isNaN(range_min) ? 1 : range_min,
 			max : range_max,
 			bottom : bottom_bucket, 
 			top : top_bucket

@@ -79,6 +79,9 @@ Wu.MapPane = Wu.Pane.extend({
 		// set position
 		this.setPosition();
 
+		// set background color :: NEW
+		this.setBackgroundColor();
+
 	},
 
 	_flush : function () {
@@ -265,6 +268,13 @@ Wu.MapPane = Wu.Pane.extend({
 		baseLayers.forEach(function (layer) {
 			this.addBaseLayer(layer);
 		}, this);
+	},
+
+	setBackgroundColor : function () {
+
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#3C4759 url(../images/canvas.png)';
+		app.MapPane._container.style.background = bgc;
+
 	},
 
 	addBaseLayer : function (baseLayer) {

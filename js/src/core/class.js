@@ -681,12 +681,6 @@ Wu.Util = {
 
 	},
 
-	setColorTheme : function () {
-
-		// injectCSS();
-
-	},
-
 	
 	prettyDate : function(date, compareTo){
 		/*

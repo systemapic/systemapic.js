@@ -5,7 +5,7 @@ Wu.Reset = Wu.Class.extend({
 		message : 'Please create a strong password',
 		sent : 'Please check your email for further instructions.',
 		button : 'Reset',
-		api : '/reset/password'
+		api : '/v2/users/password'
 	},
 
 	initialize : function (options) {
@@ -57,27 +57,11 @@ Wu.Reset = Wu.Class.extend({
 		// wrap
 		var logo_wrap = Wu.DomUtil.create('div', 'logo-wrap', this._container);
 
-		// // logo
-		// var logo = Wu.DomUtil.create('div', 'logo', logo_wrap);
-
-		// // set image
-		// var logo_img = loginConfig.invitationLogo;
-		// logo.style.backgroundImage = 'url(../' + logo_img + ')';
-
 		// logo
-		var logo_img = window.systemapicConfigOptions.logos.invitationLogo;
+		var logo_img = window.systemapicConfigOptions.logos.clientLogo;
 		logo_wrap.style.backgroundImage = logo_img.backgroundImage;
-    	logo_wrap.style.backgroundRepeat = "no-repeat";
-    	logo_wrap.style.backgroundPosition = "center";
-		// var logo = Wu.DomUtil.create('img', '', logo_wrap);
-
-		// set image
-		// logo.src = logo_img;
-
-		// set width
-		// var width = loginConfig.loginLogoWidth || 210;
-		// logo.style.width = width + 'px';
-
+    		logo_wrap.style.backgroundRepeat = "no-repeat";
+    		logo_wrap.style.backgroundPosition = "center";
 	},
 
 

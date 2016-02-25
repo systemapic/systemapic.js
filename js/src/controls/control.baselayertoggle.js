@@ -108,6 +108,9 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 			this.addLayer(baseLayer);
 		}, this);
 
+		// Add blank baselayer (NONE)
+		this.addBlankLayer();
+
 	},
 
 	_getBaselayers : function () {
@@ -140,6 +143,8 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 				}
 			}
 		}, this);
+
+		results
 		return results;
 	},	
 	
@@ -151,6 +156,8 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	},
 
 	addLayer : function (baseLayer) {
+
+
 		if (!baseLayer.layer) return console.error('BUG: fixme!');
 		
 		// create div
@@ -169,6 +176,50 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 			Wu.DomEvent.stop(e);
 			this.toggleLayer(baseLayer, item);
 		}, this);
+	},
+
+	addBlankLayer : function () {		
+		
+		var item = Wu.DomUtil.create('div', 'baselayertoggle-item', this._list, 'NONE');
+		
+		// add click event
+		Wu.DomEvent.on(item, 'mousedown', function (e) {
+
+			Wu.DomEvent.stop(e);			
+
+			var bgLayers = this._getBaselayers();
+
+			// turn all baselayers off
+			for (var l in bgLayers) {
+				if (bgLayers.hasOwnProperty(l)) {
+					var b = bgLayers[l];
+					var layer2 = this._project.getLayer(b.uuid);
+
+					// disable
+					layer2.disable();
+					Wu.DomUtil.removeClass(item, 'active');
+
+					// mark not active
+					var bl = _.find(this._layers, function (bl2) {
+						return bl2.layer.store.uuid == b.uuid;
+					});
+					var bl3 = this._layers[L.stamp(bl)];
+					bl3.active = false;
+				}
+			}
+
+			var children = this._list.childNodes;
+
+			for (var i=0; i < children.length; i++) {
+				var div = children[i];
+				Wu.DomUtil.removeClass(div, 'active');
+			}
+
+			Wu.DomUtil.addClass(item, 'active');
+
+		}, this);
+
+		
 	},
 
 	toggleLayer : function (baseLayer, item) {
