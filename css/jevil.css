@@ -2163,3 +2163,127 @@ input.chrome-field-input {
 .tableCell {
     display: block !important;
 }*/
+
+
+.big-slider-outer-container {
+    position: absolute;
+    width: 100%;
+    bottom: 50px;
+    padding-left: 100px;
+    text-align: center;
+    margin: auto;
+    padding-right: 100px;
+    }
+
+
+
+.big-slider-inner-container {
+    padding: 24px;
+    background: white;
+    border-radius: 10px;    
+    padding-left: 70px;
+    padding-right: 120px;
+    padding-bottom: 40px;
+    padding-top: 40px;
+    position: relative;
+    }    
+
+.big-slider-play-button {
+    left: 24px;
+    position: absolute;
+    font-size: 32px;
+    top: 24px;
+    cursor: pointer;
+    }
+
+.big-slider-step-forward {
+    position: absolute;
+    right: 24px;
+    font-size: 32px;
+    top: 24px;     
+    cursor: pointer;
+    }
+
+.big-slider-step-backward {
+    position: absolute;
+    font-size: 32px;
+    top: 24px; 
+    right: 65px;
+    cursor: pointer;
+    }
+
+.big-slider-tick-container {
+    left: 0;
+    position: absolute;
+    width: 100%;
+    bottom: 9px;
+    padding-left: 28px;
+    padding-right: 78px;    
+    }
+
+.big-slider-tick {
+    width: 7.69%;
+    height: 12px;
+    display: inline-block;
+    position: relative;
+    font-size: 12px;
+    color: #999;
+}    
+
+.big-slider-tick:before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    height: 10px;
+    width: 1px;
+    background: #C8C8C8;
+    top: -10px;
+}
+
+.big-slider-year-tick {
+    position: absolute;
+    width: 100%;
+    top: -58px;
+    font-size: 16px;    
+    }
+
+.disable-button {
+    cursor: default;
+    opacity: 0.2;
+}
+
+.big-slider-current-date {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    left: 0;
+    top: 9px;    
+}
+
+
+
+
+/*NEW UPDATED CSS RULES - NOT PART OF PREVIOUS MERGE! (feb 20th 2016)*/
+#c3-header-metacontainer {
+    background: white !important;
+    }
+    
+.tableRow.c3-header-metapair:nth-child(even) {
+        background: #F6F6F6;    
+    }
+
+.small-pop-up .c3-header-metapair {
+    font-weight: 500;
+    padding: 8px;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    }
+
+.small-pop-up .c3-header-metakey {
+    font-size: 13px !important;
+    width: auto !important;
+    }
+
+.small-pop-up .c3-header-metaval {
+    font-size: 13px !important;
+    }

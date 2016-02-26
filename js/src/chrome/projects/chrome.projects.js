@@ -83,7 +83,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var title = Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
 
 		// add edit button if project is editable
-		if (project.isEditable()) {
+		if (project.isEditor()) {
 
 			// edit trigger, todo: only if can edit
 			var trigger = Wu.DomUtil.create('div', 'chrome-left-popup-trigger', wrapper);
@@ -122,13 +122,23 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var tooltipWidth = this.options.publicTooltipWidth + 'px';
 			projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
 		
-		} else {
+		} else if ( project.isEditor()) {
 
 			var editorsNo = project.store.access.edit.length;
 			var readersNo = project.store.access.read.length;
 			var usersNo   = editorsNo + readersNo;
 
-			var userCount = '<span class="user-counter">' + usersNo + '</span>';
+			// xoxoxoxoxoxoxo
+
+			// // get user
+			// var createdBy = project.store.createdByName;
+			var tooltipText = editorsNo + ' editors & ' + readersNo + ' viewers';
+
+			// set tooltip width
+			var width = tooltipText.length * 10 + 'px';
+
+
+			var userCount = '<span class="project-icon user-counter">' + usersNo + '<div class="absolute"><div class="project-tooltip" style="width:' + width + '">' + tooltipText + '</div></div></span>';
 			projectTitle += userCount;
 
 		}
