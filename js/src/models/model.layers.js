@@ -137,6 +137,7 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	flyTo : function () {
 		var extent = this.getMeta().extent;
+		console.log('flyTo, meta:', this.getMeta());
 		if (!extent) return;
 
 		var southWest = L.latLng(extent[1], extent[0]),
@@ -1018,8 +1019,7 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 			fileUuid: fileUuid,
 			layerUuid : layerUuid,
 			subdomains : subdomains,
-			maxRequests : 0,
-			tms : true
+			maxRequests : 0
 		});
 	},
 
@@ -1040,16 +1040,37 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		return meta;
 	},
 
+	getExtent : function () {
+		var meta = this.getMeta();
+		var extent_geojson = meta.extent_geojson;
+		if (!extent_geojson) return false;
+		var coordinates = extent_geojson.coordinates;
+		if (!coordinates) return false;
+		var coords = coordinates[0];
+
+		console.log('extent_geojson', extent_geojson);
+		console.log('meta:', this.getMeta());
+		var extent = [
+			coords[0][0],
+			coords[0][1],
+			coords[2][0],
+			coords[2][1]
+		];
+		return extent;
+	},
+
 	flyTo : function () {
-		var extent = this.getMeta().extent;
+		// var extent = this.getMeta().extent;
+		var extent = this.getExtent();
+		console.log('flyto rastter, meta:', this.getMeta());
 		if (!extent) return;
 
-		var southWest = L.latLng(extent[1], extent[0]),
-		    northEast = L.latLng(extent[3], extent[2]),
-		    bounds = L.latLngBounds(southWest, northEast),
-		    map = app._map,
-		    row_count = parseInt(this.getMeta().row_count),
-		    flyOptions = {};
+		var southWest = L.latLng(extent[1], extent[0]);
+		var northEast = L.latLng(extent[3], extent[2]);
+		var bounds = L.latLngBounds(southWest, northEast);
+		var map = app._map;
+		var row_count = parseInt(this.getMeta().row_count);
+		var flyOptions = {};
 
 		// if large file, don't zoom out
 		if (row_count > 500000) { 
