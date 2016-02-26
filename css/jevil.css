@@ -342,6 +342,7 @@
 
 input.chrome-field-input {
     background: transparent;
+    width: 100%;
     }
 
 
@@ -2163,3 +2164,36 @@ input.chrome-field-input {
 .tableCell {
     display: block !important;
 }*/
+
+
+
+
+
+/*NEW UPDATED CSS RULES - NOT PART OF PREVIOUS MERGE! (feb 20th 2016)*/
+.tiny-pop-up #c3-header-metacontainer {
+    background: white !important;
+    }
+    
+.tiny-pop-up .tableRow.c3-header-metapair:nth-child(even) {
+    background: #F6F6F6;    
+    }
+
+.tiny-pop-up .small-pop-up .c3-header-metapair {
+    font-weight: 500;
+    padding: 8px;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    }
+
+.tiny-pop-up .small-pop-up .c3-header-metakey {
+    font-size: 13px !important;
+    width: auto !important;
+    }
+
+.tiny-pop-up .small-pop-up .c3-header-metaval {
+    font-size: 13px !important;
+    word-break: break-word;
+    }
+
+
+

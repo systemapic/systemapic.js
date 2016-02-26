@@ -869,6 +869,14 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		// fetch data
 		this._fetchData(e, function (ctx, json) {
 			
+			// console.log('click!');
+			// console.log(json);
+
+			if ( !json ) {
+				console.error('no data for popup!');
+				return;
+			}
+
 			var data = JSON.parse(json);
 
 			e.data = data;

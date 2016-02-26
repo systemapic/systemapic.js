@@ -1731,7 +1731,7 @@ input.target-input.polygon {
 
 
 /*NEW UPDATED CSS RULES - NOT PART OF PREVIOUS MERGE! (feb 20th 2016)*/
-.small-pop-up .c3-header-metapair {
+/*.small-pop-up .c3-header-metapair {
 	max-width: none !important;
 }
 .small-pop-up .c3-header-metakey {
@@ -1739,7 +1739,6 @@ input.target-input.polygon {
     	width: 100px !important;
 }
 .small-pop-up .c3-header-metaval {
-	/*display: inline-block !important;*/
    	font-size: 14px !important;
 }
 
@@ -1751,4 +1750,4 @@ input.target-input.polygon {
 	display: table-cell !important;
 	padding-top: 4px !important;
 	word-break: break-word !important;
-}
+}*/
