@@ -705,6 +705,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	},
 
 	setStyle : function (postgis) {
+		console.log('setSTyle,', postgis);
 		if (!postgis) return console.error('no styloe to set!');
 		
 		this.store.data.postgis = postgis;
@@ -713,6 +714,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	// on change in style editor, etc.
 	updateStyle : function (style) {
+		console.log('updateStyle', style);
 		var layerUuid = style.layerUuid,
 		    postgisOptions = style.options;
 
