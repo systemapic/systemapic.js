@@ -49,9 +49,14 @@ Wu.PhantomJS = Wu.Class.extend({
 	
 	develop : function (view) {		
 
+		// phantom feedback
 		this.ping('developing!');
 		this.ping(view);
 
+
+		
+
+		// set style
 		this.phantomStyle();
 
 
@@ -163,6 +168,9 @@ Wu.PhantomJS = Wu.Class.extend({
 
 							// kill interval
 							clearInterval(waiting);
+
+							// close guide
+							Wu.Mixin.Events.fire('doingScreenshot');
 
 							// wait an extra second
 							setTimeout(function () {

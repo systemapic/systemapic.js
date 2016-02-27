@@ -378,5 +378,8 @@ Wu.Guide = Wu.Evented.extend({
 		Wu.DomUtil.remove(this._bg);
 	},
 
+	_onDoingScreenshot : function () {
+		this.close();
+	},
 
 })
