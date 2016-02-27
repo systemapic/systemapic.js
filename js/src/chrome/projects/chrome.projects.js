@@ -683,7 +683,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				_.forEach(items, function (_list_item_container, index) {
 					var item_index = items[index];
 					
-					if (_list_item_container.user.getUuid().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(this._checkedUsers[options.type]).indexOf(_list_item_container.user.getUuid()) !== -1) {
+					if (_list_item_container.user.getFullName().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(this._checkedUsers[options.type]).indexOf(_list_item_container.user.getFullName()) !== -1) {
 						item_index.list_item_container.style.display = 'none';
 						item_index.list_item_container.style.backgroundColor = '';
 						item_index.current = false;
@@ -750,7 +750,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				if (options.type == 'edit' && user.getUuid() == app.Account.getUuid()) return;
 
 				// add selected user item to input box
-				this._checkedUsers[options.type][user.getUuid()] = user;
+				this._checkedUsers[options.type][user.getFullName()] = user;
 				this._addUserAccessItem({
 					input : invite_input,
 					user : user,
@@ -903,7 +903,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				if (currentContainer && currentContainer.user) {
 					if (options.type == 'read' && currentContainer.user.getUuid() == app.Account.getUuid()) return;
 
-					this._checkedUsers[options.type][currentContainer.user.getUuid()] = currentContainer.user;
+					this._checkedUsers[options.type][currentContainer.user.getFullName()] = currentContainer.user;
 					this._addUserAccessItem({
 						input : invite_input,
 						user : currentContainer.user,
@@ -939,7 +939,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				var popped = this._access[options.type].pop();
 				Wu.DomUtil.remove(popped.user_container);
 				var item = _.find(_.keys(this._checkedUsers[options.type]), function (userName) {
-					return userName == last.user.getUuid(); 
+					return userName == last.user.getFullName(); 
 				});
 
 				delete this._checkedUsers[options.type][item];
@@ -990,7 +990,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					// ensure user
 					if (!user) return console.error('no such user');
 
-					this._checkedUsers[options.type][user.getUuid()] = user;
+					this._checkedUsers[options.type][user.getFullName()] = user;
 					this._addUserAccessItem({
 						input : invite_input,
 						user : user,
@@ -1066,7 +1066,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					return i.user == user;
 				});
 
-				delete options.checkedUsers[user.getUuid()];
+				delete options.checkedUsers[user.getFullName()];
 				options.onKeyUp.call(this);
 			}, this);
 		} else {
@@ -1099,7 +1099,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			Wu.DomUtil.remove(existing.user_container);
 			
 			var item = _.find(_.keys(this._checkedUsers[otherType]), function (userName) {
-				return userName == user.getUuid(); 
+				return userName == user.getFullName(); 
 			});
 
 			delete this._checkedUsers[otherType][item];
