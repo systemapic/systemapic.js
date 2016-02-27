@@ -1220,6 +1220,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	
 	_createProject : function (options) {
 
+		// prevent double clicks
+		if (this._creatingProject) return;
+		this._creatingProject = true;
+
 		// get name
 		var projectName = options.name_input.value;
 
@@ -1300,6 +1304,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// set access
 			project.setAccess(access);
+
+			// release
+			this._creatingProject = false;
 
 		});
 
