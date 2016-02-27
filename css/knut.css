@@ -1718,7 +1718,9 @@ input.target-input.polygon {
 
 
 
-
+.data-list-line.processing.upload-error:hover {
+    background: #F13151 !important;
+}
 
 
 
