@@ -24,8 +24,6 @@ Wu.Controller = Wu.Class.extend({
 		var cookie = Cookies.get('guide');
 		var seenBefore = (cookie == 'seen');
 
-		console.log('seenBefore', seenBefore);
-
 		// start guide if public
 		if (isPublic && !seenBefore) {
 			setTimeout(function () {
