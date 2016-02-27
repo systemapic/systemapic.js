@@ -674,7 +674,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var items = this._list_item_containers[options.type];
 		
 		function onKeyUp(e) {
-			console.error('this:', this);
 			var filterUsers = [];
 			var currentIsChecked = false;
 			var key = event.which ? event.which : event.keyCode;
@@ -975,8 +974,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// add current access vars
 			var projectAccess = project.getAccess();
 
-			console.log('projectAccess', projectAccess);
-
 			// add selected user item to input box
 			if (projectAccess && projectAccess[options.type] && !options.empty) {
 
@@ -985,8 +982,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 					var user = app.Users[userUuid];
 
-					console.log('adding user: ', user);
-					
 					// ensure user
 					if (!user) return console.error('no such user');
 
@@ -1022,15 +1017,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var invite_input = options.input;
 		var user = options.user;
 
-		console.log('1');
 		// if user deleted. todo: clean up deleting
 		if (!user) return;
-		console.log('2');
 
 		// focus input
 		invite_input.focus();
-
-		console.log('this.+accees', this._access);
 
 		// don't add twice
 		var existing = _.find(this._access[options.type], function (i) {
@@ -1053,7 +1044,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// dont allow deleting of self
 		if (user.getUuid() != app.Account.getUuid()) {
-			console.log('3');
 
 			// click event (kill)
 			Wu.DomEvent.on(user_container, 'click', function () {
@@ -1070,7 +1060,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				options.onKeyUp.call(this);
 			}, this);
 		} else {
-		console.log('4');
 
 			// add special color to self
 			Wu.DomUtil.addClass(user_container, 'itsme');
@@ -1083,8 +1072,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			user_container : user_container
 		});
 
-		console.log('5');
-
 		// remove from other list if active there
 		var otherType = (options.type == 'edit') ? 'read' : 'edit';
 		var existing = _.find(this._access[otherType], function (i) {
@@ -1092,8 +1079,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		});
 
 		if (existing) {
-		console.log('6');
-
 
 			// remove div
 			Wu.DomUtil.remove(existing.user_container);
@@ -1148,11 +1133,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 
 		this._access.edit.forEach(function (i) {
-			console.log('i: ', i);
 			access.edit.push(i.user.getUuid());
 		}, this);
 		this._access.read.forEach(function (i) {
-			console.log('i: ', i);
 			access.read.push(i.user.getUuid());
 		}, this);
 
