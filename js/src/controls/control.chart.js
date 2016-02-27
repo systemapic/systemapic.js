@@ -459,16 +459,16 @@ Wu.Control.Chart = Wu.Control.extend({
 			meta 		: false,
 			popupSettings 	: this.popupSettings,
 			d3array 	: {
-				    		meta 	: [],
-				    		xName 	: 'field_x', 
-				    		yName 	: 'mm',
-				    		x 	: [],
-				    		y 	: [],
-				    		ticks 	: [],
-				    		tmpTicks : []
+				meta 	: [],
+				xName 	: 'field_x', 
+				yName 	: 'mm',
+				x 	: [],
+				y 	: [],
+				ticks 	: [],
+				tmpTicks : []
 			},
 			multiPopUp : {
-					center 		: _center,
+				center 	: _center,
 			}
 
 		}
@@ -904,6 +904,9 @@ Wu.Control.Chart = Wu.Control.extend({
 		// size of step
 		var d = this._range / 8;
 
+		// find if y axis has negative values on top
+		var axis_reversed = (this._chart.axis.max().y < 0)
+
 		// zoom Y axis
 		if (delta > 0) { // moving up
 
@@ -920,7 +923,11 @@ Wu.Control.Chart = Wu.Control.extend({
 			this._range = this._range -= d;
 
 			// dont go under 1
-			if (this._range < 1) this._range = 1;
+			if (axis_reversed) {
+				if (this._range > 1) this._range = 1;
+			} else {
+				if (this._range < 1) this._range = 1;
+			}
 
 			// update axis
 			this._chart.axis.max(this._range);
