@@ -327,7 +327,7 @@ Wu.Invite = Wu.Class.extend({
 			options.access_token = token.access_token;
 
 			// accept invite
-			this._inviteUser(options, function (err, invitation) {
+			this._acceptInvitation(options, function (err, invitation) {
 				if (err) return console.error(err);
 
 				// enter portal
@@ -344,6 +344,8 @@ Wu.Invite = Wu.Class.extend({
 		this._createUser(options, function (err, user) {
 			if (err) return console.error(err);
 
+			console.log('created user:', user);
+
 			// get access token
 			this._getAccessToken(options, function (err, response) {
 				if (err) return console.error(err);
@@ -354,12 +356,15 @@ Wu.Invite = Wu.Class.extend({
 				// add access_token to request
 				options.access_token = token.access_token;
 
+				// add user uuid
+				options.user_uuid = user.uuid;
+
 				// accept invite
-				this._inviteUser(options, function (err, invitation) {
+				this._acceptInvitation(options, function (err, invitation) {
 					if (err) return console.error(err);
 
 					// enter portal
-					window.location.href = '/';
+					// window.location.href = '/';
 				});
 			}.bind(this));
 		}.bind(this));
@@ -373,7 +378,7 @@ Wu.Invite = Wu.Class.extend({
 		this.api.createUser(options, done);
 	},
 
-	_inviteUser : function (options, done) {
+	_acceptInvitation : function (options, done) {
 		this.api.acceptInvite(options, done);
 	},
 
