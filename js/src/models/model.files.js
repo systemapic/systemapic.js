@@ -521,6 +521,18 @@ Wu.Model.File = Wu.Model.extend({
 		}
 	},
 
+	_vectorizeDataset : function () {
+		console.log('_vectorizeDataset');
+
+		app.api.vectorizeDataset({
+			file_id : this.getUuid()
+		}, function (err, result) {
+			console.log('vectorizeDataset err result', err, result);
+
+		});
+
+	},
+
 	_getType : function () {
 		if (this.store.data && this.store.data.postgis) return 'vector';
 		if (this.store.data && this.store.data.raster) return 'raster';
@@ -686,6 +698,8 @@ Wu.Model.File = Wu.Model.extend({
 
 	},
 
+
+	// deprecated - rasters are now in postgis
 	_requestDefaultRasterLayer : function (options, callback) {
 
 		var file = options.file,
@@ -723,8 +737,7 @@ Wu.Model.File = Wu.Model.extend({
 			}
 
 			var layer = Wu.parse(layerJSON);
-			if ( ! layer.options )
-			{
+			if (!layer.options) {
 				return app.feedback.setError({
 					title : 'Unexpected layerJSON',
 					description : layerJSON

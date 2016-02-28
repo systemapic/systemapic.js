@@ -39,11 +39,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Get layer object
 		var layer = this._project.getLayer(uuid);
 
-		if	( ! layer.store.metadata ) {
+		if ( ! layer.store.metadata ) {
 			app.feedback.setError({
-						title : 'Missing metadata',
-						description : 'layer ' + uuid + ' has no associated metadata'
-					});
+				title : 'Missing metadata',
+				description : 'layer ' + uuid + ' has no associated metadata'
+			});
 			layer.store.metadata = '{}';
 		}
 
@@ -120,27 +120,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Background color selector
 		this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);		
-
-
-
-		// console.log('this._project', this._project);
-		// console.log('app.activeProject', app.activeProject);
-
-		// this._colorSelector = new Wu.button({
-		// 	id 	 : 'background-color',
-		// 	type 	 : 'colorball',
-		// 	right    : true,
-		// 	isOn 	 : true,
-		// 	appendTo : this._colorSelectorWrapper,
-		// 	fn       : this._updateColor.bind(this),
-		// 	value    : '#000',
-		// 	colors   : '',
-		// 	className: 'target-color-box'
-		// });	
-
-		// this._colorSelectorTitle = Wu.DomUtil.create('div', 'base-layer-color-title', this._colorSelectorWrapper, 'Background color');
-
-
 
 		// Lines
 		this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListWrapper);		
@@ -1209,6 +1188,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				file : file
 			});
 
+			// vectorize box
+			this._createVectorizeBox({
+				container : content,
+				file : file
+			});
+
 		}		
 
 		// share button
@@ -1276,12 +1261,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// if no meta
 		if (!meta) return;
 
+		var sizeX = meta.size ? meta.size.x : 'n/a';
+		var sizeY = meta.size ? meta.size.y : 'n/a';
+
 		// meta info
 		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta');
 		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
 		var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
 		var bands_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Bands:</span> ' + meta.bands);
-		var size_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Raster size:</span> ' + meta.size.x + 'x' + meta.size.y);
+		var size_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Raster size:</span> ' + sizeX + 'x' + sizeY);
 		var projection_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Projection:</span> ' + meta.projection);
 		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
 		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
@@ -1451,6 +1439,25 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// download button
 		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
+	},
+
+	_createVectorizeBox : function (options) {
+		var container = options.container;
+		var file = options.file;
+
+		// wrapper-3: download box
+		var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+		var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Vectorize dataset');
+
+		var feedbackText = 'A new layer will be created with the raster data converted into vector format.';
+		var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper3, feedbackText);
+		
+		// download button
+		var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
+		var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Vectorize');
+		
+		// download button
+		Wu.DomEvent.on(downloadBtn, 'click', file._vectorizeDataset, file);
 	},
 
 	_createDeleteBox : function (options) {
