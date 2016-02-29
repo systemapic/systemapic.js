@@ -162,18 +162,18 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_updateLayer : function (options, done) {
-		var css 	= this.getCartocssValue(),
-		    layer 	= options.layer,
-		    file_id 	= layer.getFileUuid(),
-		    sql 	= options.sql,
-		    sql 	= this._createSQL(file_id, sql),
-		    project 	= this._project;
+		var css 	= this.getCartocssValue();
+		var layer 	= options.layer;
+		var file_id 	= layer.getFileUuid();
+		var sql 	= options.sql;
+		var sql 	= this._createSQL(file_id, sql);
+		var project 	= this._project;
 
-		// layer options
-		var layerOptions = layer.store.data.postgis;
-		layerOptions.sql = sql;
-		layerOptions.css = css;
-		layerOptions.file_id = file_id;		
+		// // layer options
+		// var layerOptions = layer.store.data.postgis;
+		// layerOptions.sql = sql;
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;		
 
 		// layer json
 		var layerJSON = {

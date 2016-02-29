@@ -1146,16 +1146,16 @@ Wu.Styler = Wu.Class.extend({
 
 	_updateLayer : function (options, done) {
 
-		var css = options.css,
-		    layer = options.layer,
-		    file_id = layer.getFileUuid(),
-		    sql = options.sql,
-		    project = this.options.project,
-		    layerOptions = layer.store.data.postgis;
+		var css = options.css;
+		var layer = options.layer;
+		var file_id = layer.getFileUuid();
+		var sql = options.sql;
+		var project = this.options.project;
+		    // layerOptions = layer.store.data.postgis;
 
-		layerOptions.sql = sql;
-		layerOptions.css = css;
-		layerOptions.file_id = file_id;		
+		// layerOptions.sql = sql;
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;		
 
 		var layerJSON = {
 			geom_column: 'the_geom_3857',

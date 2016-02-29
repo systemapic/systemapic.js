@@ -251,11 +251,11 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		    project = this._project;
 
 
-		var layerOptions = layer.store.data.postgis;
+		// var layerOptions = layer.store.data.postgis;
 
 		// layerOptions.sql = sql;
-		layerOptions.css = css;
-		layerOptions.file_id = file_id;		
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;		
 
 		var layerJSON = {
 			geom_column: 'the_geom_3857',

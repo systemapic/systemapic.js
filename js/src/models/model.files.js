@@ -524,12 +524,51 @@ Wu.Model.File = Wu.Model.extend({
 	_vectorizeDataset : function () {
 		console.log('_vectorizeDataset');
 
-		app.api.vectorizeDataset({
-			file_id : this.getUuid()
-		}, function (err, result) {
-			console.log('vectorizeDataset err result', err, result);
+		var project = app.activeProject;
+		var file = this;
 
-		});
+		app.api.vectorizeDataset({
+			file_id : file.getUuid()
+		}, function (err, layerJSON) {
+			console.log('vectorizeDataset err result', err, layerJSON);
+
+			var layer = Wu.parse(layerJSON);
+
+			var options = {
+				projectUuid : project.getUuid(), // pass to automatically attach to project
+				data : {
+					postgis : layer.options
+				},
+				metadata : layer.options.metadata,
+				title : file.getName(),
+				description : 'Description: Layer created from ' + file.getName(),
+				file : file.getUuid(),
+				style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
+			};
+
+			// create new layer model
+			this._createLayerModel(options, function (err, layerModel) {
+
+				// refresh Sidepane Options
+				var layer = project.addLayer(layerModel);
+
+				// todo: set layer icon
+				app.feedback.setMessage({
+					title : 'Layer added to project',
+					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+				});	
+
+				// select project
+				Wu.Mixin.Events.fire('layerAdded', {detail : {
+					projectUuid : project.getUuid(),
+					layerUuid : layerModel.uuid
+				}});
+
+				// callback
+				done && done(null, layer);
+			});
+
+		}.bind(this));
 
 	},
 
@@ -548,35 +587,10 @@ Wu.Model.File = Wu.Model.extend({
 			cutColor : options.color // todo: validate
 		}, callback);
 
-
-		// // fubar: it's the layer that needs cutting (with gm), not file.. 
-		// app.api.cutRasterColor({
-		// 	color : color,
-		// 	file_id : file.getUuid()
-		// }, function (err, results) {
-		// 	console.log('cutRasterAlpha err, res', err, results);
-
-		// 	// create new layer with cut
-		// 	// add layer automatically
-		// 	// layer gets cut on exit
-
-		// });
-
 	},
 
 	_createLayer : function (project, callback) {
 		this._createDefaultLayer(project, callback);
-
-
-		// var options = {
-		// 	file_id : this.getUuid(),
-		// 	project_id : project.getUuid()
-		// }
-
-		// // create default layer from file on server, returns Wu.Layer + tile-layer
-		// app.api.createDefaultLayer(options, function (err, layers) {
-		// 	console.log('app.api.createDefaultLayer err, layuers', err, layers);
-		// });
 	},
 
 
@@ -611,11 +625,11 @@ Wu.Model.File = Wu.Model.extend({
 
 	_requestDefaultVectorLayer : function (options, done) {
 
-		var file = options.file,
-		    file_id = file.getUuid(),
-		    project = options.project,
-		    defaultCartocss = options.defaultCartocss,
-		    defaultStyle = options.defaultStyle;
+		var file = options.file;
+		var file_id = file.getUuid();
+		var project = options.project;
+		var defaultCartocss = options.defaultCartocss;
+		var defaultStyle = options.defaultStyle;
 
 
 		var layerJSON = {

@@ -287,18 +287,18 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	_updateLayer : function (options, done) {
 
-		var css = options.css,
-		    layer = options.layer,
-		    file_id = layer.getFileUuid(),
-		    sql = options.sql,
-		    project = this._project;
+		var css = options.css;
+		var layer = options.layer;
+		var file_id = layer.getFileUuid();
+		var sql = options.sql;
+		var project = this._project;
 
 
-		var layerOptions = layer.store.data.postgis;
+		// var layerOptions = layer.store.data.postgis;
 
-		layerOptions.sql = sql;
-		layerOptions.css = css;
-		layerOptions.file_id = file_id;		
+		// layerOptions.sql = sql;
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;		
 
 		var layerJSON = {
 			geom_column: 'the_geom_3857',
