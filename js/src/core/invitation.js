@@ -364,7 +364,7 @@ Wu.Invite = Wu.Class.extend({
 					if (err) return console.error(err);
 
 					// enter portal
-					// window.location.href = '/';
+					window.location.href = '/';
 				});
 			}.bind(this));
 		}.bind(this));
