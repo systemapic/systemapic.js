@@ -521,8 +521,8 @@ Wu.Model.File = Wu.Model.extend({
 		}
 	},
 
-	_vectorizeDataset : function () {
-		console.log('_vectorizeDataset');
+	_vectorizeDataset : function (e, done) {
+		console.error('_vectorizeDataset', arguments);
 
 		var project = app.activeProject;
 		var file = this;
@@ -533,6 +533,8 @@ Wu.Model.File = Wu.Model.extend({
 			console.log('vectorizeDataset err result', err, layerJSON);
 
 			var layer = Wu.parse(layerJSON);
+
+			console.log('layer: ', layer);
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
@@ -546,11 +548,15 @@ Wu.Model.File = Wu.Model.extend({
 				style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
 			};
 
+			console.log('VECTORIZE: creting layer model');
+
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
 
 				// refresh Sidepane Options
 				var layer = project.addLayer(layerModel);
+
+				console.log('VECTORIZE: created layer model', layer);
 
 				// todo: set layer icon
 				app.feedback.setMessage({
@@ -679,7 +685,7 @@ Wu.Model.File = Wu.Model.extend({
 
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Layer added to project',
+					title : 'Layer ' + file.getName() + 'added to project',
 					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
 				});	
 
