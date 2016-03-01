@@ -309,15 +309,6 @@ function sendLoginCheck (options, callback) {
 	http.send(JSON.stringify(options));
 }
 
-
-zxcvbn_load_hook = function () {
-
-	// var p = document.getElementById('password-input');
-	// var r = document.getElementById('password-repeat');
-	// p.onkeyup = keyedup;
-	// r.onkeyup = keyedup;
-}
-
 function pw_key_up() {
 	console.log('pw_key_up');
 
@@ -332,23 +323,6 @@ function pw_key_up() {
 	}
 
 	checkButton();
-}
-
-function keyedup() {
-	var p = document.getElementById('password-input');
-	var r = document.getElementById('password-repeat');
-	var s = document.getElementById('password-strength');
-
-
-	var password = p.value;
-	var score = zxcvbn(password);
-	console.log(score);
-	s.innerHTML = 'Time to brute-force password: ' + score.crack_time_display; 
-
-	// score.score >= 3 ? markStrong() : markWeak();
-	// checkButton();
-	// p.value == r.value ? markSame() : markNotSame();
-	// checkButton();
 }
 
 function checkButton() {
