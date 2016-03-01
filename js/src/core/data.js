@@ -96,6 +96,8 @@ Wu.Data = Wu.Class.extend({
 		var layer = fileObject.layer;
 		var user = app.Account;
 
+		console.error('_gotFile', fileObject);
+
 		// add locally
 		var file = user.setFile(fileStore);
 
