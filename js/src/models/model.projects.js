@@ -264,7 +264,7 @@ Wu.Project = Wu.Class.extend({
 		this.initRoles();
 	},
 
-	setAccess : function (projectAccess) {
+	setAccess : function (projectAccess, callback) {
 
 		var options = {
 			project : this.getUuid(),
@@ -276,7 +276,9 @@ Wu.Project = Wu.Class.extend({
 
  			// set locally
  			this.store.access = projectAccess;
-
+ 			if (callback && _.isFunction(callback)) {
+ 				callback();
+ 			}
  		}.bind(this));
 
 	},

@@ -119,8 +119,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var readersNo = project.store.access.read.length;
 			var usersNo   = editorsNo + readersNo;
 
-			var userCount = '<span class="user-counter">' + usersNo + '</span>';
-			projectTitle += userCount;
+			if (project && project.isEditor() && project.getUuid()) {
+				var userCount = '<span class="user-counter" id="counter-' + project.getUuid() + '">' + usersNo + '</span>';
+				projectTitle += userCount;
+			}
 
 		}
 
@@ -621,9 +623,23 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		edit: []
 	},
 
-	_onCloseFullscreen : function () {
+	_onCloseFullscreen : function (options) {
 		// if (!this.access) return;
 		this._resetAccess();
+
+		if (options && options.detail && options.detail.projectId) {
+			var project = app.Projects[options.detail.projectId];
+			
+			if (project.isEditor()) {
+				var editorsNo = project.store.access.edit.length;
+				var readersNo = project.store.access.read.length;
+				var usersNo   = editorsNo + readersNo;
+				var userCount = Wu.DomUtil.get('counter-' + options.detail.projectId);
+
+				userCount.innerHTML = usersNo;
+			}
+		}
+
 		// this._access.read = [];
 		// this._access.edit = [];
 	},
@@ -1164,16 +1180,20 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		project.setName(projectName);
 
 		// set invitations
-		project.setAccess(access);
+		project.setAccess(access, function () {
+			// add project to list
+			this._refreshContent();
 
-		// add project to list
-		this._refreshContent();
+			// close fullscreen
+			this._fullscreen.close({
+				projectId: project.getUuid()
+			});
 
-		// close fullscreen
-		this._fullscreen.close();
 
-		// select project
-		project.selectProject();
+			// select project
+			project.selectProject();
+		}.bind(this));
+
 	},
 
 	_logUpdate : function (options) {
