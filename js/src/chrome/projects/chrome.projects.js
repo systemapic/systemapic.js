@@ -111,8 +111,17 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		if (project.isPublic()) {
 			var tooltipText = 'Public';
 			var tooltipWidth = this.options.publicTooltipWidth + 'px';
+			
 			projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
-		
+			
+			var editorsNo = project.store.access.edit.length;
+			var readersNo = project.store.access.read.length;
+			var usersNo   = editorsNo + readersNo;
+
+			if (project && project.isEditor() && project.getUuid()) {
+				var userCount = '<span class="user-counter" id="counter-' + project.getUuid() + '">' + usersNo + '</span>';
+				projectTitle += userCount;
+			}
 		} else {
 
 			var editorsNo = project.store.access.edit.length;
