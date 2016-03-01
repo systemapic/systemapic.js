@@ -6,7 +6,7 @@ Wu.Resumable = Wu.Class.extend({
 		simultaneousUploads : 5,
 		testChunks : true, 
 		maxFiles : 1,
-		fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw'],
+		fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw']
 	},
 
 	initialize : function (options) {
@@ -119,7 +119,7 @@ Wu.Resumable = Wu.Class.extend({
 					text : 'Uploading...',
 					error : null,
 					percent : parseInt(progress),
-					uniqueIdentifier : file.uniqueIdentifier,
+					uniqueIdentifier : file.uniqueIdentifier
 				}
 			});
 
@@ -228,7 +228,7 @@ Wu.Resumable = Wu.Class.extend({
 				text : 'Uploading...',
 				error : null,
 				percent : 0,
-				uniqueIdentifier : file.uniqueIdentifier,
+				uniqueIdentifier : file.uniqueIdentifier
 			}
 		});
 	},
@@ -257,7 +257,7 @@ Wu.Resumable = Wu.Class.extend({
 				text : 'Uploaded!',
 				error : null,
 				percent : 100,
-				uniqueIdentifier : file.uniqueIdentifier,
+				uniqueIdentifier : file.uniqueIdentifier
 			}
 		});
 
@@ -279,13 +279,13 @@ Wu.Resumable = Wu.Class.extend({
 	_generateQuery : function () {
 		var query = {
 			fileUuid : Wu.Util.guid('r'),
-			access_token : app.tokens.access_token,
+			access_token : app.tokens.access_token
 		};
 		return query;
 	},
 	_maxFilesErrorCallback : function () {
 		app.feedback.setError({
-			title : 'Please only upload one file at a time.',
+			title : 'Please only upload one file at a time.'
 		});	
 	},
 	_fileTypeErrorCallback : function (file, errorCount) {
@@ -303,7 +303,7 @@ Wu.Resumable = Wu.Class.extend({
 			description : description
 		});
 
-	},
+	}
 
 
-})
+});
