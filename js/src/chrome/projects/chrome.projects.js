@@ -707,27 +707,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// set title
 			title.innerHTML = projectTitle;
 		}
-		// if (options && options.detail && options.detail.projectId) {
-		// 	var project = app.Projects[options.detail.projectId];
-			
-		// 	if (project.isEditor()) {
-		// 		var editorsNo = project.store.access.edit.length;
-		// 		var readersNo = project.store.access.read.length;
-		// 		var usersNo   = editorsNo + readersNo;
-		// 		var userCount = Wu.DomUtil.get('counter-' + options.detail.projectId);
-
-		// 					var tooltipText = 'Public';
-		// 	var tooltipWidth = this.options.publicTooltipWidth + 'px';
-			
-		// 	projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
-			
-
-		// 		var tooltipText = 'The project is currently shared with ' + usersNo +  ' people.';
-		// 		var tooltipWidth = this.options.countInfoTooltipWidth + 'px';
-
-		// 		userCount.innerHTML = '<div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>' + usersNo;
-		// 	}
-		// }
 	},
 
 	// todo: refactor into module, var userList = new Wu.Tools.UserList();
