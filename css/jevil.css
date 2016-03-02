@@ -2078,6 +2078,11 @@ input.chrome-field-input {
     line-height: 1;
     }
 
+.user-counter:hover .project-tooltip {
+    opacity:0.9;
+    visibility: visible;
+}
+
 .active-project .user-counter {
     background: white;
     color: #3C4759;    

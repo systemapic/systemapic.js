@@ -823,6 +823,10 @@
     	height: auto;
 }
 
+.user-counter .project-tooltip {
+    top: -62px;
+}
+
 .project-icon:hover .project-tooltip {
     opacity:0.9;
     visibility: visible;

@@ -264,7 +264,7 @@ Wu.Project = Wu.Class.extend({
 		this.initRoles();
 	},
 
-	setAccess : function (projectAccess, callback) {
+	setAccess : function (projectAccess) {
 
 		var options = {
 			project : this.getUuid(),
@@ -276,9 +276,10 @@ Wu.Project = Wu.Class.extend({
 
  			// set locally
  			this.store.access = projectAccess;
- 			if (callback && _.isFunction(callback)) {
- 				callback();
- 			}
+
+			Wu.Mixin.Events.fire('updatedProjectAccess', {detail : {
+				projectId: options.project || null
+			}});
  		}.bind(this));
 
 	},
