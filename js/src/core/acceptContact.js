@@ -1,4 +1,4 @@
-Wu.AddContact = Wu.Class.extend({
+Wu.acceptContact = Wu.Class.extend({
 
 	options : systemapicConfigOptions,
 
