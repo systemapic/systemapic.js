@@ -6,7 +6,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// defaultWidth : 220,
 		defaultWidth : 283,
 		publicTooltipWidth : 55,
-		countInfoTooltipWidth : 230,
+		countInfoTooltipWidth : 155,
 		labels : {
 			private_project : 'Only invited users can access project',
 			public_project : 'Anyone with a link can access project',
@@ -121,7 +121,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var usersNo   = editorsNo + readersNo;
 
 			if (project && project.isEditor() && project.getUuid()) {
-			    tooltipText = 'The project is currently shared with ' + usersNo +  ' people.';
+			    tooltipText = 'Shared with ' + usersNo +  ' people.';
 			    tooltipWidth = this.options.countInfoTooltipWidth + 'px';
 				var userCount = '<span class="user-counter" id="counter-' + project.getUuid() + '">' + '<div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>' + usersNo + '</span>';
 				projectTitle += userCount;
@@ -131,7 +131,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var editorsNo = project.store.access.edit.length;
 			var readersNo = project.store.access.read.length;
 			var usersNo   = editorsNo + readersNo;
-			var tooltipText = 'The project is currently shared with ' + usersNo +  ' people.';
+			var tooltipText = 'Shared with ' + usersNo +  ' people.';
 			var tooltipWidth = this.options.countInfoTooltipWidth + 'px';
 
 			if (project && project.isEditor() && project.getUuid()) {
@@ -684,7 +684,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				var usersNo   = editorsNo + readersNo;
 
 				if (project && project.isEditor() && project.getUuid()) {
-				    tooltipText = 'The project is currently shared with ' + usersNo +  ' people.';
+				    tooltipText = 'Shared with ' + usersNo +  ' people.';
 				    tooltipWidth = this.options.countInfoTooltipWidth + 'px';
 					var userCount = '<span class="user-counter" id="counter-' + project.getUuid() + '">' + '<div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>' + usersNo + '</span>';
 					projectTitle += userCount;
@@ -694,7 +694,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				var editorsNo = project.store.access.edit.length;
 				var readersNo = project.store.access.read.length;
 				var usersNo   = editorsNo + readersNo;
-				var tooltipText = 'The project is currently shared with ' + usersNo +  ' people.';
+				var tooltipText = 'Shared with ' + usersNo +  ' people.';
 				var tooltipWidth = this.options.countInfoTooltipWidth + 'px';
 
 				if (project && project.isEditor() && project.getUuid()) {

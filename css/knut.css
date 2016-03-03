@@ -824,7 +824,8 @@
 }
 
 .user-counter .project-tooltip {
-    top: -62px;
+    top: -50px;
+    left: 23px;
 }
 
 .project-icon:hover .project-tooltip {
