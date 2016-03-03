@@ -635,18 +635,25 @@ Wu.Model.Layer = Wu.Model.extend({
 		console.log('delete layer', this);
 	},
 
-	isPostGIS : function () {
-		if (this.store.data && this.store.data.postgis) return true;
+	isVector : function () {
+		if (!this.store.data || !this.store.data.postgis) return false;
+		if (this.store.data.postgis.data_type == 'vector') return true;
 		return false;
 	},
-	isPostgis : function () {
-		return this.isPostGIS();
+	isRaster : function () {
+		if (!this.store.data || !this.store.data.postgis) return false;
+		if (this.store.data.postgis.data_type == 'raster') return true;
+		return false;
 	},
+	
 
 	getAttributionControl : function () {
 		return app.MapPane._attributionControl;
 	},
 	
+	_invalidateTiles : function () {
+		return;
+	},
 
 });
 
@@ -1009,7 +1016,7 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
-		    access_token 	= '?access_token=' + app.tokens.access_token;
+		    access_token = '?access_token=' + app.tokens.access_token;
 		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		var layerUuid = this._getLayerUuid();
@@ -1026,7 +1033,7 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 	},
 
 	_getLayerUuid : function () {
-		return this.store.data.raster;
+		return this.store.data.postgis.layer_id;
 	},
 
 	getMeta : function () {
@@ -1421,10 +1428,16 @@ Wu.createLayer = function (layer) {
 		console.error('no layer - weird:', layer);
 		return new Wu.ErrorLayer();
 	}
-	// postgis
-	if (layer.data.postgis && layer.data.postgis.file_id) {
+	// postgis vector
+	if (layer.data.postgis && layer.data.postgis.data_type == 'vector') {
 		return new Wu.PostGISLayer(layer);
 	}
+
+	// postgis raster
+	if (layer.data.postgis && layer.data.postgis.data_type == 'raster') {
+		return new Wu.RasterLayer(layer);
+	}
+
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
