@@ -407,7 +407,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._layer = this._project.getLayer(this.layerUuid);
 
 		// return if no layer
-		if (!this._layer || !this._layer.isPostGIS()) return;
+		if (!this._layer || !this._layer.isVector()) return;
 
 		// remember layer for other tabs
 		this._storeActiveLayerUuid(this.layerUuid);		

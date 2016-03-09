@@ -59,8 +59,8 @@ Wu.Invite = Wu.Class.extend({
 		var logo = Wu.DomUtil.create('div', 'logo', logo_wrap);
 
 		// set image
-		var logo_img = this.config.invitationLogo;
-		logo.style.backgroundImage = logo_img;
+		var logo_img = this.config.logos.invitationLogo;
+		logo.style.backgroundImage = logo_img.backgroundImage;
 		
 		// set width
 		var width = this.config.loginLogoWidth || 210;

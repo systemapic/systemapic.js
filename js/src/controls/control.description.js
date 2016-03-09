@@ -384,7 +384,7 @@ L.Control.Description = Wu.Control.extend({
 
 
 	getLegend : function (layer) {
-		var legendHTML = layer.isPostgis() ? this.createLegendHTML() : '';
+		var legendHTML = layer.isVector() ? this.createLegendHTML() : '';
 		return legendHTML;
 	},
 

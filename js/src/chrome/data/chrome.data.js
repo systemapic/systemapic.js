@@ -39,7 +39,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Get layer object
 		var layer = this._project.getLayer(uuid);
 
-		if ( ! layer.store.metadata ) {
+		if (!layer.store.metadata) {
 			app.feedback.setError({
 				title : 'Missing metadata',
 				description : 'layer ' + uuid + ' has no associated metadata'
@@ -48,7 +48,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}
 
 		// Get layer meta
-		var layerMeta = JSON.parse(layer.store.metadata);
+		var layerMeta = Wu.parse(layer.store.metadata);
 
 		// Build tooltip object
 		var tooltipMeta = app.Tools.Tooltip._buildTooltipMeta(layerMeta); // TODO: use event?
@@ -80,8 +80,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Middle container
 		this._innerContainer = Wu.DomUtil.create('div', 'chrome-data-inner', this._container);
 
-		// todo: create wrapper for layers - needs to be hidden if not editor
-
 		// LAYER LIST OUTER SCROLLER
 		this._listOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
 		this._listOuterScroller.style.height = '100%';
@@ -97,7 +95,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// Top container (with upload button)
 		this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
-		// this.topTitle = Wu.DomUtil.create('div', 'chrome-data-top-title', this.topContainer, 'Data Library');
 
 		// close event
 		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
@@ -237,6 +234,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_onFileImported : function (e) {
+
+		console.error('_onFileImported', e.detail.file);
 		
 		// refresh DOM
 		this._refresh();
@@ -251,12 +250,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this._addOnImport(layer);
 
 		}.bind(this));
-
-
 	},
 
 
 	_addOnImport : function (layer) {
+
+		console.log('_addOnImport', layer);
 
 		// add
 		this.addLayer(layer)
@@ -271,7 +270,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._refreshLayers();
 
 		// open styler if postgis
-		if (layer.isPostgis()) {
+		if (layer.isVector()) {
 			app.Tools.SettingsSelector.open();
 		}
 
@@ -298,7 +297,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			// Layer list
 			this._initLayerList();
 			this._refreshLayers();
-
 		}
 
 		this._refreshBaseLayerList();
@@ -1157,7 +1155,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 
 		// if vector 
-		if (file.isPostgis()) {
+		if (file.isVector()) {
 
 			// vector meta
 			this._createVectorMetaBox({
@@ -2064,7 +2062,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	       		var provider = layerBundle.key;
 
 	       		// only do our layers
-	       		if (provider != 'postgis' && provider != 'raster') return;
+	       		if (provider != 'postgis') return;
 
 	       		var layers = layerBundle.layers;
 
@@ -2122,7 +2120,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	sortLayers : function (layers) {
 
-		var keys = ['postgis', 'raster', 'google', 'norkart', 'geojson', 'mapbox'];
+		var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox'];
 		var results = [];
 	
 		keys.forEach(function (key) {
@@ -2138,11 +2136,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 					}
 				}
 			}
-
 			results.push(sort);
 		}, this);
-
-
 
 		this.numberOfProviders = results.length;
 		return results;
@@ -2634,9 +2629,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	enableLayer : function (layer) {
-
-		// 
-
 		// in layermenu
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu._enableLayerByUuid(layer.getUuid());
@@ -2667,14 +2659,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// Check if base layer is on
 	isBaseLayerOn : function (uuid) {
-
-
 		var on = false;
 		this._project.store.baseLayers.forEach(function (b) {
 			if ( uuid == b.uuid ) { on = true; } 
 		}.bind(this));
 		return on;
-
 	},
 
 

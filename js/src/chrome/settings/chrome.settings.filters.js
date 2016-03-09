@@ -286,7 +286,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_refreshSQL : function () {
 		if (!this._layer) return;
-		if (!this._layer.isPostgis()) return;
+		if (!this._layer.isVector()) return;
 
 		// get
 		var meta = this._layer.getPostGISData();

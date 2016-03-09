@@ -191,9 +191,9 @@ Wu.Pane.Login = Wu.Pane.extend({
 		var tokens = Wu.parse(result);
 
 		// invalid credentials
-		if (err && err == 401) {
+		if (err && err == 400) {
 			// set error feedback
-			return this._error_feedback.innerHTML = tokens.error;
+			return this._error_feedback.innerHTML = tokens.error.message;
 		}
 
 		// set tokens
