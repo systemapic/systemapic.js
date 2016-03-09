@@ -15,7 +15,12 @@ Wu.Api = Wu.Class.extend({
 		this.get(path, {}, done);
 	},
 
-
+	logout : function (options, done) {
+		var path = '/logout';
+		
+		options = options || {};
+		this.get(path, options, done);
+	},
 
 
 
