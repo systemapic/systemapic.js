@@ -206,7 +206,7 @@ Wu.Invite = Wu.Class.extend({
 	},
 
 
-	_createRegister : function () {
+	_createRegister : function (disableShader) {
 
 		// register
 		var wrapper = this._rightWrapper = Wu.DomUtil.create('div', 'right', this._centralWrapper);

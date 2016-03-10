@@ -28,6 +28,11 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "Admin",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/status"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -41,11 +46,6 @@ define({ "api": [
         ]
       }
     },
-    "sampleRequest": [
-      {
-        "url": "https://dev3.systemapic.com/"
-      }
-    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -117,7 +117,7 @@ define({ "api": [
     "groupTitle": "Data",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/data/import"
       }
     ],
     "error": {
@@ -244,7 +244,7 @@ define({ "api": [
     "groupTitle": "File",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/projects/data"
       }
     ]
   },
@@ -356,7 +356,7 @@ define({ "api": [
     "groupTitle": "File",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/data/delete"
       }
     ]
   },
@@ -453,7 +453,7 @@ define({ "api": [
     "groupTitle": "File",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/data/layers"
       }
     ]
   },
@@ -577,7 +577,7 @@ define({ "api": [
     "groupTitle": "File",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/data/share"
       }
     ]
   },
@@ -669,7 +669,7 @@ define({ "api": [
     "groupTitle": "File",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/data/update"
       }
     ]
   },
@@ -754,7 +754,7 @@ define({ "api": [
     "groupTitle": "Geo",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/layers/carto/json"
       }
     ]
   },
@@ -851,7 +851,7 @@ define({ "api": [
     "groupTitle": "Layer",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/layers/create"
       }
     ],
     "error": {
@@ -978,7 +978,7 @@ define({ "api": [
     "groupTitle": "Layer",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/layers/delete"
       }
     ]
   },
@@ -1063,7 +1063,7 @@ define({ "api": [
     "groupTitle": "Layer",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/projects/layers"
       }
     ]
   },
@@ -1236,7 +1236,7 @@ define({ "api": [
     "groupTitle": "Layer",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/layers/update"
       }
     ]
   },
@@ -1346,7 +1346,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/hashes"
       }
     ]
   },
@@ -1452,7 +1452,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/hashes"
       }
     ]
   },
@@ -1555,7 +1555,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/users/invite/project"
       }
     ]
   },
@@ -1633,7 +1633,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/projects/create"
       }
     ]
   },
@@ -1736,7 +1736,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/projects/delete"
       }
     ]
   },
@@ -1828,7 +1828,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/projects/private"
       }
     ]
   },
@@ -1941,7 +1941,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/projects/public"
       }
     ]
   },
@@ -1974,6 +1974,11 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "Project",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/projects/slug/unique"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1987,11 +1992,6 @@ define({ "api": [
         ]
       }
     },
-    "sampleRequest": [
-      {
-        "url": "https://dev3.systemapic.com/"
-      }
-    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -2242,7 +2242,7 @@ define({ "api": [
     "groupTitle": "Project",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/projects/update"
       }
     ]
   },
@@ -2352,7 +2352,7 @@ define({ "api": [
     "groupTitle": "Upload",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/data/import"
       }
     ]
   },
@@ -2448,7 +2448,7 @@ define({ "api": [
     "groupTitle": "User",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/users/invite/accept"
       }
     ]
   },
@@ -2554,7 +2554,7 @@ define({ "api": [
     "groupTitle": "User",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/users/invite/projects"
       }
     ]
   },
@@ -2639,7 +2639,7 @@ define({ "api": [
     "groupTitle": "User",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/users/invite/link"
       }
     ]
   },
@@ -2729,7 +2729,7 @@ define({ "api": [
     "groupTitle": "User",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/users/contacts/request"
       }
     ]
   },
@@ -2828,7 +2828,7 @@ define({ "api": [
     "groupTitle": "User",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/users/invite"
       }
     ]
   },
@@ -2924,7 +2924,12 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "routes/routes.js",
-    "groupTitle": "User"
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/token"
+      }
+    ]
   },
   {
     "type": "get",
@@ -2955,6 +2960,11 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/token/check"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -2968,11 +2978,6 @@ define({ "api": [
         ]
       }
     },
-    "sampleRequest": [
-      {
-        "url": "https://dev3.systemapic.com/"
-      }
-    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -3015,6 +3020,11 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/token/check"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -3028,11 +3038,6 @@ define({ "api": [
         ]
       }
     },
-    "sampleRequest": [
-      {
-        "url": "https://dev3.systemapic.com/"
-      }
-    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -3089,6 +3094,11 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/portal"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -3102,11 +3112,6 @@ define({ "api": [
         ]
       }
     },
-    "sampleRequest": [
-      {
-        "url": "https://dev3.systemapic.com/"
-      }
-    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -3184,6 +3189,13 @@ define({ "api": [
             "optional": false,
             "field": "password",
             "description": "<p>Password</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "access_token",
+            "description": "<p>A valid access token</p>"
           }
         ]
       }
@@ -3203,14 +3215,38 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n  \"user\": {\n      lastUpdated: '2016-01-19T12:49:49.076Z',\n      created: '2016-01-19T12:49:48.943Z',\n      ... etc\n  }\n}",
+          "content": "{\n  \"user\": {\n      lastUpdated: '2016-01-19T12:49:49.076Z',\n      created: '2016-01-19T12:49:48.943Z',\n      ... etc.\n  }\n}",
           "type": "json"
         }
       ]
     },
     "version": "0.0.0",
     "filename": "routes/routes.js",
-    "groupTitle": "User"
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/create"
+      }
+    ],
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>The <code>access_token</code> is invalid. (403)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "Error 401: Unauthorized\n{\n   \"error\": \"Invalid access token.\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   },
   {
     "type": "get",
@@ -3241,6 +3277,11 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/info"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -3254,11 +3295,6 @@ define({ "api": [
         ]
       }
     },
-    "sampleRequest": [
-      {
-        "url": "https://dev3.systemapic.com/"
-      }
-    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -3308,6 +3344,11 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/routes.js",
     "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/token/refresh"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -3321,11 +3362,6 @@ define({ "api": [
         ]
       }
     },
-    "sampleRequest": [
-      {
-        "url": "https://dev3.systemapic.com/"
-      }
-    ],
     "error": {
       "fields": {
         "Error 4xx": [
@@ -3417,7 +3453,12 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "routes/routes.js",
-    "groupTitle": "User"
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/password"
+      }
+    ]
   },
   {
     "type": "post",
@@ -3483,7 +3524,12 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "routes/routes.js",
-    "groupTitle": "User"
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/password/reset"
+      }
+    ]
   },
   {
     "type": "post",
@@ -3589,7 +3635,7 @@ define({ "api": [
     "groupTitle": "User",
     "sampleRequest": [
       {
-        "url": "https://dev3.systemapic.com/"
+        "url": "https://dev.systemapic.com/v2/users/update"
       }
     ]
   },
@@ -3614,6 +3660,11 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "routes/routes.js",
-    "groupTitle": "User"
+    "groupTitle": "User",
+    "sampleRequest": [
+      {
+        "url": "https://dev.systemapic.com/v2/users/session"
+      }
+    ]
   }
 ] });
