@@ -1420,7 +1420,9 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 
 // todo
 Wu.CartodbLayer = Wu.Model.Layer.extend({});
-Wu.ErrorLayer = Wu.Model.Layer.extend({})
+Wu.ErrorLayer = Wu.Model.Layer.extend({
+	_listen : function () {}
+})
 
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
@@ -1458,6 +1460,8 @@ Wu.createLayer = function (layer) {
 
 	// raster
 	if (layer.data.google) return new Wu.GoogleLayer(layer);
+
+	console.log('ErrorLayer: ', layer);
 
 	return new Wu.ErrorLayer();
 }
