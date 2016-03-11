@@ -277,6 +277,9 @@ Wu.Project = Wu.Class.extend({
  			// set locally
  			this.store.access = projectAccess;
 
+			Wu.Mixin.Events.fire('updatedProjectAccess', {detail : {
+				projectId: options.project || null
+			}});
  		}.bind(this));
 
 	},
