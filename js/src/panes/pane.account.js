@@ -94,7 +94,20 @@ Wu.Pane.Account = Wu.Pane.extend({
 	},
 
 	logout : function () {
-		window.location.href = '/logout';
+		app.api.logout({}, function (err, result) {
+			if (err) {
+				app.feedback.setError({
+					title : 'Something went wrong.',
+				});
+			} else {
+				app.feedback.setMessage({
+					title : 'Log out',
+					description : result
+				});
+				window.location.href = '/';
+			}
+		});
+		// window.location.href = '/logout';
 	},
 
 	openLogin : function () {
