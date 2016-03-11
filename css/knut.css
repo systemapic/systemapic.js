@@ -816,11 +816,12 @@
 	padding-left: 16px;
 	font-size: 12px;
 	font-weight: 600;
+    font-family: 'Open Sans', sans-serif, "Helvetica Neue", Helvetica, Arial;
 	visibility: hidden;
 	text-align: center;
 	z-index: 100002;
 	max-width: 230px;
-    	height: auto;
+	height: auto;
 }
 
 .user-counter .project-tooltip {
