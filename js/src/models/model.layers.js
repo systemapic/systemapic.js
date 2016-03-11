@@ -1431,12 +1431,12 @@ Wu.createLayer = function (layer) {
 		return new Wu.ErrorLayer();
 	}
 	// postgis vector
-	if (layer.data.postgis && layer.data.postgis.data_type == 'vector') {
+	if (layer.data.postgis && layer.data.postgis.geom_type == 'geometry') {
 		return new Wu.PostGISLayer(layer);
 	}
 
 	// postgis raster
-	if (layer.data.postgis && layer.data.postgis.data_type == 'raster') {
+	if (layer.data.postgis && layer.data.postgis.geom_type == 'raster') {
 		return new Wu.RasterLayer(layer);
 	}
 
@@ -1460,8 +1460,6 @@ Wu.createLayer = function (layer) {
 
 	// raster
 	if (layer.data.google) return new Wu.GoogleLayer(layer);
-
-	console.log('ErrorLayer: ', layer);
 
 	return new Wu.ErrorLayer();
 }
