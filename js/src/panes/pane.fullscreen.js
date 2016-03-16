@@ -48,7 +48,7 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 		// close trigger		
 		Wu.DomEvent.on(this._closer, 'click', this.destroy, this);
-		window.addEventListener('popstate', this.destroy.bind(this), false);
+		Wu.DomEvent.on(window, 'popstate', this.destroy, this);
 
 		// add esc key trigger for close fullscreen
 		this._addEscapeKey();
@@ -58,7 +58,7 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 		// close trigger		
 		Wu.DomEvent.off(this._closer, 'click', this.destroy, this);
-        window.removeEventListener('popstate', this.destroy.bind(this), false);
+		Wu.DomEvent.off(window, 'popstate', this.destroy, this);
 
 		// add esc key trigger for close fullscreen
 		this._removeEscapeKey();
