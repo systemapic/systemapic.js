@@ -2214,7 +2214,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var optionSeparator = Wu.DomUtil.create('option', 'active-layer-option', select, '----------------------------------------------------------------------------------------------------');
 		optionSeparator.disabled = true;
 
-		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
+		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'Solid background color');
 		if ( this._project.store.baseLayers.length == 0 ) {
 			option.selected = true;
 			this._enableColorSelector();
@@ -2244,10 +2244,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Add to map
 		var uuid = e.target.value;
-		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : this.oldNONEColor || '#000';	
-		this.oldNONEColor = bgc;
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : this.oldSolidBackgroundColor || '#000';	
+		
+		this.oldSolidBackgroundColor = bgc;
 
-		if ( uuid == 'NONE' ) {
+		if ( uuid == 'Solid background color' ) {
 			this._project.setBaseLayer([]);
 			this._enableColorSelector();
 			this._updateColor(bgc);
