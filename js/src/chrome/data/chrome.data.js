@@ -2211,6 +2211,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 		// Create selct option for no baselayer
+		var optionSeparator = Wu.DomUtil.create('option', 'active-layer-option', select, '----------------------------------------------------------------------------------------------------');
+		optionSeparator.disabled = true;
+		
 		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
 		if ( this._project.store.baseLayers.length == 0 ) {
 			option.selected = true;
