@@ -2213,7 +2213,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Create selct option for no baselayer
 		var optionSeparator = Wu.DomUtil.create('option', 'active-layer-option', select, '----------------------------------------------------------------------------------------------------');
 		optionSeparator.disabled = true;
-		
+
 		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
 		if ( this._project.store.baseLayers.length == 0 ) {
 			option.selected = true;
@@ -2244,7 +2244,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Add to map
 		var uuid = e.target.value;
-		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#000';	
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : this.oldNONEColor || '#000';	
+		this.oldNONEColor = bgc;
 
 		if ( uuid == 'NONE' ) {
 			this._project.setBaseLayer([]);
@@ -2275,6 +2276,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		} else {
 		    app.MapPane._container.style.removeAttribute('background');
 		}
+		this._project.setBackgroundColor('');
 	},
 
 	_initColorSelector : function () {
