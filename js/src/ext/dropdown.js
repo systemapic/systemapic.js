@@ -23,6 +23,11 @@ Wu.Dropdown = Wu.Class.extend({
 		this.options.content.forEach(function(selectOption) {
 			var option = Wu.DomUtil.create('li', 'form-combobox_option item', this._form_combobox__options, selectOption.title);
 
+			if (selectOption.disabled) {
+				Wu.DomUtil.addClass(option, "disabled-option");
+				return
+			}
+
 			option.setAttribute('data-value', selectOption.value);
 
 			var isSelected = this.isBaseLayerOn(selectOption.value);

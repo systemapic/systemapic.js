@@ -2153,9 +2153,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 	_initBaseLayerList : function () {
-
 		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false);
-		
 	},
 
 	_refreshBaseLayerList : function () {
@@ -2173,13 +2171,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_initLayout_activeLayers : function (title, subtitle, container, layers) {
-
-		// active layer wrapper
-		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'baselayer-dropdown-wrapper', container);
-		
-		// create dropdown
-		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
-		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
 		var sortedLayers = [];
 
 		// Create select options
@@ -2192,22 +2183,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// Get each provider (mapbox, google, etc)
 			provider.layers.forEach(function(layer) {
-				
-				// Create selct option
-				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-				
-				// Get layer uuid
-				var layerUuid = layer.getUuid();
-				
-				// Set option value
-				option.value = layerUuid;
-
-				// Set selected state
-				var isSelected = this.isBaseLayerOn(layerUuid);
-				if ( isSelected ) option.selected = true;
-
-				// Print option text
-				option.innerHTML = layer.getTitle();// + ' (' + provider.key + ')';
 				sortedLayers.push({
 					title: layer.getTitle(),
 					value: layer.getUuid()
@@ -2217,35 +2192,34 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}.bind(this));
 
 		sortedLayers.push({
-			title: "NONE",
-			value: "NONE"
+			title: "----------------------------------------------------------------------------",
+			disabled: true
+		});
+
+		sortedLayers.push({
+			title: "Solid background color",
+			value: "Solid background color"
 		});
 
 		this._testDropdown = new Wu.Dropdown({
 			fn: this._selectedActiveLayer.bind(this),
-			appendTo: this._baseLayerDropdownContainer,
+			appendTo: container,
 			content: sortedLayers,
 			project: this._project
 		});
 
-
-		// Create selct option for no baselayer
-		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
 		if ( this._project.store.baseLayers.length == 0 ) {
-			option.selected = true;
-			this._testDropdown.setValue("NONE");
-			this._enableColorSelector({
-				title: "NONE",
-				value: "NONE"
+			this._testDropdown.setValue({
+				title: "Solid background color",
+				value: "Solid background color"
 			});
+			this._enableColorSelector();
 		} else {
 			this._disableColorSelector();
 		}
 
 		// select event
-		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
-
-		return select;
+		return this._testDropdown;
 
 	},
 
@@ -2264,13 +2238,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Add to map
 		var uuid = value;
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : this.oldSolidBackgroundColor || '#000';	
+		
+		this.oldSolidBackgroundColor = bgc;
 
-		if ( uuid == 'NONE' ) {
+		if ( uuid == 'Solid background color' ) {
 			this._project.setBaseLayer([]);
 			this._enableColorSelector();
+			this._updateColor(bgc);
 			return;
 		}
 
+		this._setDefaultBackgroundColor();
 
 		this._disableColorSelector();
 		
@@ -2284,6 +2263,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			zIndex : 1,
 			opacity : 1
 		}]);
+	},
+
+	_setDefaultBackgroundColor : function () {
+		if (app.MapPane._container.style.removeProperty) {
+		    app.MapPane._container.style.removeProperty('background');
+		} else {
+		    app.MapPane._container.style.removeAttribute('background');
+		}
+		this._project.setBackgroundColor('');
 	},
 
 	_initColorSelector : function () {
