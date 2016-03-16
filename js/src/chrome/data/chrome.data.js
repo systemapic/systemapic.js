@@ -2180,8 +2180,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
 		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
+		var sortedLayers = [];
 
 		// Create select options
+
 		this.sortedLayers.forEach(function(provider) {
 
 			// Do not allow postgis layers to be in the baselayer dropdown
@@ -2206,17 +2208,36 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 				// Print option text
 				option.innerHTML = layer.getTitle();// + ' (' + provider.key + ')';
-
+				sortedLayers.push({
+					title: layer.getTitle(),
+					value: layer.getUuid()
+				});
 
 			}.bind(this))
 		}.bind(this));
+
+		sortedLayers.push({
+			title: "NONE",
+			value: "NONE"
+		});
+
+		this._testDropdown = new Wu.Dropdown({
+			fn: this._selectedActiveLayer.bind(this),
+			appendTo: this._baseLayerDropdownContainer,
+			content: sortedLayers,
+			project: this._project
+		});
 
 
 		// Create selct option for no baselayer
 		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
 		if ( this._project.store.baseLayers.length == 0 ) {
 			option.selected = true;
-			this._enableColorSelector();
+			this._testDropdown.setValue("NONE");
+			this._enableColorSelector({
+				title: "NONE",
+				value: "NONE"
+			});
 		} else {
 			this._disableColorSelector();
 		}
@@ -2228,7 +2249,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
-	_selectedActiveLayer : function (e) {
+	_selectedActiveLayer : function (value) {
 
 		// Remove active baselayers
 		var baselayers = this._project.getBaselayers();
@@ -2242,7 +2263,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}.bind(this));
 
 		// Add to map
-		var uuid = e.target.value;
+		var uuid = value;
 
 		if ( uuid == 'NONE' ) {
 			this._project.setBaseLayer([]);
