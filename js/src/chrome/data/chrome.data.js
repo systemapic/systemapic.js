@@ -2153,9 +2153,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 	_initBaseLayerList : function () {
-
 		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false);
-		
 	},
 
 	_refreshBaseLayerList : function () {
@@ -2243,13 +2241,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Add to map
 		var uuid = e.target.value;
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#000';	
 
 		if ( uuid == 'NONE' ) {
 			this._project.setBaseLayer([]);
 			this._enableColorSelector();
+			this._updateColor(bgc);
 			return;
 		}
 
+		this._setDefaultBackgroundColor();
 
 		this._disableColorSelector();
 		
@@ -2263,6 +2264,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			zIndex : 1,
 			opacity : 1
 		}]);
+	},
+
+	_setDefaultBackgroundColor : function () {
+		if (app.MapPane._container.style.removeProperty) {
+		    app.MapPane._container.style.removeProperty('background');
+		} else {
+		    app.MapPane._container.style.removeAttribute('background');
+		}
 	},
 
 	_initColorSelector : function () {
