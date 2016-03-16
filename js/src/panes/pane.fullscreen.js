@@ -64,12 +64,11 @@ Wu.Fullscreen = Wu.Evented.extend({
 		this._removeEscapeKey();
 	},
 
-	close : function (options) {
-		this.destroy(options);
+	close : function () {
+		this.destroy();
 	},
 
-	destroy : function (options) {
-		var options = options || {};
+	destroy : function () {
 		// remove events
 		this.removeEvents();
 
@@ -79,9 +78,7 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 		var closeCallback = this.options.closeCallback;
 		closeCallback && closeCallback();
-		Wu.Mixin.Events.fire('closeFullscreen', {detail : {
-			projectId: options.projectId || null
-		}});
+		Wu.Mixin.Events.fire('closeFullscreen');
 
 		return false;
 	},
