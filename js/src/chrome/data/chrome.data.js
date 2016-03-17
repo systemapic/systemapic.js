@@ -2205,7 +2205,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			value: "Solid background color"
 		});
 
-		this._testDropdown = new Wu.Dropdown({
+		this._backgroundLayerDropdown = new Wu.Dropdown({
 			fn: this._selectedActiveLayer.bind(this),
 			appendTo: container,
 			content: sortedLayers,
@@ -2213,7 +2213,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		});
 
 		if ( this._project.store.baseLayers.length == 0 ) {
-			this._testDropdown.setValue({
+			this._backgroundLayerDropdown.setValue({
 				title: "Solid background color",
 				value: "Solid background color"
 			});
@@ -2223,7 +2223,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}
 
 		// select event
-		return this._testDropdown;
+		return this._backgroundLayerDropdown;
 
 	},
 

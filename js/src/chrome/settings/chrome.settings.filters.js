@@ -417,7 +417,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			}
 		});
 
-		this._testDropdown = new Wu.Dropdown({
+		this._layerFiltersDropDown = new Wu.Dropdown({
 			fn: this._selectedFilterColumn.bind(this),
 			appendTo: selectWrap,
 			content: sortedLayers,

@@ -137,7 +137,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			});
 		});	
 
-		this._testDropdown = new Wu.Dropdown({
+		this._stylerDropDown = new Wu.Dropdown({
 			fn: this._selectedActiveLayer.bind(this),
 			appendTo: selectWrap,
 			content: sortedLayers,
@@ -145,7 +145,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			placeholder: subtitle
 		});
 
-		return this._testDropdown;
+		return this._stylerDropDown;
 
 	},
 
