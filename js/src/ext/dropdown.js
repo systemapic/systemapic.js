@@ -25,7 +25,10 @@ Wu.Dropdown = Wu.Class.extend({
 
 			if (selectOption.disabled) {
 				Wu.DomUtil.addClass(option, "disabled-option");
-				return
+				Wu.DomEvent.on(option, 'click', function (e) {
+					Wu.DomEvent.stop(e);
+				}, this);
+				return;
 			}
 
 			option.setAttribute('data-value', selectOption.value);
@@ -37,7 +40,6 @@ Wu.Dropdown = Wu.Class.extend({
 				this._hoverItem = option;
 				this._form_combobox_input.setAttribute('data-value', selectOption.value);
 				this._form_combobox_input.innerHTML = selectOption.title;
-
 			}
 			Wu.DomEvent.on(option, 'click', this._changeActive, this);
 			Wu.DomEvent.on(option, 'mouseover', this._optionHover, this);
@@ -53,6 +55,10 @@ Wu.Dropdown = Wu.Class.extend({
 
 	_initEventsListners : function () {
 		Wu.DomEvent.on(this._select, 'click', this._toggleListItems, this);
+		Wu.DomEvent.on(this._selectWrap, 'click', function (e) {
+			Wu.DomEvent.stop(e);
+		}, this);
+		Wu.Mixin.Events.on('appClick', this._hideListItems, this);
 	},
 
 	_toggleListItems : function () {
@@ -158,7 +164,7 @@ Wu.Dropdown = Wu.Class.extend({
 			});
 			this._hideListItems();
 		}
-		if (key === 38 || key === 40 || key === 27 || key === 32) {
+		if (key === 38 || key === 40 || key === 27 || key === 32 || key === 13) {
 			Wu.DomEvent.stop(e);	
 		}
 		

@@ -98,6 +98,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// close event
 		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
+		Wu.DomEvent.on(document.getElementById("app"), 'click', function () {
+			Wu.Mixin.Events.fire('appClick');
+		});
 	},
 
 
