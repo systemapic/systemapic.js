@@ -11,7 +11,7 @@ Wu.Dropdown = Wu.Class.extend({
 		this._initEventsListners();
 	},
 
-	_initLayoutActiveLayers : function (options) {		
+	_initLayoutActiveLayers : function (options) {
 		this._activeLayersWrap = Wu.DomUtil.create('div', 'baselayer-dropdown-wrapper', this._baseLayerDropdownContainer);
 		this._selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', this._activeLayersWrap);
 		this._select = Wu.DomUtil.create('div', 'form-combobox_inner', this._selectWrap);
@@ -29,17 +29,24 @@ Wu.Dropdown = Wu.Class.extend({
 			}
 
 			option.setAttribute('data-value', selectOption.value);
+			option.id = selectOption.value;
 
-			var isSelected = this.isBaseLayerOn(selectOption.value);
-
-			if ( isSelected ) {
-				Wu.DomUtil.addClass(option, 'selected');
+			if ( selectOption.isSelected ) {
+				Wu.DomUtil.addClass(option, 'hover');
+				this._selectOption = option;
+				this._hoverItem = option;
 				this._form_combobox_input.setAttribute('data-value', selectOption.value);
 				this._form_combobox_input.innerHTML = selectOption.title;
+
 			}
 			Wu.DomEvent.on(option, 'click', this._changeActive, this);
+			Wu.DomEvent.on(option, 'mouseover', this._optionHover, this);
+			Wu.DomEvent.on(option, 'mousemove', this._optionHover, this);
 
 		}.bind(this));
+
+		this._form_combobox_input.setAttribute("tabindex", 1);
+		Wu.DomEvent.on(this._form_combobox_input, 'keydown', this._onKeydown, this);
 		
 		// Wu.DomEvent.on(me._select, 'change', me.options.fn, me.options.scope || this);
 	},
@@ -56,6 +63,18 @@ Wu.Dropdown = Wu.Class.extend({
 		}
 	},
 
+	_showListItems : function () {
+		if (!Wu.DomUtil.hasClass(this._form_combobox__options_wrapper, "open")) {
+			Wu.DomUtil.addClass(this._form_combobox__options_wrapper, "open");
+		}
+	},
+
+	_hideListItems : function () {
+		if (Wu.DomUtil.hasClass(this._form_combobox__options_wrapper, "open")) {
+			Wu.DomUtil.removeClass(this._form_combobox__options_wrapper, "open");
+		}
+	},
+
 	_changeActive : function (e) {
 		this._toggleListItems();
 		this.setValue({
@@ -63,17 +82,6 @@ Wu.Dropdown = Wu.Class.extend({
 			title: e.currentTarget.innerHTML
 		});
 		Wu.DomEvent.stop(e);
-	},
-
-	isBaseLayerOn : function (uuid) {
-		var on = false;
-
-		this.options.project.store.baseLayers.forEach(function (baseLayer) {
-			if ( uuid == baseLayer.uuid ) {
-				on = true;
-			}
-		}.bind(this));
-		return on;
 	},
 
 	getValue: function () {
@@ -86,7 +94,74 @@ Wu.Dropdown = Wu.Class.extend({
 	setValue: function (selectOption) {
 		this._form_combobox_input.setAttribute('data-value', selectOption.value);
 		this._form_combobox_input.innerHTML = selectOption.title;
+
+		Wu.DomUtil.removeClass(this._selectOption, 'hover');
+		
+		this._selectOption = document.getElementById(selectOption.value);
+		Wu.DomUtil.addClass(this._selectOption, 'hover');
 		this.options.fn(selectOption.value);
+	},
+
+	_optionHover: function (e) {
+		Wu.DomUtil.removeClass(this._hoverItem, "hover");
+		this._hoverItem = e.currentTarget;
+		Wu.DomUtil.addClass(e.currentTarget, "hover");
+	},
+
+	_hoverDown: function () {
+		if (this._hoverItem.nextSibling && Wu.DomUtil.hasClass(this._hoverItem.nextSibling, "form-combobox_option")) {
+			Wu.DomUtil.removeClass(this._hoverItem, "hover");
+			this._hoverItem = this._hoverItem.nextSibling;
+			if (this._hoverItem && Wu.DomUtil.hasClass(this._hoverItem, "disabled-option")) {
+				this._hoverDown();
+				return;
+			}
+			Wu.DomUtil.addClass(this._hoverItem, "hover");
+		}
+	},
+
+	_hoverUp: function () {
+		if (this._hoverItem.previousSibling && Wu.DomUtil.hasClass(this._hoverItem.previousSibling, "form-combobox_option")) {
+			Wu.DomUtil.removeClass(this._hoverItem, "hover");
+			this._hoverItem = this._hoverItem.previousSibling;
+			if (this._hoverItem && Wu.DomUtil.hasClass(this._hoverItem, "disabled-option")) {
+				this._hoverUp();
+				return;
+			}
+			Wu.DomUtil.addClass(this._hoverItem, "hover");
+		}
+	},
+
+	_onKeydown: function (e) {
+		var key = event.which ? event.which : event.keyCode;
+
+		if (key === 32) {
+			this._showListItems();
+		}
+
+		if (key === 27) {
+			this._hideListItems();
+		}
+
+		if (key === 40) {
+			this._hoverDown();
+		}
+
+		if (key === 38) {
+			this._hoverUp();
+		}
+
+		if (key === 13) {
+			this.setValue({
+				value: this._hoverItem.id,
+				title: this._hoverItem.innerHTML
+			});
+			this._hideListItems();
+		}
+		if (key === 38 || key === 40 || key === 27 || key === 32) {
+			Wu.DomEvent.stop(e);	
+		}
+		
 	}
 
 });

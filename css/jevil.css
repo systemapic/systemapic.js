@@ -2224,7 +2224,7 @@ input.chrome-field-input {
     cursor: pointer;
 }
 
-.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item:hover {
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item.hover {
     background-color: #3C4759;
     color: white;
 }

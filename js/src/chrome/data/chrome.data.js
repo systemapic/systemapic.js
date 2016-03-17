@@ -2185,7 +2185,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			provider.layers.forEach(function(layer) {
 				sortedLayers.push({
 					title: layer.getTitle(),
-					value: layer.getUuid()
+					value: layer.getUuid(),
+					isSelected: this.isBaseLayerOn(layer.getUuid())
 				});
 
 			}.bind(this))
