@@ -392,7 +392,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 	// event run when layer selected 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
 		Wu.DomUtil.removeClass(this._buttonWrapper, 'displayNone');
 
@@ -401,7 +401,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._legendWrapper.innerHTML = '';
 
 		// get layer_id
-		this.layerUuid = uuid ? uuid : e.target.value
+		this.layerUuid = uuid || value;
 
 		// get layer
 		this._layer = this._project.getLayer(this.layerUuid);

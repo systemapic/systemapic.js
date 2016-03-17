@@ -114,7 +114,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 		var title = title || 'Layer';
 		var subtitle = subtitle || 'Select a layer to style...';
-
+		var sortedLayers = [];
 		// active layer wrapper
 		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', container);
 
@@ -122,30 +122,30 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
 		
 		// create dropdown
-		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
-		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
+		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer', wrap);
 
 		// get layers
 		if ( !layers ) var layers = this._project.getPostGISLayers();
 
 		// placeholder
-		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = subtitle;
-		option.setAttribute('disabled', '');
-		option.setAttribute('selected', '');
 
 		// fill select options
 		layers.forEach(function (layer) {
-			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-			option.value = layer.getUuid();
-			option.innerHTML = layer.getTitle();
+			sortedLayers.push({
+				title: layer.getTitle(),
+				value: layer.getUuid()
+			});
 		});	
 
+		this._testDropdown = new Wu.Dropdown({
+			fn: this._selectedActiveLayer.bind(this),
+			appendTo: selectWrap,
+			content: sortedLayers,
+			project: this._project,
+			placeholder: subtitle
+		});
 
-		// select event
-		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
-
-		return select;
+		return this._testDropdown;
 
 	},
 

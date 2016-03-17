@@ -308,9 +308,9 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 	open : function () {
 	},
 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
-		var layerUuid = uuid ? uuid : e.target.value;
+		var layerUuid = uuid || value;
 		
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUuid(layerUuid);

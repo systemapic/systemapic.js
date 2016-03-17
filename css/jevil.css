@@ -2234,3 +2234,7 @@ input.chrome-field-input {
     color: #000;
     cursor: default
 }
+
+.chrome-content.active-layer.select-wrap:before{
+    right: 2px;
+}

@@ -227,10 +227,10 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		console.log('open!', this);
 	},
 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
 		// get uuid
-		var layerUuid = uuid ? uuid : e.target.value;
+		var layerUuid = uuid || value;
 		
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUuid(layerUuid);
@@ -396,17 +396,11 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var titleDiv = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
 		
 		// create dropdown
-		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
-		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
+		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer', wrap);
 
 		// get layers
 		var columns = this._getSortedColumns();
-
-		// placeholder
-		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = subtitle;
-		option.setAttribute('disabled', '');
-		option.setAttribute('selected', '');
+		var sortedLayers = [];
 
 		// mute columns
 		var mute_columns = [
@@ -416,14 +410,20 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// fill dropdown
 		columns && columns.forEach(function (column) {
 			if (mute_columns.indexOf(column) == -1) {
-				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-				option.value = column;
-				option.innerHTML = column;
+				sortedLayers.push({
+					title: column,
+					value: column
+				});
 			}
 		});
 
-		// select event
-		Wu.DomEvent.on(select, 'change', this._selectedFilterColumn, this); // todo: mem leak?
+		this._testDropdown = new Wu.Dropdown({
+			fn: this._selectedFilterColumn.bind(this),
+			appendTo: selectWrap,
+			content: sortedLayers,
+			project: this._project,
+			placeholder: subtitle
+		});
 
 		// clear old filterdi
 		this._clearFilterDiv();
@@ -465,8 +465,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		return 0;
 	},
 
-	_selectedFilterColumn : function (e) {
-		var column = e.target.value;
+	_selectedFilterColumn : function (value) {
+		var column = value;
 		this._createFilterChart(column);		
 	},
 

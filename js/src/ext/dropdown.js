@@ -41,11 +41,17 @@ Wu.Dropdown = Wu.Class.extend({
 				this._form_combobox_input.setAttribute('data-value', selectOption.value);
 				this._form_combobox_input.innerHTML = selectOption.title;
 			}
+
 			Wu.DomEvent.on(option, 'click', this._changeActive, this);
 			Wu.DomEvent.on(option, 'mouseover', this._optionHover, this);
 			Wu.DomEvent.on(option, 'mousemove', this._optionHover, this);
 
 		}.bind(this));
+
+		if (!this._selectOption && this.options.placeholder) {
+			this._form_combobox_input.setAttribute('data-value', null);
+			this._form_combobox_input.innerHTML = this.options.placeholder;				
+		}
 
 		this._form_combobox_input.setAttribute("tabindex", 1);
 		Wu.DomEvent.on(this._form_combobox_input, 'keydown', this._onKeydown, this);
@@ -105,6 +111,7 @@ Wu.Dropdown = Wu.Class.extend({
 		
 		this._selectOption = document.getElementById(selectOption.value);
 		Wu.DomUtil.addClass(this._selectOption, 'hover');
+		this._hoverItem = this._selectOption;
 		this.options.fn(selectOption.value);
 	},
 
