@@ -261,7 +261,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		console.log('_addOnImport', layer);
 
 		// add
-		this.addLayer(layer)
+		this.addLayer(layer);
 
 		// enable layer
 		this.enableLayer(layer);
@@ -365,7 +365,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.expendedContaner = Wu.DomUtil.create('div', 'expended-container', this._filesContainerHeader);
 		this.searchInputWraper = Wu.DomUtil.create('div', 'files-search-input-wraper', this._filesContainerHeader);
 
-		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper)
+		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper);
 		
 		this.searchInput = Wu.DomUtil.create('input', 'files-search-input', this.searchInputWraper);
 		this.searchInput.placeholder = 'sort: date';
