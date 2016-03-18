@@ -98,6 +98,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// close event
 		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
+		Wu.DomEvent.on(document.getElementById("app"), 'click', function () {
+			Wu.Mixin.Events.fire('appClick');
+		});
 	},
 
 
@@ -258,7 +261,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		console.log('_addOnImport', layer);
 
 		// add
-		this.addLayer(layer)
+		this.addLayer(layer);
 
 		// enable layer
 		this.enableLayer(layer);
@@ -362,7 +365,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.expendedContaner = Wu.DomUtil.create('div', 'expended-container', this._filesContainerHeader);
 		this.searchInputWraper = Wu.DomUtil.create('div', 'files-search-input-wraper', this._filesContainerHeader);
 
-		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper)
+		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper);
 		
 		this.searchInput = Wu.DomUtil.create('input', 'files-search-input', this.searchInputWraper);
 		this.searchInput.placeholder = 'sort: date';
@@ -2153,9 +2156,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 	_initBaseLayerList : function () {
-
 		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false);
-		
 	},
 
 	_refreshBaseLayerList : function () {
@@ -2173,15 +2174,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_initLayout_activeLayers : function (title, subtitle, container, layers) {
-
-		// active layer wrapper
-		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'baselayer-dropdown-wrapper', container);
-		
-		// create dropdown
-		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
-		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
+		var sortedLayers = [];
 
 		// Create select options
+
 		this.sortedLayers.forEach(function(provider) {
 
 			// Do not allow postgis layers to be in the baselayer dropdown
@@ -2190,45 +2186,48 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// Get each provider (mapbox, google, etc)
 			provider.layers.forEach(function(layer) {
-				
-				// Create selct option
-				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-				
-				// Get layer uuid
-				var layerUuid = layer.getUuid();
-				
-				// Set option value
-				option.value = layerUuid;
-
-				// Set selected state
-				var isSelected = this.isBaseLayerOn(layerUuid);
-				if ( isSelected ) option.selected = true;
-
-				// Print option text
-				option.innerHTML = layer.getTitle();// + ' (' + provider.key + ')';
-
+				sortedLayers.push({
+					title: layer.getTitle(),
+					value: layer.getUuid(),
+					isSelected: this.isBaseLayerOn(layer.getUuid())
+				});
 
 			}.bind(this))
 		}.bind(this));
 
+		sortedLayers.push({
+			title: "----------------------------------------------------------------------------",
+			disabled: true
+		});
 
-		// Create selct option for no baselayer
-		var option = Wu.DomUtil.create('option', 'active-layer-option', select, 'NONE');
+		sortedLayers.push({
+			title: "Solid background color",
+			value: "Solid background color"
+		});
+
+		this._backgroundLayerDropdown = new Wu.Dropdown({
+			fn: this._selectedActiveLayer.bind(this),
+			appendTo: container,
+			content: sortedLayers,
+			project: this._project
+		});
+
 		if ( this._project.store.baseLayers.length == 0 ) {
-			option.selected = true;
+			this._backgroundLayerDropdown.setValue({
+				title: "Solid background color",
+				value: "Solid background color"
+			});
 			this._enableColorSelector();
 		} else {
 			this._disableColorSelector();
 		}
 
 		// select event
-		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
-
-		return select;
+		return this._backgroundLayerDropdown;
 
 	},
 
-	_selectedActiveLayer : function (e) {
+	_selectedActiveLayer : function (value) {
 
 		// Remove active baselayers
 		var baselayers = this._project.getBaselayers();
@@ -2242,14 +2241,19 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}.bind(this));
 
 		// Add to map
-		var uuid = e.target.value;
+		var uuid = value;
+		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : this.oldSolidBackgroundColor || '#000';	
+		
+		this.oldSolidBackgroundColor = bgc;
 
-		if ( uuid == 'NONE' ) {
+		if ( uuid == 'Solid background color' ) {
 			this._project.setBaseLayer([]);
 			this._enableColorSelector();
+			this._updateColor(bgc);
 			return;
 		}
 
+		this._setDefaultBackgroundColor();
 
 		this._disableColorSelector();
 		
@@ -2263,6 +2267,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			zIndex : 1,
 			opacity : 1
 		}]);
+	},
+
+	_setDefaultBackgroundColor : function () {
+		if (app.MapPane._container.style.removeProperty) {
+		    app.MapPane._container.style.removeProperty('background');
+		} else {
+		    app.MapPane._container.style.removeAttribute('background');
+		}
+		this._project.setBackgroundColor('');
 	},
 
 	_initColorSelector : function () {

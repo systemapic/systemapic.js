@@ -2200,4 +2200,44 @@ input.chrome-field-input {
     }
 
 
+.chrome.chrome-content.active-layer.select-wrap {
+    max-width: 387px;
+}
 
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_input {
+    height: 31px;
+    padding: 5px 10px;
+    color: #000;
+    cursor: pointer;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper {
+    display: none;
+    border-top: 1px solid #ccc;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper.open {
+    display: block;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item {
+    color: #000;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item.hover {
+    background-color: #3C4759;
+    color: white;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item.disabled-option:hover {
+    background-color: #FFF;
+    color: #000;
+    cursor: default
+}
+
+.chrome-content.active-layer.select-wrap:before{
+    right: 2px;
+}

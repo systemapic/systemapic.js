@@ -43,9 +43,9 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
-		this.layerUuid = uuid ? uuid : e.target.value
+		this.layerUuid = uuid || value;
 
 		this._layer = this._project.getLayer(this.layerUuid);
 
