@@ -2200,6 +2200,9 @@ input.chrome-field-input {
     }
 
 
+.chrome.chrome-content.active-layer.select-wrap {
+    max-width: 387px;
+}
 
 .chrome.chrome-content.active-layer.select-wrap .form-combobox_input {
     height: 31px;
