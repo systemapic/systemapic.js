@@ -48,6 +48,7 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 		// close trigger		
 		Wu.DomEvent.on(this._closer, 'click', this.destroy, this);
+		Wu.DomEvent.on(window, 'popstate', this.destroy, this);
 
 		// add esc key trigger for close fullscreen
 		this._addEscapeKey();
@@ -57,18 +58,17 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 		// close trigger		
 		Wu.DomEvent.off(this._closer, 'click', this.destroy, this);
-
+		Wu.DomEvent.off(window, 'popstate', this.destroy, this);
 
 		// add esc key trigger for close fullscreen
 		this._removeEscapeKey();
 	},
 
-	close : function (options) {
-		this.destroy(options);
+	close : function () {
+		this.destroy();
 	},
 
-	destroy : function (options) {
-		var options = options || {};
+	destroy : function () {
 		// remove events
 		this.removeEvents();
 
@@ -78,9 +78,7 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 		var closeCallback = this.options.closeCallback;
 		closeCallback && closeCallback();
-		Wu.Mixin.Events.fire('closeFullscreen', {detail : {
-			projectId: options.projectId || null
-		}});
+		Wu.Mixin.Events.fire('closeFullscreen');
 
 		return false;
 	},

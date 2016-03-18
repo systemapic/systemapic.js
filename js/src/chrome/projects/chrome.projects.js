@@ -640,11 +640,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		edit: []
 	},
 
-	_onCloseFullscreen : function (options) {
-		// if (!this.access) return;
+	_onCloseFullscreen : function () {
 		this._resetAccess();
-		// this._access.read = [];
-		// this._access.edit = [];
 	},
 
 	_onUpdatedProjectAccess : function (options) {
