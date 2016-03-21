@@ -442,7 +442,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_autoSelectFilter : function () {
 		if (!this._layer) return;
-		if (!this._layer.isPostgis()) return this._selectNone();
+		if (!this._layer.isVector()) return this._selectNone();
 		
 		var filter = Wu.parse(this._layer.getFilter());
 
