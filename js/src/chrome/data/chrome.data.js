@@ -1614,6 +1614,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		app._map.scrollWheelZoom.enable()
 	},
 
+	_onCloseFullscreen : function () {
+		this._divs = {
+			users : []
+		};
+	},
+
 	_divs : {
 		users : []
 	},
