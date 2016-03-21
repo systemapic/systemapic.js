@@ -467,14 +467,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		var classes = e.target.classList;
 		var stop = false;
+		var actions = ['file-action', 'file-popup-trigger', 'file-popup', 'toggle-button'];
 
 		// Stop when clicking on these classes
-		if (classes.forEach) classes.forEach(function(c) {
-			if ( c == 'file-action') stop = true;
-			if ( c == 'file-popup-trigger') stop = true;
-			if ( c == 'file-popup') stop = true;
-			if ( c == 'toggle-button') stop = true;
-		});
+		if (classes.forEach) {
+			classes.forEach(function(c) {
+				if ( actions.indexOf(c) !== -1) stop = true;
+			});
+		}
 
 		// Stop if we're editing name
 		if (e.target.name == this.editingFileName) stop = true;
@@ -484,7 +484,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Reset
 		this.showFileActionFor = false;
-		this.selectedFiles = [];
 
 		this.showLayerActionFor = false;
 		this.selectedLayers = [];
@@ -499,9 +498,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Currently only "my files"
 		this.fileListContainers = {};
 
-		// Holds files that we've selected
-		this.selectedFiles = [];
-
 		// Show file actions for this specific file (i.e. download, rename, etc)
 		this.showFileActionFor = false;
 
@@ -515,7 +511,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			name : 'Data Library',
 			data : [],
 			getFiles : function () {
-				return app.Account.getFiles()
+				return app.Account.getFiles();
 			}
 		};
 		
@@ -579,7 +575,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var file = e.detail.file;
 		var unique_id = file.uniqueIdentifier;
 		var filename = file.fileName;
-		var size = parseInt(file.size / 1000 / 1000) + 'MB';
 
 		// add temp file holder
 		var datawrap = Wu.DomUtil.create('div', 'data-list-line processing');
@@ -772,9 +767,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// └  ┴┴─┘└─┘  ┘└┘┴ ┴┴ ┴└─┘
 
 	createFileNameContent : function (parent, library) {
-
-		var that = this;
-
 		// Bind
 		var nameContent = 
 			parent
@@ -797,16 +789,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				this.activateFileInput(d, library);
 			}.bind(this));			
 
-
 		// Exit
 		nameContent
 			.exit()
 			.remove();
 
-
 		// Create input field (for editing file name)
 		this.createFileInputField(nameContent, library);
-
 
 	},
 
@@ -818,9 +807,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// For editing file name
 
 	createFileInputField : function (parent, library) {
-
 		var that = this;
-
 		// Bind
 		var nameInput = 
 			parent
@@ -1020,10 +1007,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	initFileActions : function (parent, library) {
 
 		// Disable actions for Layers
-		var isDisabled = (library == 'layers'),
-		    canEdit = this._project.isEditor(),
-		    canDownload = this._project.isDownloadable(),
-		    that = this;
+		var canEdit = this._project.isEditor();
+		var that = this;
 
 		var action = {
 			createLayer : {
@@ -1032,7 +1017,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			},
 			share : {
 				name : 'Share with...', 	// todo: implement sharing of data
-				disabled : true,
+				disabled : true
 			},			
 			changeName : {
 				name : 'Change Name',
@@ -1047,7 +1032,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				disabled : false
 			}
 		};
-
 
 		for (var f in action) {
 
@@ -1070,7 +1054,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				.attr('trigger', f)
 				.html(name)
 				.on('click', function (d) {
-					var trigger = this.getAttribute('trigger')
+					var trigger = this.getAttribute('trigger');
+
 					that.fileActionTriggered(trigger, d, that, library)
 				});
 
@@ -1114,7 +1099,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// Reset
 		this.showFileActionFor = false;
-		this.selectedFiles = [];
 		this._refreshFiles();
 	},
 
@@ -1122,7 +1106,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	activateFileInput : function (d, library) {
 		this.editingFileName = d.getUuid();
 		this.showFileActionFor = false;
-		this.selectedFiles = [];
 		this._refreshFiles();
 	},
 
@@ -1943,40 +1926,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 	},
 
-	_onTilesetMeta : function (e) {
-		return;
-
-		var tile_set = e.detail.data;
-
-		var data = e.detail.data;
-		var tile_count = parseInt(data.tiles) * (-1);
-
-		
-		// check tiles
-		if (tile_count > 11000) {
-
-			// mark too high tile-count
-			this._totaltiles_div.innerHTML = '<span class="bold-font red-font">Total tiles: ' + tile_count + '</span>';
-
-			// set error feedback
-			this._generated_tiles_error.innerHTML = '<span class="bold-font">The tile count is too high. Please select a lower zoom-level.</span>';
-
-		} else {
-			
-			// set tile count
-			this._totaltiles_div.innerHTML = '<span class="bold-font">Total tiles:</span> ' + tile_count;
-
-			// set error feedback
-			this._generated_tiles_error.innerHTML = ''
-
-		}
-
-	},
-
 	_calcTileCount : function (file_id) {
 
 		// set options
-		var zoom_min = 0;
 		var zoom_max = 20;
 		var zoom_levels = _.range(0, zoom_max + 1);
 		var total_tiles = [];
@@ -2380,9 +2332,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			.classed('editingName', function (d) {
 				var uuid = d.getUuid();
-				if ( this.editingLayerName == uuid ) return true;
-				return false;
-			}.bind(this))
+
+				return this.editingLayerName == uuid;
+			}.bind(this));
 
 
 		// EXIT
@@ -3001,8 +2953,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Open styler pane
 		app.Tools.SettingsSelector._togglePane();
-
-
 
 	},
 

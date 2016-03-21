@@ -109,6 +109,6 @@ Wu.Chrome = Wu.Class.extend({
 	_onTilesetMeta 			: function () {},
 	_onCloseFullscreen 		: function () {},
 	_onUpdatedProjectAccess : function () {},
-	_onWindowResize 		: function () {},
+	_onWindowResize 		: function () {}
 
 });
