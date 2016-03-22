@@ -107,7 +107,9 @@ Wu.Dropdown = Wu.Class.extend({
 		this._form_combobox_input.setAttribute('data-value', selectOption.value);
 		this._form_combobox_input.innerHTML = selectOption.title;
 
-		Wu.DomUtil.removeClass(this._selectOption, 'hover');
+		if (this._selectOption && Wu.DomUtil.hasClass(this._selectOption, "hover")) {
+			Wu.DomUtil.removeClass(this._selectOption, 'hover');
+		}
 		
 		this._selectOption = document.getElementById(selectOption.value);
 		Wu.DomUtil.addClass(this._selectOption, 'hover');
@@ -116,7 +118,9 @@ Wu.Dropdown = Wu.Class.extend({
 	},
 
 	_optionHover: function (e) {
-		Wu.DomUtil.removeClass(this._hoverItem, "hover");
+		if (this._hoverItem && Wu.DomUtil.hasClass(this._hoverItem, "hover")) {
+			Wu.DomUtil.removeClass(this._hoverItem, "hover");	
+		}
 		this._hoverItem = e.currentTarget;
 		Wu.DomUtil.addClass(e.currentTarget, "hover");
 	},
