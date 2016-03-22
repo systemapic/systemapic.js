@@ -112,20 +112,22 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_initLayout_activeLayers : function (title, subtitle, container, layers) {
 
-		var title = title || 'Layer';
-		var subtitle = subtitle || 'Select a layer to style...';
+		title = title || 'Layer';
+		subtitle = subtitle || 'Select a layer to style...';
 		var sortedLayers = [];
 		// active layer wrapper
 		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', container);
 
 		// title
-		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
+		title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
 		
 		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer', wrap);
 
 		// get layers
-		if ( !layers ) var layers = this._project.getPostGISLayers();
+		if ( !layers ) {
+			layers = this._project.getPostGISLayers();
+		}
 
 		// placeholder
 
@@ -199,20 +201,6 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		this._temps = [];
 	},
 
-
-
-	_gradientStyle : function (colorArray) {
-
-		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorArray.join() + ');';
-		gradientStyle    += 'background: -o-linear-gradient(right, '     + colorArray.join() + ');';
-		gradientStyle    += 'background: -moz-linear-gradient(right, '   + colorArray.join() + ');';
-		gradientStyle    += 'background: linear-gradient(to right, '     + colorArray.join() + ');';
-
-		return gradientStyle;
-
-	},		
-
-
 	// Make sure hex decimals have two digits
 	padToTwo : function (numberString) {
 
@@ -245,12 +233,5 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	_normalize : function (value, min, max) {
 		normalized = (value - min) / (max - min);
 		return normalized;
-	},
-
-	// Sets min value to zero, and returns value from range, up to 1.
-	_normalizeOffset : function (value, min, max) {
-		if ( min > 0 ) min = 0;
-		normalized = (value - min) / (max - min);
-		return normalized;
-	},
+	}
 });
