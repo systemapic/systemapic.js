@@ -143,6 +143,10 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		Wu.DomEvent.on(titleInput, 'blur', this.saveTitle, this);
 	},
 
+	// UNUSED Function
+	//initDescription : function () {
+	//},
+
 	initDisable : function () {
 
 		// Wrapper

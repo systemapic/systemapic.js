@@ -454,6 +454,16 @@ Wu.Styler = Wu.Class.extend({
 		};
 	},
 
+    //clearBuggyFiles : function () {
+ 	//	// Get file ID
+ 	//	var fileId = this._layer.store.file;
+    //
+ 	//	// Get file
+ 	//	var file = app.Account.getFile(fileId);
+    //
+ 	//	file.setStyleTemplates([]);
+    //
+ 	//},
 
 	_addColorFields : function (column) {
 
@@ -1237,10 +1247,12 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 	_gradientStyle : function (colorArray) {
-		return 'background: -webkit-linear-gradient(left, ' + colorArray.join() + ');'
-			+ 'background: -o-linear-gradient(right, '     + colorArray.join() + ');'
-			+ 'background: -moz-linear-gradient(right, '   + colorArray.join() + ');'
-			+ 'background: linear-gradient(to right, '     + colorArray.join() + ');';
+		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorArray.join() + ');';
+		gradientStyle += 'background: -o-linear-gradient(right, '     + colorArray.join() + ');';
+		gradientStyle += 'background: -moz-linear-gradient(right, '   + colorArray.join() + ');';
+		gradientStyle += 'background: linear-gradient(to right, '     + colorArray.join() + ');';
+
+		return gradientStyle;
 	},
 
 	_targetColumnSelected : function (e) {

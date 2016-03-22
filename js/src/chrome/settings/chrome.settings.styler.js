@@ -466,6 +466,15 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// get carto from server
 		app.api.json2carto(options, callback.bind(this));
-	}
+	},
+
+	// UNUSED Function
+	//clearBuggyFiles : function () {
+	//	// Get file ID
+	//	var fileId = this._layer.store.file;
+	//	// Get file
+	//	var file = app.Account.getFile(fileId);
+	//	file.setStyleTemplates([]);
+	//}
 
  });

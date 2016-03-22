@@ -201,6 +201,16 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		this._temps = [];
 	},
 
+	// UNUSED Function
+	//_gradientStyle : function (colorArray) {
+	//	var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorArray.join() + ');';
+	//	gradientStyle    += 'background: -o-linear-gradient(right, '     + colorArray.join() + ');';
+	//	gradientStyle    += 'background: -moz-linear-gradient(right, '   + colorArray.join() + ');';
+	//	gradientStyle    += 'background: linear-gradient(to right, '     + colorArray.join() + ');';
+    //
+	//	return gradientStyle;
+	//},
+
 	// Make sure hex decimals have two digits
 	padToTwo : function (numberString) {
 

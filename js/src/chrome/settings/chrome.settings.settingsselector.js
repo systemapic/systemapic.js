@@ -212,5 +212,12 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
 		if (layerMenu) layerMenu.disableEdit();
 
-	}
+	},
+
+	// UNUSED Function
+	//_refreshAll : function () {
+	//	for (var t in this._tabs) {
+	//		this._tabs[t]._refresh();
+	//	}
+	//}
 });

@@ -223,6 +223,19 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		return this._layer.getSQL();
 	},
 
+	// UNUSED Function
+	//_createSQL : function (file_id, sql) {
+	//	if (sql) {
+	//		// replace 'table' with file_id in sql
+	//		sql.replace('table', file_id);
+	//		// wrap
+	//		sql = '(' + sql + ') as sub';
+	//	} else {// default
+	//		sql = '(SELECT * FROM  ' + file_id + ') as sub';
+	//	}
+	//	return sql;
+	//},
+
 	_updateLayer : function (options, done) {
 
 		var css = options.css;
