@@ -24,7 +24,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			extras : {
 				enabled : true,
 				text : 'Extras'
-			},
+			}
 		}
 		
 	},
@@ -73,7 +73,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content settingsSelector', this.options.appendTo);
 
 		// header wrapper
-		this._header = Wu.DomUtil.create('div', 'settingsSelector-header', this._container)
+		this._header = Wu.DomUtil.create('div', 'settingsSelector-header', this._container);
 
 		// tabs wrapper
 		this._tabsWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-tabs-wrapper', this._container);
@@ -147,9 +147,6 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		if (!app.activeProject.isEditable()) return; // safeguard
 
-		// right chrome
-		var chrome = this.options.chrome;
-
 		// open/close
 		this._isOpen ? this.close() : this.open(); // pass this tab
 
@@ -215,11 +212,5 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
 		if (layerMenu) layerMenu.disableEdit();
 
-	},
-
-	_refreshAll : function () {
-		for (var t in this._tabs) {
-			this._tabs[t]._refresh();
-		}
-	},
+	}
 });
