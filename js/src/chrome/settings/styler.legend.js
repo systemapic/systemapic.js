@@ -16,8 +16,6 @@ Wu.Legend = Wu.Class.extend({
 
 	},
 
-
-
 	// LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR
 	// LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR
 	// LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR LEGEND CREATOR
@@ -54,10 +52,7 @@ Wu.Legend = Wu.Class.extend({
 		var layerID = this.options.layer.options.uuid;
 		Wu.Mixin.Events.fire('updateLegend', { detail : { layerUuid : layerID }}); 
 
-
-
 	},
-
 
 	saveLegend : function () {
 
@@ -134,17 +129,17 @@ Wu.Legend = Wu.Class.extend({
 			id           : 'legend-section',
 			appendTo     : this._legendTopLineWrapper,
 			title        : '<b>Legend</b>',
-			input        : false,
-		});		
+			input        : false
+		});
 
 		// Switch
 		this.enableLegendButton = new Wu.button({
-			id 	     : 'legen-section-switch',
+			id 	     	 : 'legen-section-switch',
 			type 	     : 'switch',
 			isOn 	     : _isOn,
 			right 	     : true,
 			appendTo     : line.container,
-			fn 	     : this._switchEnableLegend.bind(this),
+			fn 	     : this._switchEnableLegend.bind(this)
 			// context      : this
 		});
 
@@ -168,7 +163,7 @@ Wu.Legend = Wu.Class.extend({
 			id           : 'layer-meta-option',
 			appendTo     : legendMetaOptionsWrapper,
 			title        : '<b>Layer meta</b>',
-			input        : false,
+			input        : false
 		});		
 
 
@@ -180,7 +175,8 @@ Wu.Legend = Wu.Class.extend({
 				this.legendObj.layerMeta = true;
 			}
 		}
-		var _isOn = this.legendObj.layerMeta;
+
+		_isOn = this.legendObj.layerMeta;
 
 
 		// Layer meta switch
@@ -190,7 +186,7 @@ Wu.Legend = Wu.Class.extend({
 			isOn 	     : _isOn,
 			right 	     : true,
 			appendTo     : layerMetaOption.container,
-			fn 	     : this._switch.bind(this), // onSwitch
+			fn 	     : this._switch.bind(this) // onSwitch
 		});
 
 
@@ -204,8 +200,8 @@ Wu.Legend = Wu.Class.extend({
 			id           : 'opacity-slider-option',
 			appendTo     : legendMetaOptionsWrapper,
 			title        : '<b>Opacity slider</b>',
-			input        : false,
-		});		
+			input        : false
+		});
 
 		// If opacity slider option does not exist, see if we have it stored
 		if ( typeof this.legendObj.opacitySlider == 'undefined' ) {
@@ -217,7 +213,8 @@ Wu.Legend = Wu.Class.extend({
 				this.legendObj.opacitySlider = true;
 			}			
 		}
-		var _isOn = this.legendObj.opacitySlider;
+
+		_isOn = this.legendObj.opacitySlider;
 	
 
 		// Opacity slider switch
@@ -227,14 +224,12 @@ Wu.Legend = Wu.Class.extend({
 			isOn 	     : _isOn,
 			right 	     : true,
 			appendTo     : opacitySliderOption.container,
-			fn 	     : this._switch.bind(this),
+			fn 	     : this._switch.bind(this)
 		});
 
-
-		var layerName = this.legendObj.layerName,
-		    polygons  = this.legendObj.polygon,
-		    lines     = this.legendObj.line,
-		    points    = this.legendObj.point;
+		var polygons  = this.legendObj.polygon;
+		var lines     = this.legendObj.line;
+		var points    = this.legendObj.point;
 
 		// Build points
 		// this.pointsHTML(points);
@@ -244,15 +239,13 @@ Wu.Legend = Wu.Class.extend({
 		// they will need to be part of the same legend.
 		// this.polygonAndLinesHTML(polygons, lines);
 
-
 		var legendArray = Wu.Tools.Legend.getLegendArray(points, lines, polygons);
 
 		// Create legend settings from array
 		this.createLegendSettingsFromArray(legendArray);
 
 		// Create legend HTML from array
-		this.createLegendHTMLFromArray(legendArray);		
-
+		this.createLegendHTMLFromArray(legendArray);
 
 	},
 
@@ -267,7 +260,6 @@ Wu.Legend = Wu.Class.extend({
 
 
 	createLegendHTMLFromArray : function (legendArray) {
-
 		var legendHTML = '';
 		var gradientHTML = '';
 
@@ -284,19 +276,7 @@ Wu.Legend = Wu.Class.extend({
 		this.legendObj.html = legendHTML;
 		this.legendObj.gradient = gradientHTML;
 
-	},	
-
-
-
-
-
-
-
-
-
-
-
-
+	},
 
 	eachLegendSetting : function (options) {		
 
@@ -339,8 +319,6 @@ Wu.Legend = Wu.Class.extend({
 
 		Wu.DomEvent.on(input.input, 'keydown', this.checkKey);
 
-
-
 		// Each legend on/off button
 		// Each legend on/off button
 		// Each legend on/off button
@@ -367,32 +345,22 @@ Wu.Legend = Wu.Class.extend({
 			context      : this
 		});
 
-
 	},
-
-
-
-
-
-
-
 
 	// SETTINGS SETTINGS
 	// SETTINGS SETTINGS
 	// SETTINGS SETTINGS
 
 	gradientLegendSetting : function (options) {
-
-		var layerName = options.layerName;
 		var gradientStyle = options.style;
 		var object = options.object;
 		var minVal = options.gradient.minVal;
 		var maxVal = options.gradient.maxVal;
 		var bline = options.gradient.bline;
 		var gradientName = object.name ? object.name : bline;
-
 		var container = Wu.DomUtil.create('div', 'legend-each-container', this._legendContent);
-		    container.style.paddingLeft = 0;
+
+		container.style.paddingLeft = 0;
 
 		var gradientWrapper = Wu.DomUtil.create('div', 'info-legend-container', container);
 		var gradientInfoWrapper = Wu.DomUtil.create('div', 'info-legend-frame', gradientWrapper);
@@ -417,7 +385,7 @@ Wu.Legend = Wu.Class.extend({
 		
 
 		var gradientInfoMaxVal = Wu.DomUtil.create('div', 'info-legend-val info-legend-max-val', gradientInfoWrapper, maxVal);
-		var gradientLegend = Wu.DomUtil.create('div', 'info-legend-gradient-container', gradientInfoWrapper)
+		var gradientLegend = Wu.DomUtil.create('div', 'info-legend-gradient-container', gradientInfoWrapper);
 		    gradientLegend.setAttribute('style', gradientStyle);
 
 		// Set on to true by default
@@ -448,31 +416,26 @@ Wu.Legend = Wu.Class.extend({
 
 
 	gradientBottom : function (options) {
-
 		if ( !this.satelliteView ) return;
 
-
 		var container = Wu.DomUtil.create('div', 'legend-each-container', this._legendContent);
-		    container.style.paddingLeft = 0;		
+
+		container.style.paddingLeft = 0;
 
 		var cont     = Wu.DomUtil.create('div', 'info-legend-gradient-bottomline', container);
 		var leg      = Wu.DomUtil.create('div', 'legend-gradient-footer', cont);
-		    leg.id   = 'legend-gradient-footer';
+
+		leg.id   = 'legend-gradient-footer';
+
 		var top      = Wu.DomUtil.create('div', 'legend-gradient-footer-top', leg, 'Deformasjon i sikteretning til satellitten')
 		var lineCont = Wu.DomUtil.create('div', 'legend-gradient-footer-line-container', leg);
 		var line     = Wu.DomUtil.create('div', 'legend-gradient-footer-line', lineCont);
 		var arrowL   = Wu.DomUtil.create('div', 'legend-gradient-footer-arrow-left', lineCont);
 		var arrowR   = Wu.DomUtil.create('div', 'legend-gradient-footer-arrow-right', lineCont);
 		var midLine  = Wu.DomUtil.create('div', 'legend-gradient-footer-middle-line', lineCont);
-
 		var textL    = Wu.DomUtil.create('div', 'legend-gradient-footer-toward', leg, 'Mot satellitten');
 		var textR    = Wu.DomUtil.create('div', 'legend-gradient-footer-from', leg, 'Fra satellitten');
-
-
 	},
-
-
-
 
 	checkKey : function (e) {
 
@@ -497,14 +460,11 @@ Wu.Legend = Wu.Class.extend({
 
 
 	_saveGradientHeader : function (e) {
-
 		var value = e.target.value;
+
 		this.sourceObject.name = value;
 		// console.log('this.sourceObject.gradient', this.sourceObject.gradient);
-
 		this.context.updateLegend();
-
-
 	},
 
 
@@ -533,8 +493,6 @@ Wu.Legend = Wu.Class.extend({
 	},
 
 	_switchEnableLegend : function  (e) {
-
-
 		if ( this.legendObj.enable ) {
 			// Wu.DomUtil.addClass(this._legendContent, 'displayNone');
 			this.legendObj.enable = false;
@@ -576,15 +534,9 @@ Wu.Legend = Wu.Class.extend({
 		// this.updateLegend();
 		this.context.updateLegend();
 
-	},
-
-
+	}
 
 });
-
-
-
-
 
 // ██╗     ███████╗ ██████╗ ███████╗███╗   ██╗██████╗     ████████╗ ██████╗  ██████╗ ██╗     ███████╗
 // ██║     ██╔════╝██╔════╝ ██╔════╝████╗  ██║██╔══██╗    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔════╝
@@ -607,12 +559,11 @@ Wu.Tools.Legend = {
 
 	buildLegendObject : function  (styleJSON, layer, oldLegend) {
 
-		var point 	= styleJSON.point,
-		    line 	= styleJSON.line,
-		    polygon 	= styleJSON.polygon;
+		var point 	= styleJSON.point;
+		var line 	= styleJSON.line;
+		var polygon 	= styleJSON.polygon;
 
 		this.legendObj = oldLegend;
-
 
 		// Here we either get legend from store, or we pick up the legend from last update.
 		// We store this as "old legend object", and itarete through the styling json to look
@@ -628,10 +579,8 @@ Wu.Tools.Legend = {
 
 		// If legend does not exist, get it from store and save it as "old legend object"
 		} else {
-
 			var legend = layer.getLegends();
 			if ( legend ) this.oldLegendObj = legend;
-
 		}
 
 		// Create blank legend object that we populate with data from style json		
@@ -679,6 +628,10 @@ Wu.Tools.Legend = {
 		if (!point || !point.enabled ) return;		
 
 		var legend = {};
+		var column;
+		var value;
+		var minRange;
+		var maxRange;
 
 		// COLOR
 		// COLOR
@@ -687,10 +640,10 @@ Wu.Tools.Legend = {
 		// polygon color range
 		if ( point.color.column ) {
 
-			var column   = point.color.column;
-			var value    = point.color.value; 
-			var minRange = point.color.range[0];
-			var maxRange = point.color.range[1];
+			column   = point.color.column;
+			value    = point.color.value;
+			minRange = point.color.range[0];
+			maxRange = point.color.range[1];
 
 			// Save legend data
 			legend.color = {};
@@ -703,7 +656,7 @@ Wu.Tools.Legend = {
 		// static polygon color
 		} else {				
 
-			var value = point.color.staticVal ? point.color.staticVal : 'red';
+			value = point.color.staticVal ? point.color.staticVal : 'red';
 
 			// Save legend data
 			legend.color = {};
@@ -720,9 +673,9 @@ Wu.Tools.Legend = {
 		// polygon opacity range
 		if ( point.opacity.column ) {
 
-			var column   = point.opacity.column;
-			var minRange = point.opacity.range[0];
-			var maxRange = point.opacity.range[1];
+			column   = point.opacity.column;
+			minRange = point.opacity.range[0];
+			maxRange = point.opacity.range[1];
 
 			// Save legend data
 			legend.opacity = {};
@@ -735,9 +688,9 @@ Wu.Tools.Legend = {
 		} else {
 
 			if ( !point.opacity.staticVal && point.opacity.staticVal != 0 ) {
-				var value = 1;
+				value = 1;
 			} else {
-				var value = point.opacity.staticVal;
+				value = point.opacity.staticVal;
 			}				
 
 			// Save legend data
@@ -755,9 +708,9 @@ Wu.Tools.Legend = {
 		// polygon pointsize range
 		if ( point.pointsize.column ) {
 
-			var column   = point.pointsize.column;
-			var minRange = point.pointsize.range[0];
-			var maxRange = point.pointsize.range[1];
+			column   = point.pointsize.column;
+			minRange = point.pointsize.range[0];
+			maxRange = point.pointsize.range[1];
 
 			// Save legend data
 			legend.pointsize = {};
@@ -770,9 +723,9 @@ Wu.Tools.Legend = {
 		} else {
 
 			if ( !point.pointsize.staticVal && point.pointsize.staticVal != 0 ) {
-				var value = 1.2;
+				value = 1.2;
 			} else {
-				var value = point.pointsize.staticVal;
+				value = point.pointsize.staticVal;
 			}				
 
 			// Save legend data
@@ -807,12 +760,12 @@ Wu.Tools.Legend = {
 
 			point.targets.forEach(function (target, i) {
 
-				var column   = target.column;
+				column   = target.column;
 				var color    = target.color;					
 				var opacity  = target.opacity;
-				var value    = target.value;
 				var width    = target.width;
 				var operator = target.operator;
+				value    = target.value;
 
 				// Save legend data
 				var legend = {
@@ -822,7 +775,7 @@ Wu.Tools.Legend = {
 					value    : value,
 					width    : width,
 					operator : operator
-				}
+				};
 
 				if ( this.oldLegendObj && this.oldLegendObj.point.target[i] ) {
 					if ( this.oldLegendObj.point.target[i].name ) {
@@ -969,7 +922,7 @@ Wu.Tools.Legend = {
 					opacity  : opacity,
 					value    : value,
 					operator : operator
-				}
+				};
 
 
 				if ( this.oldLegendObj && this.oldLegendObj.polygon.target[i] ) {
@@ -1335,8 +1288,6 @@ Wu.Tools.Legend = {
 
 			// Get gradient style
 			var gradientStyle = this.getGradientStyle(colorStops);
-
-			var infoText = column;
  		
 			// Set on to true by default
 			if ( typeof points.all.isOn == 'undefined' ) {
@@ -1352,7 +1303,7 @@ Wu.Tools.Legend = {
 				gradient : {
 					minVal     : minVal,
 					maxVal     : maxVal,
-					bline      : column,
+					bline      : column
 					// name       : column				
 				}
 			});	
@@ -1373,7 +1324,7 @@ Wu.Tools.Legend = {
 
 		// (aka. we have a line and a polygon with the same target)
 
-		var linePolygonTargetMatches = {}
+		var linePolygonTargetMatches = {};
 
 		lines.target.forEach(function (l, i) {
 			polygons.target.forEach(function (p, a) {
@@ -1409,7 +1360,7 @@ Wu.Tools.Legend = {
 				}
 
 			}.bind(this))
-		}.bind(this))
+		}.bind(this));
 
 
 
@@ -1429,7 +1380,6 @@ Wu.Tools.Legend = {
 			// Style
 			var color   = line.color;
 			var opacity = line.opacity;
-			var width   = line.width;
 			var RGB     = Wu.Tools.color2RGB(color);
 			var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
 			var style   = 'border: ' + 2 + 'px solid ' + rgba;
@@ -1447,9 +1397,7 @@ Wu.Tools.Legend = {
 					style : style,
 					object : line,
 					gradient : false					
-			});			
-
-
+			});
 
 		}.bind(this));
 
@@ -1563,10 +1511,7 @@ Wu.Tools.Legend = {
 			var column     = polygons.all.color.column;
 
 			// Get gradient style
-			var gradientStyle = this.getGradientStyle(colorStops);			
-
-			var infoText = column;
-
+			var gradientStyle = this.getGradientStyle(colorStops);
 			var layerName = this.legendObj.layerName;
 
 			this._legends.push({
@@ -1576,23 +1521,14 @@ Wu.Tools.Legend = {
 				gradient : {
 					minVal     : minVal,
 					maxVal     : maxVal,
-					bline      : column,
+					bline      : column
 					// name       : column					
 				}
 			});	
 		}
 	},
 
-
-
-
-
-// 
-
-
-
-	eachLegendHTML : function (options) {		
-
+	eachLegendHTML : function (options) {
 		var name = options.layerName;
 		var style = options.style;
 		var object = options.object;		
@@ -1629,16 +1565,12 @@ Wu.Tools.Legend = {
 
 
 	gradientLegendHTML : function (options, satelliteView) {
-
-		var layerName = options.layerName;
 		var gradientStyle = options.style;
 		var object = options.object;
 		var minVal = options.gradient.minVal;
 		var maxVal = options.gradient.maxVal;
 		var bline = options.gradient.bline;
 		var gradientName = object.name ? object.name : bline;
-
-
 
 		// HTML PART
 		// HTML PART
@@ -1705,14 +1637,5 @@ Wu.Tools.Legend = {
 
 		return gradientFooter;
 
-	},
-
-
-
-// 
-
-
-
-
-
-}
+	}
+};

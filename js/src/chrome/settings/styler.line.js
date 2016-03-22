@@ -56,7 +56,7 @@ Wu.Styler.Line = Wu.Styler.extend({
 		targets && 		Wu.DomUtil.remove(targets);
 
 		// clear targets
-	},
+	}
 
 
 
