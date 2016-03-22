@@ -244,4 +244,11 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		normalized = (value - min) / (max - min);
 		return normalized;
 	}
+
+	// Sets min value to zero, and returns value from range, up to 1.
+	//_normalizeOffset : function (value, min, max) {
+	//	if ( min > 0 ) min = 0;
+	//	normalized = (value - min) / (max - min);
+	//	return normalized;
+	//}
 });
