@@ -103,20 +103,20 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 	toggleToBaseLayers : function () {
-		Wu.DomUtil.addClass(this.baselayerButton, 'layer-toggle-active')
-		Wu.DomUtil.removeClass(this.layerButton, 'layer-toggle-active')
+		Wu.DomUtil.addClass(this.baselayerButton, 'layer-toggle-active');
+		Wu.DomUtil.removeClass(this.layerButton, 'layer-toggle-active');
 
-		Wu.DomUtil.addClass(this._fieldsWrapper, 'editing-baselayers')
+		Wu.DomUtil.addClass(this._fieldsWrapper, 'editing-baselayers');
 
 		this._mode = 'baselayer';
 		this.update();		
 	},
 
 	toggleToLayers : function () {
-		Wu.DomUtil.removeClass(this.baselayerButton, 'layer-toggle-active')
-		Wu.DomUtil.addClass(this.layerButton, 'layer-toggle-active')
+		Wu.DomUtil.removeClass(this.baselayerButton, 'layer-toggle-active');
+		Wu.DomUtil.addClass(this.layerButton, 'layer-toggle-active');
 
-		Wu.DomUtil.removeClass(this._fieldsWrapper, 'editing-baselayers')
+		Wu.DomUtil.removeClass(this._fieldsWrapper, 'editing-baselayers');
 
 		this._mode = 'layer';
 		this.update();
@@ -141,7 +141,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 	       		var providerTitle = this.providerTitle(provider.key);
 
-	       		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+	       		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 			var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, providerTitle);
 
 	       		provider.layers.forEach(function (layer) {
@@ -165,8 +165,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		// set active or not
 		this._project.store.baseLayers.forEach(function (b) {
 			if ( uuid == b.uuid ) { 
-				on = true; 
-				return; 
+				on = true;
 			} 
 		}.bind(this));
 
@@ -189,7 +188,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : on,
 			right 	 : false,
 			appendTo : line.container,
-			fn 	 : this._saveSwitch.bind(this),
+			fn 	 : this._saveSwitch.bind(this)
 		});
 
 
@@ -199,19 +198,20 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : enabledByDefault,
 			right 	 : true,
 			appendTo : line.container,
-			fn 	 : this._saveRadio.bind(this),
+			fn 	 : this._saveRadio.bind(this)
 		});		
 
 	},
 
 
 	providerTitle : function (provider) {
+		var title = '';
 
-		if (provider == 'postgis') var title = 'Data Library';
-		if (provider == 'raster')  var title = 'Raster Overlays';
-		if (provider == 'mapbox')  var title = 'Mapbox';
-		if (provider == 'norkart') var title = 'Norkart';
-		if (provider == 'google')  var title = 'Google';
+		if (provider == 'postgis') title = 'Data Library';
+		if (provider == 'raster')  title = 'Raster Overlays';
+		if (provider == 'mapbox')  title = 'Mapbox';
+		if (provider == 'norkart') title = 'Norkart';
+		if (provider == 'google')  title = 'Google';
 		if (provider == 'osm')     return false;
 
 		// Return title
@@ -228,7 +228,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			var sort = {
 				key : key,
 				layers : []
-			}
+			};
 			for (var l in layers) {
 				var layer = layers[l];
 				if (layer) {
@@ -361,17 +361,15 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 
 	updateRadio : function (layer) {
-
-		// Get title 
-		var layerTitle = layer.getTitle();
 		var uuid       = layer.store.uuid;
 		var layerActive = false;
-		
 
 		// Only show radio if layer is active...
 		if (this._mode == 'layer') {
 			this._project.store.layermenu.forEach(function (b) {
-				if ( uuid == b.layer ) { layerActive = true; return; }
+				if ( uuid == b.layer ) {
+					layerActive = true;
+				}
 			}, this);
 		}
 
@@ -400,9 +398,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 	updateSwitch : function (layer) {
-
-		// Get title 
-		var layerTitle = layer.getTitle();
 		var uuid       = layer.store.uuid;
 		var on 	       = false;
 		
@@ -410,14 +405,18 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		if ( this._mode == 'baselayer' ) {
 			// Set active or not
 			this._project.store.baseLayers.forEach(function (b) {
-				if ( uuid == b.uuid ) { on = true; return; } 
+				if ( uuid == b.uuid ) {
+					on = true;
+				}
 			}.bind(this));
 		}
 
 		if ( this._mode == 'layer' ) {
 			// set active or not
 			this._project.store.layermenu.forEach(function (b) {
-				if ( uuid == b.layer ) { on = true; return; }
+				if ( uuid == b.layer ) {
+					on = true;
+				}
 			}, this);
 		}
 
@@ -442,9 +441,9 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 	_saveSwitch : function (e, isOn) {
 
-		var stateAttrib = e.target.getAttribute('state'),
-		    on          = (stateAttrib == 'true'),
-		    key         = e.target.getAttribute('key');
+		var stateAttrib = e.target.getAttribute('state');
+		var on          = (stateAttrib == 'true');
+		var key         = e.target.getAttribute('key');
 
 		if ( this._mode == 'baselayer' ) {
 			on ? this.enableBaseLayer(key) : this.disableBaseLayer(key);
@@ -510,5 +509,5 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu._remove(_uuid);
 
-	},	
+	}
 });

@@ -285,7 +285,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		if (!this._layer.isVector()) return;
 
 		// get
-		var meta = this._layer.getPostGISData();
+		var meta = this._layer.getPostGISData() || {};
 		var rawsql = meta.sql;
 		var table = meta.table_name;
 		// remove (etc) as sub
@@ -302,8 +302,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// if sql is of format (SELECT * FROM table) as sub
 		if (first == '(' && last == ') as sub') {
-			var clean_sql = sql.substr(1, sql.length -9);
-			return clean_sql;
+			return sql.substr(1, sql.length -9);
 		}
 		return sql;
 	},
@@ -459,8 +458,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_selectedFilterColumn : function (value) {
-		var column = value;
-		this._createFilterChart(column);		
+		this._createFilterChart(value);
 	},
 
 	nullHistogram : function () {
@@ -489,14 +487,14 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_createHistogram : function (column) {
 
 		// create div
-		var filterDiv = this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
+		this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
 		this._midInnerScroller.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
 
 		// create filter label div
 		this._filterLabel = Wu.DomUtil.create('div', 'chrome-content-filter-label', this._filterDiv);
 
 		// Create null historgram
-		histogram = this.nullHistogram();
+		var histogram = this.nullHistogram();
 
 		// Create Chart
 		this._chart = dc.barChart(this._filterDiv);			
@@ -671,8 +669,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			if ( maxLength < min ) maxLength = min;
 		});
 
-		var ticks = this._getSpacedTicks(maxLength);
-		return ticks;
+		return this._getSpacedTicks(maxLength);
 	},
 
 	_getSpacedTicks : function (maxLength) {
@@ -782,14 +779,12 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var bucket_max = this._getBucket(top_bucket, histogram);
 		var range_min = Math.round(bucket_min.range_min * 100)/100;
 		var range_max = Math.round(bucket_max.range_max * 100)/100;
-		var b = {
+		return {
 			min : _.isNaN(range_min) ? 1 : range_min,
 			max : range_max,
-			bottom : bottom_bucket, 
+			bottom : bottom_bucket,
 			top : top_bucket
 		};
-
-		return b;
 	},
 
 	_applyFilter : function () {

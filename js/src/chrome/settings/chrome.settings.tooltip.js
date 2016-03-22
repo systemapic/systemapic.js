@@ -99,7 +99,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		this.tooltipMeta = this._layer.getTooltip();
 		
 		// Get layermeta
-		var layerMeta = JSON.parse(this._layer.store.metadata)
+		var layerMeta = JSON.parse(this._layer.store.metadata);
 
 		// If no tooltip meta stored, create from layer meta
 		if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
@@ -127,7 +127,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var title = this.tooltipMeta.title;
 
 		// Wrapper
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)		
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 		
 		// Header
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Title');
@@ -143,14 +143,14 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		Wu.DomEvent.on(titleInput, 'blur', this.saveTitle, this);
 	},
 
-	// Description
-	initDescription : function () {
-	},
+	// UNUSED Function
+	//initDescription : function () {
+	//},
 
 	initDisable : function () {
 
 		// Wrapper
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)		
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 		
 		// Header
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Enable');
@@ -168,7 +168,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			id       : 'enable',
 			appendTo : sectionWrapper,
 			title    : 'Enable pop-up',
-			input    : false,
+			input    : false
 		});		
 
 		var timeSeriesSwitch = new Wu.button({
@@ -177,14 +177,13 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : this.tooltipMeta.enable,
 			right 	 : false,
 			appendTo : enableDisableLine.container,
-			fn 	 : this._saveEnableSwitch.bind(this),
+			fn 	 : this._saveEnableSwitch.bind(this)
 		});
 
 	},
 
 	// Init meta fields and time series
 	initFields : function () {
-
 		this.fieldListFromObject('Fields');
 		if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
 	},
@@ -194,7 +193,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		var fields = timeSeries ? this.tooltipMeta.timeSeries : this.tooltipMeta.metaFields;
 
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
 
 		// Function that saves on blur/click
@@ -215,7 +214,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				appendTo : sectionWrapper,
 				title    : title,
 				input    : hasInput,
-				fn 	 : this._saveFromBlur.bind(this),
+				fn 	 : this._saveFromBlur.bind(this)
 			});		
 
 			var _switch = new Wu.button({
@@ -226,19 +225,13 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				appendTo : line.container,
 				fn       : saveFunction.bind(this)
 			});
-
-
-
 		}
 	},
 
 	// Cretes section with time series
 	initTimeSeries : function () {
-
-		var timeSeries = this.tooltipMeta.timeSeries;
-
 		// Wrapper
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)		
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 		
 		// Header
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Time series');
@@ -253,7 +246,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			id       : 'enable',
 			appendTo : sectionWrapper,
 			title    : 'Enable time series',
-			input    : false,
+			input    : false
 		});		
 
 		var timeSeriesSwitch = new Wu.button({
@@ -262,7 +255,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : this.tooltipMeta.timeSeries.enable,
 			right 	 : false,
 			appendTo : timeSeriesLine.container,
-			fn 	 : this._saveSwitch.bind(this),
+			fn 	 : this._saveSwitch.bind(this)
 		});
 
 
@@ -275,8 +268,8 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			id       : 'minmaxRange',
 			appendTo : sectionWrapper,
 			title    : 'Range',
-			input    : false,
-		})
+			input    : false
+		});
 
 		var rangeMiniInput = new Wu.button({
 			id 	    : 'minmaxRange',
@@ -289,7 +282,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			tabindex    : 1,
 			fn 	    : this._saveMiniBlur.bind(this),
 			className   : 'time-series-input'
-		})
+		});
 
 
 
@@ -309,7 +302,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	// Saves tiny input to right
 	_saveMiniBlur : function (e) {
 
-		var key   = e.target.id.substring(17, e.target.id.length)
+		var key   = e.target.id.substring(17, e.target.id.length);
 		var value = e.target.value;
 
 		this._saveToServer(key, value);
@@ -339,14 +332,8 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		var elem = e.target;
 		var key  = elem.getAttribute('key');
-
 		var titleField = Wu.DomUtil.get('field_input_' + key);
-		var title      = titleField ? titleField.value : false;
-
-		// If no title, set to false
 		var title = titleField ? titleField.value : false;
-
-		// Save to server
 		this._saveToServer(key, on, title);
 	},
 
@@ -354,14 +341,8 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		var elem = e.target;
 		var key  = elem.getAttribute('key');
-
 		var titleField = Wu.DomUtil.get('field_input_' + key);
-		var title      = titleField ? titleField.value : false;
-
-		// If no title, set to false
 		var title = titleField ? titleField.value : false;
-
-		// Save to server
 		this._saveToServer(key, on, title, true);
 	},
 
@@ -393,7 +374,9 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				var keyIsDate = this._validateDateFormat(key);
 				
 				// If key is date, try to update timeseries
-				if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, value);
+				if ( keyIsDate ) {
+					this.updateTimeSeriesMeta(key, title, value);
+				}
 
 			} else {
 				this.updateMeta(key, title, value);
@@ -504,7 +487,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			description : false,			
 			timeSeries : {},
 			metaFields : {}
-		}
+		};
 		
 		var timeSeriesCount = 0;
 
@@ -520,7 +503,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				metaData.timeSeries[f] = {
 						title : false,
 						on    : true
-				}
+				};
 
 				timeSeriesCount ++;		
 			} 
@@ -546,6 +529,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		metaData.timeSeries.enable = true;
 
 		return [metaData, timeSeriesCount];
-	},	
+	}
 
 });
