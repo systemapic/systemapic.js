@@ -17,9 +17,9 @@ L.Control.Draw = Wu.Control.extend({
 				shapeOptions: {
 					color: 'cyan'
 				},
-				smoothFactor : 0.5,
+				smoothFactor : 0.5
 			}
-		},
+		}
 	},
 
 	type : 'draw',
@@ -86,8 +86,8 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_drawCreated : function (e) {
-		var type = e.layerType,
-		    layer = e.layer;
+		var type = e.layerType;
+		var layer = e.layer;
 
 		// add layer to map
 		this._layerContainer.addLayer(layer);
@@ -229,7 +229,7 @@ L.Control.Draw = Wu.Control.extend({
 				return l.store.data.postgis == layer_id;
 			}
 			return false;
-		})
+		});
 		return layer;
 	},
 
@@ -352,9 +352,9 @@ L.Control.Draw = Wu.Control.extend({
 
 		// add edit options
 		this.options.edit = {
-			featureGroup : this._layerContainer,
+			featureGroup : this._layerContainer
 			// remove : false
-		}
+		};
 		
 		var toolbar;
 
@@ -434,8 +434,6 @@ L.Control.Draw = Wu.Control.extend({
 			}
 		}
 	}
-
-
 
 });
 

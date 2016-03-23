@@ -97,7 +97,7 @@ Wu.Styler.Point = Wu.Styler.extend({
 		this._content[this.type].pointsize.minmax = {
 			line : line,
 			input : input
-		}
+		};
 
 		// save carto
 		this.carto().pointsize.column  = column;
@@ -105,9 +105,6 @@ Wu.Styler.Point = Wu.Styler.extend({
 
 		this.markChanged();
 
-	},
-
-
-
+	}
 
 });

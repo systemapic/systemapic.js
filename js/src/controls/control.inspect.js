@@ -8,9 +8,9 @@ L.Control.Inspect = Wu.Control.extend({
 	},
 
 	onAdd : function (map) {
-		var className = 'leaflet-control-inspect ct14',
-		    container = L.DomUtil.create('div', className),
-		    options   = this.options;
+		var className = 'leaflet-control-inspect ct14';
+		var container = L.DomUtil.create('div', className);
+		var options   = this.options;
 
 		// add html
 		this._content 	= Wu.DomUtil.create('div', 'inspect-control-inner-content', container);
@@ -232,7 +232,7 @@ L.Control.Inspect = Wu.Control.extend({
 			layer     : layer,
 			uuid      : layer.store.uuid,
 			isolated  : false
-		}
+		};
 
 		// add object to front of array
 		this._layers.unshift(entry);
@@ -293,13 +293,13 @@ L.Control.Inspect = Wu.Control.extend({
 
 		if (!this._dragging) return;
 
-		var d = this._dragging,
-		    md = this._md,
-		    movedY = e.y - d.e.y,
-		    div = d.wrapper,
-		    n = this._n,
-		    m = this._m,
-		    k = 18; // how many px to move bf trigger
+		var d = this._dragging;
+		var md = this._md;
+		var movedY = e.y - d.e.y;
+		var div = d.wrapper;
+		var n = this._n;
+		var m = this._m;
+		var k = 18; // how many px to move bf trigger
 
 		// accumulate movement
 		this._md += e.movementY;
@@ -320,16 +320,16 @@ L.Control.Inspect = Wu.Control.extend({
 		var div = this._dragging.wrapper;
 		L.DomUtil.removeClass(div, 'dragging');
 
-		this._dragClassAdded = false;;
+		this._dragClassAdded = false;
 		this._dragging = false;
 	},	
 
 	_moveUp : function () {		// todo: doesn't work as well going up then back down
 
-		var d = this._dragging,
-		    div = d.wrapper,
-		    prev = div.previousSibling,
-		    layer = this._dragging.layer;
+		var d = this._dragging;
+		var div = d.wrapper;
+		var prev = div.previousSibling;
+		var layer = this._dragging.layer;
 
 		if (!prev) return;
 
@@ -376,7 +376,7 @@ L.Control.Inspect = Wu.Control.extend({
 		if (!this._layers || !layer) return;
 
 		// find entry in array
-		var entry = _.find(this._layers, function (l) { return l.uuid == layer.store.uuid; })
+		var entry = _.find(this._layers, function (l) { return l.uuid == layer.store.uuid; });
 
 		// remove
 		this._removeLayer(entry);
@@ -407,10 +407,10 @@ L.Control.Inspect = Wu.Control.extend({
 	},
 
 	moveUp : function (entry) {
-		var d = entry,
-		    div = d.wrapper,
-		    prev = div.previousSibling,
-		    layer = d.layer;
+		var d = entry;
+		var div = d.wrapper;
+		var prev = div.previousSibling;
+		var layer = d.layer;
 
 		if (!prev) return;
 

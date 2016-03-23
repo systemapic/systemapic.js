@@ -61,11 +61,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_registerButton : function (button) {
 
 		// button options
-		var className = button.className,
-		    trigger = button.trigger,
-		    name = button.name,
-		    ctx = button.context,
-		    project_dependent = button.project_dependent;
+		var className = button.className;
+		var trigger = button.trigger;
+		var name = button.name;
+		var ctx = button.context;
+		var project_dependent = button.project_dependent;
 
 		if (project_dependent) className += ' displayNone';
 
@@ -83,7 +83,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._buttons[name] = {
 			div : buttonDiv,
 			options : button
-		}
+		};
 
 		// register event
 		Wu.DomEvent.on(buttonDiv, 'mousedown', trigger, ctx);
@@ -93,23 +93,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 
 	_updateButtonVisibility : function () {
+		var buttons = _.filter(this._buttons, function (b) {
+			return b.options.project_dependent;
+		});
 
 		if (app.activeProject) {
-
-			var buttons = _.filter(this._buttons, function (b) {
-				return b.options.project_dependent;
-			});
-
 			buttons.forEach(function (button) {
 				Wu.DomUtil.removeClass(button.div, 'displayNone');
 			});
 
 		} else {
-
-			var buttons = _.filter(this._buttons, function (b) {
-				return b.options.project_dependent;
-			});
-
 			buttons.forEach(function (button) {
 				Wu.DomUtil.addClass(button.div, 'displayNone');
 			});
@@ -353,6 +346,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		
 		// app.Chrome();
 		this.closeLeftPane();
-	},
+	}
 	
 });

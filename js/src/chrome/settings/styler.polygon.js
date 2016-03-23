@@ -163,10 +163,6 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		var bwrapper = this._content[this.type].targets.wrapper;
 		wrapper.appendChild(button);
 
-	},
-
-
-
-
+	}
 
 });
