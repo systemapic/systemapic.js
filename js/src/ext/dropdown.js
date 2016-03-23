@@ -88,12 +88,12 @@ Wu.Dropdown = Wu.Class.extend({
 	},
 
 	_changeActive : function (e) {
+		Wu.DomEvent.stop(e);
 		this._toggleListItems();
 		this.setValue({
 			value: e.currentTarget.getAttribute('data-value'),
 			title: e.currentTarget.innerHTML
 		});
-		Wu.DomEvent.stop(e);
 	},
 
 	getValue: function () {

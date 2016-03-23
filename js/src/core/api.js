@@ -242,6 +242,7 @@ Wu.Api = Wu.Class.extend({
 	updateLayer : function (options, done) {
 		// var path = '/api/layer/update';
 		var path = '/v2/layers/update';
+		console.error('updateLayer', options);
 		this.post(path, options, done);
 	},
 
@@ -291,6 +292,10 @@ Wu.Api = Wu.Class.extend({
 
 	
 
+	importStatus : function (options, done) {
+		var path = '/v2/data/import/status';
+		this.get(path, options, done);
+	},
 
 
 

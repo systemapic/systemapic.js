@@ -529,6 +529,7 @@ Wu.Model.File = Wu.Model.extend({
 		var project = app.activeProject;
 		var file = this;
                 var ops = [];
+		var defaultStyle = file.defaultStyle();
 
 
                 ops.push(function (callback) {
@@ -538,32 +539,57 @@ Wu.Model.File = Wu.Model.extend({
                 });
 
                 ops.push(function (datasetJSON, callback) {
-                        console.log('vectorizeDataset err result', datasetJSON);
+                	console.log('vectorizeDataset err result', datasetJSON);
 
                         var dataset = Wu.parse(datasetJSON);
 
                         console.log('dataset: ', dataset);
 
-                        var tileLayerJSON = {
-				"geom_column"	   : "the_geom_3857",
-				"geom_type"	   : "geometry",
-				"raster_band"	   : "",
-				"srid"		   : "",
-				"affected_tables"  : "",
-				"interactivity"	   : "",
-				"attributes"	   : "",
-				"data_type" 	   : "vector",
-				"access_token"	   : app.tokens.access_token,
-				"cartocss_version" : "2.0.1",
-				"cartocss"	   : "#layer { polygon-fill: red; polygon-opacity: 1; }", 	// save default cartocss style (will be active on first render)
-				"sql"		   : "(SELECT * FROM " + dataset.uuid + ") as sub",
-				"file_id"	   : file.getUuid(),
-				"return_model" 	   : true,
-				"projectUuid" 	   : project.getUuid()
-			};
+                        // wait for processing_success == true
+
+                        var check_status = setInterval(function () {
+                        	console.log('checking');
+                        	app.api.importStatus({
+                        		file_id : dataset.file_id
+                        	}, function (err, status_json) {
+                        		var status = Wu.parse(status_json);
+                        		console.log('status: ', status);
+                        		if (status.processing_success) {
+                        			clearInterval(check_status);
+                        			callback(null, status);
+                        		}
+                        	});
+
+                        }, 1000);
+
+                });
+
+
+                ops.push(function (dataset, callback) {
+                        console.log('vectorizeDataset err result', dataset);
+
+                        // var dataset = Wu.parse(datasetJSON);
+
+                        console.log('dataset: ', dataset);
+
+			 var layer = {
+	                    geom_column: 'the_geom_3857',
+	                    geom_type: 'geometry',
+	                    raster_band: '',
+	                    srid: '',
+	                    affected_tables: '',
+	                    interactivity: '',
+	                    attributes: '',
+	                    cartocss_version: '2.0.1',
+	                    cartocss : '#layer { polygon-fill: yellow; polygon-opacity: 0.5; }',
+	                    sql: '(SELECT * FROM ' + dataset.table_name + ') as sub',
+	                    file_id: dataset.file_id,
+	                    return_model: true,
+	                    debug_1 : 'vectorize_dataset',
+	                }
 
 			// create postgis layer
-			app.api.createTileLayer(tileLayerJSON, callback);
+			app.api.createTileLayer(layer, callback);
 
                 });
 
@@ -582,19 +608,22 @@ Wu.Model.File = Wu.Model.extend({
                                         postgis : layer.options
                                 },
                                 metadata : layer.options.metadata,
-                                title : file.getName(),
+                                title : file.getName() + ' (vectorized)',
                                 description : 'Description: Layer created from ' + file.getName(),
                                 file : file.getUuid(),
-                                style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
+                                // style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
+				style : JSON.stringify(defaultStyle), // save default json style
+                        	
                         };
 
-                        console.log('VECTORIZE: creting layer model');
+                        console.log('VECTORIZE: creting layer model', layerModel);
 
                         // create new layer model
                         file._createLayerModel(layerModel, callback);
                 });
 
                 ops.push(function (layerJSON, callback) {
+                        
                         // refresh Sidepane Options
                         var layer = project.addLayer(layerJSON);
 
@@ -620,73 +649,9 @@ Wu.Model.File = Wu.Model.extend({
                         done && done(err, layer);
                 })
 
-		// app.api.vectorizeDataset({
-		// 	file_id : file.getUuid()
-		// }, function (err, datasetJSON) {
-		// 	console.log('vectorizeDataset err result', err, datasetJSON);
-
-		// 	var dataset = Wu.parse(datasetJSON);
-
-		// 	console.log('layer: ', dataset);
-
-		// 	var layerModel = {
-		// 		projectUuid : project.getUuid(), // pass to automatically attach to project
-		// 		data : {
-		// 			postgis : dataset.data.postgis
-		// 		},
-		// 		metadata : dataset.data.metadata,
-		// 		title : file.getName(),
-		// 		description : 'Description: Layer created from ' + file.getName(),
-		// 		file : file.getUuid(),
-		// 		style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
-		// 	};
-
-		// 	console.log('VECTORIZE: creting layer model');
-
-		// 	// create new layer model
-		// 	this._createLayerModel(layerModel, function (err, layerJSON) {
-
-		// 		// refresh Sidepane Options
-		// 		var layer = project.addLayer(layerJSON);
-
-		// 		console.log('VECTORIZE: created layer model', layer);
-
-		// 		// todo: set layer icon
-		// 		app.feedback.setMessage({
-		// 			title : 'Layer added to project',
-		// 			// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
-		// 		});	
-
-		// 		// select project
-		// 		Wu.Mixin.Events.fire('layerAdded', {detail : {
-		// 			projectUuid : project.getUuid(),
-		// 			layerUuid : layer.getUuid()
-		// 		}});
-
-		// 		// callback
-		// 		done && done(null, layer);
-		// 	});
-
-		// }.bind(this));
 
 	},
 
-	// _getType : function () {
-	// 	if (this.store.data && this.store.data.postgis) return 'vector';
-	// 	if (this.store.data && this.store.data.raster) return 'raster';
-	// 	return false;
-	// },
-
-	// cutRasterColor : function (options, callback) {
-
-	// 	// request layer with cut
-	// 	this._requestDefaultRasterLayer({
-	// 		file : this,
-	// 		project : options.project,
-	// 		cutColor : options.color // todo: validate
-	// 	}, callback);
-
-	// },
 
 	_createLayer : function (project, callback) {
 		console.error('CR E E A AT T  ALLALALAL YER', this.isVector(), this.isRaster());
@@ -695,7 +660,6 @@ Wu.Model.File = Wu.Model.extend({
 
 
 	_createDefaultLayer : function (project, callback) {
-		// this.isVector() && this._createDefaultVectorLayer(project, callback);
 		this.isVector() && this.createVectorLayer(project, callback);
 		this.isRaster() && this._createDefaultRasterLayer(project, callback);
 	},
@@ -899,10 +863,26 @@ Wu.Model.File = Wu.Model.extend({
 	
 
 	_createDefaultRasterLayer : function (project, callback) {
+
+		var defaultCartocss = '#layer {'
+		defaultCartocss += 'raster-opacity: 0.8; '; 
+		defaultCartocss += 'raster-scaling: lanczos; '; 
+		defaultCartocss += 'raster-colorizer-default-mode: linear; '; 
+		defaultCartocss += 'raster-colorizer-default-color: transparent; '; 
+		defaultCartocss += 'raster-colorizer-epsilon: 3; '; 
+		defaultCartocss += 'raster-colorizer-stops: '; 
+		defaultCartocss += '  stop(0, #EF0F0F) '; 
+		defaultCartocss += '  stop(50, #EF0F0F) '; 
+		defaultCartocss += '  stop(100, #EF0F0F) '; 
+		defaultCartocss += '  stop(200, #EF0F0F) '; 
+		defaultCartocss += '  stop(255, #EF0F0F); '; 
+		defaultCartocss += 'raster-comp-op: color-dodge;';
+		defaultCartocss += ' }';
 		
 		var options = {
 			file : this,
-			defaultCartocss : '#layer { raster-opacity:1.0 }', // TODO tweak a default CSS for raster
+			// defaultCartocss : '#layer { raster-opacity:1.0 }', // TODO tweak a default CSS for raster
+			defaultCartocss : defaultCartocss,
 			project : project
 		}
 
@@ -1061,13 +1041,11 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	isRaster : function () {
-		console.log('isRaster?', this);
 		if (!this.store.data || !this.store.data.postgis) return false;
 		if (this.store.data.postgis.data_type == 'raster') return true;
 		return false;	
 	},
 	isVector : function () {
-		console.log('isVector?', this);
 		if (!this.store.data || !this.store.data.postgis) return false;
 		if (this.store.data.postgis.data_type == 'vector') return true;
 		return false;

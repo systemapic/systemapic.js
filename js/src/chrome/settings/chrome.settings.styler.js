@@ -272,8 +272,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var selected = e.target.value;
 
+		console.log('_selectTemplate', selected);
 
 		this.templates.forEach(function (template) {
+			console.log('tempalte:', template);
 			if ( template.uuid == selected ) {
 				this._carto = template.carto;
 				this._legend = template.legend;
@@ -327,6 +329,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// Update style
 	_updateStyle : function (newLegend) {
 
+		console.log('update_style');
 
 		// Update point
 		this._pointStyler.setCarto(this._carto.point);
@@ -417,6 +420,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.tabindex = 1;
 
 		// set local cartoJSON
+		console.log('_selectedActiveLayer', style);
 		this._carto = style || {};
 
 		// Clear legend objects

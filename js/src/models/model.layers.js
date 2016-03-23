@@ -465,6 +465,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	getStyling : function () {
+		console.log('getStyling', this.store.style, this);
 		var json = this.store.style;
 		if (!json) return false;
 		var styleJSON = Wu.parse(json);
@@ -721,7 +722,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	// on change in style editor, etc.
 	updateStyle : function (style) {
-		console.log('updateStyle', style);
+		console.error('updateStyle', style);
 		var layerUuid = style.layerUuid,
 		    postgisOptions = style.options;
 

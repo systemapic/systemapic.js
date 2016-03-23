@@ -44,16 +44,17 @@ Wu.Styler = Wu.Class.extend({
 
 		blendModes : ["color", "color-burn", "color-dodge", "contrast", "darken", "difference", "dst", "dst-atop", "dst-in", "dst-out", "dst-over", "exclusion", "grain-extract", "grain-merge", "hard-light", "hue", "invert", "invert-rgb", "lighten", "minus", "multiply", "overlay", "plus", "saturation", "screen", "soft-light", "src", "src-atop", "src-in", "src-out", "src-over", "value", "xor"]
 
-
 	},
 
 	_content : {},
 
 	carto : function () {
+		console.log('this.lopitons.carto', this.options.carto, this.type);
 		return this.options.carto[this.type];
 	},
 
 	setCarto : function (carto) {
+		console.error('setCarto', carto, this);
 		this.options.carto[this.type] = carto;
 	},
 
@@ -64,7 +65,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// init container
 		this._initContainer();
-
 	},
 
 
@@ -74,10 +74,11 @@ Wu.Styler = Wu.Class.extend({
 		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper toggles-wrapper', this.options.container);
 
 		this._refresh();
-
 	},
 
 	_refresh : function () {
+
+		console.error('_refresh', this);
 
 		this._wrapper.innerHTML = '';
 
@@ -85,6 +86,8 @@ Wu.Styler = Wu.Class.extend({
 		this.options.carto[this.type] = this.carto() || {};
 
 		this._content[this.type] = {};
+
+		console.log('carto()', this.carto());
 
 		// Get on/off state
 		var isOn = this.carto().enabled;
@@ -109,9 +112,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// toggle
 		this._toggle(isOn);
-
 	},
-
 
 	_switch : function (e, on) {
 
@@ -136,7 +137,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// select options
 		this._preSelectOptions();
-
 	},
 
 	_disable : function () {
@@ -1135,6 +1135,9 @@ Wu.Styler = Wu.Class.extend({
 		// get sql
 		var sql = layer.getSQL();
 
+		console.error('lyaer.getSQL', sql);
+		console.log('layuer: ', layer);
+
 		// request new layer
 		var layerOptions = {
 			css : carto, 
@@ -1152,6 +1155,15 @@ Wu.Styler = Wu.Class.extend({
 		var layer = options.layer;
 		var file_id = layer.getFileUuid();
 		var sql = options.sql;
+		var project = this.options.project;
+		    // layerOptions = layer.store.data.postgis;
+
+		// layerOptions.sql = sql;
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;
+
+		// var sql = 'SELECT * FROM ' + file_id;	
+		var sql = '(SELECT * FROM ' + file_id + ') as sub';	
 
 		var layerJSON = {
 			geom_column: 'the_geom_3857',
