@@ -860,7 +860,9 @@
 						for (var key in input) {
 							try {
 								var improvementsForIE10 = input[key];
-							} catch (e) {}
+							} catch (e) {
+								console.log(e);
+							}
 						}
 						input.style.opacity = 0;
 						input.style.display='block';
