@@ -24,7 +24,7 @@ L.Map.ScrollWheelZoom.prototype._onWheelScroll = function (e) {
     this._timer = setTimeout(L.bind(this._performZoom, this), left);
 
     L.DomEvent.stop(e);
-}
+};
 
 
 
@@ -58,7 +58,7 @@ L.Map.include({
 		zoom = options && options.minZoom ? Math.max(options.minZoom, zoom) : zoom;
 
 		return this.setView(center, zoom, options);
-	},
+	}
 });
 
 
@@ -92,8 +92,8 @@ L.Polygon.include({
 			center = [x / area, y / area];
 		}
 		return this._map.layerPointToLatLng(center);
-	},
-})
+	}
+});
 
 // prevent minifed bug
 L.Icon.Default.imagePath = '/css/images';
@@ -104,5 +104,5 @@ L.Control.Attribution.include({
 		this._attributions = {};
 		this._update();
 		return this;
-	},
-})
+	}
+});

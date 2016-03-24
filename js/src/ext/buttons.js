@@ -26,14 +26,14 @@ Wu.button = Wu.Class.extend({
 
 	initDualInput : function () {
 
-		var appendTo    = this.options.appendTo,
-		    key         = this.options.id,
-		    right       = this.options.right,
-		    value       = this.options.value,
-		    minmax 	= this.options.minmax,
-		    tabindex    = this.options.tabindex
-		    className   = this.options.className,
-		    fn          = this.options.fn;
+		var appendTo    = this.options.appendTo;
+		var key         = this.options.id;
+		var right       = this.options.right;
+		var value       = this.options.value;
+		var minmax 	 	= this.options.minmax;
+		var tabindex    = this.options.tabindex;
+		var className   = this.options.className;
+		var fn          = this.options.fn;
 
 
 		var prefix = 'chrome-field-mini-input mini-input-dual ';
@@ -84,8 +84,8 @@ Wu.button = Wu.Class.extend({
 	},
 
 	saveDualBlur : function (maxElem, minElem, absoluteMax, absoluteMin, options) {
-		var fn      = options.fn,
-		    key     = options.key;
+		var fn      = options.fn;
+		var key     = options.key;
 
 		fn(maxElem.value, minElem.value, absoluteMax, absoluteMin)
 	},
@@ -97,13 +97,13 @@ Wu.button = Wu.Class.extend({
 
 	initColorRange : function () {
 
-		var appendTo    = this.options.appendTo,
-		    key         = this.options.id,
-		    right       = this.options.right,
-		    value       = this.options.value,
-		    presetFn    = this.options.presetFn,
-		    className   = this.options.className,
-		    customFn    = this.options.customFn;
+		var appendTo    = this.options.appendTo;
+		var key         = this.options.id;
+		var right       = this.options.right;
+		var value       = this.options.value;
+		var presetFn    = this.options.presetFn;
+		var className   = this.options.className;
+		var customFn    = this.options.customFn;
 
 		// Set styling
 		var gradientStyle = this._gradientStyle(value);
@@ -205,7 +205,7 @@ Wu.button = Wu.Class.extend({
 
 			Wu.DomEvent.on(colorRangePreset, 'click', presetFn);
 
-		}.bind(this))
+		}.bind(this));
 
 		// select color on range
 		Wu.DomEvent.on(color, 'click', function (e) {
@@ -266,16 +266,15 @@ Wu.button = Wu.Class.extend({
 	// └─┘└─┘┴─┘└─┘┴└─  └─┘┴ ┴┴─┘┴─┘
 
 	initColorBall : function () {
+		var appendTo    = this.options.appendTo;
+		var key         = this.options.id;
+		var fn          = this.options.fn;
+		var right       = this.options.right;
+		var on          = this.options.isOn;
+		var className   = this.options.className;
+		var value       = this.options.value;
+		var _class 		= 'chrome-color-ball ';
 
-		var appendTo    = this.options.appendTo,
-		    key         = this.options.id,
-		    fn          = this.options.fn,
-		    right       = this.options.right,
-		    on          = this.options.isOn,
-		    className   = this.options.className,
-		    value       = this.options.value;
-
-		var _class = 'chrome-color-ball ';
 		if ( className ) _class += className;
 
 		var color = Wu.DomUtil.create('div', _class, appendTo);
@@ -295,8 +294,6 @@ Wu.button = Wu.Class.extend({
 
 
 	initSpectrum : function (hex, wrapper, key, fn) {
-
-
 		$(wrapper).spectrum({
 			color: hex,
 			preferredFormat: 'hex',
@@ -315,7 +312,7 @@ Wu.button = Wu.Class.extend({
 				if ( g.length == 1 ) g += '0';
 				if ( b.length == 1 ) b += '0';
 
-				var hex = '#' + r + g + b;
+				hex = '#' + r + g + b;
 
 				wrapper.style.background = hex;
 
@@ -332,16 +329,16 @@ Wu.button = Wu.Class.extend({
 
 	initMiniDropDown : function () {
 
-		var appendTo    = this.options.appendTo,
-		    key         = this.options.id,
-		    fn          = this.options.fn,
-		    right       = this.options.right,
-		    array 	= this.options.array,
-		    selected    = this.options.selected,
-		    reversed    = this.options.reversed,
-		    className   = this.options.className;
-
+		var appendTo    = this.options.appendTo;
+		var key         = this.options.id;
+		var fn          = this.options.fn;
+		var right       = this.options.right;
+		var array 	= this.options.array;
+		var selected    = this.options.selected;
+		var reversed    = this.options.reversed;
+		var className   = this.options.className;
 		var _class = 'chrome chrome-mini-dropdown active-field select-field-wrap ';
+
 		if ( className ) _class += className;
 
 		// create dropdown
@@ -406,19 +403,18 @@ Wu.button = Wu.Class.extend({
 
 	initInput : function  () {
 		
-		var appendTo    = this.options.appendTo,
-		    key         = this.options.id,
-		    fn          = this.options.fn,
-		    value       = this.options.value,
-		    placeholder = this.options.placeholder,
-		    tabindex    = this.options.tabindex,
-		    right       = this.options.right,
-		    className   = this.options.className,
-		    isOn        = this.options.isOn,
-		    allowText   = this.options.allowText;
-
-
+		var appendTo    = this.options.appendTo;
+		var key         = this.options.id;
+		var fn          = this.options.fn;
+		var value       = this.options.value;
+		var placeholder = this.options.placeholder;
+		var tabindex    = this.options.tabindex;
+		var right       = this.options.right;
+		var className   = this.options.className;
+		var isOn        = this.options.isOn;
+		var allowText   = this.options.allowText;
 		var _class = 'chrome-field-input ';
+
 		if ( className ) _class += className;
 
 		// create
@@ -460,16 +456,16 @@ Wu.button = Wu.Class.extend({
 
 	initMiniInput : function () {
 
-		var appendTo    = this.options.appendTo,
-		    key         = this.options.id,
-		    fn          = this.options.fn,
-		    value       = this.options.value,
-		    placeholder = this.options.placeholder,
-		    tabindex    = this.options.tabindex,
-		    right       = this.options.right,
-		    className   = this.options.className,
-		    isOn        = this.options.isOn,
-		    allowText   = this.options.allowText;
+		var appendTo    = this.options.appendTo;
+		var key         = this.options.id;
+		var fn          = this.options.fn;
+		var value       = this.options.value;
+		var placeholder = this.options.placeholder;
+		var tabindex    = this.options.tabindex;
+		var right       = this.options.right;
+		var className   = this.options.className;
+		var isOn        = this.options.isOn;
+		var allowText   = this.options.allowText;
 
 
 		var _class = 'chrome-field-mini-input ';
@@ -559,13 +555,13 @@ Wu.button = Wu.Class.extend({
 
 	initRadio : function () {
 
-		var appendTo  = this.options.appendTo,
-		    key       = this.options.id,
-		    fn        = this.options.fn,
-		    className = this.options.className,
-		    on        = this.options.isOn;
-
+		var appendTo  = this.options.appendTo;
+		var key       = this.options.id;
+		var fn        = this.options.fn;
+		var className = this.options.className;
+		var on        = this.options.isOn;
 		var _class = 'layer-radio ';
+
 		if ( className ) _class += className;
 
 		var radio = Wu.DomUtil.create('div', _class, appendTo);
@@ -609,12 +605,12 @@ Wu.button = Wu.Class.extend({
 
 	initSet : function () {
 
-		var appendTo  = this.options.appendTo,
-		    key       = this.options.id,
-		    className = this.options.className,
-		    fn        = this.options.fn;
-
+		var appendTo  = this.options.appendTo;
+		var key       = this.options.id;
+		var className = this.options.className;
+		var fn        = this.options.fn;
 		var _class = 'chrome-set ';
+
 		if ( className ) _class += className;
 
 		// create
@@ -631,8 +627,8 @@ Wu.button = Wu.Class.extend({
 
 	toggleSet : function (e) {
 
-		var elem = e.target,
-		    key = elem.getAttribute('key');
+		var elem = e.target;
+		var key = elem.getAttribute('key');
 
 		this.options.fn(key);
 
@@ -645,13 +641,13 @@ Wu.button = Wu.Class.extend({
 
 	initSetClear : function () {
 
-		var appendTo  = this.options.appendTo,
-		    key       = this.options.id,
-		    fn        = this.options.fn,
-		    className = this.options.className, 
-		    isOn      = this.options.isOn;	
-
+		var appendTo  = this.options.appendTo;
+		var key       = this.options.id;
+		var fn        = this.options.fn;
+		var className = this.options.className;
+		var isOn      = this.options.isOn;
 		var _class = 'setClear ';
+
 		if ( className ) _class += className;
 
 		// create
@@ -677,11 +673,11 @@ Wu.button = Wu.Class.extend({
 
 	toggleSetClear : function (e) {
 
-		var elem  = e.target,
-		    id    = elem.id,
-		    key   = elem.getAttribute('key'),
-		    state = elem.getAttribute('state'),
-		    on 	  = (state == 'true');
+		var elem  = e.target;
+		var id    = elem.id;
+		var key   = elem.getAttribute('key');
+		var state = elem.getAttribute('state');
+		var on 	  = (state == 'true');
 
 		if (on) {
 			Wu.DomUtil.removeClass(elem, 'setClear-on');
@@ -705,20 +701,20 @@ Wu.button = Wu.Class.extend({
 
 	initSwitch : function () {
 
-		var isOn      = this.options.isOn,
-		    right     = this.options.right,
-		    id        = this.options.id,
-		    appendTo  = this.options.appendTo,
-		    fn        = this.options.fn,
-		    className = this.options.className,
-		    disabled  = this.options.disabled;
+		var isOn      = this.options.isOn;
+		var right     = this.options.right;
+		var id        = this.options.id;
+		var appendTo  = this.options.appendTo;
+		var fn        = this.options.fn;
+		var className = this.options.className;
+		var disabled  = this.options.disabled;
 
 		this.value = id;
 
 		// Create classname
 		var divclass = 'chrome-switch-container';
 		if (isOn) divclass += ' switch-on';
-		if (right) divclass += ' right-switch'
+		if (right) divclass += ' right-switch';
 		if (disabled) divclass += ' disabled-switch';
 		if (className) divclass += ' ' + className;
 
@@ -745,9 +741,9 @@ Wu.button = Wu.Class.extend({
 	// Toggle switch
 	toggleSwitch : function (e) {
 
-		var stateAttrib = e.target.getAttribute('state'),
-		    on          = (stateAttrib == 'true'),
-		    key         = e.target.getAttribute('key');
+		var stateAttrib = e.target.getAttribute('state');
+		var on          = (stateAttrib == 'true');
+		var key         = e.target.getAttribute('key');
 
 		if (on) {
 			e.target.setAttribute('state', 'false');
@@ -771,13 +767,13 @@ Wu.button = Wu.Class.extend({
 
 	initToggleButton : function (e) {
 
-		var option1   = this.options.option1,
-		    option2   = this.options.option2,
-		    id        = this.options.id,
-		    appendTo  = this.options.appendTo,
-		    fn        = this.options.fn,
-		    className = this.options.className,
-		    selected  = this.options.selected;
+		var option1   = this.options.option1;
+		var option2   = this.options.option2;
+		var id        = this.options.id;
+		var appendTo  = this.options.appendTo;
+		var fn        = this.options.fn;
+		var className = this.options.className;
+		var selected  = this.options.selected;
 
 
 		// Create classname
@@ -794,7 +790,7 @@ Wu.button = Wu.Class.extend({
 
 		
 
-	},
+	}
 
 });
 
@@ -818,16 +814,15 @@ Wu.fieldLine = Wu.Class.extend({
 
 	_initContent : function (options) {
 
-		var key          = options.id,
-		    appendTo     = options.appendTo,
-		    title        = options.title,
-		    fn           = options.fn,
-		    input        = options.input,
-		    className    = options.className ? options.className : '',
-		    childWrapper = options.childWrapper;
-
-
+		var key          = options.id;
+		var appendTo     = options.appendTo;
+		var title        = options.title;
+		var fn           = options.fn;
+		var input        = options.input;
+		var className    = options.className ? options.className : '';
+		var childWrapper = options.childWrapper;
 		var cName = 'chrome-metafield-line ' + className;
+
 		this.container = Wu.DomUtil.create('div', cName, appendTo);
 		this.container.id = 'field_wrapper_' + key;
 
@@ -861,9 +856,9 @@ Wu.fieldLine = Wu.Class.extend({
 		}
 
 		return this.container;
-	},
+	}
 
-})
+});
 
 
 
