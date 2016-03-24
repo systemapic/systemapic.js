@@ -141,9 +141,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	initSettings : function (title) {
 
 
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._settingsDropdown)
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._settingsDropdown);
 		var header = Wu.DomUtil.create('div', 'chrome-content title', sectionWrapper, title);
-
 		var options = {
 
 			zoom : {
@@ -187,8 +186,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			cartocss : {
 				enable : false,
 				name   : 'CartoCSS'
-			},
-		}
+			}
+		};
 
 		// Get control
 		var project = app.activeProject;
@@ -205,7 +204,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 					id       : key,
 					appendTo : sectionWrapper,
 					title    : title,
-					input    : false,
+					input    : false
 				});		
 
 				var _switch = new Wu.button({ 
@@ -214,7 +213,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 					isOn 	 : project.store.controls[key],
 					right 	 : false,
 					appendTo : line.container,
-					fn 	 : this._saveSwitch.bind(this),
+					fn 	 : this._saveSwitch.bind(this)
 				});
 			}
 		}
@@ -222,9 +221,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 
 	initBoundPos : function (title) {
 
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._settingsDropdown)
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._settingsDropdown);
 		var header = Wu.DomUtil.create('div', 'chrome-content title', sectionWrapper, title);
-
 		var isBoundsSet = this.isBoundsSet();
 
 		// Line
@@ -233,7 +231,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			appendTo  : sectionWrapper,
 			title     : 'Bounds',
 			className : 'no-padding',
-			input     : false,
+			input     : false
 		});
 
 		// Switch
@@ -243,7 +241,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			isOn 	 : isBoundsSet,
 			right 	 : false,
 			appendTo : boundsLine.container,
-			fn 	 : this._saveSetClear.bind(this),
+			fn 	 : this._saveSetClear.bind(this)
 		});
 
 		// Line
@@ -252,8 +250,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			appendTo  : sectionWrapper,
 			title     : 'Position',
 			className : 'no-padding',
-			input     : false,
-		})				
+			input     : false
+		});
 
 		// Switch
 		var setPosition = new Wu.button({ 
@@ -262,7 +260,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			isOn 	 : false,
 			right 	 : false,
 			appendTo : positionLine.container,
-			fn 	 : this._saveSet.bind(this),
+			fn 	 : this._saveSet.bind(this)
 		});
 
 	},
@@ -343,7 +341,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			lat  : center.lat,
 			lng  : center.lng,
 			zoom : zoom
-		}
+		};
 
 		// save to project
 		project.setPosition(position);
@@ -386,7 +384,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		// get actual Project object
 		var project = Wu.app.activeProject;
 		var map = Wu.app._map;
-
 		var nullBounds = {
 			northEast : {
 				lat : '90',
@@ -399,7 +396,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			},
 			minZoom : '1',
 			maxZoom : '20'
-		}
+		};
 
 		// set bounds to project
 		project.setBounds(nullBounds);
@@ -438,6 +435,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		}
 		
 		map.invalidateSize();
-	},	
+	}
 
 });

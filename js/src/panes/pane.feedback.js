@@ -22,7 +22,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 		this._container = Wu.DomUtil.create('div', 'feedback-pane', appendHere);
 		this._innerWrapper = Wu.DomUtil.create('div', 'feedback-pane-inner-wrapper', this._container);
 
-       		Wu.DomEvent.on(this._container, 'click', Wu.DomEvent.stopPropagation)
+		Wu.DomEvent.on(this._container, 'click', Wu.DomEvent.stopPropagation);
             
 		// .on(link, 'dblclick', L.DomEvent.stopPropagation)
 		// .on(link, 'click', L.DomEvent.preventDefault)
@@ -64,7 +64,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 			innerWrapper 	: this._innerWrapper,   // Used to see if inner wrapper overflow container
 			id : id,
 			severity : severity || 3 // error default
-		}		
+		};
 
 		var pane = this._messages[id];
 		
@@ -123,7 +123,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 		var container = pane._content;
 		Wu.DomUtil.remove(container);
 		delete this._messages[id];
-	},
+	}
 });
 
 

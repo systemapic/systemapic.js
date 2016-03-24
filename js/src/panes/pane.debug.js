@@ -13,7 +13,7 @@ Wu.DebugPane = Wu.Class.extend({
 
 		
 
-	},
+	}
 
 
 });

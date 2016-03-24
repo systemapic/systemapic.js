@@ -46,6 +46,6 @@ Wu.Pane = Wu.Class.extend({
 	_updateView 	: function () {},
 	_refresh 	: function () {},
 	_initContainer : function () {},
-	_onCloseMenuTabs : function () {},
+	_onCloseMenuTabs : function () {}
 
 });

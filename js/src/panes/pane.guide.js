@@ -72,7 +72,7 @@ Wu.Guide = Wu.Evented.extend({
 		// Welcome buttons
 		this._welcomeButtonsContainer = Wu.DomUtil.create('div', 'tour-welcome-buttons-container', this._welcomeOuterContainer);
 		this._welcomeButtonTour = Wu.DomUtil.create('div', 'smooth-button', this._welcomeButtonsContainer, this._tourText);		
-		this._welcomeButtonStart = Wu.DomUtil.create('div', 'smooth-button right', this._welcomeButtonsContainer, this._directButtonText)		
+		this._welcomeButtonStart = Wu.DomUtil.create('div', 'smooth-button right', this._welcomeButtonsContainer, this._directButtonText);
 
 		// Welcome disclaimer
 		this._disclaimerContainer = Wu.DomUtil.create('div', 'tour-welcome-disclaimer', this._welcomeOuterContainer);
@@ -82,7 +82,7 @@ Wu.Guide = Wu.Evented.extend({
 
 		// Welcome contact information
 		this._contactContainer = Wu.DomUtil.create('div', 'tour-welcome-contact', this._welcomeOuterContainer);
-		this._contactTextArea = Wu.DomUtil.create('div', 'tour-welcome-contact-text', this._contactContainer, this._contactText)
+		this._contactTextArea = Wu.DomUtil.create('div', 'tour-welcome-contact-text', this._contactContainer, this._contactText);
 
 		// Centralize this._container
 		this._centralize(this._container, 400);
@@ -380,6 +380,6 @@ Wu.Guide = Wu.Evented.extend({
 
 	_onDoingScreenshot : function () {
 		this.close();
-	},
+	}
 
-})
+});
