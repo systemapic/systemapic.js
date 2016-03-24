@@ -1361,10 +1361,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var store  = result.project;
 
 			// return error
-			if (error) return app.feedback.setError({
-				title : 'There was an error creating new project!', 
-				description : error
-			});
+			if (error) {
+				this._fullscreen.close();
+				return app.feedback.setError({
+					title : 'There was an error creating new project!',
+					description : error
+				});
+			}
 				
 			// add to global store
 			app.Projects[store.uuid] = project;
