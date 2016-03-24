@@ -857,7 +857,7 @@
 					input.setAttribute('type', 'file');
 					input.style.display = 'none';
 					domNode.addEventListener('click', function(){
-						for (key in input) {
+						for (var key in input) {
 							try {
 								var improvementsForIE10 = input[key];
 							} catch (e) {}
