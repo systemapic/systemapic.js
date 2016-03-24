@@ -58,7 +58,7 @@ L.Control.Description = Wu.Control.extend({
 		// COMPACT LEGEND VIEW WRAPPER		
 		this._compactLegendViewWrapper = Wu.DomUtil.create('div', 'compact-legend-view-wrapper displayNone', this._inner);
 		this._compactExpand = Wu.DomUtil.create('div', 'compact-legends-expand displayNone', this._outer, '<i class="fa fa-arrow-up"></i>');
-		this._compactLegendInnerScroller = Wu.DomUtil.create('div', 'compact-legend-scroll-wrapper', this._compactLegendViewWrapper)
+		this._compactLegendInnerScroller = Wu.DomUtil.create('div', 'compact-legend-scroll-wrapper', this._compactLegendViewWrapper);
 
 		// Meta
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._metaOuterContainer);
@@ -67,7 +67,7 @@ L.Control.Description = Wu.Control.extend({
 		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._metaOuterContainer});
 		
 		// Opacity 
-		this._opacityWrapper = Wu.DomUtil.create('div', 'description-opacity-wrapper', this._metaOuterContainer)
+		this._opacityWrapper = Wu.DomUtil.create('div', 'description-opacity-wrapper', this._metaOuterContainer);
 		this._opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._opacityWrapper, 'Opacity:');
 		this._opacityContainer = Wu.DomUtil.create('div', 'description-control-opacity-container', this._opacityWrapper);
 
@@ -90,7 +90,7 @@ L.Control.Description = Wu.Control.extend({
 		if ( app.isMobile ) {
 			// Toggle while clicking on the container on toch devices
 			Wu.DomEvent.on(this._container, 'click', this.closeMobile, this);
-			Wu.DomEvent.on(this._legendCollapsed, 'click', this.openMobile, this)
+			Wu.DomEvent.on(this._legendCollapsed, 'click', this.openMobile, this);
 			Wu.DomEvent.on(this._legendCollapsed, 'click',  Wu.DomEvent.stop, this);
 			Wu.DomEvent.on(this._legendCollapsed, 'onscroll scroll mousewheel', Wu.DomEvent.stopPropagation, this);
 
@@ -125,7 +125,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_listeners : function () {
-		Wu.Mixin.Events.on('updateLegend', this._legendIsBeingUpdated, this)
+		Wu.Mixin.Events.on('updateLegend', this._legendIsBeingUpdated, this);
 		Wu.Mixin.Events.on('phantomjs', this.compactLegend, this);
 
 	},
@@ -290,7 +290,7 @@ L.Control.Description = Wu.Control.extend({
 		for ( var first in this.layers ) break;
 
 		// If there are other legend, display it...
-		if ( first ) this.setHTMLfromStore(first)	
+		if ( first ) this.setHTMLfromStore(first);
 
 		// For multiple layers
 		this.updateMultiple(first);
@@ -394,7 +394,7 @@ L.Control.Description = Wu.Control.extend({
 		var meta = layer.getMeta();
 
 		// set geom type
-		var geom_type = 'items'
+		var geom_type = 'items';
 		if (meta.geometry_type == 'ST_Point') geom_type = 'points';
 		if (meta.geometry_type == 'ST_MultiPolygon') geom_type = 'polygons';
 
@@ -430,7 +430,7 @@ L.Control.Description = Wu.Control.extend({
 		// Create legend if there are none
 		if ( !legend ) {
 			this.createLegend(layer);
-			var legend = layer.getLegends();
+			legend = layer.getLegends();
 		}
 
 		if ( legend && !legend.enable ) {
@@ -444,7 +444,7 @@ L.Control.Description = Wu.Control.extend({
 		// Todo: write as plugin
 		var satellitePos = layer.getSatellitePosition();
 		if ( satellitePos ) {
-			var satellitePos = JSON.parse(satellitePos);
+			satellitePos = JSON.parse(satellitePos);
 			this.satelliteAngle.update(satellitePos);
 		}
 
@@ -483,10 +483,6 @@ L.Control.Description = Wu.Control.extend({
 		} else if ( !legend.gradient ) {
 			this.setLegendHTML('');
 		}
-
-
-		
-
 	},
 
 
@@ -497,7 +493,6 @@ L.Control.Description = Wu.Control.extend({
 
 		var legendObj = Wu.Tools.Legend.buildLegendObject(styleJSON, layer, false);
 		var legendArray = Wu.Tools.Legend.getLegendArray(legendObj.point, legendObj.line, legendObj.polygon);
-
 		var legendHTML = '';
 		var gradientHTML = '';
 
@@ -558,7 +553,7 @@ L.Control.Description = Wu.Control.extend({
 			range: {
 				'min': [0],
 				'max': [100]
-			},
+			}
 		});
 
 		// events
@@ -587,11 +582,11 @@ L.Control.Description = Wu.Control.extend({
 		this._metaContainer.innerHTML = '';
 
 		for (var key in meta) {
-			var val = meta[key]
+			var val = meta[key];
 
 			// Make new content	
 			var metaLine = Wu.DomUtil.create('div', 'legends-meta-line', this._metaContainer);
-			var metaKey = Wu.DomUtil.create('div', 'legends-meta-key', metaLine, key)
+			var metaKey = Wu.DomUtil.create('div', 'legends-meta-key', metaLine, key);
 			var metaVal = Wu.DomUtil.create('div', 'legend-meta-valye', metaLine, val)
 		}
 	},
@@ -619,7 +614,7 @@ L.Control.Description = Wu.Control.extend({
 					}
 				}
 			}
-		};
+		}
 
 		function sortNumber(a,b) {
 			return a - b;
@@ -635,7 +630,7 @@ L.Control.Description = Wu.Control.extend({
 		var startend = {
 			start : m_first,
 			end : m_last
-		}
+		};
 
 		return startend;
 	},
@@ -917,7 +912,7 @@ L.Control.Description = Wu.Control.extend({
 
 
 		this._compactLegendInnerScroller.innerHTML = '';
-		this._comactContent = Wu.DomUtil.create('div', 'compact-legends', this._compactLegendInnerScroller, allLegendHTML + allGradientHTML)
+		this._comactContent = Wu.DomUtil.create('div', 'compact-legends', this._compactLegendInnerScroller, allLegendHTML + allGradientHTML);
 		this.miniLegend = true;
 
 	},
@@ -931,13 +926,6 @@ L.Control.Description = Wu.Control.extend({
 		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 		    return {width : x, height : y};
 	}
-
-
-
-
-
-
-
 	
 });
 

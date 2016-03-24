@@ -199,7 +199,7 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 		var layer_id = layer.store.data.postgis.layer_id;
 
 		return layer_id;
-	},
+	}
 
 });
 

@@ -60,7 +60,6 @@ Wu.Model = Wu.Class.extend({
 	_onLayerEdited   : function () {},
 	_onLayerDeleted  : function () {},
 	
-	_onDownloadReady : function () {},
-
+	_onDownloadReady : function () {}
 
 });

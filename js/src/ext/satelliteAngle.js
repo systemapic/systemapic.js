@@ -93,12 +93,7 @@ Wu.satelliteAngle = Wu.Class.extend({
 					var x = flip ? width * size : width/2 * size;
 					var y = padding * size;
 					return 'rotate(' + r + ', ' + x + ',' + y + ')';
-				})
-
-
-
-
-
+				});
 
 		var angleLine = lineContainer
 				.append("line")
@@ -143,13 +138,6 @@ Wu.satelliteAngle = Wu.Class.extend({
 				.attr('stroke', 'none')
 				.attr('fill', this.color);
 
-
-
-
-
-
-
-
 		var startCircle = D3angle
 				.append("circle")
 				.attr('cx', function () {
@@ -166,18 +154,18 @@ Wu.satelliteAngle = Wu.Class.extend({
 
 		// Angle
 		var text = D3angle
-				.append('text')
-				.attr('x', ((width/2)+padding) * size)
-				.attr('y', (height+15) * size)
-				.attr('font-family', 'sans-serif')
-				.attr('font-size', '10px')
-				.attr('font-weight', 900)
-				.attr('fill', '#999')
-				.attr("text-anchor", "middle")
-				.text(function() {
-					if ( flip ) return  (-angle) + '°';
-						    return  angle + '°'
-				});
+			.append('text')
+			.attr('x', ((width/2)+padding) * size)
+			.attr('y', (height+15) * size)
+			.attr('font-family', 'sans-serif')
+			.attr('font-size', '10px')
+			.attr('font-weight', 900)
+			.attr('fill', '#999')
+			.attr("text-anchor", "middle")
+			.text(function() {
+				if ( flip ) return  (-angle) + '°';
+						return  angle + '°'
+			});
 
 
 	},
@@ -306,7 +294,7 @@ Wu.satelliteAngle = Wu.Class.extend({
 				.attr("y2", ((height-10) * size))
 				// style
 				.attr('stroke-width', 2)
-				.attr('stroke', this.color)
+				.attr('stroke', this.color);
 
 
 		// Arrow head
@@ -323,7 +311,7 @@ Wu.satelliteAngle = Wu.Class.extend({
 				// style
 				.attr('stroke-width', 0)
 				.attr('stroke', 'none')
-				.attr('fill', this.color)		
+				.attr('fill', this.color);
 
 
                 var innerCircle = D3container
@@ -335,7 +323,7 @@ Wu.satelliteAngle = Wu.Class.extend({
 				// style
 				.attr('fill', '#FFF')
 				.attr('stroke-width', 2)
-				.attr('stroke', this.color)
+				.attr('stroke', this.color);
 
 
 
@@ -353,7 +341,4 @@ Wu.satelliteAngle = Wu.Class.extend({
 				.text(path + '°');
 
 	}
-
-
-
 });

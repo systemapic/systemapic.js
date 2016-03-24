@@ -431,13 +431,13 @@ L.Control.Legends = Wu.Control.extend({
 			layer : layer,
 			div   : div,
 			width : legendWidth
-		}
+		};
 
 	    	// Added by Jølle		    	
 	    	var tempObj = {
 			id : uuid,
 			width : legendWidth
-		}
+		};
 
 		// Push in array for sliding control
 	    	this.legendsCounter.push(tempObj);

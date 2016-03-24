@@ -6,7 +6,7 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 		defaultWidth : 282,
 		tabs : {
 			projects : true,
-			users : true,
+			users : true
 		}
 	},
 
@@ -100,8 +100,8 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 		var dims = {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
-		}
+		};
 		return dims;
-	},
+	}
 
 });

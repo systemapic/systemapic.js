@@ -224,7 +224,7 @@ Wu.Analytics = Wu.Class.extend({
 
 		// get latlngs
 		var prevLatlng = app._prevLatlng;
-		var latlng = data.latlng.toString()
+		var latlng = data.latlng.toString();
 		
 		// remember prev latlng
 		app._prevLatlng = data.latlng;
@@ -234,7 +234,7 @@ Wu.Analytics = Wu.Class.extend({
 
 		// description
 		var description = '`at ' + latlng + '` ';
-		description +='\n     on ' + data.layer.getTitle() + '.' 
+		description +='\n     on ' + data.layer.getTitle() + '.';
 		
 		// add description for keys
 		keys.forEach(function (key) {
@@ -277,7 +277,7 @@ Wu.Analytics = Wu.Class.extend({
 		// stats
 		this.setGaPageview(e.detail.projectUuid);
 
-		var projectName = this._project ? '`project` ' + this._project.getName() : 'no project.'
+		var projectName = this._project ? '`project` ' + this._project.getName() : 'no project.';
 		
 		// slack
 		app.Socket.sendUserEvent({
@@ -358,18 +358,16 @@ Wu.Analytics = Wu.Class.extend({
 			dimension2  : dimension2Value,	// User full name
 			version     : version		// Systemapic version
 
-		}
+		};
 
 		// Contains tracking id and client id (for user)
-		var userHeader = this.gaHeader()		
+		var userHeader = this.gaHeader();
 
 		var trackThis = {
-			
 			userHeader  : userHeader,
 			gaEvent     : false,
 			gaPageview  : gaPageview
-
-		}
+		};
 
 		// SEND TO SERVER
 		// SEND TO SERVER
@@ -390,7 +388,7 @@ Wu.Analytics = Wu.Class.extend({
 	setGaEvent : function (trackArray) {
 
 
-		var gaEvent = {}		
+		var gaEvent = {};
 
 		// GET EVENT PARAMETERS
 		// GET EVENT PARAMETERS
@@ -412,7 +410,7 @@ Wu.Analytics = Wu.Class.extend({
 		if ( app.activeProject ) {
 			// if (app.activeProject._client === undefined || app.activeProject === undefined ) return;
 			// var clientSlug  = app.activeProject._client.getSlug();
-			var projectSlug = app.activeProject.getSlug()
+			var projectSlug = app.activeProject.getSlug();
 			// var pageUrl 	= '/' + clientSlug + '/' + projectSlug;
 			var pageUrl = '/' + projectSlug;
 			gaEvent.path = pageUrl;
@@ -421,7 +419,7 @@ Wu.Analytics = Wu.Class.extend({
 		}
 
 		// GET UNIVERSAL HEADER FOR USER
-		var userHeader = this.gaHeader()		
+		var userHeader = this.gaHeader();
 
 		var trackThis = {
 			
@@ -429,7 +427,7 @@ Wu.Analytics = Wu.Class.extend({
 			gaEvent     : gaEvent,
 			gaPageview  : false
 
-		}
+		};
 
 		// SEND TO SERVER
 		// SEND TO SERVER
@@ -456,15 +454,11 @@ Wu.Analytics = Wu.Class.extend({
 
 		// Header for GA
 		var userHeader = {
-
 			trackingID : Wu.app.options.ga.id,
-			clientID   : userID,			// This might have to be session specific
-
+			clientID   : userID			// This might have to be session specific
 		};
 
-
 		return userHeader;
-
 	}
 
 });

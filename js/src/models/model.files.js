@@ -323,7 +323,7 @@ Wu.Model.File = Wu.Model.extend({
 			var options = {
 				data : this.store.data.postgis, 
 				type : 'postgis'
-			}
+			};
 			return options;
 		}
 		// if (this.store.data.raster) {
@@ -387,10 +387,10 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	_onDownloadReady : function (e) {
-		var options = e.detail,
-		    file_id = options.file_id,
-		    finished = options.finished,
-		    filepath = options.filepath;
+		var options = e.detail;
+		var file_id = options.file_id;
+		var finished = options.finished;
+		var filepath = options.filepath;
 
 		// parse results
 		var path = app.options.servers.portal;
@@ -400,7 +400,7 @@ Wu.Model.File = Wu.Model.extend({
 		path += '&access_token=' + app.tokens.access_token;
 
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
-		window.open(path, 'mywindow')
+		window.open(path, 'mywindow');
 
 		// remove feedback
 		app.feedback.remove(this._downloadingID);
@@ -566,13 +566,13 @@ Wu.Model.File = Wu.Model.extend({
 
 
                 ops.push(function (dataset, callback) {
-                        console.log('vectorizeDataset err result', dataset);
+					console.log('vectorizeDataset err result', dataset);
 
-                        // var dataset = Wu.parse(datasetJSON);
+					// var dataset = Wu.parse(datasetJSON);
 
-                        console.log('dataset: ', dataset);
+					console.log('dataset: ', dataset);
 
-			 var layer = {
+			 		var layer = {
 	                    geom_column: 'the_geom_3857',
 	                    geom_type: 'geometry',
 	                    raster_band: '',
@@ -585,11 +585,11 @@ Wu.Model.File = Wu.Model.extend({
 	                    sql: '(SELECT * FROM ' + dataset.table_name + ') as sub',
 	                    file_id: dataset.file_id,
 	                    return_model: true,
-	                    debug_1 : 'vectorize_dataset',
-	                }
+	                    debug_1 : 'vectorize_dataset'
+	                };
 
-			// create postgis layer
-			app.api.createTileLayer(layer, callback);
+					// create postgis layer
+					app.api.createTileLayer(layer, callback);
 
                 });
 
@@ -603,17 +603,16 @@ Wu.Model.File = Wu.Model.extend({
                 	console.log('LLALALA ', layer);
 
                         var layerModel = {
-                                projectUuid : project.getUuid(), // pass to automatically attach to project
-                                data : {
-                                        postgis : layer.options
-                                },
-                                metadata : layer.options.metadata,
-                                title : file.getName() + ' (vectorized)',
-                                description : 'Description: Layer created from ' + file.getName(),
-                                file : file.getUuid(),
-                                // style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
-				style : JSON.stringify(defaultStyle), // save default json style
-                        	
+							projectUuid : project.getUuid(), // pass to automatically attach to project
+							data : {
+								postgis : layer.options
+							},
+							metadata : layer.options.metadata,
+							title : file.getName() + ' (vectorized)',
+							description : 'Description: Layer created from ' + file.getName(),
+							file : file.getUuid(),
+							// style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
+							style : JSON.stringify(defaultStyle) // save default json style
                         };
 
                         console.log('VECTORIZE: creting layer model', layerModel);
@@ -631,7 +630,7 @@ Wu.Model.File = Wu.Model.extend({
 
                         // todo: set layer icon
                         app.feedback.setMessage({
-                                title : 'Layer added to project',
+                                title : 'Layer added to project'
                                 // description : 'Added <strong>' + layerModel.title + '</strong> to project.',
                         });     
 
@@ -646,7 +645,7 @@ Wu.Model.File = Wu.Model.extend({
                 });
 
                 async.waterfall(ops, function (err, layer) {
-                        done && done(err, layer);
+					done && done(err, layer);
                 })
 
 
@@ -719,7 +718,7 @@ Wu.Model.File = Wu.Model.extend({
 				style 		: JSON.stringify(defaultStyle), // save default json style
 				data : { 
 					postgis : layer.options 
-				},
+				}
 			};
 
 			// create new layer model
@@ -734,7 +733,7 @@ Wu.Model.File = Wu.Model.extend({
 
 			// provide feedback
 			app.feedback.setMessage({
-				title : 'Layer ' + layer.getTitle() + 'added to project',
+				title : 'Layer ' + layer.getTitle() + 'added to project'
 			});	
 
 			// fire layerAdded event
@@ -864,7 +863,7 @@ Wu.Model.File = Wu.Model.extend({
 
 	_createDefaultRasterLayer : function (project, callback) {
 
-		var defaultCartocss = '#layer {'
+		var defaultCartocss = '#layer {';
 		defaultCartocss += 'raster-opacity: 0.8; '; 
 		defaultCartocss += 'raster-scaling: lanczos; '; 
 		defaultCartocss += 'raster-colorizer-default-mode: linear; '; 
@@ -884,7 +883,7 @@ Wu.Model.File = Wu.Model.extend({
 			// defaultCartocss : '#layer { raster-opacity:1.0 }', // TODO tweak a default CSS for raster
 			defaultCartocss : defaultCartocss,
 			project : project
-		}
+		};
 
 		// create layer on server
 		this._requestDefaultRasterLayer(options, callback)
@@ -961,7 +960,7 @@ Wu.Model.File = Wu.Model.extend({
 
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Layer added to project',
+					title : 'Layer added to project'
 				});	
 
 				// select project
@@ -1055,5 +1054,5 @@ Wu.Model.File = Wu.Model.extend({
 		var size = this.getDatasize();
 		var pretty = Wu.Util.bytesToSize(size);
 		return pretty;
-	},
+	}
 });

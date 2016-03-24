@@ -42,7 +42,7 @@ Wu.ZIndexControl = Wu.Class.extend({
 	},
 
 	getIndex : function () {
-		var clear = []
+		var clear = [];
 		this._index.forEach(function (l) {
 			clear.push(l.getTitle());
 		});

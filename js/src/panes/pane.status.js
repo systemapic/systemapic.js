@@ -103,6 +103,6 @@ Wu.StatusPane = Wu.Class.extend({
 	updateContent : function (project) {
 		this.project = project;
 		this.close();
-	},
+	}
 
 });

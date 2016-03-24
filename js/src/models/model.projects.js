@@ -100,7 +100,6 @@ Wu.Project = Wu.Class.extend({
 	createOSMLayer : function (callback) {
 
 		var title = this._getOSMLayerTitle();
-
 		var options = JSON.stringify({
 			projectUuid : this.getUuid(),
 			title : title
@@ -454,7 +453,6 @@ Wu.Project = Wu.Class.extend({
 
 		// todo: remove active layers, etc.
 		var layers = this.getLayers();
-
 		var lids = [];
 
 		layers.forEach(function (layer) {
@@ -484,7 +482,7 @@ Wu.Project = Wu.Class.extend({
 				});
 			}
 
-			var result = Wu.parse(result);
+			result = Wu.parse(result);
 
 			if (result.error) {
 				return app.feedback.setError({
@@ -847,7 +845,7 @@ Wu.Project = Wu.Class.extend({
 		if(Wu.app.Style.getCurrentTheme() === 'darkTheme'){
 			var defaultProjectLogo = '/css/images/defaultProjectLogoLight.png';
 		}
-		else if(Wu.app.Style.getCurrentTheme() === 'lightTheme'){
+		else if(Wu.app.Style.getCurrentTheme() === 'lightTheme') {
 			var defaultProjectLogo = '/css/images/defaultProjectLogo.png';
 		}
 		var logo = this.store.header.logo;
@@ -1168,7 +1166,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	isSpectator : function (user) {
-		var user = user || app.Account;
+		user = user || app.Account;
 		var access = this.getAccess();
 
 		// true: if user is listed as editor
@@ -1179,8 +1177,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	isEditable : function (user) {
-		var user = user || app.Account;
-
+		user = user || app.Account;
 		var access = this.getAccess();
 
 		// true: if user created project

@@ -241,7 +241,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			project : app.activeProject,
 			type : 'read',
 			trigger : false,
-			checkedProjects : this._checkedProjects['read'],
+			checkedProjects : this._checkedProjects['read']
 		});
 
 		// close inputs
@@ -584,7 +584,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 					invite_list_container.style.display = 'block';
 				}
 			}
-		};
+		}
 
 		_.each(allProjects, function (project, index) {
 
@@ -862,12 +862,11 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var container = this._divs.edit.invite_list_container;
 		if (container) container.style.display = 'none';
 
-		var container = this._divs.read.invite_list_container;
+		container = this._divs.read.invite_list_container;
 		if (container) container.style.display = 'none';
 	},
 
 	_addAccessItem : function (options) {
-		var me = this;
 		var invite_input = options.input;
 		var project = options.project;
 
@@ -922,7 +921,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// remove from other list if active there
 		var otherType = (options.type == 'edit') ? 'read' : 'edit';
-		var existing = _.find(this._access[otherType], function (i) {
+		existing = _.find(this._access[otherType], function (i) {
 			return i.project == project;
 		});
 

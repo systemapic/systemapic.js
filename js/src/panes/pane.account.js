@@ -97,7 +97,7 @@ Wu.Pane.Account = Wu.Pane.extend({
 		app.api.logout({}, function (err, result) {
 			if (err) {
 				app.feedback.setError({
-					title : 'Something went wrong.',
+					title : 'Something went wrong.'
 				});
 			} else {
 				app.feedback.setMessage({
@@ -122,8 +122,6 @@ Wu.Pane.Account = Wu.Pane.extend({
 
 	_onCloseMenuTabs : function () {
 		this._closeAccountTab();
-	},
-
-
+	}
 	
-})
+});

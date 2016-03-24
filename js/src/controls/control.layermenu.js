@@ -225,7 +225,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			var layerItem = {
 				item  : item,
 				layer : layer
-			}
+			};
 
 			// add to layermenu
 			this._add(layerItem);
@@ -241,7 +241,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			var uuid = item.layer.getUuid();
 			var ison = _.find(active, function (a) {
 				return a.getUuid() == uuid;
-			})
+			});
 			return ison;
 		});
 
@@ -541,7 +541,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 			// set dragstart event
 			Wu.DomEvent.on(el, 'dragstart', this.drag.start, this);
-		};
+		}
 
 		// set hooks
 		var bin = this._content;
@@ -573,7 +573,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			
 			// set attrs
 			el.setAttribute('draggable', true);
-		};
+		}
 	},
 
 	disableDraggable : function () {
@@ -585,7 +585,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			
 			// set attrs
 			el.setAttribute('draggable', false);
-		};		
+		}
 	},
 
 	
@@ -688,7 +688,7 @@ L.Control.Layermenu = Wu.Control.extend({
 				cur = cur.previousSibling;
 			}
 			return false;
-		},
+		}
 
 	},
 
@@ -871,7 +871,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 			// add classes
 			panes.forEach(function (pane) {
-				Wu.DomUtil.removeClass(pane, 'layeritem-closed')
+				Wu.DomUtil.removeClass(pane, 'layeritem-closed');
 				Wu.DomUtil.addClass(pane, 'layeritem-open');
 			}, this);
 
@@ -931,7 +931,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.Mixin.Events.fire('layerSelected', { detail : {
 				layer : layer
 			}}); 
-		}    
+		}
 
 		this.calculateHeight();
 	},
@@ -1099,13 +1099,13 @@ L.Control.Layermenu = Wu.Control.extend({
 			caption : layer.store.title, // caption/title in layermenu
 			pos     : 0, // position in menu
 			zIndex  : 1,
-			opacity : 1,
-		}
+			opacity : 1
+		};
 
 		var layerItem = {
 			item  : item,
 			layer : layer
-		}
+		};
 
 		// add
 		var l = this._add(layerItem);
@@ -1230,12 +1230,12 @@ L.Control.Layermenu = Wu.Control.extend({
 			caption : 'New folder',
 			pos : 0,
 			folder : true
-		}
+		};
 
 		var layerItem = {
 			item : folder, 
 			layer : false
-		}
+		};
 
 		// this._addFolder(folder);
 		this._add(layerItem);

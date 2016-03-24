@@ -234,6 +234,6 @@ Wu.Pane.Login = Wu.Pane.extend({
 
 	_onCloseMenuTabs : function () {
 		this.close();
-	},
+	}
 
-})
+});

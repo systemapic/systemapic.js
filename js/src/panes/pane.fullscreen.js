@@ -89,6 +89,6 @@ Wu.Fullscreen = Wu.Evented.extend({
 
 	_removeEscapeKey : function () {
 		if (keymaster.unbind) keymaster.unbind('esc');
-	},
+	}
 
-})
+});
