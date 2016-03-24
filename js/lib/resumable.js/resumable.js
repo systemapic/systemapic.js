@@ -857,6 +857,11 @@
 					input.setAttribute('type', 'file');
 					input.style.display = 'none';
 					domNode.addEventListener('click', function(){
+						for (key in input) {
+							try {
+								var improvementsForIE10 = input[key];
+							} catch (e) {}
+						}
 						input.style.opacity = 0;
 						input.style.display='block';
 						input.focus();
