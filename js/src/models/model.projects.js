@@ -1,4 +1,4 @@
-Wu.Project = Wu.Model.extend({
+Wu.Model.Project = Wu.Model.extend({
 
 	initialize : function (store) {
 

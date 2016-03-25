@@ -1352,7 +1352,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		};
 
 		// create new project with options, and save
-		var project = new Wu.Project(store);
+		var project = new Wu.Model.Project(store);
 
 		// create project on server
 		project.create(options, function (err, json) {

@@ -198,7 +198,7 @@ Wu.App = Wu.Class.extend({
 		// create project objects
 		app.Projects = {};
 		app.options.json.projects.forEach(function(store, i, arr) {
-		       	app.Projects[store.uuid] = new Wu.Project(store);
+		       	app.Projects[store.uuid] = new Wu.Model.Project(store);
 		});
 
 		// phantomjs
@@ -329,7 +329,7 @@ Wu.App = Wu.Class.extend({
 		}
 
 		// create project model
-		var project = new Wu.Project(project_store);
+		var project = new Wu.Model.Project(project_store);
 		app.Projects[project.getUuid()] = project;
 		app.Chrome.Projects._addProject(project);
 
