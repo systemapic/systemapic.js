@@ -1362,6 +1362,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// return error
 			if (error) {
+				this._creatingProject = false;
 				this._fullscreen.close();
 				return app.feedback.setError({
 					title : 'There was an error creating new project!',

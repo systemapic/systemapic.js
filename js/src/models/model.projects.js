@@ -318,15 +318,15 @@ Wu.Project = Wu.Class.extend({
 		this._refresh();
 	},
 
-	_update : function (field) {
+	_update : function (field, value, callback) {
 
 		// set fields
 		var options = {};
-		options[field] = this.store[field];
+		options[field] = value || this.store[field];
 		options.uuid = this.store.uuid;
 
 		// save to server
-		this._save(options);
+		this._save(options, callback);
 	},
 
 
@@ -335,21 +335,24 @@ Wu.Project = Wu.Class.extend({
 	},
 	
 
-	_save : function (options) {
+	_save : function (options, done) {
 
 		// save to server                                       	
-		app.api.updateProject(options, this._saved.bind(this)); 
+		app.api.updateProject(options, function(ctx, json) {
+			this._saved(ctx, json, done)
+		}.bind(this));
 	},
 
 	// callback for save
-	_saved : function (ctx, json) {
-
+	_saved : function (ctx, json, done) {
 		var result = Wu.parse(json);
 		if (result.error) return app.feedback.setError({
 			title : "Could not update project", 
 			description : result.error
 		});
-
+		if (done) {
+			done();
+		}
 		Wu.Mixin.Events.fire('projectChanged', { detail : {
 			projectUuid : this.getUuid()
 		}});
@@ -949,12 +952,13 @@ Wu.Project = Wu.Class.extend({
 
 	setName : function (name) {
 
-		// store on server
-		this.store.name = name;
-		this._update('name');
-
-		// update slug name
-		this.setSlug(name);
+		this._update('name', name, function () {
+			// store on server
+			this.store.name = name;
+			// update slug name
+			this.setSlug(name);	
+		}.bind(this));
+		
 	},
 
 	setDescription : function (description) {
