@@ -1,4 +1,4 @@
-Wu.Project = Wu.Class.extend({
+Wu.Project = Wu.Model.extend({
 
 	initialize : function (store) {
 
@@ -318,7 +318,7 @@ Wu.Project = Wu.Class.extend({
 		this._refresh();
 	},
 
-	_update : function (field, value, callback) {
+	_update : function (field, value) {
 
 		// set fields
 		var options = {};
@@ -326,7 +326,7 @@ Wu.Project = Wu.Class.extend({
 		options.uuid = this.store.uuid;
 
 		// save to server
-		this._save(options, callback);
+		this._save(options);
 	},
 
 
@@ -335,29 +335,34 @@ Wu.Project = Wu.Class.extend({
 	},
 	
 
-	_save : function (options, done) {
+	_save : function (options) {
 
 		// save to server                                       	
-		app.api.updateProject(options, function(ctx, json) {
-			this._saved(ctx, json, done)
-		}.bind(this));
+		app.api.updateProject(options, this._saved.bind(this));
 	},
 
 	// callback for save
-	_saved : function (ctx, json, done) {
+	_saved : function (ctx, json) {
 		var result = Wu.parse(json);
 		if (result.error) return app.feedback.setError({
 			title : "Could not update project", 
 			description : result.error
 		});
-		if (done) {
-			done();
-		}
 		Wu.Mixin.Events.fire('projectChanged', { detail : {
-			projectUuid : this.getUuid()
+			projectUuid : this.getUuid(),
+			name : result.project.name
 		}});
 	},
 
+	_onProjectChanged : function (e) {
+		if (!e.detail.name) {
+			return
+		}
+		// store on server
+		this.store.name = e.detail.name;
+		// update slug name
+		this.setSlug(e.detail.name);
+	},
 
 	// create project on server
 	create : function (opts, callback) {
@@ -952,12 +957,7 @@ Wu.Project = Wu.Class.extend({
 
 	setName : function (name) {
 
-		this._update('name', name, function () {
-			// store on server
-			this.store.name = name;
-			// update slug name
-			this.setSlug(name);	
-		}.bind(this));
+		this._update('name', name);
 		
 	},
 
