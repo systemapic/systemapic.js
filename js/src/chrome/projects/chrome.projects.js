@@ -1352,7 +1352,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		};
 
 		// create new project with options, and save
-		var project = new Wu.Project(store);
+		var project = new Wu.Model.Project(store);
 
 		// create project on server
 		project.create(options, function (err, json) {
@@ -1361,10 +1361,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var store  = result.project;
 
 			// return error
-			if (error) return app.feedback.setError({
-				title : 'There was an error creating new project!', 
-				description : error
-			});
+			if (error) {
+				this._creatingProject = false;
+				this._fullscreen.close();
+				return app.feedback.setError({
+					title : 'There was an error creating new project!',
+					description : error.message
+				});
+			}
 				
 			// add to global store
 			app.Projects[store.uuid] = project;

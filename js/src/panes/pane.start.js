@@ -504,7 +504,7 @@ Wu.StartPane = Wu.Pane.extend({
 			folders : []
 		};
 		// create new project with options, and save
-		var project = new Wu.Project(store);
+		var project = new Wu.Model.Project(store);
 		project.editMode = true;
 
 		var sidepaneClient = this._getSidepaneClient(client);
