@@ -1,5 +1,11 @@
 Wu.BigSlider = Wu.Class.extend({
 
+	options : {
+
+		// animation frames per second
+		fps : 4
+	},
+
 	initialize : function () {
 
 		// fetching data is async, so must wait for callback
@@ -12,7 +18,7 @@ Wu.BigSlider = Wu.Class.extend({
 			this.updateDayOfYear();
 
 			this.addHooks();
-					
+
 		}.bind(this));
 		
 	},
@@ -168,7 +174,15 @@ Wu.BigSlider = Wu.Class.extend({
   		var date = new Date(blankDate.setDate(no));
 		return date;
 
-	},	
+	},
+
+	hide : function () {
+		this.sliderOuterContainer.style.display = 'none';
+	},
+
+	show : function () {
+		this.sliderOuterContainer.style.display = 'block';
+	},
 
 	initSlider : function () {
 
@@ -443,7 +457,7 @@ Wu.BigSlider = Wu.Class.extend({
 				this.slider.set(this.currentSliderValue++);
 				this.updateDayOfYear()
 			}			
-		}.bind(this), 250) 
+		}.bind(this), (1000/this.options.fps)) 
 	},
 
 	stopPlaying : function () {
@@ -748,10 +762,6 @@ Wu.BigSlider = Wu.Class.extend({
 		return years;
 	},
 
-	getAllYears : function () {		
-		console.log('Request data.js in this folder (/js/src/panes/) ...');
-		return allYears;
-	},
 
 });
 
