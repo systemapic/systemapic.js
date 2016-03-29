@@ -4,7 +4,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		num_buckets : 50
 	},
 
-
 	_initialize : function () {
 
 		// init container
@@ -38,7 +37,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._sqlSave = Wu.DomUtil.create('div', 'sql-save', this._bottomContainer, 'Save');
 
 		// CodeMirror
-		this._codeWrapOuter = Wu.DomUtil.create('div', 'chrome-content sql-wrapper-outer', this._bottomContainer)
+		this._codeWrapOuter = Wu.DomUtil.create('div', 'chrome-content sql-wrapper-outer', this._bottomContainer);
 		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._codeWrapOuter);
 
 		// sql editor
@@ -129,7 +128,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			sql : sql,
 			css : css,
 			layer : this._layer
-		}
+		};
 
 		// update layer
 		this._updateLayer(layerOptions);
@@ -162,18 +161,18 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_updateLayer : function (options, done) {
-		var css 	= this.getCartocssValue(),
-		    layer 	= options.layer,
-		    file_id 	= layer.getFileUuid(),
-		    sql 	= options.sql,
-		    sql 	= this._createSQL(file_id, sql),
-		    project 	= this._project;
+		options = options || {};
 
-		// layer options
-		var layerOptions = layer.store.data.postgis;
-		layerOptions.sql = sql;
-		layerOptions.css = css;
-		layerOptions.file_id = file_id;		
+		var css = this.getCartocssValue();
+		var layer = options.layer;
+		var file_id = layer.getFileUuid();
+		var sql = this._createSQL(file_id, options.sql);
+
+		// // layer options
+		// var layerOptions = layer.store.data.postgis;
+		// layerOptions.sql = sql;
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;		
 
 		// layer json
 		var layerJSON = {
@@ -227,10 +226,10 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		console.log('open!', this);
 	},
 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
 		// get uuid
-		var layerUuid = uuid ? uuid : e.target.value;
+		var layerUuid = uuid || value;
 		
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUuid(layerUuid);
@@ -281,21 +280,16 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._SQLEditor.refresh();
 	},
 
-	_refreshCartoCSS : function () {
-	},
-
 	_refreshSQL : function () {
 		if (!this._layer) return;
-		if (!this._layer.isPostgis()) return;
+		if (!this._layer.isVector()) return;
 
 		// get
-		var meta = this._layer.getPostGISData();
+		var meta = this._layer.getPostGISData() || {};
 		var rawsql = meta.sql;
 		var table = meta.table_name;
-		var sql = rawsql.replace(table, 'table').replace('  ', ' ');
-
 		// remove (etc) as sub
-		var sql = this._cleanSQL(sql);
+		var sql = this._cleanSQL(rawsql.replace(table, 'table').replace('  ', ' '));
 
 		// set
 		this._SQLEditor.setValue(sql);
@@ -308,8 +302,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// if sql is of format (SELECT * FROM table) as sub
 		if (first == '(' && last == ') as sub') {
-			var clean_sql = sql.substr(1, sql.length -9);
-			return clean_sql;
+			return sql.substr(1, sql.length -9);
 		}
 		return sql;
 	},
@@ -353,7 +346,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
     			lineNumbers: true,    			
     			mode: {
-    				name : 'text/x-sql',
+    				name : 'text/x-sql'
     			},
     			matchBrackets: true,
     			lineWrapping: false,
@@ -363,14 +356,13 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_getSortedColumns : function () {
-		if (!this._layer) return false
+		if (!this._layer) return false;
 
 		if (!this._layer.getPostGISData) return false;
 	
-		var meta = Wu.parse(this._layer.getPostGISData().metadata),
-		    columns = meta.columns,
-		    keys = Object.keys(columns),
-		    keysSorted = keys.sort();
+		var meta = Wu.parse(this._layer.getPostGISData().metadata);
+		var columns = meta.columns;
+		var keys = Object.keys(columns);
 
 		return keys.reverse();
 	},
@@ -383,7 +375,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		}
 
 		// set titles
-		var title = 'Columns'
+		var title = 'Columns';
 		var subtitle = 'Select a column to filter by...';
 
 		// active layer wrapper
@@ -396,34 +388,34 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var titleDiv = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
 		
 		// create dropdown
-		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
-		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
+		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer', wrap);
 
 		// get layers
 		var columns = this._getSortedColumns();
-
-		// placeholder
-		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = subtitle;
-		option.setAttribute('disabled', '');
-		option.setAttribute('selected', '');
+		var sortedLayers = [];
 
 		// mute columns
 		var mute_columns = [
 			'_columns'
-		]
+		];
 
 		// fill dropdown
 		columns && columns.forEach(function (column) {
 			if (mute_columns.indexOf(column) == -1) {
-				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-				option.value = column;
-				option.innerHTML = column;
+				sortedLayers.push({
+					title: column,
+					value: column
+				});
 			}
 		});
 
-		// select event
-		Wu.DomEvent.on(select, 'change', this._selectedFilterColumn, this); // todo: mem leak?
+		this._layerFiltersDropDown = new Wu.Dropdown({
+			fn: this._selectedFilterColumn.bind(this),
+			appendTo: selectWrap,
+			content: sortedLayers,
+			project: this._project,
+			placeholder: subtitle
+		});
 
 		// clear old filterdi
 		this._clearFilterDiv();
@@ -442,7 +434,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_autoSelectFilter : function () {
 		if (!this._layer) return;
-		if (!this._layer.isPostgis()) return this._selectNone();
+		if (!this._layer.isVector()) return this._selectNone();
 		
 		var filter = Wu.parse(this._layer.getFilter());
 
@@ -465,9 +457,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		return 0;
 	},
 
-	_selectedFilterColumn : function (e) {
-		var column = e.target.value;
-		this._createFilterChart(column);		
+	_selectedFilterColumn : function (value) {
+		this._createFilterChart(value);
 	},
 
 	nullHistogram : function () {
@@ -496,14 +487,14 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_createHistogram : function (column) {
 
 		// create div
-		var filterDiv = this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
+		this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
 		this._midInnerScroller.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
 
 		// create filter label div
 		this._filterLabel = Wu.DomUtil.create('div', 'chrome-content-filter-label', this._filterDiv);
 
 		// Create null historgram
-		histogram = this.nullHistogram();
+		var histogram = this.nullHistogram();
 
 		// Create Chart
 		this._chart = dc.barChart(this._filterDiv);			
@@ -678,8 +669,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			if ( maxLength < min ) maxLength = min;
 		});
 
-		var ticks = this._getSpacedTicks(maxLength);
-		return ticks;
+		return this._getSpacedTicks(maxLength);
 	},
 
 	_getSpacedTicks : function (maxLength) {
@@ -789,19 +779,15 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var bucket_max = this._getBucket(top_bucket, histogram);
 		var range_min = Math.round(bucket_min.range_min * 100)/100;
 		var range_max = Math.round(bucket_max.range_max * 100)/100;
-
-
-		var b = {
+		return {
 			min : _.isNaN(range_min) ? 1 : range_min,
 			max : range_max,
-			bottom : bottom_bucket, 
+			bottom : bottom_bucket,
 			top : top_bucket
-		}
-
-		return b;
+		};
 	},
 
-	_applyFilter : function (column, buckets, histogram) {
+	_applyFilter : function () {
 
 		if (!this._filters) return this._clearFilter();
 
@@ -814,7 +800,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		
 		// create SQL
 		var sql = 'SELECT * FROM table';
-		sql    += ' \nwhere ' + column + ' > ' + b.min + '\nand ' + column + ' < ' + b.max;
+		sql += ' \nwhere ' + column + ' > ' + b.min + '\nand ' + column + ' < ' + b.max;
 
 		// set sql
 		this._SQLEditor.setValue(sql);
@@ -831,7 +817,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-	_getHistogram : function (column, done, fresh) {
+	_getHistogram : function (column, done) {
 
 		// debug switch
 		var fresh = true;

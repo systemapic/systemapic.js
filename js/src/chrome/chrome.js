@@ -13,25 +13,26 @@ Wu.Chrome = Wu.Class.extend({
 	},      
 
 	_listen : function () {
-		Wu.Mixin.Events.on('projectSelected', 	 this._projectSelected, this);
-		Wu.Mixin.Events.on('projectDeleted',  	 this._onProjectDeleted, this);
-		Wu.Mixin.Events.on('editEnabled',     	 this._editEnabled, this);
-		Wu.Mixin.Events.on('editDisabled',    	 this._editDisabled, this);
-		Wu.Mixin.Events.on('layerEnabled',    	 this._layerEnabled, this);
-		Wu.Mixin.Events.on('layerDisabled',   	 this._layerDisabled, this);
-		Wu.Mixin.Events.on('fileImported',    	 this._onFileImported, this);
-		Wu.Mixin.Events.on('fileDeleted',     	 this._onFileDeleted, this);
-		Wu.Mixin.Events.on('layerAdded',      	 this._onLayerAdded, this);
-		Wu.Mixin.Events.on('layerEdited',     	 this._onLayerEdited, this);
-		Wu.Mixin.Events.on('layerDeleted',    	 this._onLayerDeleted, this);
-		Wu.Mixin.Events.on('closeMenuTabs',   	 this._onCloseMenuTabs, this);
-		Wu.Mixin.Events.on('fileProcessing',  	 this._onFileProcessing, this);
-		Wu.Mixin.Events.on('processingProgress', this._onProcessingProgress, this);
-		Wu.Mixin.Events.on('processingError',  	 this._onProcessingError, this);
-		Wu.Mixin.Events.on('tileCount',  	 this._onTileCount, this);
-		Wu.Mixin.Events.on('tileset_meta',  	 this._onTilesetMeta, this);
-		Wu.Mixin.Events.on('generatedTiles',  	 this._onGeneratedTiles, this);
-		Wu.Mixin.Events.on('closeFullscreen', 	 this._onCloseFullscreen, this);
+		Wu.Mixin.Events.on('projectSelected',  	   this._projectSelected, this);
+		Wu.Mixin.Events.on('projectDeleted',       this._onProjectDeleted, this);
+		Wu.Mixin.Events.on('editEnabled',     	   this._editEnabled, this);
+		Wu.Mixin.Events.on('editDisabled',    	   this._editDisabled, this);
+		Wu.Mixin.Events.on('layerEnabled',    	   this._layerEnabled, this);
+		Wu.Mixin.Events.on('layerDisabled',   	   this._layerDisabled, this);
+		Wu.Mixin.Events.on('fileImported',    	   this._onFileImported, this);
+		Wu.Mixin.Events.on('fileDeleted',     	   this._onFileDeleted, this);
+		Wu.Mixin.Events.on('layerAdded',      	   this._onLayerAdded, this);
+		Wu.Mixin.Events.on('layerEdited',     	   this._onLayerEdited, this);
+		Wu.Mixin.Events.on('layerDeleted',    	   this._onLayerDeleted, this);
+		Wu.Mixin.Events.on('closeMenuTabs',   	   this._onCloseMenuTabs, this);
+		Wu.Mixin.Events.on('fileProcessing',  	   this._onFileProcessing, this);
+		Wu.Mixin.Events.on('processingProgress',   this._onProcessingProgress, this);
+		Wu.Mixin.Events.on('processingError',  	   this._onProcessingError, this);
+		Wu.Mixin.Events.on('tileCount',  	 	   this._onTileCount, this);
+		Wu.Mixin.Events.on('tileset_meta',  	   this._onTilesetMeta, this);
+		Wu.Mixin.Events.on('generatedTiles',  	   this._onGeneratedTiles, this);
+		Wu.Mixin.Events.on('closeFullscreen', 	   this._onCloseFullscreen, this);
+		Wu.Mixin.Events.on('updatedProjectAccess', this._onUpdatedProjectAccess, this);
 
 		Wu.DomEvent.on(window, 'resize', _.throttle(this._onWindowResize, 1000), this);
 	},
@@ -85,28 +86,29 @@ Wu.Chrome = Wu.Class.extend({
 	
 	// dummies
 	// _projectSelected : function () {},
-	_initialize 	 : function () {},
-	_initContainer   : function () {},
-	_editEnabled 	 : function () {},
-	_editDisabled 	 : function () {},
-	_layerEnabled 	 : function () {},
-	_layerDisabled 	 : function () {},
-	_updateView 	 : function () {},
-	_refresh 	 : function () {},
-	_onFileImported  : function () {},
-	_onFileDeleted   : function () {},
-	_onLayerAdded    : function () {},
-	_onLayerEdited   : function () {},
-	_onLayerDeleted  : function () {},
-	_onProjectDeleted : function () {},
-	_onCloseMenuTabs  : function () {},
-	_onFileProcessing : function () {},
-	_onProcessingProgress : function () {},
-	_onProcessingError : function () {},
-	_onTileCount : function () {},
-	_onGeneratedTiles : function () {},
-	_onTilesetMeta : function () {},
-	_onCloseFullscreen : function () {},
-	_onWindowResize : function () {},
+	_initialize 	 		: function () {},
+	_initContainer   		: function () {},
+	_editEnabled 	 		: function () {},
+	_editDisabled 	 		: function () {},
+	_layerEnabled 	 		: function () {},
+	_layerDisabled 	 		: function () {},
+	_updateView 	 		: function () {},
+	_refresh 	 	 		: function () {},
+	_onFileImported  		: function () {},
+	_onFileDeleted   		: function () {},
+	_onLayerAdded    		: function () {},
+	_onLayerEdited   		: function () {},
+	_onLayerDeleted  		: function () {},
+	_onProjectDeleted 		: function () {},
+	_onCloseMenuTabs  		: function () {},
+	_onFileProcessing 		: function () {},
+	_onProcessingProgress 	: function () {},
+	_onProcessingError 		: function () {},
+	_onTileCount 			: function () {},
+	_onGeneratedTiles 		: function () {},
+	_onTilesetMeta 			: function () {},
+	_onCloseFullscreen 		: function () {},
+	_onUpdatedProjectAccess : function () {},
+	_onWindowResize 		: function () {}
 
 });

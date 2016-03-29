@@ -465,6 +465,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	getStyling : function () {
+		console.log('getStyling', this.store.style, this);
 		var json = this.store.style;
 		if (!json) return false;
 		var styleJSON = Wu.parse(json);
@@ -479,7 +480,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	getLegends : function () {
-		var meta = this.store.legends
+		var meta = this.store.legends;
 		if (meta) return Wu.parse(meta);
 		return false;
 	},
@@ -635,18 +636,25 @@ Wu.Model.Layer = Wu.Model.extend({
 		console.log('delete layer', this);
 	},
 
-	isPostGIS : function () {
-		if (this.store.data && this.store.data.postgis) return true;
+	isVector : function () {
+		if (!this.store.data || !this.store.data.postgis) return false;
+		if (this.store.data.postgis.data_type == 'vector') return true;
 		return false;
 	},
-	isPostgis : function () {
-		return this.isPostGIS();
+	isRaster : function () {
+		if (!this.store.data || !this.store.data.postgis) return false;
+		if (this.store.data.postgis.data_type == 'raster') return true;
+		return false;
 	},
+	
 
 	getAttributionControl : function () {
 		return app.MapPane._attributionControl;
 	},
 	
+	_invalidateTiles : function () {
+		return;
+	}
 
 });
 
@@ -678,7 +686,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 		app.Analytics._eventLayerLoaded({
 			layer : this.getTitle(),
-			load_time : loadTime,
+			load_time : loadTime
 		});
 	},
 
@@ -705,6 +713,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	},
 
 	setStyle : function (postgis) {
+		console.log('setSTyle,', postgis);
 		if (!postgis) return console.error('no styloe to set!');
 		
 		this.store.data.postgis = postgis;
@@ -713,6 +722,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	// on change in style editor, etc.
 	updateStyle : function (style) {
+		console.error('updateStyle', style);
 		var layerUuid = style.layerUuid,
 		    postgisOptions = style.options;
 
@@ -762,9 +772,9 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	_prepareRaster : function () {
 
 		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    subdomains  = app.options.servers.tiles.subdomains,
-		    access_token = '?access_token=' + app.tokens.access_token;
+		var fileUuid 	= this._fileUuid;	// file id of geojson
+		var subdomains  = app.options.servers.tiles.subdomains;
+		var access_token = '?access_token=' + app.tokens.access_token;
 
 		var layerUuid = this._getLayerUuid();
 		// var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
@@ -870,6 +880,14 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		// fetch data
 		this._fetchData(e, function (ctx, json) {
 			
+			// console.log('click!');
+			// console.log(json);
+
+			if ( !json ) {
+				console.error('no data for popup!');
+				return;
+			}
+
 			var data = JSON.parse(json);
 
 			e.data = data;
@@ -877,7 +895,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			this._event = {
 				x : event.x,
 				y : event.y
-			}
+			};
 
 			// open popup
 			app.MapPane._addPopupContent(e);
@@ -918,10 +936,10 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	},
 
 	_onDownloadReady : function (e) {
-		var options = e.detail,
-		    file_id = options.file_id,
-		    finished = options.finished,
-		    filepath = options.filepath;
+		var options = e.detail;
+		var file_id = options.file_id;
+		var finished = options.finished;
+		var filepath = options.filepath;
 
 		// parse results
 		var path = app.options.servers.portal;
@@ -932,7 +950,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		path += '&access_token=' + app.tokens.access_token;
 
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
-		window.open(path, 'mywindow')
+		window.open(path, 'mywindow');
 
 		// remove feedback
 		app.feedback.remove(this._downloadingID);
@@ -952,11 +970,11 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		var layerUuid = this.getUuid();
 		var project = _.find(app.Projects, function (p) {
 			return p.layers[layerUuid];
-		})
+		});
 
 		// delete layer
 		project.deleteLayer(this);
-	},
+	}
 	
 
 });
@@ -995,11 +1013,11 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 	_prepareRaster : function () {
 
 		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.tiles.uri,
-		    subdomains  = app.options.servers.tiles.subdomains,
-		    access_token 	= '?access_token=' + app.tokens.access_token;
+		var fileUuid 	= this._fileUuid;	// file id of geojson
+		var cartoid 	= this.store.data.cartoid || this._defaultCartoid;
+		var tileServer 	= app.options.servers.tiles.uri;
+		var subdomains  = app.options.servers.tiles.subdomains;
+		var access_token = '?access_token=' + app.tokens.access_token;
 		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		var layerUuid = this._getLayerUuid();
@@ -1016,7 +1034,7 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 	},
 
 	_getLayerUuid : function () {
-		return this.store.data.raster;
+		return this.store.data.postgis.layer_id;
 	},
 
 	getMeta : function () {
@@ -1084,7 +1102,7 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		var layerUuid = this.getUuid();
 		var project = _.find(app.Projects, function (p) {
 			return p.layers[layerUuid];
-		})
+		});
 
 		// delete layer
 		project.deleteLayer(this);
@@ -1110,7 +1128,7 @@ Wu.MapboxLayer = Wu.Model.Layer.extend({
 
 		this.layer = L.tileLayer(url, {
 			accessToken : this.store.accessToken,
-			mapboxUri : this.store.data.mapbox,
+			mapboxUri : this.store.data.mapbox
 		});
 
 		// add hooks
@@ -1134,7 +1152,7 @@ Wu.MapboxLayer = Wu.Model.Layer.extend({
 
 	_addEvents : function () {
 		Wu.DomEvent.on(this.layer, 'loading', this.setAttribution, this);
-	},
+	}
 });
 
 
@@ -1145,7 +1163,7 @@ Wu.GoogleLayer = Wu.Model.Layer.extend({
 
 	options : {
 		minZoom : 0,
-		maxZoom : 20,
+		maxZoom : 20
 	},
 
 	initialize : function (layer) {
@@ -1208,12 +1226,12 @@ Wu.GoogleLayer = Wu.Model.Layer.extend({
 			maxRequests : 0,
 			tms : false,
 			maxZoom : this.options.maxZoom,
-			minZoom : this.options.minZoom,
+			minZoom : this.options.minZoom
 		});
 
 		this._addEvents();
 
-	},
+	}
 });
 
 
@@ -1232,7 +1250,7 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 	        },
 		customer_id : 'systemapic',
 		minZoom : 0,
-		maxZoom : 20,
+		maxZoom : 20
 	},
 
 	initialize : function (layer) {
@@ -1276,7 +1294,7 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 			maxRequests : 0,
 			tms : false,
 			maxZoom : this.options.maxZoom,
-			minZoom : this.options.minZoom,
+			minZoom : this.options.minZoom
 		});
 
 		// add clear background cache event (hack for hanging tiles)
@@ -1325,12 +1343,12 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 		var zoom = app._map.getZoom();
 		if (zoom > this.options.maxZoom || zoom < this.options.minZoom) return;
 
-		var e = app._map.getBounds(),
-		    t = e.getNorthWest().lng,
-		    n = e.getNorthWest().lat,
-		    r = e.getSouthEast().lng,
-		    i = e.getSouthEast().lat,
-		    s = document.createElement("img");
+		var e = app._map.getBounds();
+		var t = e.getNorthWest().lng;
+		var n = e.getNorthWest().lat;
+		var r = e.getSouthEast().lng;
+		var i = e.getSouthEast().lat;
+		var s = document.createElement("img");
 		
 		// log
 		var logstring = this.options.log_url + "WMS-REQUEST=BBOX=" + t + "," + i + "," + r + "," + n + "&MAPSTYLE=" + this.options.current_mapstyle + "&CUSTOMER=" + this.options.customer_id;
@@ -1360,23 +1378,23 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 			if (t <= 14) {
 				try {
 					if (this.t_containsPoint(e, L.Control.WAAttribution.t_norgeLat, L.Control.WAAttribution.t_norgeLon)) return n[1];
-				} catch (r) {};
+				} catch (r) {}
 			} else {
 				try {
 					if (this.t_containsPoint(e, L.Control.WAAttribution.t_osloLat, L.Control.WAAttribution.t_osloLon)) return n[0];
-				} catch (r) {};
+				} catch (r) {}
 			}
 			
 			try {
 				if (this.t_containsPoint(e, L.Control.WAAttribution.t_norgeLat, L.Control.WAAttribution.t_norgeLon)) return n[1];
-			} catch (r) {};
+			} catch (r) {}
 		
 			return n[3]
 		}
 		
 		try {
 			return this.t_containsPoint(e, L.Control.WAAttribution.t_norgeLat, L.Control.WAAttribution.t_norgeLon) ? n[2] : n[3]
-		} catch (r) {};
+		} catch (r) {}
 
 		return n[4];
 
@@ -1403,7 +1421,9 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 
 // todo
 Wu.CartodbLayer = Wu.Model.Layer.extend({});
-Wu.ErrorLayer = Wu.Model.Layer.extend({})
+Wu.ErrorLayer = Wu.Model.Layer.extend({
+	_listen : function () {}
+});
 
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
@@ -1411,10 +1431,16 @@ Wu.createLayer = function (layer) {
 		console.error('no layer - weird:', layer);
 		return new Wu.ErrorLayer();
 	}
-	// postgis
-	if (layer.data.postgis && layer.data.postgis.file_id) {
+	// postgis vector
+	if (layer.data.postgis && layer.data.postgis.geom_type == 'geometry') {
 		return new Wu.PostGISLayer(layer);
 	}
+
+	// postgis raster
+	if (layer.data.postgis && layer.data.postgis.geom_type == 'raster') {
+		return new Wu.RasterLayer(layer);
+	}
+
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
@@ -1437,7 +1463,7 @@ Wu.createLayer = function (layer) {
 	if (layer.data.google) return new Wu.GoogleLayer(layer);
 
 	return new Wu.ErrorLayer();
-}
+};
 
 
 

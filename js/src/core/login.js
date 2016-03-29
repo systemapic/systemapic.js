@@ -22,7 +22,7 @@ function check_token() {
 
 	var options = {
 		token : getToken()
-	}
+	};
 
 	sendRequest('/reset/checktoken', options, function (err, body){
 
@@ -42,7 +42,7 @@ function check_token() {
 
 window.onload = function () {
 	check_invite();
-}
+};
 
 function login_key_up() {
 }
@@ -86,7 +86,7 @@ function sendAccessTokenRequest(entryPoint, options, callback) {
 		if (http.readyState == 4) {
 			callback && callback(null, http.responseText); 
 		} 
-	}
+	};
 	http.send(JSON.stringify(options));
 }
 
@@ -117,7 +117,7 @@ function addhooks() {
 	var forgotLink = document.getElementById('forgot-link');
 	forgotLink.onclick = function () {
 		showForgotPassword();
-	}	
+	};
 
 	// request reset
 	var requestButton = document.getElementById('request-button');
@@ -132,7 +132,7 @@ function addhooks() {
 			showLogin();
 			setFeedback(body);
 		});
-	}
+	};
 
 	// create password
 	var createButton = document.getElementById('create-button');
@@ -149,8 +149,8 @@ function submitNewPassword () {
 
 	var options = {
 		token : getToken(),
-		password : pass1,
-	}
+		password : pass1
+	};
 
 	// send to server
 	sendRequest('/reset/password', options, function (err, body){
@@ -179,7 +179,7 @@ function sendRequest(entryPoint, options, callback) {
 		if (http.readyState == 4 && http.status == 200) {
 			callback && callback(null, http.responseText); 
 		}
-	}
+	};
 	http.send(JSON.stringify(options));
 }
 
@@ -199,7 +199,7 @@ function requestReset (options, callback) {
 			// callback
 			callback && callback(null, http.responseText); 
 		}
-	}
+	};
 
 	http.send(JSON.stringify(options));
 }
@@ -271,7 +271,7 @@ function loginClick () {
 	var options = {
 		password : password,
 		email : email
-	}
+	};
 
 	sendLoginCheck(options, function (err, authenticated) {
 		console.log('/loginCheck ok?', err, authenticated);
@@ -304,18 +304,9 @@ function sendLoginCheck (options, callback) {
 			// callback
 			callback && callback(null, http.responseText); 
 		}
-	}
+	};
 
 	http.send(JSON.stringify(options));
-}
-
-
-zxcvbn_load_hook = function () {
-
-	// var p = document.getElementById('password-input');
-	// var r = document.getElementById('password-repeat');
-	// p.onkeyup = keyedup;
-	// r.onkeyup = keyedup;
 }
 
 function pw_key_up() {
@@ -332,23 +323,6 @@ function pw_key_up() {
 	}
 
 	checkButton();
-}
-
-function keyedup() {
-	var p = document.getElementById('password-input');
-	var r = document.getElementById('password-repeat');
-	var s = document.getElementById('password-strength');
-
-
-	var password = p.value;
-	var score = zxcvbn(password);
-	console.log(score);
-	s.innerHTML = 'Time to brute-force password: ' + score.crack_time_display; 
-
-	// score.score >= 3 ? markStrong() : markWeak();
-	// checkButton();
-	// p.value == r.value ? markSame() : markNotSame();
-	// checkButton();
 }
 
 function checkButton() {

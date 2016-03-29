@@ -6,8 +6,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		dropdown : {
 			staticText : 'None',
 			staticDivider : '-'
-		},
-
+		}
 	},
 
 	_initialize : function () {
@@ -17,18 +16,15 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		// add events
 		this._addEvents();
-
 	},
 
 	_initContainer : function () {
-
 		// Create Container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane extras', this.options.appendTo);
 
 	},
 
 	_initLayout : function () {
-
 		this._layers = this._project.getDataLayers();
 
 		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
@@ -39,13 +35,11 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		// Create Field Wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
-		
-
 	},
 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
-		this.layerUuid = uuid ? uuid : e.target.value
+		this.layerUuid = uuid || value;
 
 		this._layer = this._project.getLayer(this.layerUuid);
 
@@ -58,32 +52,17 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		var style = this._layer.getStyling();
 
 		this.tabindex = 1;
-
 		this.cartoJSON = style || {};
-
-		
-
-
 		this.getLayerMeta();
-
 		// Add temp layer
 		this._tempaddLayer();
-
-
 		// Clear
 		this._fieldsWrapper.innerHTML = '';
-
 	
 		// Globesar Extras
 		this.initGlobesarExtras();
 
-
-
-
 	},
-
-
-
 
 	// Get all metafields
 	// Get all metafields
@@ -96,9 +75,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		// Get styling json
 		this.cartoJSON = layer.getStyling();
-
-		// Get stored tooltip meta
-		var tooltipMeta = layer.getTooltip();
 		
 		// Get layermeta
 		var layerMeta = layer.getMeta();
@@ -125,7 +101,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 	// GLOBSAR EXTRAS
 
 	initGlobesarExtras : function () {
-
 		if ( !this.cartoJSON.extras || !this.cartoJSON.extras.referencepoint ) {
 
 			this.cartoJSON.extras = {
@@ -135,8 +110,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 				}
 			}
 
-		}		
-
+		}
 
 		var wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 		var header = Wu.DomUtil.create('div', 'chrome-content-header globesar-extras', wrapper, 'Globesar Extras');
@@ -144,10 +118,8 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		this.layer = this._project.getLayer(this.layerUuid);
 
 		var satpos = Wu.parse(this.layer.getSatellitePosition());
-
 		var path = satpos.path ? satpos.path : false;
 		var angle = satpos.angle ? satpos.angle : false;
-
 
 		// ANGLE
 		// ANGLE
@@ -157,7 +129,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			id       : 'satelliteAngle',
 			appendTo : wrapper,
 			title    : 'Satellite angle',
-			input    : false,		
+			input    : false
 		});
 
 		var angleMiniInput = new Wu.button({
@@ -170,9 +142,8 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			placeholder : 'none',
 			className   : 'globesar-extras-input',
 			tabindex    : 1,
-			fn 	    : this._saveMiniBlur.bind(this),
+			fn 	    : this._saveMiniBlur.bind(this)
 		});
-
 
 		// PATH
 		// PATH
@@ -182,7 +153,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			id       : 'satellitePath',
 			appendTo : wrapper,
 			title    : 'Satellite path',
-			input    : false,	
+			input    : false
 		});
 
 		var pathMiniInput = new Wu.button({
@@ -195,24 +166,19 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			placeholder : 'none',
 			className   : 'globesar-extras-input',
 			tabindex    : 2,
-			fn 	    : this._saveMiniBlur.bind(this),		
+			fn 	    : this._saveMiniBlur.bind(this)
 		});
 
 	},
 
-
-
 	// ON BLUR IN MINI FIELDS
 	_saveMiniBlur : function (e) {
-
-
-
 		var angle = Wu.DomUtil.get('field_mini_input_satelliteAngle').value;
 		var path  = Wu.DomUtil.get('field_mini_input_satellitePath').value;
 		this.layer = this._project.getLayer(this.layerUuid);
 
 		// Save object
-		this.satpos = {}
+		this.satpos = {};
 		if ( path ) this.satpos.path = path;
 		if ( angle ) this.satpos.angle = angle;
 
@@ -226,8 +192,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		// Update description...
 		app.MapPane._controls.description.setHTMLfromStore(this.layerUuid);
 
-
-
 	},	
 
 
@@ -239,9 +203,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 	_flush : function () {
 		this._container.innerHTML = '';
 	},
-
-
-
 
 	// CARTO CARTO CARTO CARTO
 	// CARTO CARTO CARTO CARTO
@@ -287,18 +248,16 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	_updateLayer : function (options, done) {
 
-		var css = options.css,
-		    layer = options.layer,
-		    file_id = layer.getFileUuid(),
-		    sql = options.sql,
-		    project = this._project;
+		var css = options.css;
+		var layer = options.layer;
+		var file_id = layer.getFileUuid();
+		var sql = options.sql;
 
+		// var layerOptions = layer.store.data.postgis;
 
-		var layerOptions = layer.store.data.postgis;
-
-		layerOptions.sql = sql;
-		layerOptions.css = css;
-		layerOptions.file_id = file_id;		
+		// layerOptions.sql = sql;
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;		
 
 		var layerJSON = {
 			geom_column: 'the_geom_3857',
@@ -316,8 +275,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			return_model : true,
 			layerUuid : layer.getUuid()
 		};
-
-		var that = this;
 
 		console.log('layerJSON', layerJSON);
 

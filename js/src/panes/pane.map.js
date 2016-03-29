@@ -14,7 +14,7 @@ Wu.MapPane = Wu.Pane.extend({
 			'mouseposition',
 			'baselayertoggle',
 			// 'cartocss',
-			'draw',
+			'draw'
 		]
 	},
 	
@@ -135,7 +135,7 @@ Wu.MapPane = Wu.Pane.extend({
 				// get wu layer
 				var l = app.activeProject.getPostGISLayer(layerUuid);
 		
-				if (!l) return  
+				if (!l) return ;
 				
 				l._invalidateTiles();
 			});
@@ -143,7 +143,7 @@ Wu.MapPane = Wu.Pane.extend({
 			// send invalidate to pile
 			this._invalidateTiles();
 
-		}, this)
+		}, this);
 
 
 		// // on map load
@@ -242,7 +242,7 @@ Wu.MapPane = Wu.Pane.extend({
 		var z = {
 			b : this._baselayerZIndex, // base
 			l : this._layermenuZIndex  // layermenu
-		}
+		};
 		return z;
 	},
 
@@ -322,7 +322,7 @@ Wu.MapPane = Wu.Pane.extend({
 			lat : center.lat,
 			lng : center.lng,
 			zoom : this._map.getZoom()
-		}
+		};
 		return position;
 	},
 
@@ -395,7 +395,7 @@ Wu.MapPane = Wu.Pane.extend({
 			},
 			minZoom : '1',
 			maxZoom : '20'
-		}
+		};
 		var southWest = L.latLng(noBounds.southWest.lat, noBounds.southWest.lng);
 		var northEast = L.latLng(noBounds.northEast.lat, noBounds.northEast.lng);
 		var nullBounds = L.latLngBounds(southWest, northEast);
@@ -410,7 +410,6 @@ Wu.MapPane = Wu.Pane.extend({
 		// get actual Project object
 		var project = Wu.app.activeProject;
 		var map = Wu.app._map;
-
 		var nullBounds = {
 			northEast : {
 				lat : '90',
@@ -423,7 +422,7 @@ Wu.MapPane = Wu.Pane.extend({
 			},
 			minZoom : '1',
 			maxZoom : '20'
-		}
+		};
 
 		// set bounds to project
 		project.setBounds(nullBounds);
@@ -648,7 +647,7 @@ Wu.MapPane = Wu.Pane.extend({
 		
 		var options = {
 				e 		: e,
-				multiPopUp 	: multiPopUp,
+				multiPopUp 	: multiPopUp
 			};
 		
 		this._chart = new Wu.Control.Chart(options);
@@ -673,7 +672,7 @@ Wu.MapPane = Wu.Pane.extend({
 		if (this._chart) {
 			this._chart._refresh();
 		}
-	},
+	}
 
 	
 });

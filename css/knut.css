@@ -816,11 +816,17 @@
 	padding-left: 16px;
 	font-size: 12px;
 	font-weight: 600;
+    font-family: 'Open Sans', sans-serif, "Helvetica Neue", Helvetica, Arial;
 	visibility: hidden;
 	text-align: center;
 	z-index: 100002;
 	max-width: 230px;
-    	height: auto;
+	height: auto;
+}
+
+.user-counter .project-tooltip {
+    top: -50px;
+    left: 23px;
 }
 
 .project-icon:hover .project-tooltip {
@@ -1718,7 +1724,9 @@ input.target-input.polygon {
 
 
 
-
+.data-list-line.processing.upload-error:hover {
+    background: #F13151 !important;
+}
 
 
 
@@ -1731,7 +1739,7 @@ input.target-input.polygon {
 
 
 /*NEW UPDATED CSS RULES - NOT PART OF PREVIOUS MERGE! (feb 20th 2016)*/
-.small-pop-up .c3-header-metapair {
+/*.small-pop-up .c3-header-metapair {
 	max-width: none !important;
 }
 .small-pop-up .c3-header-metakey {
@@ -1739,7 +1747,6 @@ input.target-input.polygon {
     	width: 100px !important;
 }
 .small-pop-up .c3-header-metaval {
-	/*display: inline-block !important;*/
    	font-size: 14px !important;
 }
 
@@ -1751,4 +1758,4 @@ input.target-input.polygon {
 	display: table-cell !important;
 	padding-top: 4px !important;
 	word-break: break-word !important;
-}
+}*/

@@ -15,7 +15,12 @@ Wu.Api = Wu.Class.extend({
 		this.get(path, {}, done);
 	},
 
-
+	logout : function (options, done) {
+		var path = '/logout';
+		
+		options = options || {};
+		this.get(path, options, done);
+	},
 
 
 
@@ -215,7 +220,10 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-
+	vectorizeDataset : function (options, done) {
+		var path = '/v2/tiles/vectorize';
+		this.post(path, options, done);
+	},
 
 
 
@@ -234,6 +242,7 @@ Wu.Api = Wu.Class.extend({
 	updateLayer : function (options, done) {
 		// var path = '/api/layer/update';
 		var path = '/v2/layers/update';
+		console.error('updateLayer', options);
 		this.post(path, options, done);
 	},
 
@@ -283,6 +292,10 @@ Wu.Api = Wu.Class.extend({
 
 	
 
+	importStatus : function (options, done) {
+		var path = '/v2/data/import/status';
+		this.get(path, options, done);
+	},
 
 
 
@@ -453,7 +466,7 @@ Wu.Api = Wu.Class.extend({
 		};
 
 		// add access_token to request
-		var access_token = app.tokens ? app.tokens.access_token : null;
+		var access_token = (window.app && app.tokens) ? app.tokens.access_token : null;
 		var options = _.isString(json) ? Wu.parse(json) : json;
 		options.access_token = options.access_token || access_token;
 		var send_json = Wu.stringify(options);
@@ -500,7 +513,7 @@ Wu.Api = Wu.Class.extend({
 	_addQueryOptions : function (url, options) {
 		var options = options || {};
 		options = _.isObject(options) ? options : Wu.parse(options);
-		options.access_token = (app && app.tokens) ? app.tokens.access_token : null;
+		options.access_token = (window.app && app.tokens) ? app.tokens.access_token : null;
 		if (!_.isEmpty(options)) {
 			_.forOwn(options, function (value, key) {
 				// encode and add

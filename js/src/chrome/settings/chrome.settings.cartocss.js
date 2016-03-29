@@ -130,7 +130,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 			"Ctrl-R": function(cm){
 				this._refreshLayer();
 			}.bind(this)
-		}
+		};
 
 		this._cartoEditor.addKeyMap(this._keymap);
 		// this._SQLEditor.addKeyMap(this._keymap);
@@ -209,7 +209,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 			css : css, 
 			sql : sql,
 			layer : this._layer
-		}
+		};
 
 		this._updateLayer(layerOptions);
 
@@ -223,39 +223,32 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		return this._layer.getSQL();
 	},
 
-
-	_createSQL : function (file_id, sql) {
-
-		if (sql) {
-			// replace 'table' with file_id in sql
-			sql.replace('table', file_id);
-
-			// wrap
-			sql = '(' + sql + ') as sub';
-
-		} else {
-			// default
-			sql = '(SELECT * FROM  ' + file_id + ') as sub';
-		}
-		return sql;
-	},
+	// UNUSED Function
+	//_createSQL : function (file_id, sql) {
+	//	if (sql) {
+	//		// replace 'table' with file_id in sql
+	//		sql.replace('table', file_id);
+	//		// wrap
+	//		sql = '(' + sql + ') as sub';
+	//	} else {// default
+	//		sql = '(SELECT * FROM  ' + file_id + ') as sub';
+	//	}
+	//	return sql;
+	//},
 
 	_updateLayer : function (options, done) {
 
-		var css = options.css,
-		    layer = options.layer,
-		    file_id = layer.getFileUuid(),
-		    // sql = options.sql,
-		    // sql = this._createSQL(file_id, sql),
-		    sql = this.getSQLValue(),
-		    project = this._project;
+		var css = options.css;
+		var layer = options.layer;
+		var file_id = layer.getFileUuid();
+		var sql = this.getSQLValue();
 
 
-		var layerOptions = layer.store.data.postgis;
+		// var layerOptions = layer.store.data.postgis;
 
 		// layerOptions.sql = sql;
-		layerOptions.css = css;
-		layerOptions.file_id = file_id;		
+		// layerOptions.css = css;
+		// layerOptions.file_id = file_id;		
 
 		var layerJSON = {
 			geom_column: 'the_geom_3857',
@@ -308,9 +301,9 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 	open : function () {
 	},
 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
-		var layerUuid = uuid ? uuid : e.target.value;
+		var layerUuid = uuid || value;
 		
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUuid(layerUuid);
@@ -330,7 +323,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		// SOLUTION: temporarily add layers to map for editing, remove when done editing.
 
 
-		if (!this._layer || !this._layer.isPostgis()) return;
+		if (!this._layer || !this._layer.isVector()) return;
 
 		// refresh
 		this._refreshEditor();
@@ -417,5 +410,5 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 			if ( options[k].value == layerUuid ) options[k].selected = true;
 		}
 
-	},
+	}
 });

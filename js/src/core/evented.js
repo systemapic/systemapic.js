@@ -25,6 +25,7 @@ Wu.Evented = Wu.Class.extend({
 		Wu.Mixin.Events.on('layerEdited',     this._onLayerEdited, this);
 		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
 		Wu.Mixin.Events.on('closePopups',     this._onClosePopups, this);
+		Wu.Mixin.Events.on('doingScreenshot', this._onDoingScreenshot, this);
 	},
 
 	// dummies
@@ -44,5 +45,6 @@ Wu.Evented = Wu.Class.extend({
 	_onLayerDeleted  : function () {},
 	_onProjectDeleted : function () {},
 	_onClosePopups : function () {},
+	_onDoingScreenshot : function () {},
 
 });

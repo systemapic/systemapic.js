@@ -67,7 +67,8 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		var dims = {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
-		}
+		};
+
 		return dims;
 	},
 
@@ -124,7 +125,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	close : function (tab) {
 
-		var tab = tab || this._currentTab;
+		tab = tab || this._currentTab;
 		
 		// hide tab
 		if (tab && tab._hide) tab._hide();
@@ -148,5 +149,5 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	_onCloseMenuTabs : function () {
 
 		this.close();
-	},
+	}
 });

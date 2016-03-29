@@ -143,9 +143,9 @@ L.SpinningMap = L.Class.extend({
 	createMap : function () {
 
 		// set vars
-		var lat = this.options.position.lat,
-		    lng = this.options.position.lng,
-		    zoom = this.options.position.zoom;
+		var lat = this.options.position.lat;
+		var lng = this.options.position.lng;
+		var zoom = this.options.position.zoom;
 
 		// create map
 		var map = this._map = L.mapbox.map(this._container, {
@@ -154,8 +154,7 @@ L.SpinningMap = L.Class.extend({
 
 		// add layer
 		var layer = L.mapbox.tileLayer(this.options.layer, {
-			format : this.options.tileFormat,
-
+			format : this.options.tileFormat
 		}).addTo(map);
 
 		// set map options
@@ -315,16 +314,16 @@ L.SpinningMap = L.Class.extend({
 
 	// get window dimensions
 	_getDimensions : function (e) {
-		var w = window,
-		    d = document,
-		    e = d.documentElement,
-		    g = d.getElementsByTagName('body')[0],
-		    x = w.innerWidth || e.clientWidth || g.clientWidth,
-		    y = w.innerHeight|| e.clientHeight|| g.clientHeight,
-		    d = {
+		var w = window;
+		var d = document;
+		var e = d.documentElement;
+		var g = d.getElementsByTagName('body')[0];
+		var x = w.innerWidth || e.clientWidth || g.clientWidth;
+		var y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+		var d = {
 			height : y,
 			width : x
-		    }
+		    };
 		return d;
 	},
 
@@ -400,12 +399,12 @@ L.SpinningMap = L.Class.extend({
 	createGLmap : function () {
 
 		// set vars
-		var lat = this.options.position.lat,
-		    lng = this.options.position.lng,
-		    zoom = this._getZoomLevel(),
-		    accessToken = this.options.accessToken,
-		    container = this._container,
-		    tileset = this.options.layer;
+		var lat = this.options.position.lat;
+		var lng = this.options.position.lng;
+		var zoom = this._getZoomLevel();
+		var accessToken = this.options.accessToken;
+		var container = this._container;
+		var tileset = this.options.layer;
 
 		// set access token
 		mapboxgl.accessToken = accessToken;
@@ -539,7 +538,7 @@ L.SpinningMap = L.Class.extend({
 			offset : offset,
 			easing : function (a) {
 				return a;
-			},
+			}
 		});
 
 		// rerun
@@ -638,7 +637,7 @@ L.SpinningMap = L.Class.extend({
 
 	_stopGL : function () {
 
-	},
+	}
 
 	
 });

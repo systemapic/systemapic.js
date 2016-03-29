@@ -115,7 +115,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			carto     : this._carto,
 			globesar  : this.globesar, 		// todo: remove client name, make truly customizable
 			container : this._legendWrapper
-		}
+		};
 
 		this._legendStyler = new Wu.Legend(legendOptions);
 
@@ -132,7 +132,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._templateSaverError = Wu.DomUtil.create('div', 'save-as-template-error', this._templateSaverWrapper);
 		this._templateSaverInput = Wu.DomUtil.create('input', 'save-as-template-input-name', this._templateSaverWrapper);
 		this._templateSaverInput.setAttribute('tabindex', -1);
-		this._templateSaverInput.setAttribute('placeholder', 'template name')
+		this._templateSaverInput.setAttribute('placeholder', 'template name');
 		this._templateSaverInput.setAttribute('type', 'text');
 		this._templateSaverOK = Wu.DomUtil.create('div', 'save-as-template-OK-button smooth-fullscreen-save', this._templateSaverWrapper, 'OK');
 		this._templateSaverCancel = Wu.DomUtil.create('div', 'save-as-template-cancel-button', this._templateSaverWrapper, 'Cancel');
@@ -182,7 +182,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			if ( t.name && t.name == val ) {
 				this._templateSaveError('That name is already taken');
 				error = true;
-				return;
 			}
 
 		}.bind(this));
@@ -273,12 +272,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var selected = e.target.value;
 
+		console.log('_selectTemplate', selected);
 
 		this.templates.forEach(function (template) {
+			console.log('tempalte:', template);
 			if ( template.uuid == selected ) {
 				this._carto = template.carto;
 				this._legend = template.legend;
-				return;
 			}
 		}.bind(this));
 
@@ -306,7 +306,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		   legend : this._layer.store.legends,
 		   createdBy : app.Account.getUuid(),
 		   name : name
-		}
+		};
 
 		var templateStr = JSON.stringify(template);
 
@@ -329,6 +329,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// Update style
 	_updateStyle : function (newLegend) {
 
+		console.log('update_style');
 
 		// Update point
 		this._pointStyler.setCarto(this._carto.point);
@@ -392,7 +393,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 	// event run when layer selected 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (value, uuid) {
 
 		Wu.DomUtil.removeClass(this._buttonWrapper, 'displayNone');
 
@@ -401,13 +402,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._legendWrapper.innerHTML = '';
 
 		// get layer_id
-		this.layerUuid = uuid ? uuid : e.target.value
+		this.layerUuid = uuid || value;
 
 		// get layer
 		this._layer = this._project.getLayer(this.layerUuid);
 
 		// return if no layer
-		if (!this._layer || !this._layer.isPostGIS()) return;
+		if (!this._layer || !this._layer.isVector()) return;
 
 		// remember layer for other tabs
 		this._storeActiveLayerUuid(this.layerUuid);		
@@ -419,6 +420,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.tabindex = 1;
 
 		// set local cartoJSON
+		console.log('_selectedActiveLayer', style);
 		this._carto = style || {};
 
 		// Clear legend objects
@@ -439,9 +441,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Get layer
 		var layer = this._project.getLayer(this.layerUuid);
-
-		// Get stored tooltip meta
-		var tooltipMeta = layer.getTooltip();
 		
 		// Get layermeta
 		var layerMeta = layer.getMeta();
@@ -473,20 +472,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		app.api.json2carto(options, callback.bind(this));
 	},
 
-
-
-	clearBuggyFiles : function () {
-
-		// Get file ID
-		var fileId = this._layer.store.file;
-
-		// Get file
-		var file = app.Account.getFile(fileId);
-
-		file.setStyleTemplates([]);
-
-	},
-
-
+	// UNUSED Function
+	//clearBuggyFiles : function () {
+	//	// Get file ID
+	//	var fileId = this._layer.store.file;
+	//	// Get file
+	//	var file = app.Account.getFile(fileId);
+	//	file.setStyleTemplates([]);
+	//}
 
  });

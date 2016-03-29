@@ -137,7 +137,7 @@ L.Control.Mouseposition = Wu.Control.extend({
                 var enforced = splitValue[0] + '.' + d;
                 return enforced;
 
-        },
+        }
 
 });
 

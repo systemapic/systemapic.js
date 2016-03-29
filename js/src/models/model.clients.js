@@ -168,7 +168,7 @@ Wu.Client = Wu.Class.extend({
 	setSlug : function (slug) {
 		this.slug = slug;
 		this.update('slug');
-	},
+	}
 
 
 });

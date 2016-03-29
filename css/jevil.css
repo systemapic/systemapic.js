@@ -342,6 +342,7 @@
 
 input.chrome-field-input {
     background: transparent;
+    width: 100%;
     }
 
 
@@ -355,7 +356,6 @@ input.chrome-field-input {
     top: 0;
     padding-right: 20px;
     background: #3C4759;
-    border: 1px solid #3C4759;
 }
 
 .chrome-upload-button:hover {
@@ -2078,6 +2078,11 @@ input.chrome-field-input {
     line-height: 1;
     }
 
+.user-counter:hover .project-tooltip {
+    opacity:0.9;
+    visibility: visible;
+}
+
 .active-project .user-counter {
     background: white;
     color: #3C4759;    
@@ -2125,47 +2130,87 @@ input.chrome-field-input {
 
 
 
+/*NEW UPDATED CSS RULES - NOT PART OF PREVIOUS MERGE! (feb 20th 2016)*/
+.tiny-pop-up #c3-header-metacontainer {
+    background: white !important;
+    }
+    
+.tiny-pop-up .tableRow.c3-header-metapair:nth-child(even) {
+    background: #F6F6F6;    
+    }
+
+.tiny-pop-up .small-pop-up .c3-header-metapair {
+    font-weight: 500;
+    padding: 8px;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    }
+
+.tiny-pop-up .small-pop-up .c3-header-metakey {
+    font-size: 13px !important;
+    width: auto !important;
+    }
+
+.tiny-pop-up .small-pop-up .c3-header-metaval {
+    font-size: 13px !important;
+    word-break: break-word;
+    }
 
 
-
-
-/*
-
-
-
-
-.small-pop-up .c3-header-metapair {
-    height: auto;
-    border: none;
-    box-shadow: none;
-    border-bottom: none !important;
-    margin-bottom: 4px; 
+.chrome.chrome-content.active-layer.select-wrap {
+    max-width: 387px;
 }
 
-.small-pop-up .c3-header-metakey {
-    margin-right: 6px;
-    font-size: 15px !important;
-    margin-bottom: 0px;
-        margin-top: 5px;
-        color: #777;
-        font-weight: 400;    
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_input {
+    height: 31px;
+    padding: 5px 10px;
+    color: #000;
+    cursor: pointer;
 }
 
-.small-pop-up .c3-header-metaval {
-    padding: 0;
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper {
+    display: none;
+    border-top: 1px solid #ccc;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper.open {
     display: block;
-    margin-bottom: 4px;
-    font-size: 14px !important;
-    font-weight: 400;
-    line-height: 1.4;       
 }
 
-.tableCell {
-    display: block !important;
-}*/
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item {
+    color: #000;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item.hover {
+    background-color: #3C4759;
+    color: white;
+}
+
+.chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper .form-combobox_option.item.disabled-option:hover {
+    background-color: #FFF;
+    color: #000;
+    cursor: default
+}
+
+.chrome-content.active-layer.select-wrap:before{
+    right: 2px;
+}
 
 
 
+
+
+
+
+
+
+
+/*  CRASH  */
+/*  CRASH  */
+/*  CRASH  */
 
 .big-slider-outer-container {
     position: absolute;
@@ -2215,15 +2260,6 @@ input.chrome-field-input {
     }
 
 .big-slider-tick-container {
-    /*  
-    left: 0;
-    position: absolute;
-    width: 100%;
-    bottom: 9px;
-    padding-left: 28px;
-    padding-right: 78px;
-    */
-
     left: 0;
     width: 100%;
     bottom: -13px;
@@ -2232,7 +2268,6 @@ input.chrome-field-input {
     height: 2px;
     position: relative;
     text-align: left;
-
     }
 
 .big-slider-tick {
@@ -2243,19 +2278,17 @@ input.chrome-field-input {
     font-size: 12px;
     color: #999;
     text-align: center;
-}    
+    }
 
 .big-slider-tick:before {
     content: '';
     position: absolute;
-    /*left: 50%;*/
-
     right: 0;
     height: 10px;
     width: 1px;
     background: #C8C8C8;
     top: -10px;
-}
+    }
 
 .big-slider-year-tick {
     position: absolute;
@@ -2267,7 +2300,7 @@ input.chrome-field-input {
 .disable-button {
     cursor: default;
     opacity: 0.2;
-}
+    }
 
 .big-slider-current-date {
     position: absolute;
@@ -2275,9 +2308,8 @@ input.chrome-field-input {
     text-align: center;
     left: 0;
     top: 9px;    
-
     display: none;
-}
+    }
 
 
 
@@ -2296,18 +2328,12 @@ input.chrome-field-input {
     position: absolute;
     right: 100px;
     bottom: 110px;
-    /*border-radius: 10px;*/
     border-radius: 5px;
-}
-
-
-
-
-
+    }
 
     path.line {
         stroke-width: 1.0 !important;       
-    }
+        }
 
     .sub._0 path.line,
     .sub._1 path.line {
@@ -2316,19 +2342,19 @@ input.chrome-field-input {
 
     .sub._0 path.area,
     .sub._1 path.area {
-            fill-opacity: 1;
+        fill-opacity: 1;
         }
 
 
 
 
 .big-graph-info-container div {
-    margin-left: 5px;
-    margin-right: 5px;
-}
+        margin-left: 5px;
+        margin-right: 5px;
+        }
 
 .big-graph-current-day {
-    font-weight: 600;
-    font-size: 18px;
-    margin: 0;    
-}
+        font-weight: 600;
+        font-size: 18px;
+        margin: 0;    
+        }  

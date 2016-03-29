@@ -80,7 +80,7 @@ Wu.StartPane = Wu.Pane.extend({
 				lng : 151.22299,
 				zoom : [4, 17]
 			},
-			circle : false,
+			circle : false
 		});
 
 	},
@@ -245,7 +245,7 @@ Wu.StartPane = Wu.Pane.extend({
 			}
 
 			newProject._projectThumb.src = ssrc; 
-		}
+		};
 
 		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
 		newProject._projectTitle.innerHTML = project.getName();
@@ -502,9 +502,9 @@ Wu.StartPane = Wu.Pane.extend({
 				height : 50
 			},
 			folders : []
-		}
+		};
 		// create new project with options, and save
-		var project = new Wu.Project(store);
+		var project = new Wu.Model.Project(store);
 		project.editMode = true;
 
 		var sidepaneClient = this._getSidepaneClient(client);
@@ -513,7 +513,7 @@ Wu.StartPane = Wu.Pane.extend({
 			store : store,
 			callback : sidepaneClient._projectCreated,
 			context : sidepaneClient
-		}
+		};
 
 		project._saveNew(options);
 
@@ -524,9 +524,9 @@ Wu.StartPane = Wu.Pane.extend({
 
 	_projectCreated : function (project, json) {
 
-		var result = Wu.parse(json),
-		    error  = result.error,
-		    store  = result.project;
+		var result = Wu.parse(json);
+		var error  = result.error;
+		var store  = result.project;
 
 		// return error
 		if (error) return app.feedback.setError({
@@ -559,7 +559,7 @@ Wu.StartPane = Wu.Pane.extend({
 		if (!logo) return false;
 		var base;
 		base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=250&height=250&format=png'+'&access_token=' + app.tokens.access_token;;
+		var url = '/pixels/image/' + base + '?width=250&height=250&format=png'+'&access_token=' + app.tokens.access_token;
 		return url;
 	}
 });

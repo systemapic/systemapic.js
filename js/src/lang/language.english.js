@@ -15,11 +15,8 @@ var language = {
 			projectReader : 'Can read project only.',
 			noRole : 'No access to project or users.',
 
-			dropdown : 'Delegate a role to user for this project.',
-		},
-
-
-
+			dropdown : 'Delegate a role to user for this project.'
+		}
 
 	}
-}
+};

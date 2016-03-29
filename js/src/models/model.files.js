@@ -323,16 +323,16 @@ Wu.Model.File = Wu.Model.extend({
 			var options = {
 				data : this.store.data.postgis, 
 				type : 'postgis'
-			}
+			};
 			return options;
 		}
-		if (this.store.data.raster) {
-			var options = {
-				data : this.store.data.raster, 
-				type : 'raster'
-			}
-			return options;
-		}
+		// if (this.store.data.raster) {
+		// 	var options = {
+		// 		data : this.store.data.raster, 
+		// 		type : 'raster'
+		// 	}
+		// 	return options;
+		// }
 		return false;
 	},
 
@@ -340,7 +340,7 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	_downloadFile : function () {
-		if (this.isPostgis()) this._downloadDataset();
+		if (this.isVector()) this._downloadDataset();
 		if (this.isRaster()) this._downloadRaster();
 	}, 	
 
@@ -387,10 +387,10 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	_onDownloadReady : function (e) {
-		var options = e.detail,
-		    file_id = options.file_id,
-		    finished = options.finished,
-		    filepath = options.filepath;
+		var options = e.detail;
+		var file_id = options.file_id;
+		var finished = options.finished;
+		var filepath = options.filepath;
 
 		// parse results
 		var path = app.options.servers.portal;
@@ -400,7 +400,7 @@ Wu.Model.File = Wu.Model.extend({
 		path += '&access_token=' + app.tokens.access_token;
 
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
-		window.open(path, 'mywindow')
+		window.open(path, 'mywindow');
 
 		// remove feedback
 		app.feedback.remove(this._downloadingID);
@@ -415,7 +415,7 @@ Wu.Model.File = Wu.Model.extend({
 		return this._getGeometryType();
 	},
 
-	_getDefaultStyling : function () {
+	defaultStyle : function () {
 
 		// get geom type
 		var geometry_type = this._getGeometryType();
@@ -437,9 +437,11 @@ Wu.Model.File = Wu.Model.extend({
 		return style;
 	},
 
-	_createDefaultCartocss : function (json, callback) {
+	defaultCarto : function (json, callback) {
 		var styler = app.Tools.Styler;
-		styler.createCarto(json, callback);
+		styler.createCarto(json, function (ctx, result) {
+			callback(null, result);
+		});
 	},
 
 
@@ -521,178 +523,378 @@ Wu.Model.File = Wu.Model.extend({
 		}
 	},
 
-	_getType : function () {
-		if (this.store.data && this.store.data.postgis) return 'vector';
-		if (this.store.data && this.store.data.raster) return 'raster';
-		return false;
+	_vectorizeDataset : function (e, done) {
+		console.error('_vectorizeDataset', arguments);
+
+		var project = app.activeProject;
+		var file = this;
+                var ops = [];
+		var defaultStyle = file.defaultStyle();
+
+
+                ops.push(function (callback) {
+                        app.api.vectorizeDataset({
+                                file_id : file.getUuid()
+                        }, callback);
+                });
+
+                ops.push(function (datasetJSON, callback) {
+                	console.log('vectorizeDataset err result', datasetJSON);
+
+                        var dataset = Wu.parse(datasetJSON);
+
+                        console.log('dataset: ', dataset);
+
+                        // wait for processing_success == true
+
+                        var check_status = setInterval(function () {
+                        	console.log('checking');
+                        	app.api.importStatus({
+                        		file_id : dataset.file_id
+                        	}, function (err, status_json) {
+                        		var status = Wu.parse(status_json);
+                        		console.log('status: ', status);
+                        		if (status.processing_success) {
+                        			clearInterval(check_status);
+                        			callback(null, status);
+                        		}
+                        	});
+
+                        }, 1000);
+
+                });
+
+
+                ops.push(function (dataset, callback) {
+					console.log('vectorizeDataset err result', dataset);
+
+					// var dataset = Wu.parse(datasetJSON);
+
+					console.log('dataset: ', dataset);
+
+			 		var layer = {
+	                    geom_column: 'the_geom_3857',
+	                    geom_type: 'geometry',
+	                    raster_band: '',
+	                    srid: '',
+	                    affected_tables: '',
+	                    interactivity: '',
+	                    attributes: '',
+	                    cartocss_version: '2.0.1',
+	                    cartocss : '#layer { polygon-fill: yellow; polygon-opacity: 0.5; }',
+	                    sql: '(SELECT * FROM ' + dataset.table_name + ') as sub',
+	                    file_id: dataset.file_id,
+	                    return_model: true,
+	                    debug_1 : 'vectorize_dataset'
+	                };
+
+					// create postgis layer
+					app.api.createTileLayer(layer, callback);
+
+                });
+
+                ops.push(function (tileLayer, callback) {
+
+                	console.log('$$$$ $ $ $ $ $  $ $ tileLayer', tileLayer);
+
+                	var layer = Wu.parse(tileLayer);
+                	if (!layer) return callback('Error parsing layer: ' + tileLayer);
+
+                	console.log('LLALALA ', layer);
+
+                        var layerModel = {
+							projectUuid : project.getUuid(), // pass to automatically attach to project
+							data : {
+								postgis : layer.options
+							},
+							metadata : layer.options.metadata,
+							title : file.getName() + ' (vectorized)',
+							description : 'Description: Layer created from ' + file.getName(),
+							file : file.getUuid(),
+							// style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
+							style : JSON.stringify(defaultStyle) // save default json style
+                        };
+
+                        console.log('VECTORIZE: creting layer model', layerModel);
+
+                        // create new layer model
+                        file._createLayerModel(layerModel, callback);
+                });
+
+                ops.push(function (layerJSON, callback) {
+                        
+                        // refresh Sidepane Options
+                        var layer = project.addLayer(layerJSON);
+
+                        console.log('VECTORIZE: created layer model', layer);
+
+                        // todo: set layer icon
+                        app.feedback.setMessage({
+                                title : 'Layer added to project'
+                                // description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+                        });     
+
+                        // select project
+                        Wu.Mixin.Events.fire('layerAdded', {detail : {
+                                projectUuid : project.getUuid(),
+                                layerUuid : layer.getUuid()
+                        }});
+
+                        // callback
+                        callback(null, layer);
+                });
+
+                async.waterfall(ops, function (err, layer) {
+					done && done(err, layer);
+                })
+
+
 	},
 
-	cutRasterColor : function (options, callback) {
-
-		// request layer with cut
-		this._requestDefaultRasterLayer({
-			file : this,
-			project : options.project,
-			cutColor : options.color // todo: validate
-		}, callback);
-
-
-		// // fubar: it's the layer that needs cutting (with gm), not file.. 
-		// app.api.cutRasterColor({
-		// 	color : color,
-		// 	file_id : file.getUuid()
-		// }, function (err, results) {
-		// 	console.log('cutRasterAlpha err, res', err, results);
-
-		// 	// create new layer with cut
-		// 	// add layer automatically
-		// 	// layer gets cut on exit
-
-		// });
-
-	},
 
 	_createLayer : function (project, callback) {
+		console.error('CR E E A AT T  ALLALALAL YER', this.isVector(), this.isRaster());
 		this._createDefaultLayer(project, callback);
-
-
-		// var options = {
-		// 	file_id : this.getUuid(),
-		// 	project_id : project.getUuid()
-		// }
-
-		// // create default layer from file on server, returns Wu.Layer + tile-layer
-		// app.api.createDefaultLayer(options, function (err, layers) {
-		// 	console.log('app.api.createDefaultLayer err, layuers', err, layers);
-		// });
 	},
 
 
 	_createDefaultLayer : function (project, callback) {
-		this.isVector() && this._createDefaultVectorLayer(project, callback);
+		this.isVector() && this.createVectorLayer(project, callback);
 		this.isRaster() && this._createDefaultRasterLayer(project, callback);
 	},
 
-	_createDefaultVectorLayer : function (project, done) {
-		var file_id = this.getUuid();
-		var file = this;
+
+	createVectorLayer : function (project, done) {
 
 		// get default style
-		var defaultStyle = this._getDefaultStyling();
-		
+		var ops = [];
+		var file = this;
+		var defaultStyle = file.defaultStyle();
+
 		// create css from json (server side) (json2carto)
-		this._createDefaultCartocss(defaultStyle, function (ctx, defaultCartocss) {
+		ops.push(function (callback) {
+			file.defaultCarto(defaultStyle, callback);
+		});
 
-			var options = {
-				file : file,
-				defaultCartocss : defaultCartocss,
-				project : project,
-				defaultStyle : defaultStyle
-			}
+		// create tile layer
+		ops.push(function (defaultCartocss, callback) {
+			
+			var tileLayerJSON = {
+				"geom_column"	   : "the_geom_3857",
+				"geom_type"	   : "geometry",
+				"raster_band"	   : "",
+				"srid"		   : "",
+				"affected_tables"  : "",
+				"interactivity"	   : "",
+				"attributes"	   : "",
+				"access_token"	   : app.tokens.access_token,
+				"cartocss_version" : "2.0.1",
+				"cartocss"	   : defaultCartocss, 	// save default cartocss style (will be active on first render)
+				"sql"		   : "(SELECT * FROM " + file.getUuid() + ") as sub",
+				"file_id"	   : file.getUuid(),
+				"return_model" 	   : true,
+				"projectUuid" 	   : project.getUuid()
+			};
 
-			// create layer on server
-			this._requestDefaultVectorLayer(options, done)
+			// create postgis layer
+			app.api.createTileLayer(tileLayerJSON, callback);
+		});
 
-
-		}.bind(this));
-	},
-
-	_requestDefaultVectorLayer : function (options, done) {
-
-		var file = options.file,
-		    file_id = file.getUuid(),
-		    project = options.project,
-		    defaultCartocss = options.defaultCartocss,
-		    defaultStyle = options.defaultStyle;
-
-
-		var layerJSON = {
-			"geom_column": "the_geom_3857",
-			"geom_type": "geometry",
-			"raster_band": "",
-			"srid": "",
-			"affected_tables": "",
-			"interactivity": "",
-			"attributes": "",
-			"access_token": app.tokens.access_token,
-			"cartocss_version": "2.0.1",
-			"cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
-			"sql": "(SELECT * FROM " + file_id + ") as sub",
-			"file_id": file_id,
-			"return_model" : true,
-			"projectUuid" : project.getUuid()
-		};
-
-		// create postgis layer
-		app.api.createTileLayer(layerJSON, function (err, layerJSON) {
-			if (err) {
-				return app.feedback.setError({
-					title : 'Something went wrong',
-					description : err
-				});
-			}
+		// create layer model
+		ops.push(function (layerJSON, callback) {
+			
+			// parse
 			var layer = Wu.parse(layerJSON);
+			if (!layer) return callback('Error parsing layer.');
 
-			var options = {
-				projectUuid : project.getUuid(), // pass to automatically attach to project
-				data : {
-					postgis : layer.options
-				},
-				metadata : layer.options.metadata,
-				title : file.getName(),
-				description : 'Description: Layer created from ' + file.getName(),
-				file : file.getUuid(),
-				style : JSON.stringify(defaultStyle) // save default json style
+			console.log('0----> layer', layer);
+
+			var layerModelJSON = {
+				projectUuid 	: project.getUuid(), // pass to automatically attach to project
+				metadata 	: layer.options.metadata,
+				title 		: file.getName(),
+				description 	: 'Description: Layer created from ' + file.getName(),
+				file 		: file.getUuid(),
+				style 		: JSON.stringify(defaultStyle), // save default json style
+				data : { 
+					postgis : layer.options 
+				}
 			};
 
 			// create new layer model
-			this._createLayerModel(options, function (err, layerModel) {
+			file._createLayerModel(layerModelJSON, callback);
+		});
 
-				// refresh Sidepane Options
-				var layer = project.addLayer(layerModel);
+		// set feedback and fire events
+		ops.push(function (layerJSON, callback) {
 
-				// todo: set layer icon
-				app.feedback.setMessage({
-					title : 'Layer added to project',
-					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
-				});	
+			// refresh Sidepane Options
+			var layer = project.addLayer(layerJSON);
 
-				// select project
-				Wu.Mixin.Events.fire('layerAdded', {detail : {
-					projectUuid : project.getUuid(),
-					layerUuid : layerModel.uuid
-				}});
+			// provide feedback
+			app.feedback.setMessage({
+				title : 'Layer ' + layer.getTitle() + 'added to project'
+			});	
 
-				// callback
-				done && done(null, layer);
+			// fire layerAdded event
+			Wu.Mixin.Events.fire('layerAdded', {detail : {
+				projectUuid : project.getUuid(),
+				layerUuid : layer.getUuid()
+			}});
+
+			// callback
+			callback(null, layer);
+		});
+
+	
+		async.waterfall(ops, function (err, layer) {
+
+			// report errors
+			if (err) return app.feedback.setError({
+				title : 'Something went wrong',
+				description : err
 			});
-			
-		}.bind(this));
+
+			// all done
+			done && done(null, layer);
+		});
 
 	},
+
+	// _createDefaultVectorLayer : function (project, done) {
+	// 	var file_id = this.getUuid();
+	// 	var file = this;
+
+	// 	// get default style
+	// 	var defaultStyle = file.defaultStyle();
+		
+	// 	// create css from json (server side) (json2carto)
+	// 	this._createDefaultCartocss(defaultStyle, function (ctx, defaultCartocss) {
+
+	// 		var options = {
+	// 			file : file,
+	// 			defaultCartocss : defaultCartocss,
+	// 			project : project,
+	// 			defaultStyle : defaultStyle
+	// 		}
+
+	// 		// create layer on server
+	// 		this._requestDefaultVectorLayer(options, done)
+
+
+	// 	}.bind(this));
+	// },
+
+	// _requestDefaultVectorLayer : function (options, done) {
+
+	// 	var file = options.file;
+	// 	var file_id = file.getUuid();
+	// 	var project = options.project;
+	// 	var defaultCartocss = options.defaultCartocss;
+	// 	var defaultStyle = options.defaultStyle;
+
+
+	// 	var layerJSON = {
+	// 		"geom_column": "the_geom_3857",
+	// 		"geom_type": "geometry",
+	// 		"raster_band": "",
+	// 		"srid": "",
+	// 		"affected_tables": "",
+	// 		"interactivity": "",
+	// 		"attributes": "",
+	// 		"access_token": app.tokens.access_token,
+	// 		"cartocss_version": "2.0.1",
+	// 		"cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
+	// 		"sql": "(SELECT * FROM " + file_id + ") as sub",
+	// 		"file_id": file_id,
+	// 		"return_model" : true,
+	// 		"projectUuid" : project.getUuid()
+	// 	};
+
+	// 	// create postgis layer
+	// 	app.api.createTileLayer(layerJSON, function (err, layerJSON) {
+	// 		if (err) {
+	// 			return app.feedback.setError({
+	// 				title : 'Something went wrong',
+	// 				description : err
+	// 			});
+	// 		}
+	// 		var layer = Wu.parse(layerJSON);
+
+	// 		var options = {
+	// 			projectUuid : project.getUuid(), // pass to automatically attach to project
+	// 			data : {
+	// 				postgis : layer.options
+	// 			},
+	// 			metadata : layer.options.metadata,
+	// 			title : file.getName(),
+	// 			description : 'Description: Layer created from ' + file.getName(),
+	// 			file : file.getUuid(),
+	// 			style : JSON.stringify(defaultStyle) // save default json style
+	// 		};
+
+	// 		// create new layer model
+	// 		this._createLayerModel(options, function (err, layerModel) {
+
+	// 			// refresh Sidepane Options
+	// 			var layer = project.addLayer(layerModel);
+
+	// 			// todo: set layer icon
+	// 			app.feedback.setMessage({
+	// 				title : 'Layer ' + file.getName() + 'added to project',
+	// 				// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+	// 			});	
+
+	// 			// select project
+	// 			Wu.Mixin.Events.fire('layerAdded', {detail : {
+	// 				projectUuid : project.getUuid(),
+	// 				layerUuid : layerModel.uuid
+	// 			}});
+
+	// 			// callback
+	// 			done && done(null, layer);
+	// 		});
+			
+	// 	}.bind(this));
+
+	// },
 
 	
 
 	_createDefaultRasterLayer : function (project, callback) {
+
+		var defaultCartocss = '#layer {';
+		defaultCartocss += 'raster-opacity: 0.8; '; 
+		defaultCartocss += 'raster-scaling: lanczos; '; 
+		defaultCartocss += 'raster-colorizer-default-mode: exact; '; 
+		defaultCartocss += 'raster-colorizer-default-color: transparent; '; 
+		defaultCartocss += 'raster-colorizer-epsilon: 0.001; '; 
+		defaultCartocss += 'raster-colorizer-stops: '; 
+		defaultCartocss += '  stop(20, rgba(0,0,0,0)) '; 
+		defaultCartocss += '  stop(50, #dddddd) '; 
+		defaultCartocss += '  stop(100, #cccccc) '; 
+		defaultCartocss += '  stop(150, #0085ff) '; 
+		defaultCartocss += '  stop(200, red); '; 
+		defaultCartocss += 'raster-comp-op: color-dodge;';
+		defaultCartocss += ' }';
 		
 		var options = {
 			file : this,
-			defaultCartocss : '#layer { raster-opacity:1.0 }', // TODO tweak a default CSS for raster
+			// defaultCartocss : '#layer { raster-opacity:1.0 }', // TODO tweak a default CSS for raster
+			defaultCartocss : defaultCartocss,
 			project : project
-		}
+		};
 
 		// create layer on server
 		this._requestDefaultRasterLayer(options, callback)
-
 	},
 
+
 	_requestDefaultRasterLayer : function (options, callback) {
-
-		var file = options.file,
-		    file_id = file.getUuid(),
-		    defaultCartocss = options.defaultCartocss,
-		    project = options.project;
-
+		var file = options.file;
+		var file_id = file.getUuid();
+		var defaultCartocss = options.defaultCartocss;
+		var project = options.project;
 		var cutColor = options.cutColor || false;
 
 		var layerJSON = {
@@ -713,8 +915,14 @@ Wu.Model.File = Wu.Model.extend({
 			"cutColor" : cutColor
 		};
 
+		console.log('=====================');
+		console.log('_requestDefaultRasterLayer');
+		console.log('layerJSON', layerJSON);
+		console.log('=====================');
+
 		// create postgis layer
 		app.api.createTileLayer(layerJSON, function (err, layerJSON) {
+			console.log('createed Tile Layer: ', err, layerJSON);
 			if (err) {
 				return app.feedback.setError({
 					title : 'Something went wrong',
@@ -723,8 +931,7 @@ Wu.Model.File = Wu.Model.extend({
 			}
 
 			var layer = Wu.parse(layerJSON);
-			if ( ! layer.options )
-			{
+			if (!layer || !layer.options) {
 				return app.feedback.setError({
 					title : 'Unexpected layerJSON',
 					description : layerJSON
@@ -734,7 +941,7 @@ Wu.Model.File = Wu.Model.extend({
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
 				data : {
-					raster : layer.layerUuid
+					postgis : layer.options
 				},
 				metadata : layer.options.metadata, 	// TODO
 				title : file.getName(),
@@ -742,16 +949,18 @@ Wu.Model.File = Wu.Model.extend({
 				file : file.getUuid()
 			};
 
+			console.log('creating layer mode', options);
+
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
+				console.log('created layer mode;', layerModel);
 
 				// create layer on project
 				var layer = project.addLayer(layerModel);
 
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Layer added to project',
-					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+					title : 'Layer added to project'
 				});	
 
 				// select project
@@ -831,20 +1040,19 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	isRaster : function () {
-		if (!this.store.data || !this.store.data.raster || !this.store.data.raster.file_id) return false;
-		return true;
+		if (!this.store.data || !this.store.data.postgis) return false;
+		if (this.store.data.postgis.data_type == 'raster') return true;
+		return false;	
 	},
 	isVector : function () {
-		return this.isPostgis();
-	},
-	isPostgis : function () {
 		if (!this.store.data || !this.store.data.postgis) return false;
-		return true;
+		if (this.store.data.postgis.data_type == 'vector') return true;
+		return false;
 	},
 
 	getDatasizePretty : function () {
 		var size = this.getDatasize();
 		var pretty = Wu.Util.bytesToSize(size);
 		return pretty;
-	},
+	}
 });

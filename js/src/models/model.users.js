@@ -135,7 +135,6 @@ Wu.User = Wu.Class.extend({
 		return this.store.username;
 	},
 
-
 	setFile : function (file) {
 		this.store.files.push(file);
 		this._files[file.uuid] = new Wu.Model.File(file);
@@ -228,7 +227,7 @@ Wu.User = Wu.Class.extend({
 		app.api.updateUser(changes, function (err, result) {
 			if (err) console.error('err', err);
 
-			var result = Wu.parse(result);
+			result = Wu.parse(result);
 
 			if (result.error) {
 				console.error('something went worng', result);
@@ -307,7 +306,6 @@ Wu.User = Wu.Class.extend({
 		return this.store.token;
 	},
 
-
 	getUuid : function () {
 		return this.store.uuid;
 	},
@@ -327,7 +325,7 @@ Wu.User = Wu.Class.extend({
 					var d = a[b];
 					equal = _.isEqual(clone[c][b], last[c][b]);
 					if (!equal) {
-						var change = {}
+						var change = {};
 						change[c] = {};
 						change[c][b] = clone[c][b];
 						changes.push(change);
@@ -336,7 +334,7 @@ Wu.User = Wu.Class.extend({
 			} else {
 				var equal = _.isEqual(clone[c], last[c]);
 				if (!equal) {
-					var change = {}
+					var change = {};
 					change[c] = clone[c];
 					changes.push(change);
 				}
@@ -376,7 +374,6 @@ Wu.User = Wu.Class.extend({
 
 	isSuper : function () {
 		return this.store.access.account_type == 'super';
-	},
-
+	}
 
 });

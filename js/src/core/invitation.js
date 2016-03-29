@@ -59,8 +59,8 @@ Wu.Invite = Wu.Class.extend({
 		var logo = Wu.DomUtil.create('div', 'logo', logo_wrap);
 
 		// set image
-		var logo_img = this.config.invitationLogo;
-		logo.style.backgroundImage = logo_img;
+		var logo_img = this.config.logos.invitationLogo;
+		logo.style.backgroundImage = logo_img.backgroundImage;
 		
 		// set width
 		var width = this.config.loginLogoWidth || 210;
@@ -206,7 +206,7 @@ Wu.Invite = Wu.Class.extend({
 	},
 
 
-	_createRegister : function () {
+	_createRegister : function (disableShader) {
 
 		// register
 		var wrapper = this._rightWrapper = Wu.DomUtil.create('div', 'right', this._centralWrapper);
@@ -327,7 +327,7 @@ Wu.Invite = Wu.Class.extend({
 			options.access_token = token.access_token;
 
 			// accept invite
-			this._inviteUser(options, function (err, invitation) {
+			this._acceptInvitation(options, function (err, invitation) {
 				if (err) return console.error(err);
 
 				// enter portal
@@ -344,6 +344,8 @@ Wu.Invite = Wu.Class.extend({
 		this._createUser(options, function (err, user) {
 			if (err) return console.error(err);
 
+			console.log('created user:', user);
+
 			// get access token
 			this._getAccessToken(options, function (err, response) {
 				if (err) return console.error(err);
@@ -354,8 +356,11 @@ Wu.Invite = Wu.Class.extend({
 				// add access_token to request
 				options.access_token = token.access_token;
 
+				// add user uuid
+				options.user_uuid = user.uuid;
+
 				// accept invite
-				this._inviteUser(options, function (err, invitation) {
+				this._acceptInvitation(options, function (err, invitation) {
 					if (err) return console.error(err);
 
 					// enter portal
@@ -373,7 +378,7 @@ Wu.Invite = Wu.Class.extend({
 		this.api.createUser(options, done);
 	},
 
-	_inviteUser : function (options, done) {
+	_acceptInvitation : function (options, done) {
 		this.api.acceptInvite(options, done);
 	},
 

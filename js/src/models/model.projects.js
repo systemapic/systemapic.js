@@ -1,4 +1,4 @@
-Wu.Project = Wu.Class.extend({
+Wu.Model.Project = Wu.Model.extend({
 
 	initialize : function (store) {
 
@@ -100,7 +100,6 @@ Wu.Project = Wu.Class.extend({
 	createOSMLayer : function (callback) {
 
 		var title = this._getOSMLayerTitle();
-
 		var options = JSON.stringify({
 			projectUuid : this.getUuid(),
 			title : title
@@ -277,6 +276,9 @@ Wu.Project = Wu.Class.extend({
  			// set locally
  			this.store.access = projectAccess;
 
+			Wu.Mixin.Events.fire('updatedProjectAccess', {detail : {
+				projectId: options.project || null
+			}});
  		}.bind(this));
 
 	},
@@ -316,11 +318,11 @@ Wu.Project = Wu.Class.extend({
 		this._refresh();
 	},
 
-	_update : function (field) {
+	_update : function (field, value) {
 
 		// set fields
 		var options = {};
-		options[field] = this.store[field];
+		options[field] = value || this.store[field];
 		options.uuid = this.store.uuid;
 
 		// save to server
@@ -336,23 +338,31 @@ Wu.Project = Wu.Class.extend({
 	_save : function (options) {
 
 		// save to server                                       	
-		app.api.updateProject(options, this._saved.bind(this)); 
+		app.api.updateProject(options, this._saved.bind(this));
 	},
 
 	// callback for save
 	_saved : function (ctx, json) {
-
 		var result = Wu.parse(json);
 		if (result.error) return app.feedback.setError({
 			title : "Could not update project", 
 			description : result.error
 		});
-
 		Wu.Mixin.Events.fire('projectChanged', { detail : {
-			projectUuid : this.getUuid()
+			projectUuid : this.getUuid(),
+			name : result.project.name
 		}});
 	},
 
+	_onProjectChanged : function (e) {
+		if (!e.detail.name) {
+			return
+		}
+		// store on server
+		this.store.name = e.detail.name;
+		// update slug name
+		this.setSlug(e.detail.name);
+	},
 
 	// create project on server
 	create : function (opts, callback) {
@@ -451,7 +461,6 @@ Wu.Project = Wu.Class.extend({
 
 		// todo: remove active layers, etc.
 		var layers = this.getLayers();
-
 		var lids = [];
 
 		layers.forEach(function (layer) {
@@ -481,7 +490,7 @@ Wu.Project = Wu.Class.extend({
 				});
 			}
 
-			var result = Wu.parse(result);
+			result = Wu.parse(result);
 
 			if (result.error) {
 				return app.feedback.setError({
@@ -844,7 +853,7 @@ Wu.Project = Wu.Class.extend({
 		if(Wu.app.Style.getCurrentTheme() === 'darkTheme'){
 			var defaultProjectLogo = '/css/images/defaultProjectLogoLight.png';
 		}
-		else if(Wu.app.Style.getCurrentTheme() === 'lightTheme'){
+		else if(Wu.app.Style.getCurrentTheme() === 'lightTheme') {
 			var defaultProjectLogo = '/css/images/defaultProjectLogo.png';
 		}
 		var logo = this.store.header.logo;
@@ -948,12 +957,8 @@ Wu.Project = Wu.Class.extend({
 
 	setName : function (name) {
 
-		// store on server
-		this.store.name = name;
-		this._update('name');
-
-		// update slug name
-		this.setSlug(name);
+		this._update('name', name);
+		
 	},
 
 	setDescription : function (description) {
@@ -1165,7 +1170,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	isSpectator : function (user) {
-		var user = user || app.Account;
+		user = user || app.Account;
 		var access = this.getAccess();
 
 		// true: if user is listed as editor
@@ -1176,8 +1181,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	isEditable : function (user) {
-		var user = user || app.Account;
-
+		user = user || app.Account;
 		var access = this.getAccess();
 
 		// true: if user created project

@@ -328,9 +328,9 @@ Wu.List = Wu.Class.extend({
 				// If we've got a hit
 				if ( res ) that.buildSearchString(searchResults, sf.location);
 			
-			})
+			});
 
-		};
+		}
 
 		var resultData  = this.buildResultData(searchResults);
 		this.sortedData = this.data2array(resultData);
@@ -362,7 +362,7 @@ Wu.List = Wu.Class.extend({
 			_sortedData.forEach(function (filteredItem) {
 
 				if ( filteredItem.fileUuid == allItem.fileUuid ) match = true;				
-			})
+			});
 
 			// If file has been filtered OUT (not on the screen)
 			if ( !match ) {
@@ -372,12 +372,10 @@ Wu.List = Wu.Class.extend({
 				// We must find out of it's selected...
 				_selected.forEach(function (sel) {
 					if ( sel == allItem.fileUuid ) isSelected = true;
-				})
+				});
 
 				if ( isSelected ) {
-				
 					that.unSelectListItem(allItem.fileUuid, that)
-				
 				}
 				
 			}
@@ -417,7 +415,7 @@ Wu.List = Wu.Class.extend({
 								var type = {
 									value    : val,
 									location : f
-								}
+								};
 								searchHere.push(type);
 							}
 						})
@@ -430,13 +428,13 @@ Wu.List = Wu.Class.extend({
 
 						value    : val,
 						location : f
-					}
+					};
 
 					searchHere.push(type);
 
 				}
 			}
-		})
+		});
 
 
 		return searchHere;
@@ -452,7 +450,7 @@ Wu.List = Wu.Class.extend({
 
 		searchResults.forEach(function (res) {
 			if ( res == thisResult ) pushing = false
-		})
+		});
 
 		if ( pushing ) searchResults.push(thisResult);
 
@@ -475,7 +473,7 @@ Wu.List = Wu.Class.extend({
 				// If there is a match, copy object
 				if ( f == res ) _DATA[f] = objDATA[f];
 			})
-		};
+		}
 
 		return _DATA;
 
@@ -502,10 +500,11 @@ Wu.List = Wu.Class.extend({
 
 		// Create input box
 		var input 	    = Wu.DomUtil.create('input');
-		    input.type 	    = 'text';
-		    input.className = 'autocarto-input';
-		    input.value     = options.value ? options.value : '';
-		
+
+		input.type 	    = 'text';
+		input.className = 'autocarto-input';
+		input.value     = options.value ? options.value : '';
+
 		options.context.innerHTML = '';		
 
 		options.context.appendChild(input);
@@ -519,12 +518,12 @@ Wu.List = Wu.Class.extend({
 		// Blur on enter
 		document.addEventListener("keydown", function(e) {
 			if ( e.keyCode == 13 ) input.blur();
-		})				
+		});
 
 		// Fire this when bluring
 		input.onblur = function () {
 			blurFunction(input, options);
-		}
+		};
 		
 		return input;
 
@@ -548,7 +547,7 @@ Wu.List = Wu.Class.extend({
 		var that = options.outerContext;
 
 		// Refresh list
-		that._D3list(DATA)
+		that._D3list(DATA);
 
 		// create update object
 		var saveJSON = {};
@@ -654,9 +653,9 @@ Wu.List = Wu.Class.extend({
 			var file = {
 				fileUuid : f,
 				file     : data[f]
-			}
+			};
 			DATA.push(file);
-		};
+		}
 
 		return DATA;
 	
@@ -676,11 +675,6 @@ Wu.List = Wu.Class.extend({
 	// INIT
 
 	_D3list : function (DATA) {
-	
-
-
-		// Context
-		var that = this;
 
 		// Create header
 		this._D3header();
@@ -711,16 +705,17 @@ Wu.List = Wu.Class.extend({
 	_D3header : function () {
 
 		var listOptions = this.listOptions;
-		var field = this.listOptions.titleSpace.name.field
+		var field = this.listOptions.titleSpace.name.field;
 
 		var that = this;
 		var DATA = listOptions.attributes;
 
 
 		// CLEAN UP – ONLY SHOW FIELDS THAT WE WANT!!!
-		var _DATA = []
+		var _DATA = [];
 		DATA.forEach(function (D) {
-			var proceed = true
+			var proceed = true;
+
 			listOptions.attributes.forEach(function (lo) {
 				if ( D.name == lo.name ) {
 					if ( lo.killOnSmall && that.tableSize == 'small' ) {
@@ -729,7 +724,7 @@ Wu.List = Wu.Class.extend({
 				}
 			});
 			if ( proceed ) _DATA.push(D);
-		})
+		});
 
 
 		var headerWrapper = 
@@ -815,7 +810,7 @@ Wu.List = Wu.Class.extend({
 						
 						}
 				
-					})
+					});
 				
 
 					var style = 'width: ' + width + '%; left: 0%; ';
@@ -1012,10 +1007,10 @@ Wu.List = Wu.Class.extend({
 			
 				// Set active state of button
 				if ( this.className == 'item-select-button active' ) {
-					Wu.DomUtil.removeClass(this, 'active')
+					Wu.DomUtil.removeClass(this, 'active');
 					d.checked = true;
 				} else {
-					Wu.DomUtil.addClass(this, 'active')
+					Wu.DomUtil.addClass(this, 'active');
 					d.checked = false;
 				}			
 
@@ -1034,11 +1029,11 @@ Wu.List = Wu.Class.extend({
 				var selected = false;
 				slArr.forEach(function (sel) {
 					if ( d.fileUuid == sel ) selected = true;
-				})
+				});
 
 				if ( selected ) return 'item-select-button active';
 				else 		return 'item-select-button';
-			})
+			});
 
 
 		// EXIT
@@ -1053,10 +1048,8 @@ Wu.List = Wu.Class.extend({
 
 	listTitle : function (DATA) {
 
-
 		var wrapper = this.listOptions.wrapper;
 		var field   = this.listOptions.titleSpace.name.field;
-
 		var that    = this;
 
 		// FILE TITLE & DESCRIPTION WRAPPER
@@ -1219,7 +1212,7 @@ Wu.List = Wu.Class.extend({
 			info
 				.on('click', function(d) {
 					that.toggleFileInfo(d, that, info);
-				})
+				});
 
 
 			// EXIT
@@ -1683,7 +1676,7 @@ Wu.List = Wu.Class.extend({
 		processBarInner
 			.attr('style', function(d) {
 				return 'width:' + d.file.isProcessing.percent + '%'; 
-			})
+			});
 
 		// EXIT
 		processBarInner
@@ -1710,7 +1703,7 @@ Wu.List = Wu.Class.extend({
 		processNO
 			.html(function(d) {
 				return d.file.isProcessing.tiles;
-			})
+			});
 
 		// EXIT
 		processNO
@@ -1732,7 +1725,7 @@ Wu.List = Wu.Class.extend({
 
 		var attribs = that.listOptions.attributes;
 		var _width = 100;
-		var that = this;
+		that = this;
 
 		attribs.forEach(function (att) {
 
@@ -1813,7 +1806,7 @@ Wu.List = Wu.Class.extend({
 				if ( _width ) 	         b_allWidth += _width;
 			}
 			
-		}, this)
+		}, this);
 
 
 		var right = (b_allWidth - 10) - (a_allWidth - 10);
@@ -1846,7 +1839,7 @@ Wu.List = Wu.Class.extend({
 			this.listOptions.button.arr = [];
 			DATA.forEach(function (d) {
 				this.listOptions.button.arr.push(d.fileUuid);
-			}, this)
+			}, this);
 			this.refreshTable();
 		}
 
@@ -1863,7 +1856,7 @@ Wu.List = Wu.Class.extend({
 
 		slArr.forEach(function (selected) {
 			if ( selected == uuid ) isSelected = true;
-		})
+		});
 
 		return isSelected;
 	
@@ -1879,7 +1872,7 @@ Wu.List = Wu.Class.extend({
 		var isOpen = false;
 		that.openFolders.forEach(function(openFolder) {
 			if ( openFolder == fileUuid ) isOpen = true;
-		})
+		});
 
 		return isOpen;
 
@@ -1916,7 +1909,7 @@ Wu.List = Wu.Class.extend({
 		var isOpen = false;
 		that.showFileInfo.forEach(function(openInfo) {
 			if ( openInfo == fileUuid ) isOpen = true;
-		})
+		});
 
 		return isOpen;		
 
@@ -1930,7 +1923,7 @@ Wu.List = Wu.Class.extend({
 		var thisOpen = false;
 		that.showFileInfo.forEach(function (fi, i) {
 			if (fi == d.fileUuid) thisOpen = i+1;
-		})
+		});
 
 		if ( thisOpen ) {
 			that.showFileInfo.splice(thisOpen-1, 1);
@@ -1940,9 +1933,9 @@ Wu.List = Wu.Class.extend({
 
 		that.refreshTable();
 
-	},
+	}
 
-})
+});
 
 
 
@@ -1998,14 +1991,11 @@ Wu.UserList = Wu.List.extend({
 
 	// Save
 	save : function (saveJSON) {
-
 		var key   = saveJSON.key;
 		var value = saveJSON.value ? saveJSON.value : ' ';
 		var id    = saveJSON.id;
-
 		var user = app.Users[id];
 		user.setKey(key, value);
-
 	},
 
 	// OPTIONS FOR THE LIST
@@ -2114,10 +2104,7 @@ Wu.UserList = Wu.List.extend({
 						killOnSmall : false,
 						width       : 12,
 						smallWidth  : 20
-					},
-
-
-
+					}
 
 			],
 
@@ -2134,7 +2121,7 @@ Wu.UserList = Wu.List.extend({
 
 				]			
 
-		}
+		};
 
 		return listOptions;
 	
@@ -2162,7 +2149,7 @@ Wu.UserList = Wu.List.extend({
 			value        : d.file.store.lastName,
 			uuid         : d.fileUuid
 
-		}
+		};
 
 		if ( this.sortedData ) options.allDATA = this.sortedData;
 
@@ -2186,7 +2173,7 @@ Wu.UserList = Wu.List.extend({
 			value        : d.file.store.firstName,
 			uuid         : d.fileUuid
 
-		}
+		};
 
 		if ( this.sortedData ) options.allDATA = this.sortedData;
 
@@ -2211,7 +2198,7 @@ Wu.UserList = Wu.List.extend({
 			value        : d.file.store.company,
 			uuid         : d.fileUuid
 
-		}
+		};
 
 		if ( this.sortedData ) options.allDATA = this.sortedData;
 
@@ -2235,7 +2222,7 @@ Wu.UserList = Wu.List.extend({
 			value        : d.file.store.position,
 			uuid         : d.fileUuid
 
-		}
+		};
 
 		if ( this.sortedData ) options.allDATA = this.sortedData;
 
@@ -2258,7 +2245,7 @@ Wu.UserList = Wu.List.extend({
 			value        : d.file.store.phone,
 			uuid         : d.fileUuid
 
-		}
+		};
 
 		if ( this.sortedData ) options.allDATA = this.sortedData;
 
@@ -2338,7 +2325,7 @@ Wu.UserList = Wu.List.extend({
 			if ( DATA.fileUuid == f ) {
 				var user = allUsers[f];
 			}
-		};
+		}
 
 		if ( !user ) return;
 
@@ -2365,7 +2352,7 @@ Wu.UserList = Wu.List.extend({
 
 		for (f in allUsers) {
 			if ( uuid == f ) return allUsers[f];
-		};		
+		}
 
 	},
 
@@ -2396,12 +2383,12 @@ Wu.UserList = Wu.List.extend({
 
 			});
 
-		};
+		}
 
 		// Return files
 		return checks;
 
-	},	
+	}
 
 
-})
+});

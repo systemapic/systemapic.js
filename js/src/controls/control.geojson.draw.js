@@ -80,10 +80,11 @@ L.GeoJSON = L.FeatureGroup.extend({
 L.extend(L.GeoJSON, {
 	geometryToLayer: function (geojson, pointToLayer, coordsToLatLng, vectorOptions) {
 
-		var geometry = geojson.type === 'Feature' ? geojson.geometry : geojson,
-		    coords = geometry.coordinates,
-		    layers = [],
-		    latlng, latlngs, i, len;
+		var geometry = geojson.type === 'Feature' ? geojson.geometry : geojson;
+		var coords = geometry.coordinates;
+		var layers = [];
+		var latlng, latlngs, i;
+		var len;
 
 		coordsToLatLng = coordsToLatLng || this.coordsToLatLng;
 		

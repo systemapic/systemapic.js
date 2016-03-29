@@ -104,7 +104,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 			var baseLayer = {
 				layer : this._project.getLayer(b.uuid),
 				baseLayer : b
-			}
+			};
 			this.addLayer(baseLayer);
 		}, this);
 
@@ -151,7 +151,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	mouseOut : function () {
 		return;
 		if ( this._isOpen ) { this.collapse() }
-		else { return };
+		else { return }
 
 	},
 
@@ -285,7 +285,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	expand : function () {
 		this._isOpen = true;
 		Wu.DomUtil.addClass(this._container, 'open');
-	},
+	}
 
 });
 

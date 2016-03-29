@@ -521,7 +521,7 @@ L.Control.Geolocation = Wu.Control.extend({
 			// console.log('fdata: ', data);
 			var fdata = that._filterJSON(data); // _filterJSON defined in inizialize...
 			callAfter(fdata);
-		}
+		};
 		var script = L.DomUtil.create('script','search-jsonp', document.getElementsByTagName('body')[0] ),			
 			url = L.Util.template(this.options.url+'&'+this.options.jsonpParam+'=L.Control.Geolocation.callJsonp', {s: text}); //parsing url
 			//rnd = '&_='+Math.floor(Math.random()*10000);

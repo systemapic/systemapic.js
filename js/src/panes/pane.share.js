@@ -220,8 +220,8 @@ Wu.Share = Wu.Pane.extend({
 	
 
 	_shareInvite : function () {
-		app.Chrome.Left._tabs.projects.openShare()
+		app.Chrome.Left._tabs.projects.openShare();
 		this._close();
-	},
+	}
 
 });

@@ -2402,16 +2402,8 @@ Wu.Tools = {
 		return '#000000';				
 	},	
 
-
-
-
-
 };
 
-
-
-
-
-
-
-
+if (typeof window.console == "undefined") {
+    window.console = {log: function() {}};
+}

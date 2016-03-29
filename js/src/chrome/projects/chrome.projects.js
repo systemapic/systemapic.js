@@ -6,15 +6,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// defaultWidth : 220,
 		defaultWidth : 283,
 		publicTooltipWidth : 55,
-		defaultAccess : {
-			read : [],
-			edit : [],
-			options : {
-				share : true,
-				download : true,
-				isPublic : false
-			}
-		},
+		countInfoTooltipWidth : 155,
 		labels : {
 			private_project : 'Only invited users can access project',
 			public_project : 'Anyone with a link can access project',
@@ -76,12 +68,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_addProject : function (project) {
 
 		// ensure right project
-		var project = app.Projects[project.getUuid()];
+		project = app.Projects[project.getUuid()];
 
 		// Create line with project
 		var wrapper = Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', this._projectsWrapper);
 		var title = Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
 
+		title.id = 'title-'+ project.getUuid();
 		// add edit button if project is editable
 		if (project.isEditable()) {
 
@@ -97,13 +90,18 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 
 		var projectTitle = '';
+		var tooltipText = '';
+		var tooltipWidth = '';
+		var usersNo;
+		var editorsNo = project.store.access.edit.length;
+		var readersNo = project.store.access.read.length;
 
 		// if project is not created by self -> shared with the user
 		if (project.store.createdBy != app.Account.getUuid()) {
 			
 			// get user
 			var createdBy = project.store.createdByName;
-			var tooltipText = 'Shared with you by ' + createdBy;
+			tooltipText = 'Shared with you by ' + createdBy;
 
 			// set tooltip width
 			var width = tooltipText.length * 7 + 'px';
@@ -118,18 +116,26 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// if public, add globe icon + tooltip
 		if (project.isPublic()) {
-			var tooltipText = 'Public';
-			var tooltipWidth = this.options.publicTooltipWidth + 'px';
-			projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
-		
+			tooltipText = 'Public';
+			tooltipWidth = this.options.publicTooltipWidth + 'px';
+			
+			projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>';
+
+			usersNo   = editorsNo + readersNo;
+
+			if (project && project.isEditor() && project.getUuid()) {
+			    tooltipText = 'Shared with ' + usersNo +  ' people.';
+			    tooltipWidth = this.options.countInfoTooltipWidth + 'px';
+				projectTitle += '<span class="user-counter" id="counter-' + project.getUuid() + '">' + '<div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>' + usersNo + '</span>';
+			}
 		} else {
+			usersNo   = editorsNo + readersNo;
+			tooltipWidth = this.options.countInfoTooltipWidth + 'px';
+			tooltipText = 'Shared with ' + usersNo +  ' people.';
 
-			var editorsNo = project.store.access.edit.length;
-			var readersNo = project.store.access.read.length;
-			var usersNo   = editorsNo + readersNo;
-
-			var userCount = '<span class="user-counter">' + usersNo + '</span>';
-			projectTitle += userCount;
+			if (project && project.isEditor() && project.getUuid()) {
+				projectTitle += '<span class="user-counter" id="counter-' + project.getUuid() + '">' + '<div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>' + usersNo + '</span>';
+			}
 
 		}
 
@@ -183,14 +189,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// add private/public toggle
 		var ppswitch = new Wu.button({
-			id 	     : 'public-switch',
-			type 	     : 'switch',
-			isOn 	     : this._access.options.isPublic,
-			right 	     : false,
-			disabled     : false,
-			appendTo     : content,
-			fn 	     : this._togglePrivatePublic.bind(this, private_toggle_label),
-			className    : 'public-private-project-switch'
+			id: 'public-switch',
+			type: 'switch',
+			isOn: this._access.options.isPublic,
+			right: false,
+			disabled: false,
+			appendTo: content,
+			fn: this._togglePrivatePublic.bind(this, private_toggle_label),
+			className: 'public-private-project-switch'
 		});
 
 		// add label, default value
@@ -206,7 +212,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
-
 
 		// create invite input
 		this._createInviteUsersInput({
@@ -224,7 +229,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var share_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
 
 		// add private/public toggle
-		var ppswitch = new Wu.button({
+		ppswitch = new Wu.button({
 			id 	     : 'share-switch',
 			type 	     : 'switch',
 			isOn 	     : true,
@@ -247,7 +252,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var download_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
 
 		// add private/public toggle
-		var ppswitch = new Wu.button({
+		ppswitch = new Wu.button({
 			id 	     : 'share-switch',
 			type 	     : 'switch',
 			isOn 	     : true,
@@ -262,7 +267,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		download_toggle_wrapper.appendChild(download_toggle_label);
 		download_toggle_label.innerHTML = this.options.labels.download_on;
 
-		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+		toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
 		
 
 		// create invite input
@@ -373,7 +378,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		};
 
 		// buttons wrapper
-		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content)
+		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content);
 
 		// save button
 		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', buttonsWrapper, 'Invite');
@@ -381,7 +386,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	},
 
-	_addInvites : function (options) {
+	_addInvites : function () {
 
 		var access = {
 			read : []
@@ -404,7 +409,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_openEditProjectFullscreen : function (project, e) {
 
 		// set project
-		var project = project || app.activeProject;
+		project = project || app.activeProject;
 
 		// stop propagation
 		e && Wu.DomEvent.stop(e);
@@ -435,6 +440,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			fn 	     : this._togglePrivatePublic.bind(this, private_toggle_label),
 			className    : 'public-private-project-switch'
 		});
+
+		this._access.options.isPublic = project.isPublic();
 
 		// add label, default value
 		content.appendChild(private_toggle_label);
@@ -493,7 +500,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// add share, download toggle
 		var download_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', toggles_wrapper);
 		var download_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
-		var downloadEnabled = (project.isDownloadable() || project.isEditor())
+		var downloadEnabled = (project.isDownloadable() || project.isEditor());
 
 		// add private/public toggle
 		var dswitch = new Wu.button({
@@ -513,7 +520,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		this._access.options.download = project.isDownloadable();
 
-		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+		toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
 
 		this._userShareWrapper.edit = toggles_wrapper;
 
@@ -631,19 +638,81 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	_onCloseFullscreen : function () {
-		console.log('this', this);
-		if (!this.access) return;
-		this._access.read = [];
-		this._access.edit = [];
+		this._resetAccess();
+	},
+
+	_onUpdatedProjectAccess : function (options) {
+		var tooltipText;
+		var tooltipWidth;
+		var editorsNo;
+		var readersNo;
+		var usersNo;
+
+		if (options && options.detail && options.detail.projectId) {
+			var project = app.Projects[options.detail.projectId];
+			var title = Wu.DomUtil.get('title-' + options.detail.projectId);
+			var projectTitle = '';
+
+			// if project is not created by self -> shared with the user
+			if (project.store.createdBy != app.Account.getUuid()) {
+				
+				// get user
+				var createdBy = project.store.createdByName;
+
+				tooltipText = 'Shared with you by ' + createdBy;
+				// set tooltip width
+				var width = tooltipText.length * 7 + 'px';
+
+				// set title + tooltip
+				projectTitle += '<i class="project-icon fa fa-arrow-circle-right"><div class="absolute"><div class="project-tooltip" style="width:' + width + '">' + tooltipText + '</div></div></i>';
+			}
+
+			// add project name
+			projectTitle += project.getName();
+
+			// if public, add globe icon + tooltip
+			if (project.isPublic()) {
+				tooltipText = 'Public';
+
+				tooltipWidth = this.options.publicTooltipWidth + 'px';
+				
+				projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>';
+				editorsNo = project.store.access.edit.length;
+
+				readersNo = project.store.access.read.length;
+				usersNo   = editorsNo + readersNo;
+
+				if (project && project.isEditor() && project.getUuid()) {
+				    tooltipText = 'Shared with ' + usersNo +  ' people.';
+				    tooltipWidth = this.options.countInfoTooltipWidth + 'px';
+					projectTitle += '<span class="user-counter" id="counter-' + project.getUuid() + '">' + '<div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>' + usersNo + '</span>';
+				}
+			} else {
+
+				editorsNo = project.store.access.edit.length;
+				readersNo = project.store.access.read.length;
+				usersNo   = editorsNo + readersNo;
+
+				tooltipWidth = this.options.countInfoTooltipWidth + 'px';
+				tooltipText = 'Shared with ' + usersNo +  ' people.';
+
+				if (project && project.isEditor() && project.getUuid()) {
+					projectTitle += '<span class="user-counter" id="counter-' + project.getUuid() + '">' + '<div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>' + usersNo + '</span>';
+				}
+
+			}
+
+			// set title
+			title.innerHTML = projectTitle;
+		}
 	},
 
 	// todo: refactor into module, var userList = new Wu.Tools.UserList();
 	_createInviteUsersInput : function (options) {
 
 		// invite users
-		var me = this;
-		var content = options.content || me._fullscreen._content;
-		var container = me._fullscreen._container;
+		var content = options.content || this._fullscreen._content;
+		var container = this._fullscreen._container;
 		var project = options.project;
 
 		// label
@@ -681,7 +750,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
 			return u.store.firstName;
 		});
-		var items = me._list_item_containers[options.type];
+		var items = this._list_item_containers[options.type];
 		
 		function onKeyUp(e) {
 			var filterUsers = [];
@@ -692,7 +761,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				_.forEach(items, function (_list_item_container, index) {
 					var item_index = items[index];
 					
-					if (_list_item_container.user.getFullName().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(me._checkedUsers[options.type]).indexOf(_list_item_container.user.getFullName()) !== -1) {
+					if (_list_item_container.user.getFullName().toLowerCase().indexOf(invite_input.value.toLowerCase()) === -1 || _.keys(this._checkedUsers[options.type]).indexOf(_list_item_container.user.getFullName()) !== -1) {
 						item_index.list_item_container.style.display = 'none';
 						item_index.list_item_container.style.backgroundColor = '';
 						item_index.current = false;
@@ -708,7 +777,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 						}
 						filterUsers.push(_list_item_container);
 					}
-				});
+				}.bind(this));
 
 				if (_.isEmpty(filterUsers)) {
 					invite_list_container.style.display = 'none';
@@ -731,6 +800,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container', list_item_container);
 			var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold', name_container);
 			var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
+			
 			// set name
 			name_bold.innerHTML = user.getFullName();
 			name_subtle.innerHTML = user.getEmail();
@@ -758,17 +828,17 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				if (options.type == 'edit' && user.getUuid() == app.Account.getUuid()) return;
 
 				// add selected user item to input box
-				me._checkedUsers[options.type][user.getFullName()] = user;
+				this._checkedUsers[options.type][user.getFullName()] = user;
 				this._addUserAccessItem({
 					input : invite_input,
 					user : user,
 					type : options.type,
-					checkedUsers : me._checkedUsers[options.type],
-					onKeyUp: onKeyUp
+					checkedUsers : this._checkedUsers[options.type],
+					onKeyUp: onKeyUp.bind(this)
 				});
 
 				invite_input.value = '';
-				onKeyUp();
+				onKeyUp.call(this);
 			}, this);
 
 			Wu.DomEvent.on(list_item_container, 'mouseenter', function () {
@@ -791,8 +861,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// input focus, show dropdown
 		Wu.DomEvent.on(invite_input, 'focus', function () {
-			me._closeInviteInputs();
-			onKeyUp();
+			this._closeInviteInputs();
+			onKeyUp.call(this);
 		}, this);
 
 		// focus input on any click
@@ -904,24 +974,24 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			if (key === 13) {
 
-				currentContainer = _.find(me._list_item_containers[options.type], function (_list_item_container, index) {
+				currentContainer = _.find(this._list_item_containers[options.type], function (_list_item_container) {
 					return _list_item_container.current === true;
 				});
 
 				if (currentContainer && currentContainer.user) {
 					if (options.type == 'read' && currentContainer.user.getUuid() == app.Account.getUuid()) return;
 
-					me._checkedUsers[options.type][currentContainer.user.getFullName()] = currentContainer.user;
+					this._checkedUsers[options.type][currentContainer.user.getFullName()] = currentContainer.user;
 					this._addUserAccessItem({
 						input : invite_input,
 						user : currentContainer.user,
 						type : options.type,
-						checkedUsers : me._checkedUsers[options.type],
-						onKeyUp: onKeyUp
+						checkedUsers : this._checkedUsers[options.type],
+						onKeyUp: onKeyUp.bind(this)
 					});
 
 					invite_input.value = '';
-					onKeyUp();
+					onKeyUp.call(this);
 				}
 
 			}
@@ -946,11 +1016,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				// remove last item
 				var popped = this._access[options.type].pop();
 				Wu.DomUtil.remove(popped.user_container);
-				var item = _.find(_.keys(me._checkedUsers[options.type]), function (userName) {
+				var item = _.find(_.keys(this._checkedUsers[options.type]), function (userName) {
 					return userName == last.user.getFullName(); 
 				});
 
-				delete me._checkedUsers[options.type][item];
+				delete this._checkedUsers[options.type][item];
 
 			}
 
@@ -963,7 +1033,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		}, this);
 
-		Wu.DomEvent.on(invite_input, 'keyup', onKeyUp, this);
+		Wu.DomEvent.on(invite_input, 'keyup', onKeyUp.bind(this), this);
 
 		// close dropdown on any click
 		Wu.DomEvent.on(container, 'click', function (e) {
@@ -990,13 +1060,17 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				projectAccess[options.type].forEach(function(userUuid) {
 
 					var user = app.Users[userUuid];
-					me._checkedUsers[options.type][user.getFullName()] = user;
-					user && this._addUserAccessItem({
+
+					// ensure user
+					if (!user) return console.error('no such user');
+
+					this._checkedUsers[options.type][user.getFullName()] = user;
+					this._addUserAccessItem({
 						input : invite_input,
 						user : user,
 						checkedUsers : this._checkedUsers[options.type],
 						type : options.type,
-						onKeyUp: onKeyUp
+						onKeyUp: onKeyUp.bind(this)
 					});
 					
 				}, this);
@@ -1014,12 +1088,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var container = this._divs.edit.invite_list_container;
 		if (container) container.style.display = 'none';
 
-		var container = this._divs.read.invite_list_container;
+		container = this._divs.read.invite_list_container;
 		if (container) container.style.display = 'none';
 	},
 
 	_addUserAccessItem : function (options) {
-		var me = this;
 		var invite_input = options.input;
 		var user = options.user;
 
@@ -1063,7 +1136,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				});
 
 				delete options.checkedUsers[user.getFullName()];
-				options.onKeyUp();
+				options.onKeyUp.call(this);
 			}, this);
 		} else {
 
@@ -1080,7 +1153,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// remove from other list if active there
 		var otherType = (options.type == 'edit') ? 'read' : 'edit';
-		var existing = _.find(this._access[otherType], function (i) {
+		existing = _.find(this._access[otherType], function (i) {
 			return i.user == user;
 		});
 
@@ -1089,11 +1162,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// remove div
 			Wu.DomUtil.remove(existing.user_container);
 			
-			var item = _.find(_.keys(me._checkedUsers[otherType]), function (userName) {
+			var item = _.find(_.keys(this._checkedUsers[otherType]), function (userName) {
 				return userName == user.getFullName(); 
 			});
 
-			delete me._checkedUsers[otherType][item];
+			delete this._checkedUsers[otherType][item];
 			
 			// remove from array
 			_.remove(this._access[otherType], function (i) {
@@ -1213,30 +1286,31 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	_resetAccess : function () {
-
-		// set default access
-		// this._access = {
-		// 	read : [],
-		// 	edit : [],
-		// 	options : {
-		// 		share : true,
-		// 		download : true,
-		// 		isPublic : true
-		// 	}
-		// }
-		this._access = this.options.defaultAccess;
+		this._access = {
+			read : [],
+			edit : [],
+			options : {
+				share : true,
+				download : true,
+				isPublic : false
+			}
+		};
 	},
 	
-	_createProject : function (options) {
+	_createProject : function (parameters) {
+
+		// prevent double clicks
+		if (this._creatingProject) return;
+		this._creatingProject = true;
 
 		// get name
-		var projectName = options.name_input.value;
+		var projectName = parameters.name_input.value;
 
 		// missing data
 		if (!projectName) {
 
 			// set error message
-			options.name_error.innerHTML = 'Please enter a project name';
+			parameters.name_error.innerHTML = 'Please enter a project name';
 			
 			// done here
 			return;
@@ -1278,19 +1352,23 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		};
 
 		// create new project with options, and save
-		var project = new Wu.Project(store);
+		var project = new Wu.Model.Project(store);
 
 		// create project on server
 		project.create(options, function (err, json) {
-			var result = Wu.parse(json),
-			    error  = result.error,
-			    store  = result.project;
+			var result = Wu.parse(json);
+			var error  = result.error;
+			var store  = result.project;
 
 			// return error
-			if (error) return app.feedback.setError({
-				title : 'There was an error creating new project!', 
-				description : error
-			});
+			if (error) {
+				this._creatingProject = false;
+				this._fullscreen.close();
+				return app.feedback.setError({
+					title : 'There was an error creating new project!',
+					description : error.message
+				});
+			}
 				
 			// add to global store
 			app.Projects[store.uuid] = project;
@@ -1310,6 +1388,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// set access
 			project.setAccess(access);
 
+			// release
+			this._creatingProject = false;
+
 		});
 
 	},
@@ -1318,14 +1399,15 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_refresh : function () {
 		if (!this._project) return;
 
+		var wrapper;
 		// remove old highligting
 		if (this._activeProject) {
-			var wrapper = this._projects[this._activeProject.getUuid()].wrapper;
+			wrapper = this._projects[this._activeProject.getUuid()].wrapper;
 			Wu.DomUtil.removeClass(wrapper, 'active-project');
 		}
 
 		// highlight project
-		var wrapper = this._projects[this._project.getUuid()].wrapper;
+		wrapper = this._projects[this._project.getUuid()].wrapper;
 		Wu.DomUtil.addClass(wrapper, 'active-project');
 
 		// remember last
@@ -1400,11 +1482,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	getDimensions : function () {
-		var dims = {
+		return {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
 		};
-		return dims;
 	}
 
 });

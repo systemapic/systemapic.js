@@ -49,9 +49,14 @@ Wu.PhantomJS = Wu.Class.extend({
 	
 	develop : function (view) {		
 
+		// phantom feedback
 		this.ping('developing!');
 		this.ping(view);
 
+
+		
+
+		// set style
 		this.phantomStyle();
 
 
@@ -85,7 +90,7 @@ Wu.PhantomJS = Wu.Class.extend({
 
 		// request project from server
 		app.api.getPrivateProject({
-			project_id : project_id,
+			project_id : project_id
 		}, function (err, project_json) {
 			if (!project_json || !JSON.parse(project_json).uuid) {
 				return this.ping(JSON.stringify({
@@ -164,6 +169,9 @@ Wu.PhantomJS = Wu.Class.extend({
 							// kill interval
 							clearInterval(waiting);
 
+							// close guide
+							Wu.Mixin.Events.fire('doingScreenshot');
+
 							// wait an extra second
 							setTimeout(function () {
 
@@ -232,9 +240,9 @@ Wu.PhantomJS = Wu.Class.extend({
 
 	// todo: move phantom to own script.. app.phantomjs = new Wu.PhantomJS()
 	phantomJS : function (args) {
-		var projectUuid = args.projectUuid,
-	   	    hash    	= args.hash,
-	   	    isThumb     = args.thumb;
+		var projectUuid = args.projectUuid;
+		var hash    	= args.hash;
+		var isThumb     = args.thumb;
 
 	   	// return if no project
 	   	if (!projectUuid) return false;
@@ -330,7 +338,7 @@ Wu.PhantomJS = Wu.Class.extend({
 	// phantomjs: loaded layers
 	_loaded : [],
 
-	_loading : [],
+	_loading : []
 
 
 });

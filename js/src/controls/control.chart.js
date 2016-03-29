@@ -61,10 +61,10 @@ Wu.Control.Chart = Wu.Control.extend({
 	
 		if ( this._popup ) return;
 
-		var popup   = this._createPopup(e),
-		    content = this._popupContent,
-		    map     = app._map,
-		    project = this._project || app.activeProject;
+		var popup   = this._createPopup(e);
+		var content = this._popupContent;
+		var map     = app._map;
+		var project = this._project || app.activeProject;
 
 		// set latlng
 		var latlng = multiPopUp ? multiPopUp.center : e.latlng;
@@ -88,7 +88,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		if (!multiPopUp) {
 
 			// set latlng
-			var latlng = this._getMarkerPosition(latlng, e);
+			latlng = this._getMarkerPosition(latlng, e);
 			
 			// Add marker circle
 			this._addMarkerCircle(latlng);
@@ -98,10 +98,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 	updateExistingPopup : function (options) {
-
-
 		var popup = options.context._chart._popup;
-
 		var e = options.e;
 		var multiPopUp = options.multiPopUp;
 
@@ -111,8 +108,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var content = this.singlePopUp(e);
 
 		popup.setContent(content, true);
-
-
 	},
 
 	_getMarkerPosition : function (latlng, e) {
@@ -132,7 +127,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			weight: 15,
 			opacity : 1,
 			fillOpacity: 0.4
-		}
+		};
 
 		this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(app._map);
 	},
@@ -261,7 +256,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		    		tmpTicks : []
 			},
 			multiPopUp : false
-		}
+		};
 
 		this._c3Obj = this.createC3dataObj(c3Obj);
 	
@@ -273,7 +268,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			pointCount 	: false,
 			multiPopUp 	: false,
 			layer 		: e.layer
-		}
+		};
 
 		// Create HTML
 		var _header = this.createHeader(headerOptions);
@@ -283,7 +278,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		var content = this._content = Wu.DomUtil.create('div', 'popup-inner-content');
 		content.appendChild(_header);
 		content.appendChild(_chartContainer);
-		content.appendChild(_footer)
+		content.appendChild(_footer);
 
 
 		return content;		
@@ -307,8 +302,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		    		y 	: [],
 		    		ticks 	: [],
 		    		tmpTicks : []
-			},
-		}
+			}
+		};
 
 		this._c3Obj = this.createC3dataObj(c3Obj);
 
@@ -319,7 +314,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			pointCount 	: false,
 			multiPopUp 	: false,
 			layer 		: e.layer
-		}
+		};
 
 
 		var content = Wu.DomUtil.create('div', 'popup-inner-content');
@@ -408,7 +403,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		var n = y.length;
 		var result_a = ((y_sum * xx_sum) - (x_sum * xy_sum)) / ((n * xx_sum) - (x_sum * x_sum));
 		var result_b = ((n * xy_sum) - (x_sum * y_sum)) / ((n * xx_sum) - (x_sum * x_sum));
-		var result_y_start = result_a + (result_b * x[0])
+		var result_y_start = result_a + (result_b * x[0]);
 		var result_y_end = result_a + (result_b * x[x.length-1]);
 
 
@@ -454,24 +449,23 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		
 		var c3Obj = {
-
 			data 		: _average,
 			meta 		: false,
 			popupSettings 	: this.popupSettings,
 			d3array 	: {
-				    		meta 	: [],
-				    		xName 	: 'field_x', 
-				    		yName 	: 'mm',
-				    		x 	: [],
-				    		y 	: [],
-				    		ticks 	: [],
-				    		tmpTicks : []
+				meta 	: [],
+				xName 	: 'field_x', 
+				yName 	: 'mm',
+				x 	: [],
+				y 	: [],
+				ticks 	: [],
+				tmpTicks : []
 			},
 			multiPopUp : {
-					center 		: _center,
+				center 	: _center
 			}
 
-		}
+		};
 
 		this._c3Obj = this.createC3dataObj(c3Obj);
 
@@ -483,8 +477,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			pointCount 	: _totalPoints,
 			multiPopUp 	: true,
 			layer 		: _layer
-		}
-
+		};
 
 		var content = Wu.DomUtil.create('div', 'popup-inner-content');
 
@@ -575,14 +568,14 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Header
 		var headerWrapper = Wu.DomUtil.create('div', 'c3-header-wrapper', container);
-		var headerName = Wu.DomUtil.create('div', 'c3-header-layer-name', headerWrapper, layerName)
+		var headerName = Wu.DomUtil.create('div', 'c3-header-layer-name', headerWrapper, layerName);
 
 		// add more text for multiquery
 		if (multiPopUp) {
 			
 			// set geom text based on type
 			var geom_type = options.layer.getMeta().geometry_type;
-			var geom_text = 'items'
+			var geom_text = 'items';
 			if (geom_type == 'ST_Point') geom_text = 'points';
 			if (geom_type == 'ST_MultiPolygon') geom_text = 'polygons';
 
@@ -724,11 +717,10 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// CHART SETTINGS
 		var chart = this._chart = c3.generate({
-		        
-		        interaction : true,
+			interaction : true,
 
-		        bindto: _C3Container,
-		        
+			bindto: _C3Container,
+
 			size: {
 				height: 200,
 				// width: 430
@@ -737,10 +729,11 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			point : {
 				show : false,
-				r: 3,
+				r: 3
 			},
 
-			grid: { y: { show: true },
+			grid: {
+				y: { show: true },
 				x: { show: true }
 			},
 
@@ -749,53 +742,48 @@ Wu.Control.Chart = Wu.Control.extend({
 			},		
 
 			zoom : {
-				enabled : false,
-				
+				enabled : false
 			},
-		        data: {
 
-		                xs: {
-		                        mm: 'field_x',
-		                        regression : 'reg_x'
-		                },
+			data: {
 
-		                columns: _columns,
+				xs: {
+						mm: 'field_x',
+						regression : 'reg_x'
+				},
 
-		                colors : {
-		                	mm: '#0000FF',
-		                	regression: '#C83333'
-		                },
-		                types: {
-		                	mm : 'scatter',
-		                	regression : 'line'
-		                }
-		        },
+				columns: _columns,
 
+				colors : {
+					mm: '#0000FF',
+					regression: '#C83333'
+				},
+				types: {
+					mm : 'scatter',
+					regression : 'line'
+				}
+			},
 
+		    axis: {
 
-		        axis: {
+				x: {
+						type: 'timeseries',
+						localtime: false,
+						tick: {
+								format: '%Y',
+								values: [],
+								multiline: true
+						}
+				},
 
-		                x: {
-		                        type: 'timeseries',
-		                        localtime: false,
-		                        tick: {
-		                                format: '%Y',
-		                                values: [],
-		                                multiline: true
-		                        }
-		                },
-
-		                y: {
-		                	max : range,
-		                	min : -range,
+				y: {
+					max : range,
+					min : -range,
 					tick: {
 						format: function (d) { return Math.floor(d * 100)/100}
 					}
-		                },
-
-		              
-
-		        },
+				}
+			},
 
 			tooltip: {
 				grouped : true,
@@ -803,10 +791,10 @@ Wu.Control.Chart = Wu.Control.extend({
 					title: function (d) { 
 						var nnDate = moment(d).format("DD.MM.YYYY");
 						return nnDate;
-					},
-				},
+					}
+				}
 				
-			},	        
+			},
 
 			color: {
 				pattern: ['#000000']
@@ -837,14 +825,12 @@ Wu.Control.Chart = Wu.Control.extend({
 			appendTo  : w,
 			fn 	  : this._updateRegression.bind(this),
 			className : 'relative-switch'
-		})
+		});
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
 		label.htmlFor = 'regression';
 		label.appendChild(document.createTextNode('Regression'));
-
-
 	},
 
 	_updateRegression : function (e) {
@@ -904,6 +890,9 @@ Wu.Control.Chart = Wu.Control.extend({
 		// size of step
 		var d = this._range / 8;
 
+		// find if y axis has negative values on top
+		var axis_reversed = (this._chart.axis.max().y < 0);
+
 		// zoom Y axis
 		if (delta > 0) { // moving up
 
@@ -920,7 +909,11 @@ Wu.Control.Chart = Wu.Control.extend({
 			this._range = this._range -= d;
 
 			// dont go under 1
-			if (this._range < 1) this._range = 1;
+			if (axis_reversed) {
+				if (this._range > 1) this._range = 1;
+			} else {
+				if (this._range < 1) this._range = 1;
+			}
 
 			// update axis
 			this._chart.axis.max(this._range);
@@ -1049,7 +1042,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			return layer.store.data.postgis.layer_id == postgis_layer_id;
 		});
 		return layerUuid;		
-	},	
+	}
 
 
-})
+});

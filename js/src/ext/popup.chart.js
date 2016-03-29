@@ -113,7 +113,7 @@ Wu.Popup.Chart = L.Control.extend({
 	},
 
 	close : function () {
-		this._map.fire('popupclose')
+		this._map.fire('popupclose');
 		this._remove();
 	},
 
@@ -173,7 +173,7 @@ Wu.Popup.Chart = L.Control.extend({
 			var dims = app.Chrome.Left.getDimensions();
 			var _x = dims.width + 10;
 			var _y = this.options.defaultPosition.y;
-			var pos = { x : _x, y : _y }	
+			var pos = { x : _x, y : _y };
 			return this.setPosition(pos);		
 		}
 
@@ -187,7 +187,7 @@ Wu.Popup.Chart = L.Control.extend({
 		}		
 
 		// or, set default, set from bottom
-		var pos = this.options.defaultPosition;
+		pos = this.options.defaultPosition;
 		this.setPosition(pos);
 	},
 
@@ -212,12 +212,12 @@ Wu.Popup.Chart = L.Control.extend({
 		var popupPosition = {
 			x : this._container.offsetLeft,
 			y : this._container.offsetTop
-		}
+		};
 
 		var mousePosition = {
 			x : e.x,
 			y : e.y
-		}
+		};
 
 		var p = popupPosition;
 		var m = mousePosition;
@@ -226,7 +226,7 @@ Wu.Popup.Chart = L.Control.extend({
 		this._mouseOffset = {
 			x : m.x - p.x,
 			y : m.y - p.y
-		}
+		};
 
 		// set window height
 		this._windowDimensions = this._getWindowDimensions();
@@ -262,7 +262,7 @@ Wu.Popup.Chart = L.Control.extend({
 		var diff = {
 			x : e.offsetX - this._mouseOffset.x,
 			y : window_height - (e.offsetY - this._mouseOffset.y) - this._container.offsetHeight // todo: calc from bottom instead
-		}
+		};
 
 		// set pos
 		this.setPosition({
@@ -305,7 +305,7 @@ Wu.Popup.Chart = L.Control.extend({
 	// clean up
 	_onLayerDeleted  : function () {
 		this.close();
-	},
+	}
 
 
 	
