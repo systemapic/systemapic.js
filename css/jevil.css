@@ -2130,49 +2130,6 @@ input.chrome-field-input {
 
 
 
-
-
-
-
-/*
-
-
-
-
-.small-pop-up .c3-header-metapair {
-    height: auto;
-    border: none;
-    box-shadow: none;
-    border-bottom: none !important;
-    margin-bottom: 4px; 
-}
-
-.small-pop-up .c3-header-metakey {
-    margin-right: 6px;
-    font-size: 15px !important;
-    margin-bottom: 0px;
-        margin-top: 5px;
-        color: #777;
-        font-weight: 400;    
-}
-
-.small-pop-up .c3-header-metaval {
-    padding: 0;
-    display: block;
-    margin-bottom: 4px;
-    font-size: 14px !important;
-    font-weight: 400;
-    line-height: 1.4;       
-}
-
-.tableCell {
-    display: block !important;
-}*/
-
-
-
-
-
 /*NEW UPDATED CSS RULES - NOT PART OF PREVIOUS MERGE! (feb 20th 2016)*/
 .tiny-pop-up #c3-header-metacontainer {
     background: white !important;
@@ -2241,3 +2198,163 @@ input.chrome-field-input {
 .chrome-content.active-layer.select-wrap:before{
     right: 2px;
 }
+
+
+
+
+
+
+
+
+
+
+/*  CRASH  */
+/*  CRASH  */
+/*  CRASH  */
+
+.big-slider-outer-container {
+    position: absolute;
+    width: 100%;
+    bottom: 50px;
+    padding-left: 100px;
+    text-align: center;
+    margin: auto;
+    padding-right: 100px;
+    }
+
+
+
+.big-slider-inner-container {
+    padding: 24px;
+    background: white;
+    border-radius: 10px;    
+    padding-left: 70px;
+    padding-right: 120px;
+    padding-bottom: 40px;
+    padding-top: 40px;
+    position: relative;
+    }    
+
+.big-slider-play-button {
+    left: 24px;
+    position: absolute;
+    font-size: 32px;
+    top: 24px;
+    cursor: pointer;
+    }
+
+.big-slider-step-forward {
+    position: absolute;
+    right: 24px;
+    font-size: 32px;
+    top: 24px;     
+    cursor: pointer;
+    }
+
+.big-slider-step-backward {
+    position: absolute;
+    font-size: 32px;
+    top: 24px; 
+    right: 65px;
+    cursor: pointer;
+    }
+
+.big-slider-tick-container {
+    left: 0;
+    width: 100%;
+    bottom: -13px;
+    padding-left: 0;
+    padding-right: 0;
+    height: 2px;
+    position: relative;
+    text-align: left;
+    }
+
+.big-slider-tick {
+    width: 7.69%;
+    height: 12px;
+    display: inline-block;
+    position: relative;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    }
+
+.big-slider-tick:before {
+    content: '';
+    position: absolute;
+    right: 0;
+    height: 10px;
+    width: 1px;
+    background: #C8C8C8;
+    top: -10px;
+    }
+
+.big-slider-year-tick {
+    position: absolute;
+    width: 100%;
+    top: -58px;
+    font-size: 16px;    
+    }
+
+.disable-button {
+    cursor: default;
+    opacity: 0.2;
+    }
+
+.big-slider-current-date {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    left: 0;
+    top: 9px;    
+    display: none;
+    }
+
+
+
+
+
+
+
+/* *************************************** */
+/* *************************************** */
+/* *************************************** */
+
+.big-graph-outer-container {
+    background: white;
+    padding: 20px;
+    padding-right: 0px;
+    position: absolute;
+    right: 100px;
+    bottom: 110px;
+    border-radius: 5px;
+    }
+
+    path.line {
+        stroke-width: 1.0 !important;       
+        }
+
+    .sub._0 path.line,
+    .sub._1 path.line {
+        stroke-width: 0;
+        }
+
+    .sub._0 path.area,
+    .sub._1 path.area {
+        fill-opacity: 1;
+        }
+
+
+
+
+.big-graph-info-container div {
+        margin-left: 5px;
+        margin-right: 5px;
+        }
+
+.big-graph-current-day {
+        font-weight: 600;
+        font-size: 18px;
+        margin: 0;    
+        }  
