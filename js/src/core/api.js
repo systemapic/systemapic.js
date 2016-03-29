@@ -406,8 +406,11 @@ Wu.Api = Wu.Class.extend({
 	},
 
 
-
-
+	// get custom data (allYears)
+	getCustomData : function (options, done) {
+  		var path = '/v2/static/getCustomData';		
+		this.get(path, options, done)
+  	},
 
 
 

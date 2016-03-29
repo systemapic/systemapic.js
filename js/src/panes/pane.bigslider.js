@@ -2,24 +2,46 @@ Wu.BigSlider = Wu.Class.extend({
 
 	initialize : function () {
 
-		this.initData();
+		// fetching data is async, so must wait for callback
+		this.initData(function (err) {
+
+			this.initSlider();
+
+			this.initGraph();
+
+			this.updateDayOfYear();
+
+			this.addHooks();
+					
+		}.bind(this));
 		
-		this.initSlider();
-
-		this.initGraph();
-
-		this.updateDayOfYear();
-
-		this.addHooks();		
-		
-
 	},
 
 
-	initData : function () {
+	initData : function (done) {
+
+		// get data from server
+		app.api.getCustomData({
+			name : 'allYears'
+		}, function (err, data) {
+
+			// parse
+			var allYears = Wu.parse(data);
+
+			// render
+			this.renderData(allYears);
+
+			// continue initialize
+			done(err);
+
+		}.bind(this));
+
+	},
+
+	renderData : function (allYears) {
 
 		// Array of JSON with all days with every year, one by one
-		this.allYears = this.getAllYears();
+		this.allYears = allYears;
 
 		// Array of JSON with all days, categorized by year
 		this.years = this.sanitizeYears(this.allYears);
