@@ -1115,6 +1115,15 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 
 
 
+Wu.CubeLayer = Wu.Model.Layer.extend({
+
+
+
+
+
+
+
+});
 
 
 
@@ -1440,6 +1449,9 @@ Wu.createLayer = function (layer) {
 	if (layer.data.postgis && layer.data.postgis.geom_type == 'raster') {
 		return new Wu.RasterLayer(layer);
 	}
+
+	// cubes
+	if (layer.data.cube) return new Wu.CubeLayer(layer);
 
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
