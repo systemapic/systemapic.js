@@ -6,7 +6,9 @@ Wu.BigSlider = Wu.Class.extend({
 		fps : 4
 	},
 
-	initialize : function () {
+	initialize : function (options) {
+
+		Wu.setOptions(this, options);
 
 		// fetching data is async, so must wait for callback
 		this.initData(function (err) {
@@ -26,13 +28,25 @@ Wu.BigSlider = Wu.Class.extend({
 
 	initData : function (done) {
 
+		// only get data once
+		if (app._animatorData) {
+			console.error('already got animator data');
+			return done();
+		}
+
+		console.error('initData', app._animatorData);
+
 		// get data from server
 		app.api.getCustomData({
-			name : 'allYears'
+			name : this.options.data
 		}, function (err, data) {
 
 			// parse
 			var allYears = Wu.parse(data);
+
+			// save, so won't need to get again
+			app._animatorData = app._animatorData || {};
+			app._animatorData['allYears'] = allYears;
 
 			// render
 			this.renderData(allYears);
@@ -76,17 +90,14 @@ Wu.BigSlider = Wu.Class.extend({
 		}.bind(this))		
 
 
-
-
 		this.ticks = [];
 
 		var currentMonth = '';
 
 		this.allYears.forEach(function (y) {
-			var year    = y.Year;
-			var month   = this.getMonthName(y.Doy, y.Year);
-			var doy     = y.Doy;
-
+			var year = y.Year;
+			var month = this.getMonthName(y.Doy, y.Year);
+			var doy = y.Doy;
 		  	var blankDate = new Date(year, 0);
 	  		var date = new Date(blankDate.setDate(doy));
 			var day = date.getDate();
@@ -386,6 +397,7 @@ Wu.BigSlider = Wu.Class.extend({
 		this.years[year].forEach(function (d, i) {
 
 			if ( d.Doy < day ) {
+				console.log('rebuild graph data');
 				d.date = this._dateFromNo(i)
 				this.graphData.push(d);
 			}

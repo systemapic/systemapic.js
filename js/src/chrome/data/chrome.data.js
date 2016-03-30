@@ -2015,44 +2015,42 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Layer providers
 		this.layerProviders = {};
 
+		// Empty layers container
+		this._layersContainer.innerHTML = '';
+
 		// Create PROJECT LAYERS section, with D3 container
 		var sortedLayers = this.sortedLayers = this.sortLayers(this._project.layers);
 
 		sortedLayers.forEach(function (layerBundle) {
 
+			console.log('layerbundle key', layerBundle.key);
+
 			var provider = layerBundle.key;
 
 			// only do our layers
-			if (provider != 'postgis') return;
+			if (provider == 'postgis' || provider == 'cube') {
 
-			var layers = layerBundle.layers;
+				var layers = layerBundle.layers;
 
-			if ( layers.length <= 0 ) return this.createNoLayers();
+				if ( layers.length < 1 ) return;
 
-			this.layerProviders[provider] = {
-				name : provider,
-				layers : layers
-			};
+				this.layerProviders[provider] = {
+					name : provider,
+					layers : layers
+				};
 
-			this.layerListContainers[provider] = {};
+				this.layerListContainers[provider] = {};
 
-			// Empty layers container
-			this._layersContainer.innerHTML = '';
+				// Create wrapper
+				this.layerListContainers[provider].wrapper = Wu.DomUtil.create('div', 'layer-list-container', this._layersContainer);
 
-			// Create wrapper
-			this.layerListContainers[provider].wrapper = Wu.DomUtil.create('div', 'layer-list-container', this._layersContainer);
-
-			// D3 Container
-			this.layerListContainers[provider].layerList = Wu.DomUtil.create('div', 'layer-list-container-layer-list', this.layerListContainers[provider].wrapper);
-			this.layerListContainers[provider].D3container = d3.select(this.layerListContainers[provider].layerList);
+				// D3 Container
+				this.layerListContainers[provider].layerList = Wu.DomUtil.create('div', 'layer-list-container-layer-list', this.layerListContainers[provider].wrapper);
+				this.layerListContainers[provider].D3container = d3.select(this.layerListContainers[provider].layerList);
+			}
 
 		}.bind(this));
 
-	},
-
-	createNoLayers : function () {
-		// var noLayersText = 'This project has no layers.<br>Upload files, and add them to project.';
-		// var noLayers = Wu.DomUtil.create('div', 'no-layers', this._layersContainer, noLayersText);
 	},
 
 
@@ -2081,7 +2079,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	sortLayers : function (layers) {
 
-		var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox'];
+		var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube'];
 		var results = [];
 
 		keys.forEach(function (key) {

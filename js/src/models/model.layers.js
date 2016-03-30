@@ -35,7 +35,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	_mapMove : function () {},
 	
 	_unload : function (e) {
-		// delete 
 		this.removeHooks();
 	},
 
@@ -60,6 +59,8 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	add : function (type) {
 
+		console.log('add', this);
+
 		// mark as base or layermenu layer
 		this._isBase = (type == 'baselayer');
 		
@@ -68,6 +69,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	addTo : function () {
+		console.log('addTo', this);
 		if (!this._inited) this.initLayer();
 
 		// add to map
@@ -78,6 +80,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	_addTo : function (type) {
+		console.log('_addTo', this);
 		if (!this._inited) this.initLayer();
 
 		var map = app._map;
@@ -106,6 +109,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	_addThin: function () {
+		console.log('_addThin', this);
 		if (!this._inited) this.initLayer();
 
 		var map = app._map;
@@ -137,7 +141,7 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	flyTo : function () {
 		var extent = this.getMeta().extent;
-		console.log('flyTo, meta:', this.getMeta());
+
 		if (!extent) return;
 
 		var southWest = L.latLng(extent[1], extent[0]),
@@ -159,33 +163,27 @@ Wu.Model.Layer = Wu.Model.extend({
 
 
 	addToControls : function () {
-
 		if (this._isBase) return;
-
 		this._addToDescription();
 		this._addToLayermenu();
 	},
 
 	_addToLayermenu : function () {
-
 		// activate in layermenu
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu && layerMenu._enableLayer(this.getUuid());
 	},
 
 	_addToLegends : function () {
-
 		// add legends if active
 		var legendsControl = app.MapPane.getControls().legends;
 		legendsControl && legendsControl.addLegend(this);
 	},
 
 	_addToInspect : function () {
-
 		// add to inspectControl if available
 		var inspectControl = app.MapPane.getControls().inspect;		
 		if (inspectControl) inspectControl.addLayer(this);
-
 	},
 
 	_addToDescription : function () {
@@ -194,7 +192,6 @@ Wu.Model.Layer = Wu.Model.extend({
 		var descriptionControl = app.MapPane.getControls().description;
 		if (!descriptionControl) return;
 
-		// xoxoxo
 		descriptionControl._addLayer(this);
 
 		// hide if empty and not editor
@@ -265,9 +262,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	saveOpacity : function (opacity) {
-
-		// set
-		// this.setOpacity(opacity);
 
 		// save if editable
 		var project = app.activeProject;
@@ -465,16 +459,13 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	getStyling : function () {
-		console.log('getStyling', this.store.style, this);
 		var json = this.store.style;
 		if (!json) return false;
 		var styleJSON = Wu.parse(json);
-
 		return styleJSON;
 	},
 
 	setStyling : function (styleJSON) {
-
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
@@ -511,30 +502,21 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	createLegends : function (callback) {
-
-		console.log('%c createLegends ', 'background: green; color: white;');
 		var layerID = this._getLayerUuid();
-		console.log('layerID', layerID);
 		var accessToken = app.tokens.access_token;
 
 		// get layer feature values for this layer
 		var options = {
-			// fileUuid : this.getFileUuid(),
 			layerUuid : layerID,
 			accessToken : accessToken
-			// legendJson : this.getLegedJson()
-			// cartoid : this.getCartoid()
 		};
 
 		app.api.createLegends(options, callback)
 	},
 
 	getLegedJson : function () {
-
 		return this.store.legend;
-
 	},
-
 
 	getFeaturesValues : function (callback, ctx) {
 		if (!callback || !ctx) return console.error('must provide callback() and context');
@@ -580,7 +562,7 @@ Wu.Model.Layer = Wu.Model.extend({
 
 			var result = Wu.parse(result);
 
-			if (result.error) {
+			if (!result || result.error) {
 				return app.feedback.setError({
 					title : 'Something went wrong',
 					description : err
@@ -604,9 +586,6 @@ Wu.Model.Layer = Wu.Model.extend({
 
 		var startEvent = 'click';
 		var endEvent = 'mouseup';
-
-		// var startEvent = 'mouseover';
-		// var endEvent = 'mouseleave';		
 
 		grid[on]('mousedown', this._gridOnMousedown, this);		
 		grid[on](endEvent, this._gridOnMouseup, this);	
@@ -655,6 +634,251 @@ Wu.Model.Layer = Wu.Model.extend({
 	_invalidateTiles : function () {
 		return;
 	}
+
+});
+
+
+
+
+Wu.CubeLayer = Wu.Model.Layer.extend({
+
+	options : {
+		fps : 1,
+	},
+
+
+	initialize : function (store) {
+
+		console.log('Wu.CubeLayer --> ', store, this);
+
+		// set store
+		this._setStore(store);
+
+		// init slider
+		this._initAnimator();
+	},
+
+
+	_setStore : function (store) {
+		console.log(store);
+		
+		this.store = store;
+
+		// parse json
+		this.store.data.cube = Wu.parse(this.store.data.cube);
+	},
+
+
+	_initAnimator : function () {
+
+		// connect slider to layer
+		this._animator = new Wu.BigSlider({
+			data : 'allYears'
+		});
+
+	},
+
+
+	initLayer : function () {
+		this.update();
+		this._inited = true;
+	},
+
+	update : function () {
+		var map = app._map;
+
+		// prepare raster
+		this._prepareRaster();
+	},
+
+	getDatasets : function () {
+		return this.store.data.cube.datasets;
+	},
+
+	getCubeId : function () {
+		return this.store.data.cube.cube_id;
+	},	
+
+	_prepareRaster : function () {
+
+		// cube has array of layers
+		this._layers = this._layers || [];
+
+		// get vars
+		var datasets = this.getDatasets();
+		var cube_id = this.getCubeId();
+		var subdomains  = app.options.servers.cubes.subdomains;
+		var access_token = '?access_token=' + app.tokens.access_token;
+
+		// add each dataset as layer
+		datasets.forEach(function (d) {
+
+			// url template
+			var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token;
+			
+			// create leaflet layer
+			var cubeLayer = L.tileLayer(url, {
+				cube_id : cube_id,
+				dataset_id : d.uuid,
+				subdomains : subdomains,
+				maxRequests : 0
+			});
+
+			// add layer to cube array
+			this._layers.push(cubeLayer);
+
+			// add to map
+			app._map.addLayer(cubeLayer);
+
+			// hide by default
+			cubeLayer.getContainer().style.display = 'none';
+
+		}, this);
+
+		console.log('added all datasets: ', this._layers);
+
+		// set first layer as default
+		this._showLayer(this._layers[0]);
+	},
+
+	_showLayer : function (layer) {
+		
+		// show layer
+		layer.getContainer().style.display = 'block';
+
+		// mark current layer (needed?)
+		this.layer = layer;
+	},
+
+	_hideLayer : function (layer) {
+		layer.getContainer().style.display = 'none';
+	},
+
+	playAnimation : function () {
+
+		// debug: start on layer 0
+		this._currentFrame = this._layers[0];
+
+		// show one layer after the other (in loop)
+		this._player = setInterval(function () {
+
+			// figure out which frame is current and next
+			this._setFrames();
+
+			// hide current frame
+			this._hideFrame && this._hideLayer(this._hideFrame);
+
+			// show next frame
+			this._showFrame && this._showLayer(this._showFrame);
+
+		}.bind(this), 1000 / this.options.fps);
+	},
+
+	stopAnimation : function () {
+		clearInterval(this._player);
+	},
+
+	_setFrames : function () {
+		
+		var curIdx = _.findIndex(this._layers, this._currentFrame);
+
+		console.log('curIdx = ', curIdx);
+
+		var nextIdx = curIdx + 1;
+		if (nextIdx > this._layers.length -1) {
+			nextIdx = 0;
+		}
+
+		this._showFrame = this._layers[nextIdx];
+		this._hideFrame = this._layers[curIdx];
+		this._currentFrame = this._showFrame;
+	},
+
+	add : function (type) {
+
+		console.log('cube add', this);
+
+		// mark as base or layermenu layer
+		// this._isBase = (type == 'baselayer');
+		
+		// add
+		this.addTo();
+	},
+
+	addTo : function () {
+		console.log('cube addTo', this);
+		
+		if (!this._inited) this.initLayer();
+
+		// add to map
+		// this._addTo();
+		
+		// add to controls
+		// this.addToControls();
+	},
+
+	_addTo : function (type) {
+
+		console.log('cube _addTo', this);
+
+		if (!this._inited) this.initLayer();
+
+		var map = app._map;
+
+		// leaflet fn
+		map.addLayer(this.layer);
+
+		// // add gridLayer if available
+		// if (this.gridLayer) {
+		// 	map.addLayer(this.gridLayer);
+		// }
+
+		// add to active layers
+		app.MapPane.addActiveLayer(this);	// includes baselayers
+
+		// update zindex
+		this._addToZIndex(type);
+
+		this._added = true;
+
+		// fire event
+		Wu.Mixin.Events.fire('layerEnabled', { detail : {
+			layer : this
+		}}); 
+
+	},
+
+	_addThin: function () {
+		console.error('not implemented for cube');
+		// if (!this._inited) this.initLayer();
+
+		// var map = app._map;
+
+		// // only add to map temporarily
+		// map.addLayer(this.layer);
+		// this.layer.bringToFront();
+
+		// // add gridLayer if available
+		// if (this.gridLayer) {
+		// 	map.addLayer(this.gridLayer);
+		// }
+
+	},
+
+	_removeThin : function () {
+		console.error('not implemented for cube');
+		// if (!this._inited) this.initLayer();
+
+		// var map = app._map;
+
+		// map.removeLayer(this.layer);
+
+		// // remove gridLayer if available
+		// if (this.gridLayer) {
+		// 	this.gridLayer._flush();
+		// 	if (map.hasLayer(this.gridLayer)) map.removeLayer(this.gridLayer); 
+		// }
+	},
 
 });
 
@@ -713,7 +937,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	},
 
 	setStyle : function (postgis) {
-		console.log('setSTyle,', postgis);
 		if (!postgis) return console.error('no styloe to set!');
 		
 		this.store.data.postgis = postgis;
@@ -722,9 +945,8 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	// on change in style editor, etc.
 	updateStyle : function (style) {
-		console.error('updateStyle', style);
-		var layerUuid = style.layerUuid,
-		    postgisOptions = style.options;
+		var layerUuid = style.layerUuid;
+		var postgisOptions = style.options;
 
 		// save 
 		this.setStyle(postgisOptions);
@@ -767,7 +989,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 		this.layer.redraw();
 	},
-
 
 	_prepareRaster : function () {
 
@@ -828,7 +1049,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 		// add grid events
 		this._addGridEvents();
-
 	},
 
 
@@ -880,9 +1100,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		// fetch data
 		this._fetchData(e, function (ctx, json) {
 			
-			// console.log('click!');
-			// console.log(json);
-
 			if ( !json ) {
 				console.error('no data for popup!');
 				return;
@@ -1018,10 +1235,7 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		var tileServer 	= app.options.servers.tiles.uri;
 		var subdomains  = app.options.servers.tiles.subdomains;
 		var access_token = '?access_token=' + app.tokens.access_token;
-		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-
 		var layerUuid = this._getLayerUuid();
-		// var url = app.options.servers.subdomain + 'overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
 		var url = app.options.servers.tiles.uri + '{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
 		// add vector tile raster layer
@@ -1058,8 +1272,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		if (!coordinates) return false;
 		var coords = coordinates[0];
 
-		console.log('extent_geojson', extent_geojson);
-		console.log('meta:', this.getMeta());
 		var extent = [
 			coords[0][0],
 			coords[0][1],
@@ -1070,9 +1282,9 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 	},
 
 	flyTo : function () {
-		// var extent = this.getMeta().extent;
+
 		var extent = this.getExtent();
-		console.log('flyto rastter, meta:', this.getMeta());
+
 		if (!extent) return;
 
 		var southWest = L.latLng(extent[1], extent[0]);
@@ -1114,16 +1326,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 });
 
 
-
-Wu.CubeLayer = Wu.Model.Layer.extend({
-
-
-
-
-
-
-
-});
 
 
 
