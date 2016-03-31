@@ -135,16 +135,6 @@ Wu.BigSlider = Wu.Class.extend({
 		}
 
 
-		// Push in blank month at end of year
-		// (if last date is November 17th, 
-		// we want to have the scle go all the way to December)
-
-		// if ( lastDofMonth > 1 ) {
-		// 	this.ticks.push({ month : '', year : lastYear })
-		// }
-
-
-
 		this.tickStart = this.ticks.length-13;
 		this.tickEnd = this.ticks.length;
 		this.currentSliderValue = 365;
@@ -205,6 +195,7 @@ Wu.BigSlider = Wu.Class.extend({
 
 	initGraph : function () {
 
+
 		// AVERAGE DATA FOR ALL YEARS
 		// AVERAGE DATA FOR ALL YEARS
 		// AVERAGE DATA FOR ALL YEARS
@@ -231,6 +222,9 @@ Wu.BigSlider = Wu.Class.extend({
 
 		// LINE DIMENSION
 		// LINE DIMENSION
+
+		// THIS PART CHANGES FOR EVERY MOVE
+
 		var thisXdim = this.ndx.dimension(function(d) { return d.date });
 		var yThisDim = thisXdim.group().reduceSum(function(d) { return d.SCF; });
 
@@ -238,10 +232,7 @@ Wu.BigSlider = Wu.Class.extend({
 		// SCATTER DIMENSION
 		var scatterDim = thisXdim.group().reduceSum(function(d) { 
 			return d.SCF
-			// if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return d.SCF;
-			// return false;
 		}.bind(this));
-
 
 		var graphOuterContainer = Wu.DomUtil.create('div', 'big-graph-outer-container', this.sliderOuterContainer);
 
@@ -250,12 +241,10 @@ Wu.BigSlider = Wu.Class.extend({
 		this.dayNameTitle = Wu.DomUtil.create('div', 'big-graph-current-day', graphInfoContainer);
 
 		this.currentSCF = Wu.DomUtil.create('div', 'big-graph-current-scf inline', graphInfoContainer);
-		this.cloud = Wu.DomUtil.create('div', 'big-graph-current-cloud inline', graphInfoContainer);
-		this.age = Wu.DomUtil.create('div', 'big-graph-current-age inline', graphInfoContainer);
-
-		this.maxSCF = Wu.DomUtil.create('div', 'big-graph-current-maxscf inline', graphInfoContainer);
-		this.minSCF = Wu.DomUtil.create('div', 'big-graph-current-minscf inline', graphInfoContainer);
-
+		// this.cloud = Wu.DomUtil.create('div', 'big-graph-current-cloud inline', graphInfoContainer);
+		// this.age = Wu.DomUtil.create('div', 'big-graph-current-age inline', graphInfoContainer);
+		// this.maxSCF = Wu.DomUtil.create('div', 'big-graph-current-maxscf inline', graphInfoContainer);
+		// this.minSCF = Wu.DomUtil.create('div', 'big-graph-current-minscf inline', graphInfoContainer);
 
 		var graphInnerContainer = Wu.DomUtil.create('div', 'big-graph-inner-container', graphOuterContainer)
 
@@ -331,7 +320,7 @@ Wu.BigSlider = Wu.Class.extend({
 		    				if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
 		    				return false;
 		    			}.bind(this))
-				,
+			
 			])
 
 
@@ -349,6 +338,8 @@ Wu.BigSlider = Wu.Class.extend({
 	},
 
 	updateGraph : function () {
+
+		console.error('updateGraph');
 
 		// Current year
 		var year = this.currentYear;
@@ -370,12 +361,8 @@ Wu.BigSlider = Wu.Class.extend({
 
 		// Rebuild graph data
 		this.years[year].forEach(function (d, i) {
-
-			if ( d.Doy < day ) {
-				d.date = this._dateFromNo(i)
-				this.graphData.push(d);
-			}
-
+			var doy = i+1;
+			if ( doy < day ) this.graphData.push(d);
 		}.bind(this));
 
 
@@ -395,14 +382,14 @@ Wu.BigSlider = Wu.Class.extend({
 		dc.redrawAll()
 
 		var scf = Math.round(this.years[year][day-1].SCF * 100) / 100;
-		var cloud = Math.round(this.years[year][day-1].Cloud * 10) / 10;
-		var age = Math.round(this.years[year][day-1].Age * 10) / 10;
+		// var cloud = Math.round(this.years[year][day-1].Cloud * 10) / 10;
+		// var age = Math.round(this.years[year][day-1].Age * 10) / 10;
 
-		// Update HTML
+		// // Update HTML
 		this.dayNameTitle.innerHTML = this.dayName;
 		this.currentSCF.innerHTML = 'SCF: ' + scf + '%';
-		this.cloud.innerHTML = 'Cloud: ' + cloud;
-		this.age.innerHTML = 'Age: ' + age;
+		// this.cloud.innerHTML = 'Cloud: ' + cloud;
+		// this.age.innerHTML = 'Age: ' + age;
 
 
 
@@ -742,8 +729,19 @@ Wu.BigSlider = Wu.Class.extend({
 				currentYear = each.Year;
 				years[currentYear] = [];
 			}
-			years[currentYear].push(each)
-		})
+
+			// console.log('each', each);
+			var thisYear = {
+				SCF : each.SCF,
+				// Year : each.Year,
+				// Doy : each.Doy,
+				date : this._dateFromNo(each.Doy)
+				// Cloud : each.Clod,
+				// Age : each.Age
+			}
+
+			years[currentYear].push(thisYear)
+		}.bind(this))
 
 		return years;
 	},
