@@ -246,6 +246,9 @@ Wu.App = Wu.Class.extend({
 		// share pane
 		app.Share = new Wu.Share();
 
+		// big slider
+		app.BigSlider = new Wu.BigSlider();
+		
 		// add account tab
 		app.AccountPane = new Wu.Pane.Account();
 
