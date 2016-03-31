@@ -44,10 +44,6 @@ Wu.BigSlider = Wu.Class.extend({
 			// parse
 			var allYears = Wu.parse(data);
 
-			// save, so won't need to get again
-			app._animatorData = app._animatorData || {};
-			app._animatorData['allYears'] = allYears;
-
 			// render
 			this.renderData(allYears);
 

@@ -247,8 +247,14 @@ Wu.App = Wu.Class.extend({
 		app.Share = new Wu.Share();
 
 		// big slider
+<<<<<<< HEAD
 		// app.BigSlider = new Wu.BigSlider();
 		app.BigSlider = new Wu.BigSlider({ data : 'allYears' });
+=======
+		app.BigSlider = new Wu.BigSlider({
+			data : 'allYears'
+		});
+>>>>>>> master
 		
 		// add account tab
 		app.AccountPane = new Wu.Pane.Account();
