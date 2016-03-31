@@ -386,18 +386,8 @@ Wu.BigSlider = Wu.Class.extend({
 
 		// Rebuild graph data
 		this.years[year].forEach(function (d, i) {
-<<<<<<< HEAD
 			var doy = i+1;
 			if ( doy < day ) this.graphData.push(d);
-=======
-
-			if ( d.Doy < day ) {
-				console.log('rebuild graph data');
-				d.date = this._dateFromNo(i)
-				this.graphData.push(d);
-			}
-
->>>>>>> 302a62b7e817e4369a3935bf61700703c30c15f4
 		}.bind(this));
 
 
