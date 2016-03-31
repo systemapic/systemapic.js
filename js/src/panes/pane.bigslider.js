@@ -1,6 +1,14 @@
 Wu.BigSlider = Wu.Class.extend({
 
-	initialize : function () {
+	options : {
+
+		// animation frames per second
+		fps : 4
+	},
+
+	initialize : function (options) {
+
+		Wu.setOptions(this, options);
 
 		// fetching data is async, so must wait for callback
 		this.initData(function (err) {
@@ -12,7 +20,7 @@ Wu.BigSlider = Wu.Class.extend({
 			this.updateDayOfYear();
 
 			this.addHooks();
-					
+
 		}.bind(this));
 		
 	},
@@ -20,13 +28,25 @@ Wu.BigSlider = Wu.Class.extend({
 
 	initData : function (done) {
 
+		// only get data once
+		if (app._animatorData) {
+			console.error('already got animator data');
+			return done();
+		}
+
+		console.error('initData', app._animatorData);
+
 		// get data from server
 		app.api.getCustomData({
-			name : 'allYears'
+			name : this.options.data
 		}, function (err, data) {
 
 			// parse
 			var allYears = Wu.parse(data);
+
+			// save, so won't need to get again
+			app._animatorData = app._animatorData || {};
+			app._animatorData['allYears'] = allYears;
 
 			// render
 			this.renderData(allYears);
@@ -70,17 +90,14 @@ Wu.BigSlider = Wu.Class.extend({
 		}.bind(this))		
 
 
-
-
 		this.ticks = [];
 
 		var currentMonth = '';
 
 		this.allYears.forEach(function (y) {
-			var year    = y.Year;
-			var month   = this.getMonthName(y.Doy, y.Year);
-			var doy     = y.Doy;
-
+			var year = y.Year;
+			var month = this.getMonthName(y.Doy, y.Year);
+			var doy = y.Doy;
 		  	var blankDate = new Date(year, 0);
 	  		var date = new Date(blankDate.setDate(doy));
 			var day = date.getDate();
@@ -158,7 +175,15 @@ Wu.BigSlider = Wu.Class.extend({
   		var date = new Date(blankDate.setDate(no));
 		return date;
 
-	},	
+	},
+
+	hide : function () {
+		this.sliderOuterContainer.style.display = 'none';
+	},
+
+	show : function () {
+		this.sliderOuterContainer.style.display = 'block';
+	},
 
 	initSlider : function () {
 
@@ -361,8 +386,18 @@ Wu.BigSlider = Wu.Class.extend({
 
 		// Rebuild graph data
 		this.years[year].forEach(function (d, i) {
+<<<<<<< HEAD
 			var doy = i+1;
 			if ( doy < day ) this.graphData.push(d);
+=======
+
+			if ( d.Doy < day ) {
+				console.log('rebuild graph data');
+				d.date = this._dateFromNo(i)
+				this.graphData.push(d);
+			}
+
+>>>>>>> 302a62b7e817e4369a3935bf61700703c30c15f4
 		}.bind(this));
 
 
@@ -430,7 +465,7 @@ Wu.BigSlider = Wu.Class.extend({
 				this.slider.set(this.currentSliderValue++);
 				this.updateDayOfYear()
 			}			
-		}.bind(this), 250) 
+		}.bind(this), (1000/this.options.fps)) 
 	},
 
 	stopPlaying : function () {
@@ -746,10 +781,6 @@ Wu.BigSlider = Wu.Class.extend({
 		return years;
 	},
 
-	getAllYears : function () {		
-		console.log('Request data.js in this folder (/js/src/panes/) ...');
-		return allYears;
-	},
 
 });
 
