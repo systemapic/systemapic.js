@@ -28,14 +28,6 @@ Wu.BigSlider = Wu.Class.extend({
 
 	initData : function (done) {
 
-		// only get data once
-		if (app._animatorData) {
-			console.error('already got animator data');
-			return done();
-		}
-
-		console.error('initData', app._animatorData);
-
 		// get data from server
 		app.api.getCustomData({
 			name : this.options.data
@@ -43,10 +35,6 @@ Wu.BigSlider = Wu.Class.extend({
 
 			// parse
 			var allYears = Wu.parse(data);
-
-			// save, so won't need to get again
-			app._animatorData = app._animatorData || {};
-			app._animatorData['allYears'] = allYears;
 
 			// render
 			this.renderData(allYears);

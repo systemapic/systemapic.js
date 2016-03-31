@@ -672,10 +672,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 	_initAnimator : function () {
 
 		// connect slider to layer
-		this._animator = new Wu.BigSlider({
-			data : 'allYears'
-		});
-
+		this._animator = app.BigSlider;
 	},
 
 
