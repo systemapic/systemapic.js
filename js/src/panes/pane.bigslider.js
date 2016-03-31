@@ -3,7 +3,7 @@ Wu.BigSlider = Wu.Class.extend({
 	options : {
 
 		// animation frames per second
-		fps : 4
+		fps : 1
 	},
 
 	initialize : function (options) {
@@ -34,12 +34,12 @@ Wu.BigSlider = Wu.Class.extend({
 			return done();
 		}
 
-		console.error('initData', app._animatorData);
-
 		// get data from server
 		app.api.getCustomData({
 			name : this.options.data
 		}, function (err, data) {
+
+			if ( err ) console.error(err);
 
 			// parse
 			var allYears = Wu.parse(data);
@@ -75,7 +75,7 @@ Wu.BigSlider = Wu.Class.extend({
 		this.avgSCF = this.getAvgSCF(this.days);
 		
 		// Create blank array
-		this.allData = []
+		this.allData = [];
 
 		// Populate array with data
 		this.maxSCF.forEach(function (mx,i) {
@@ -87,7 +87,7 @@ Wu.BigSlider = Wu.Class.extend({
 				avg  : this.avgSCF[i]
 			};
 			this.allData.push(obj);
-		}.bind(this))		
+		}.bind(this));	
 
 
 		this.ticks = [];
@@ -148,7 +148,6 @@ Wu.BigSlider = Wu.Class.extend({
 			Day     : lastDofMonth,
 			Doy     : lastDoy,
 			MonthNo : lastMonthNo
-
 		}
 
 
@@ -170,11 +169,9 @@ Wu.BigSlider = Wu.Class.extend({
 	},
 
 	_dateFromNo : function (no) {
-
 	  	var blankDate = new Date(2014, 0);
   		var date = new Date(blankDate.setDate(no));
 		return date;
-
 	},
 
 	hide : function () {
@@ -336,15 +333,14 @@ Wu.BigSlider = Wu.Class.extend({
 					.excludedOpacity(0)
 					.colors('#ff0000')
 					.symbol('triangle-up')
-				    	.keyAccessor(function(d) {
-
-				    		if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
-				    		return false;
-				    	}.bind(this))
-		    			.valueAccessor(function(d) {
-		    				if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
-		    				return false;
-		    			}.bind(this))
+					.keyAccessor(function(d) {
+						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
+						return false;
+					}.bind(this))
+					.valueAccessor(function(d) {
+						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
+						return false;
+					}.bind(this))
 			
 			])
 
@@ -364,7 +360,7 @@ Wu.BigSlider = Wu.Class.extend({
 
 	updateGraph : function () {
 
-		console.error('updateGraph');
+		// console.error('updateGraph');
 
 		// Current year
 		var year = this.currentYear;
@@ -468,7 +464,6 @@ Wu.BigSlider = Wu.Class.extend({
 
 	updateDayOfYear : function () {
 
-
 		// Month names
 		var monthNames = [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember" ];
 
@@ -479,40 +474,28 @@ Wu.BigSlider = Wu.Class.extend({
 		// we've got, and work our ways backwards from
 		// there...
 
-		var lastDayObj = this.finalDay,
-		    lastYear = lastDayObj.Year,
-		    lastMonth = lastDayObj.Month,
-		    lastDay = lastDayObj.Day,
-		    lastDoy = lastDayObj.Doy,
+		var lastDayObj  = this.finalDay,
+		    lastYear    = lastDayObj.Year,
+		    lastMonth   = lastDayObj.Month,
+		    lastDay     = lastDayObj.Day,
+		    lastDoy     = lastDayObj.Doy,
 		    lastMonthNo = lastDayObj.MonthNo;
 
-		var _firstDay = lastDoy - 365;
-
-		// console.log('_firstDay', _firstDay);
-		// console.log('365 + _firstDay', 365 + _firstDay);
-
-		// console.log('lastDayObj', lastDayObj);
-
+		var _firstDay   = lastDoy - 365;
 
 
 		// Find out where we start
 		var tickStartMonthName = this.ticks[this.tickStart].month;
-		var tickStartMonthNo = monthNames.indexOf(tickStartMonthName);
-		var tickStartYear = this.ticks[this.tickStart].year;
-
-		// What day of the year do we start?
-		// var now = new Date(tickStartYear, tickStartMonthNo, tickStartDay);
-		// var start = new Date(tickStartYear, 0, 0);
-		// var diff = now - start;
-		// var oneDay = 1000 * 60 * 60 * 24;
-		// var startDay = Math.floor(diff / oneDay);
+		var tickStartMonthNo   = monthNames.indexOf(tickStartMonthName);
+		var tickStartYear      = this.ticks[this.tickStart].year;
 
 		var startDay = 365 + _firstDay;
+		
 
 
 		// Start figuring out what day we are showing
 		var year = this.currentYear = tickStartYear;
-		var day = this.currentDay = this.currentSliderValue + startDay - 1;
+		var day  = this.currentDay  = this.currentSliderValue + startDay - 1;
 	
 	  	var blankDate = new Date(year, 0);
   		var date = new Date(blankDate.setDate(day));
@@ -535,10 +518,31 @@ Wu.BigSlider = Wu.Class.extend({
 		this.tickEnd--;
 		this.tickStart--;
 
+	
+		var finalDay = this.ticks[this.tickEnd-1];
+		var finalYear     = finalDay.year;
+		var finalDoy      = finalDay.doy;
+		var finalMonth    = this.getMonthName(finalDoy, finalYear);
+		var blankDate     = new Date(finalYear, 0);
+		var setDate       = new Date(blankDate.setDate(finalDoy));
+		var finalDofMonth = setDate.getDate();
+		var finalMonthNo  = setDate.getMonth()+1;
+		var _finalDay     = {
+			Year    : finalYear,
+			Month   : finalMonth,
+			Day     : finalDofMonth,
+			Doy     : finalDoy,
+			MonthNo : finalMonthNo
+		}
+		this.finalDay = _finalDay;
+
+
+
 		this.updateTicks();
 		this.updateButtons();
-
 		this.updateDayOfYear();
+
+
 
 	},
 
@@ -562,10 +566,6 @@ Wu.BigSlider = Wu.Class.extend({
 	updateTicks : function () {
 
 
-		// console.log('this.tickStart', this.tickStart);
-		// console.log('this.tickEnd', this.tickEnd);
-		// console.log('ticks', this.tickEnd - this.tickStart);
-
 		var lastDayObj  = this.finalDay,
 		    lastYear    = lastDayObj.Year,		    
 		    lastDay     = lastDayObj.Day,
@@ -574,52 +574,51 @@ Wu.BigSlider = Wu.Class.extend({
 		    diffDays    = daysInMonth - lastDay;
 
 
-		    console.log('daysInMonth', daysInMonth);
-		    console.log('lastDay', lastDay);
-		    console.log('diffDays', diffDays);
-
 
 		// Now we need to figure out how many days it adds up to...
-		// var allDays = diffDays;
 		var allDays = 0;
-		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {	
-			allDays += new Date(this.ticks[i].year, this.ticks[i].monthNo, 0).getDate();
+		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {	// how many months we itterate
+			var daysInMonth = new Date(this.ticks[i].year, this.ticks[i].monthNo, 0).getDate();
+			allDays += daysInMonth;
 		}
 
-		// var pixelProp = 365 / allDays;
-		// var promp = (diffDays / allDays) * 100;
+		// Get start date
+		var firstMonth = this.ticks[this.tickStart];	
+		var daysInFirstMonth = new Date(firstMonth.year, firstMonth.monthNo, 0).getDate();
+		var _firstDay = new Date(firstMonth.year, firstMonth.monthNo, (daysInFirstMonth-diffDays));
 
+		// Do I even need this?
+		var _lastMonth = this.ticks[this.tickEnd-1];
+		var _daysInLastMonth = new Date(_lastMonth.year, _lastMonth.monthNo, 0).getDate();
+		var _lastDay = new Date(_lastMonth.year, _lastMonth.monthNo, lastDay);
 
 
 		this.tickContainer.innerHTML = '';
 	
 		var year = '';
 
+
 		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {
 
-			var month = this.ticks[i].month.substr(0,3);
+			var _i = i;
+
+			var month = this.ticks[_i].month.substr(0,3);
 			var _tick = Wu.DomUtil.create('div', 'big-slider-tick', this.tickContainer, month);
 
-			if ( year != this.ticks[i].year ) {
-				var newYear = Wu.DomUtil.create('div', 'big-slider-year-tick', _tick, this.ticks[i].year);
-				year = this.ticks[i].year;	
+			if ( year != this.ticks[_i].year ) {
+				var newYear = Wu.DomUtil.create('div', 'big-slider-year-tick', _tick, this.ticks[_i].year);
+				year = this.ticks[_i].year;	
 			}
 
 			// Days in this month...
-			var DIM = new Date(year, this.ticks[i].monthNo, 0).getDate();
+			var DIM = new Date(year, this.ticks[_i].monthNo, 0).getDate();
 
-			if ( i == this.tickStart ) DIM -= lastDay;
+			if ( i == this.tickStart ) DIM -= (daysInFirstMonth-diffDays);
 			if ( i == this.tickEnd-1 ) DIM -= diffDays;
 
-
-			// var dimprop = allDays / DIM;
-			var dimprop = (DIM / 366) * 100;
-
-
+			var dimprop = (DIM / 365) * 99;
+			
 			_tick.style.width = dimprop + '%';
-
-
-
 
 		}
 
@@ -707,7 +706,7 @@ Wu.BigSlider = Wu.Class.extend({
 
 			var minD = false;
 
-			if( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
+			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
 				if ( !minD ) minD = days[day][1].SCF;
 				days[day].forEach(function (d) { if ( d.SCF < minD ) minD = d.SCF });
 				eachDay[day] = Math.round(minD);
@@ -723,7 +722,7 @@ Wu.BigSlider = Wu.Class.extend({
 		var eachDay = [];
 
 		for ( var day in days ) {		
-			if( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
+			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
 				var avg = 0;
 				days[day].forEach(function(d) { avg += d.SCF; });
 				eachDay[day] = Math.round(avg / days[day].length);
