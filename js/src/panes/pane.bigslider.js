@@ -3,7 +3,7 @@ Wu.BigSlider = Wu.Class.extend({
 	options : {
 
 		// animation frames per second
-		fps : 4
+		fps : 8
 	},
 
 	initialize : function (options) {
@@ -153,7 +153,12 @@ Wu.BigSlider = Wu.Class.extend({
 
 	},
 
-
+	setFPS : function (fps) {
+		this.options.fps = fps;
+		Wu.Mixin.Events.fire('setFPS', {detail : {
+			fps : fps
+		}});
+	},
 
 	getMonthName : function (doy, year) {
 		var monthNames = [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember" ];

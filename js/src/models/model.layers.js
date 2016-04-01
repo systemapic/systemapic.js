@@ -643,7 +643,7 @@ Wu.Model.Layer = Wu.Model.extend({
 Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	options : {
-		fps : 4,
+		fps : 8,
 	},
 
 
@@ -778,6 +778,11 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	stopAnimation : function () {
 		this._player && clearInterval(this._player);
+	},
+
+	_onSetFPS : function (e) {
+		var fps = e.detail.fps;
+		this.options.fps = fps;
 	},
 
 	_onAnimationPlay : function () {
