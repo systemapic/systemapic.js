@@ -643,7 +643,7 @@ Wu.Model.Layer = Wu.Model.extend({
 Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	options : {
-		fps : 1,
+		fps : 4,
 	},
 
 
@@ -656,6 +656,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 		// init slider
 		this._initAnimator();
+
+		// listen up
+		this._listen();
 	},
 
 
@@ -753,6 +756,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	playAnimation : function () {
 
+		console.log('playin!', this);
+
 		// debug: start on layer 0
 		this._currentFrame = this._layers[0];
 
@@ -772,7 +777,22 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 	},
 
 	stopAnimation : function () {
-		clearInterval(this._player);
+		this._player && clearInterval(this._player);
+	},
+
+	_onAnimationPlay : function () {
+		console.log('_onAnimationPlay!', this._added);
+		if (this._added) {
+			this.playAnimation();
+		}
+	},
+
+	_onAnimationStop : function () {
+		console.log('_onAnimationStop!', this._added);
+
+		if (this._added) {
+			this.stopAnimation();
+		}
 	},
 
 	_setFrames : function () {
@@ -807,12 +827,16 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		
 		if (!this._inited) this.initLayer();
 
+		this._added = true;
+
 		// add to map
 		// this._addTo();
 		
 		// add to controls
 		// this.addToControls();
 	},
+
+	
 
 	_addTo : function (type) {
 

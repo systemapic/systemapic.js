@@ -3,7 +3,7 @@ Wu.BigSlider = Wu.Class.extend({
 	options : {
 
 		// animation frames per second
-		fps : 1
+		fps : 4
 	},
 
 	initialize : function (options) {
@@ -448,6 +448,10 @@ Wu.BigSlider = Wu.Class.extend({
 				this.updateDayOfYear()
 			}			
 		}.bind(this), (1000/this.options.fps)) 
+
+		// fire animation play
+		Wu.Mixin.Events.fire('animationPlay');
+
 	},
 
 	stopPlaying : function () {
@@ -456,6 +460,9 @@ Wu.BigSlider = Wu.Class.extend({
 
 		clearInterval(this.playInterval);
 		this.playing = false;
+
+		// fire animation stop
+		Wu.Mixin.Events.fire('animationStop');
 	},
 
 	updateDayOfYear : function () {
