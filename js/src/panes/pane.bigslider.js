@@ -3,7 +3,7 @@ Wu.BigSlider = Wu.Class.extend({
 	options : {
 
 		// animation frames per second
-		fps : 4
+		fps : 1
 	},
 
 	initialize : function (options) {
@@ -28,10 +28,18 @@ Wu.BigSlider = Wu.Class.extend({
 
 	initData : function (done) {
 
+		// only get data once
+		if (app._animatorData) {
+			console.error('already got animator data');
+			return done();
+		}
+
 		// get data from server
 		app.api.getCustomData({
 			name : this.options.data
 		}, function (err, data) {
+
+			if ( err ) console.error(err);
 
 			// parse
 			var allYears = Wu.parse(data);
@@ -63,7 +71,7 @@ Wu.BigSlider = Wu.Class.extend({
 		this.avgSCF = this.getAvgSCF(this.days);
 		
 		// Create blank array
-		this.allData = []
+		this.allData = [];
 
 		// Populate array with data
 		this.maxSCF.forEach(function (mx,i) {
@@ -75,7 +83,7 @@ Wu.BigSlider = Wu.Class.extend({
 				avg  : this.avgSCF[i]
 			};
 			this.allData.push(obj);
-		}.bind(this))		
+		}.bind(this));	
 
 
 		this.ticks = [];
@@ -136,18 +144,7 @@ Wu.BigSlider = Wu.Class.extend({
 			Day     : lastDofMonth,
 			Doy     : lastDoy,
 			MonthNo : lastMonthNo
-
 		}
-
-
-		// Push in blank month at end of year
-		// (if last date is November 17th, 
-		// we want to have the scle go all the way to December)
-
-		// if ( lastDofMonth > 1 ) {
-		// 	this.ticks.push({ month : '', year : lastYear })
-		// }
-
 
 
 		this.tickStart = this.ticks.length-13;
@@ -168,11 +165,9 @@ Wu.BigSlider = Wu.Class.extend({
 	},
 
 	_dateFromNo : function (no) {
-
 	  	var blankDate = new Date(2014, 0);
   		var date = new Date(blankDate.setDate(no));
 		return date;
-
 	},
 
 	hide : function () {
@@ -218,6 +213,7 @@ Wu.BigSlider = Wu.Class.extend({
 
 	initGraph : function () {
 
+
 		// AVERAGE DATA FOR ALL YEARS
 		// AVERAGE DATA FOR ALL YEARS
 		// AVERAGE DATA FOR ALL YEARS
@@ -244,6 +240,9 @@ Wu.BigSlider = Wu.Class.extend({
 
 		// LINE DIMENSION
 		// LINE DIMENSION
+
+		// THIS PART CHANGES FOR EVERY MOVE
+
 		var thisXdim = this.ndx.dimension(function(d) { return d.date });
 		var yThisDim = thisXdim.group().reduceSum(function(d) { return d.SCF; });
 
@@ -251,10 +250,7 @@ Wu.BigSlider = Wu.Class.extend({
 		// SCATTER DIMENSION
 		var scatterDim = thisXdim.group().reduceSum(function(d) { 
 			return d.SCF
-			// if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return d.SCF;
-			// return false;
 		}.bind(this));
-
 
 		var graphOuterContainer = Wu.DomUtil.create('div', 'big-graph-outer-container', this.sliderOuterContainer);
 
@@ -263,12 +259,10 @@ Wu.BigSlider = Wu.Class.extend({
 		this.dayNameTitle = Wu.DomUtil.create('div', 'big-graph-current-day', graphInfoContainer);
 
 		this.currentSCF = Wu.DomUtil.create('div', 'big-graph-current-scf inline', graphInfoContainer);
-		this.cloud = Wu.DomUtil.create('div', 'big-graph-current-cloud inline', graphInfoContainer);
-		this.age = Wu.DomUtil.create('div', 'big-graph-current-age inline', graphInfoContainer);
-
-		this.maxSCF = Wu.DomUtil.create('div', 'big-graph-current-maxscf inline', graphInfoContainer);
-		this.minSCF = Wu.DomUtil.create('div', 'big-graph-current-minscf inline', graphInfoContainer);
-
+		// this.cloud = Wu.DomUtil.create('div', 'big-graph-current-cloud inline', graphInfoContainer);
+		// this.age = Wu.DomUtil.create('div', 'big-graph-current-age inline', graphInfoContainer);
+		// this.maxSCF = Wu.DomUtil.create('div', 'big-graph-current-maxscf inline', graphInfoContainer);
+		// this.minSCF = Wu.DomUtil.create('div', 'big-graph-current-minscf inline', graphInfoContainer);
 
 		var graphInnerContainer = Wu.DomUtil.create('div', 'big-graph-inner-container', graphOuterContainer)
 
@@ -335,16 +329,15 @@ Wu.BigSlider = Wu.Class.extend({
 					.excludedOpacity(0)
 					.colors('#ff0000')
 					.symbol('triangle-up')
-				    	.keyAccessor(function(d) {
-
-				    		if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
-				    		return false;
-				    	}.bind(this))
-		    			.valueAccessor(function(d) {
-		    				if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
-		    				return false;
-		    			}.bind(this))
-				,
+					.keyAccessor(function(d) {
+						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
+						return false;
+					}.bind(this))
+					.valueAccessor(function(d) {
+						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
+						return false;
+					}.bind(this))
+			
 			])
 
 
@@ -362,6 +355,8 @@ Wu.BigSlider = Wu.Class.extend({
 	},
 
 	updateGraph : function () {
+
+		// console.error('updateGraph');
 
 		// Current year
 		var year = this.currentYear;
@@ -383,13 +378,8 @@ Wu.BigSlider = Wu.Class.extend({
 
 		// Rebuild graph data
 		this.years[year].forEach(function (d, i) {
-
-			if ( d.Doy < day ) {
-				console.log('rebuild graph data');
-				d.date = this._dateFromNo(i)
-				this.graphData.push(d);
-			}
-
+			var doy = i+1;
+			if ( doy < day ) this.graphData.push(d);
 		}.bind(this));
 
 
@@ -409,14 +399,14 @@ Wu.BigSlider = Wu.Class.extend({
 		dc.redrawAll()
 
 		var scf = Math.round(this.years[year][day-1].SCF * 100) / 100;
-		var cloud = Math.round(this.years[year][day-1].Cloud * 10) / 10;
-		var age = Math.round(this.years[year][day-1].Age * 10) / 10;
+		// var cloud = Math.round(this.years[year][day-1].Cloud * 10) / 10;
+		// var age = Math.round(this.years[year][day-1].Age * 10) / 10;
 
-		// Update HTML
+		// // Update HTML
 		this.dayNameTitle.innerHTML = this.dayName;
 		this.currentSCF.innerHTML = 'SCF: ' + scf + '%';
-		this.cloud.innerHTML = 'Cloud: ' + cloud;
-		this.age.innerHTML = 'Age: ' + age;
+		// this.cloud.innerHTML = 'Cloud: ' + cloud;
+		// this.age.innerHTML = 'Age: ' + age;
 
 
 
@@ -470,7 +460,6 @@ Wu.BigSlider = Wu.Class.extend({
 
 	updateDayOfYear : function () {
 
-
 		// Month names
 		var monthNames = [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember" ];
 
@@ -481,40 +470,28 @@ Wu.BigSlider = Wu.Class.extend({
 		// we've got, and work our ways backwards from
 		// there...
 
-		var lastDayObj = this.finalDay,
-		    lastYear = lastDayObj.Year,
-		    lastMonth = lastDayObj.Month,
-		    lastDay = lastDayObj.Day,
-		    lastDoy = lastDayObj.Doy,
+		var lastDayObj  = this.finalDay,
+		    lastYear    = lastDayObj.Year,
+		    lastMonth   = lastDayObj.Month,
+		    lastDay     = lastDayObj.Day,
+		    lastDoy     = lastDayObj.Doy,
 		    lastMonthNo = lastDayObj.MonthNo;
 
-		var _firstDay = lastDoy - 365;
-
-		// console.log('_firstDay', _firstDay);
-		// console.log('365 + _firstDay', 365 + _firstDay);
-
-		// console.log('lastDayObj', lastDayObj);
-
+		var _firstDay   = lastDoy - 365;
 
 
 		// Find out where we start
 		var tickStartMonthName = this.ticks[this.tickStart].month;
-		var tickStartMonthNo = monthNames.indexOf(tickStartMonthName);
-		var tickStartYear = this.ticks[this.tickStart].year;
-
-		// What day of the year do we start?
-		// var now = new Date(tickStartYear, tickStartMonthNo, tickStartDay);
-		// var start = new Date(tickStartYear, 0, 0);
-		// var diff = now - start;
-		// var oneDay = 1000 * 60 * 60 * 24;
-		// var startDay = Math.floor(diff / oneDay);
+		var tickStartMonthNo   = monthNames.indexOf(tickStartMonthName);
+		var tickStartYear      = this.ticks[this.tickStart].year;
 
 		var startDay = 365 + _firstDay;
+		
 
 
 		// Start figuring out what day we are showing
 		var year = this.currentYear = tickStartYear;
-		var day = this.currentDay = this.currentSliderValue + startDay - 1;
+		var day  = this.currentDay  = this.currentSliderValue + startDay - 1;
 	
 	  	var blankDate = new Date(year, 0);
   		var date = new Date(blankDate.setDate(day));
@@ -537,10 +514,31 @@ Wu.BigSlider = Wu.Class.extend({
 		this.tickEnd--;
 		this.tickStart--;
 
+	
+		var finalDay = this.ticks[this.tickEnd-1];
+		var finalYear     = finalDay.year;
+		var finalDoy      = finalDay.doy;
+		var finalMonth    = this.getMonthName(finalDoy, finalYear);
+		var blankDate     = new Date(finalYear, 0);
+		var setDate       = new Date(blankDate.setDate(finalDoy));
+		var finalDofMonth = setDate.getDate();
+		var finalMonthNo  = setDate.getMonth()+1;
+		var _finalDay     = {
+			Year    : finalYear,
+			Month   : finalMonth,
+			Day     : finalDofMonth,
+			Doy     : finalDoy,
+			MonthNo : finalMonthNo
+		}
+		this.finalDay = _finalDay;
+
+
+
 		this.updateTicks();
 		this.updateButtons();
-
 		this.updateDayOfYear();
+
+
 
 	},
 
@@ -564,10 +562,6 @@ Wu.BigSlider = Wu.Class.extend({
 	updateTicks : function () {
 
 
-		// console.log('this.tickStart', this.tickStart);
-		// console.log('this.tickEnd', this.tickEnd);
-		// console.log('ticks', this.tickEnd - this.tickStart);
-
 		var lastDayObj  = this.finalDay,
 		    lastYear    = lastDayObj.Year,		    
 		    lastDay     = lastDayObj.Day,
@@ -576,52 +570,51 @@ Wu.BigSlider = Wu.Class.extend({
 		    diffDays    = daysInMonth - lastDay;
 
 
-		    console.log('daysInMonth', daysInMonth);
-		    console.log('lastDay', lastDay);
-		    console.log('diffDays', diffDays);
-
 
 		// Now we need to figure out how many days it adds up to...
-		// var allDays = diffDays;
 		var allDays = 0;
-		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {	
-			allDays += new Date(this.ticks[i].year, this.ticks[i].monthNo, 0).getDate();
+		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {	// how many months we itterate
+			var daysInMonth = new Date(this.ticks[i].year, this.ticks[i].monthNo, 0).getDate();
+			allDays += daysInMonth;
 		}
 
-		// var pixelProp = 365 / allDays;
-		// var promp = (diffDays / allDays) * 100;
+		// Get start date
+		var firstMonth = this.ticks[this.tickStart];	
+		var daysInFirstMonth = new Date(firstMonth.year, firstMonth.monthNo, 0).getDate();
+		var _firstDay = new Date(firstMonth.year, firstMonth.monthNo, (daysInFirstMonth-diffDays));
 
+		// Do I even need this?
+		var _lastMonth = this.ticks[this.tickEnd-1];
+		var _daysInLastMonth = new Date(_lastMonth.year, _lastMonth.monthNo, 0).getDate();
+		var _lastDay = new Date(_lastMonth.year, _lastMonth.monthNo, lastDay);
 
 
 		this.tickContainer.innerHTML = '';
 	
 		var year = '';
 
+
 		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {
 
-			var month = this.ticks[i].month.substr(0,3);
+			var _i = i;
+
+			var month = this.ticks[_i].month.substr(0,3);
 			var _tick = Wu.DomUtil.create('div', 'big-slider-tick', this.tickContainer, month);
 
-			if ( year != this.ticks[i].year ) {
-				var newYear = Wu.DomUtil.create('div', 'big-slider-year-tick', _tick, this.ticks[i].year);
-				year = this.ticks[i].year;	
+			if ( year != this.ticks[_i].year ) {
+				var newYear = Wu.DomUtil.create('div', 'big-slider-year-tick', _tick, this.ticks[_i].year);
+				year = this.ticks[_i].year;	
 			}
 
 			// Days in this month...
-			var DIM = new Date(year, this.ticks[i].monthNo, 0).getDate();
+			var DIM = new Date(year, this.ticks[_i].monthNo, 0).getDate();
 
-			if ( i == this.tickStart ) DIM -= lastDay;
+			if ( i == this.tickStart ) DIM -= (daysInFirstMonth-diffDays);
 			if ( i == this.tickEnd-1 ) DIM -= diffDays;
 
-
-			// var dimprop = allDays / DIM;
-			var dimprop = (DIM / 366) * 100;
-
-
+			var dimprop = (DIM / 365) * 99;
+			
 			_tick.style.width = dimprop + '%';
-
-
-
 
 		}
 
@@ -709,7 +702,7 @@ Wu.BigSlider = Wu.Class.extend({
 
 			var minD = false;
 
-			if( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
+			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
 				if ( !minD ) minD = days[day][1].SCF;
 				days[day].forEach(function (d) { if ( d.SCF < minD ) minD = d.SCF });
 				eachDay[day] = Math.round(minD);
@@ -725,7 +718,7 @@ Wu.BigSlider = Wu.Class.extend({
 		var eachDay = [];
 
 		for ( var day in days ) {		
-			if( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
+			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
 				var avg = 0;
 				days[day].forEach(function(d) { avg += d.SCF; });
 				eachDay[day] = Math.round(avg / days[day].length);
@@ -756,8 +749,19 @@ Wu.BigSlider = Wu.Class.extend({
 				currentYear = each.Year;
 				years[currentYear] = [];
 			}
-			years[currentYear].push(each)
-		})
+
+			// console.log('each', each);
+			var thisYear = {
+				SCF : each.SCF,
+				// Year : each.Year,
+				// Doy : each.Doy,
+				date : this._dateFromNo(each.Doy)
+				// Cloud : each.Clod,
+				// Age : each.Age
+			}
+
+			years[currentYear].push(thisYear)
+		}.bind(this))
 
 		return years;
 	},
