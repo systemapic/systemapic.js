@@ -3,7 +3,7 @@ Wu.BigSlider = Wu.Class.extend({
 	options : {
 
 		// animation frames per second
-		fps : 8
+		fps : 4
 	},
 
 	initialize : function (options) {
@@ -27,12 +27,6 @@ Wu.BigSlider = Wu.Class.extend({
 
 
 	initData : function (done) {
-
-		// only get data once
-		if (app._animatorData) {
-			console.error('already got animator data');
-			return done();
-		}
 
 		// get data from server
 		app.api.getCustomData({

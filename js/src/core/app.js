@@ -247,7 +247,7 @@ Wu.App = Wu.Class.extend({
 		app.Share = new Wu.Share();
 
 		// big slider
-		app.BigSlider = new Wu.BigSlider({
+		app.BigSlider = new Wu.BigSlider({ // refactor to project controls
 			data : 'allYears'
 		});
 

@@ -225,7 +225,12 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	importStatus : function (options, done) {
+		var path = '/v2/data/import/status';
+		this.get(path, options, done);
+	},
 
+	
 
 
 
@@ -290,14 +295,10 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	
-
-	importStatus : function (options, done) {
-		var path = '/v2/data/import/status';
-		this.get(path, options, done);
+	updateCube : function (options, done) {
+		var path = '/v2/cubes/update';
+		this.post(path, options, done);
 	},
-
-
 
 
 

@@ -651,9 +651,8 @@ Wu.Model.Layer = Wu.Model.extend({
 Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	options : {
-		fps : 8,
+		fps : 4,
 	},
-
 
 	initialize : function (store) {
 
@@ -662,30 +661,18 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		// set store
 		this._setStore(store);
 
-		// init slider
-		this._initAnimator();
-
 		// listen up
 		this._listen();
 	},
 
-
 	_setStore : function (store) {
-		console.log(store);
-		
+
+		// set store		
 		this.store = store;
 
-		// parse json
+		// parse cube json
 		this.store.data.cube = Wu.parse(this.store.data.cube);
 	},
-
-
-	_initAnimator : function () {
-
-		// connect slider to layer
-		this._animator = app.BigSlider;
-	},
-
 
 	initLayer : function () {
 		this.update();
@@ -794,31 +781,33 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 	},
 
 	_onAnimationPlay : function () {
-		console.log('_onAnimationPlay!', this._added);
-		if (this._added) {
-			this.playAnimation();
-		}
+		if (!this._added) return;
+
+		// play
+		this.playAnimation();
 	},
 
 	_onAnimationStop : function () {
-		console.log('_onAnimationStop!', this._added);
-
-		if (this._added) {
-			this.stopAnimation();
-		}
+		if (!this._added) return;
+		
+		// stop
+		this.stopAnimation();
 	},
 
 	_setFrames : function () {
 		
+		// find current index
 		var curIdx = _.findIndex(this._layers, this._currentFrame);
 
 		console.log('curIdx = ', curIdx);
 
+		// find next index
 		var nextIdx = curIdx + 1;
 		if (nextIdx > this._layers.length -1) {
 			nextIdx = 0;
 		}
 
+		// set frames
 		this._showFrame = this._layers[nextIdx];
 		this._hideFrame = this._layers[curIdx];
 		this._currentFrame = this._showFrame;
@@ -848,8 +837,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		// add to controls
 		// this.addToControls();
 	},
-
-	
 
 	_addTo : function (type) {
 
@@ -905,8 +892,31 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		return true;
 	},
 
-});
+	updateStyle : function (style) {
+		var options = {
+			cube_id : this.getCubeId(),
+			style : style
+		}
+		console.log('cbue upadet style options', options);
+		app.api.updateCube(options, function (err, response) {
+			if (err) return console.error('Error updating Cube Style:', err, response);
+			console.log('updateCube: ', err, Wu.parse(response));
 
+
+			this._refreshLayer();
+
+		}.bind(this));
+	},
+
+	_refreshLayer : function () {
+
+		this.layer.setOptions({
+			cube_id : this.getCubeId()
+		});
+
+		this.layer.redraw();
+	},
+});
 
 
 Wu.PostGISLayer = Wu.Model.Layer.extend({
@@ -1021,9 +1031,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		var fileUuid 	= this._fileUuid;	// file id of geojson
 		var subdomains  = app.options.servers.tiles.subdomains;
 		var access_token = '?access_token=' + app.tokens.access_token;
-
 		var layerUuid = this._getLayerUuid();
-		// var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
 		var url = app.options.servers.tiles.uri + '{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
 		// add vector tile raster layer
@@ -1033,7 +1041,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			maxRequests : 0,
 			maxZoom : 19
 		});
-
 	},
 
 	_invalidateTiles : function () {
@@ -1055,8 +1062,8 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	_prepareGrid : function () {
 
 		// set ids
-		var subdomains  = app.options.servers.utfgrid.subdomains,
-		    access_token = '?access_token=' + app.tokens.access_token;
+		var subdomains  = app.options.servers.utfgrid.subdomains;
+		var access_token = '?access_token=' + app.tokens.access_token;
 		
 		var layerUuid = this._getLayerUuid();
 		var url = app.options.servers.tiles.uri + "{layerUuid}/{z}/{x}/{y}.grid" + access_token;
@@ -1078,7 +1085,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 
 	_fetchData : function (e, callback) {
-
 		var keys = Object.keys(e.data);
 		var column = keys[0];
 		var row = e.data[column];
@@ -1145,10 +1151,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			// analytics/slack
 			app.Analytics.onPointQuery(e);
 		});
-
-
 	},
-
 
 	downloadLayer : function () {
 
