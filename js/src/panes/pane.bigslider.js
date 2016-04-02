@@ -3,7 +3,7 @@ Wu.BigSlider = Wu.Class.extend({
 	options : {
 
 		// animation frames per second
-		fps : 1
+		fps : 4
 	},
 
 	initialize : function (options) {
@@ -27,12 +27,6 @@ Wu.BigSlider = Wu.Class.extend({
 
 
 	initData : function (done) {
-
-		// only get data once
-		if (app._animatorData) {
-			console.error('already got animator data');
-			return done();
-		}
 
 		// get data from server
 		app.api.getCustomData({
@@ -153,7 +147,12 @@ Wu.BigSlider = Wu.Class.extend({
 
 	},
 
-
+	setFPS : function (fps) {
+		this.options.fps = fps;
+		Wu.Mixin.Events.fire('setFPS', {detail : {
+			fps : fps
+		}});
+	},
 
 	getMonthName : function (doy, year) {
 		var monthNames = [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember" ];
@@ -448,6 +447,10 @@ Wu.BigSlider = Wu.Class.extend({
 				this.updateDayOfYear()
 			}			
 		}.bind(this), (1000/this.options.fps)) 
+
+		// fire animation play
+		Wu.Mixin.Events.fire('animationPlay');
+
 	},
 
 	stopPlaying : function () {
@@ -456,6 +459,9 @@ Wu.BigSlider = Wu.Class.extend({
 
 		clearInterval(this.playInterval);
 		this.playing = false;
+
+		// fire animation stop
+		Wu.Mixin.Events.fire('animationStop');
 	},
 
 	updateDayOfYear : function () {

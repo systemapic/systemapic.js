@@ -9,6 +9,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 	},
 
+	// todo: remove globesar name
 	globesar : true,
 
 	_initialize : function () {
@@ -423,8 +424,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get layer
 		this._layer = this._project.getLayer(this.layerUuid);
 
+		console.log('this._layer', this._layer);
+
 		// return if no layer
-		if (!this._layer || !this._layer.isVector()) return;
+		if (!this._layer || !this._layer.isStylable()) return;
 
 		// remember layer for other tabs
 		this._storeActiveLayerUuid(this.layerUuid);		
@@ -432,19 +435,28 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
 
+		console.log('style: ', style);
+
 		// define tab
 		this.tabindex = 1;
 
 		// set local cartoJSON
-		console.log('_selectedActiveLayer', style);
 		this._carto = style || {};
 
 		// Clear legend objects
 		this.oldLegendObj = false;
 		this.legendObj = false;
 
-		// init style json
-		this._initStyle();
+		if (this._layer.isCube()) {
+			
+			// init style json
+			this._initStyle();
+		} else {
+
+			// add GUI for cube styling here!
+			
+
+		}
 
 		// Add temp layer
 		this._tempaddLayer();

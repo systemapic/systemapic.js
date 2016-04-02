@@ -624,22 +624,23 @@ Wu.Model.Project = Wu.Model.extend({
 		return _.toArray(this.layers);
 	},
 
+	getStylableLayers : function () {
+		// get active baselayers and layermenulayers that are editable (geojson)
+		var layers = _.filter(this.layers, function (l) {
+			if (!l || !l.store) return false;
+			if (l.store.data.hasOwnProperty('cube')) return true;
+			if (l.store.data.hasOwnProperty('postgis')) return true;
+		});
+		return layers;
+	},
+
 	getPostGISLayers : function () {
-		// return _.filter(this.layers, function (l) {
-		// 	if (!l) return false;
-		// 	if (!l.store.data) return false;
-		// 	return l.store.data.postgis;
-		// });
-
 		var layers = [];
-
 		for (var l in this.layers) {
 			var layer = this.layers[l];
 			if (layer.store && layer.store.data && layer.store.data.postgis) layers.push(layer);
 		}
-
 		return layers;
-
 	},
 
 	getRasterLayers : function () {
@@ -703,23 +704,7 @@ Wu.Model.Project = Wu.Model.extend({
 		});
 	},
 
-	getStylableLayers : function () {
-		// get active baselayers and layermenulayers that are editable (geojson)
-		var all = this.getActiveLayers();
-		var cartoLayers = _.filter(all, function (l) {
-
-			if (l) {
-				if (!l.store) return false;
-				if (l.store.data.hasOwnProperty('geojson')) return true;
-				if (l.store.data.hasOwnProperty('osm')) return true;
-				if (l.store.data.hasOwnProperty('postgis')) return true;
-
-			} else {
-				return false;
-			}
-		});
-		return cartoLayers;
-	},
+	
 
 	getLayerFromFile : function (fileUuid) {
 		return _.find(this.layers, function (l) {

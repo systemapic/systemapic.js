@@ -24,6 +24,9 @@ Wu.Model = Wu.Class.extend({
 		Wu.Mixin.Events.on('layerEdited',     this._onLayerEdited, this);
 		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
 		Wu.Mixin.Events.on('projectChanged',  this._onProjectChanged, this);
+		Wu.Mixin.Events.on('animationPlay',   this._onAnimationPlay, this);
+		Wu.Mixin.Events.on('animationStop',   this._onAnimationStop, this);
+		Wu.Mixin.Events.on('setFPS',   		this._onSetFPS, this);
 
 		// file events
 		var event_id = 'downloadReady-' + this.getUuid();
@@ -62,6 +65,9 @@ Wu.Model = Wu.Class.extend({
 	_onLayerDeleted  : function () {},
 	
 	_onDownloadReady : function () {},
-	_onProjectChanged: function () {}
+	_onProjectChanged: function () {},
+	_onAnimationPlay: function () {},
+	_onAnimationStop: function () {},
+	_onSetFPS: function () {},
 
 });
