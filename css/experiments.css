@@ -954,7 +954,6 @@
     position: relative;
     right: -34px;
     transition: opacity 100ms linear;
-/*<<<<<<< HEAD*/
 }
 
 .share-dropdown {
@@ -981,6 +980,3 @@
     border-radius: 0 0 4px 4px;
     padding-bottom: 10px;
 }
-/*=======
-    }
->>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
