@@ -115,6 +115,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		title = title || 'Layer';
 		subtitle = subtitle || 'Select a layer to style...';
 		var sortedLayers = [];
+		
 		// active layer wrapper
 		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', container);
 
@@ -126,7 +127,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 		// get layers
 		if ( !layers ) {
-			layers = this._project.getPostGISLayers();
+			layers = this._project.getStylableLayers();
 		}
 
 		// placeholder

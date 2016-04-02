@@ -626,6 +626,14 @@ Wu.Model.Layer = Wu.Model.extend({
 		return false;
 	},
 	
+	isStylable : function () {
+		if (this.isVector()) return true;
+		return false;
+	},
+
+	isCube : function () {
+		return false;
+	},
 
 	getAttributionControl : function () {
 		return app.MapPane._attributionControl;
@@ -835,7 +843,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		this._added = true;
 
 		// add to map
-		// this._addTo();
+		this._addTo();
 		
 		// add to controls
 		// this.addToControls();
@@ -875,35 +883,26 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 	},
 
 	_addThin: function () {
-		console.error('not implemented for cube');
-		// if (!this._inited) this.initLayer();
+		if (!this._inited) this.initLayer();
 
-		// var map = app._map;
-
-		// // only add to map temporarily
-		// map.addLayer(this.layer);
-		// this.layer.bringToFront();
-
-		// // add gridLayer if available
-		// if (this.gridLayer) {
-		// 	map.addLayer(this.gridLayer);
-		// }
-
+		// only add to map temporarily
+		app._map.addLayer(this.layer);
+		this.layer.bringToFront();
 	},
 
 	_removeThin : function () {
-		console.error('not implemented for cube');
-		// if (!this._inited) this.initLayer();
+		if (!this._inited) this.initLayer();
 
-		// var map = app._map;
+		// remove from map
+		app._map.removeLayer(this.layer);
+	},
 
-		// map.removeLayer(this.layer);
+	isStylable : function () {
+		return true;
+	},
 
-		// // remove gridLayer if available
-		// if (this.gridLayer) {
-		// 	this.gridLayer._flush();
-		// 	if (map.hasLayer(this.gridLayer)) map.removeLayer(this.gridLayer); 
-		// }
+	isCube : function () {
+		return true;
 	},
 
 });
