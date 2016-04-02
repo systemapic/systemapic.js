@@ -73,6 +73,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Get layer meta
 		this.getLayerMeta();
 
+
+		this.layerType = 'raster';
+
+		if ( this.layerType == 'raster' ) {
+			this._initRasterLayer();
+			return;
+		}
+
 		// Init styling templates
 		this._initTemplates();
 
@@ -81,6 +89,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Init legend options
 		this._initLegendOptions();
+
+	},
+
+
+	_initRasterLayer : function () {
+
+		var options = {};
+		var rasterStyler = new Wu.RasterStyler(options);
 
 	},
 
