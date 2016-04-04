@@ -709,14 +709,15 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		datasets.forEach(function (d) {
 
 			// url template
-			var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token;
+			var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}';
 			
 			// create leaflet layer
 			var cubeLayer = L.tileLayer(url, {
 				cube_id : cube_id,
 				dataset_id : d.uuid,
 				subdomains : subdomains,
-				maxRequests : 0
+				maxRequests : 0,
+				cache : Wu.Util.getRandomChars(6)
 			});
 
 			// add layer to cube array
@@ -910,10 +911,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	_refreshLayer : function () {
 
+		// mark modified
 		this.layer.setOptions({
-			cube_id : this.getCubeId()
+			cache : Wu.Util.getRandomChars(6) // change url to skip browser cache
 		});
 
+		// redraw
 		this.layer.redraw();
 	},
 });
