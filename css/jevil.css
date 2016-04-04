@@ -2358,3 +2358,121 @@ input.chrome-field-input {
         font-size: 18px;
         margin: 0;    
         }  
+
+
+
+
+
+
+
+
+
+
+.raster-styler {
+    /*border: 1px solid red;*/
+    /*padding-right: 16px;*/
+    padding-left: 10px;
+    padding-right: 24px;
+
+    position: relative;
+}
+
+.raster-range-marks {
+    position: relative;
+    bottom: 6px;
+    font-size: 12px;
+    color: #999;
+}
+
+.raster-range-min-mark {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.raster-color-range-wrapper {    
+    height: 11px;
+    position: relative;
+    padding-right: 16px;
+    top: -12px;
+    /*z-index: 99;*/
+}
+
+.raster-color-range {
+    position: absolute;
+    height: 100%;
+    background-color: red;
+}
+
+.raster-range-slider .noUi-connect {
+    background-color: transparent !important;
+}
+
+.raster-color-selector {
+    position: absolute;
+    bottom: -28px;
+/*    
+    border-radius: 25px;
+    background: red;
+    bottom: -31px;
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 0 0px 2px white inset, 0 0 0px 1px #c8c8c8;*/
+}
+
+.raster-color-selector.left {
+    left: -9px;
+}
+
+.raster-color-selector.right {
+    right: -9px;
+}
+
+.raster-color {
+    border-radius: 25px;
+    background: red;
+    bottom: -31px;
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 0 0px 2px white inset, 0 0 0px 1px #c8c8c8;    
+    }
+
+.raster-color {
+    display: block;
+    float: none;
+    margin: 0;
+    }
+
+.raster-color-selector.left .raster-color {
+    position: absolute;
+    left: 2px;
+    top: -16px;    
+    }
+
+.raster-color-selector.right .raster-color {
+    position: absolute;
+    left: -18px;
+    top: -16px;    
+    }    
+
+
+
+.raster-color-number {
+    position: absolute;
+    top: -62px;
+    font-size: 12px;
+    text-align: center; 
+    }
+
+.right .raster-color-number {
+    width: 100px;
+    left: -60px;
+    }
+
+.left .raster-color-number {
+    width: 100px;
+    left: -40px;   
+    }    
+
+
+
