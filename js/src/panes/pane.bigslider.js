@@ -1,4 +1,4 @@
-Wu.BigSlider = Wu.Class.extend({
+Wu.BigSlider = Wu.Evented.extend({
 
 	options : {
 
@@ -6,9 +6,7 @@ Wu.BigSlider = Wu.Class.extend({
 		fps : 4
 	},
 
-	initialize : function (options) {
-
-		Wu.setOptions(this, options);
+	_initialize : function (options) {
 
 		// fetching data is async, so must wait for callback
 		this.initData(function (err) {
@@ -21,10 +19,13 @@ Wu.BigSlider = Wu.Class.extend({
 
 			this.addHooks();
 
+			// hide by default is option set
+			if (this.options.hide) this.hide();
+
 		}.bind(this));
 		
 	},
-
+		
 
 	initData : function (done) {
 
@@ -205,10 +206,7 @@ Wu.BigSlider = Wu.Class.extend({
 				'max': 365
 			}
 		});
-
-
 	},
-
 
 	initGraph : function () {
 
@@ -770,6 +768,13 @@ Wu.BigSlider = Wu.Class.extend({
 		}.bind(this))
 
 		return years;
+	},
+
+	_layerEnabled : function (e) {
+		var layer = e.detail.layer;
+		var show = e.detail.showSlider;
+		console.log('_layerEnabled', e.detail);
+		if (show) this.show();
 	},
 
 

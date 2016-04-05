@@ -816,18 +816,11 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	add : function (type) {
 
-		console.log('cube add', this);
-
-		// mark as base or layermenu layer
-		// this._isBase = (type == 'baselayer');
-		
 		// add
 		this.addTo();
 	},
 
 	addTo : function () {
-		console.log('cube addTo', this);
-		
 		if (!this._inited) this.initLayer();
 
 		this._added = true;
@@ -835,8 +828,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		// add to map
 		this._addTo();
 		
-		// add to controls
-		// this.addToControls();
 	},
 
 	_addTo : function (type) {
@@ -850,11 +841,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 		// leaflet fn
 		map.addLayer(this.layer);
 
-		// // add gridLayer if available
-		// if (this.gridLayer) {
-		// 	map.addLayer(this.gridLayer);
-		// }
-
 		// add to active layers
 		app.MapPane.addActiveLayer(this);	// includes baselayers
 
@@ -865,9 +851,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 		// fire event
 		Wu.Mixin.Events.fire('layerEnabled', { detail : {
-			layer : this
+			layer : this,
+			showSlider : true
 		}}); 
-
 	},
 
 	_addThin: function () {
@@ -898,26 +884,25 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 			cube_id : this.getCubeId(),
 			style : style
 		}
-		console.log('cbue upadet style options', options);
 		app.api.updateCube(options, function (err, response) {
 			if (err) return console.error('Error updating Cube Style:', err, response);
-			console.log('updateCube: ', err, Wu.parse(response));
 
-
+			// refresh layers
 			this._refreshLayer();
-
 		}.bind(this));
 	},
 
 	_refreshLayer : function () {
 
-		// mark modified
-		this.layer.setOptions({
-			cache : Wu.Util.getRandomChars(6) // change url to skip browser cache
+		// refresh all layers
+		this._layers.forEach(function (layer) {
+			layer.setOptions({
+				cache : Wu.Util.getRandomChars(6) // change url to skip browser cache
+			});
+			layer.redraw();
 		});
 
-		// redraw
-		this.layer.redraw();
+		// TODO: add to queue etc. with websocket implementation
 	},
 });
 

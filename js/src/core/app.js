@@ -246,10 +246,11 @@ Wu.App = Wu.Class.extend({
 		// share pane
 		app.Share = new Wu.Share();
 
-		// // big slider
-		// app.BigSlider = new Wu.BigSlider({ // refactor to project controls
-		// 	data : 'allYears'
-		// });
+		// big slider
+		app.BigSlider = new Wu.BigSlider({ // refactor to project controls
+			data : 'allYears',
+			hide : true
+		});
 
 		// add account tab
 		app.AccountPane = new Wu.Pane.Account();
