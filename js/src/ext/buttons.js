@@ -273,7 +273,7 @@ Wu.button = Wu.Class.extend({
 		var on          = this.options.isOn;
 		var className   = this.options.className;
 		var value       = this.options.value;
-		var _class 		= 'chrome-color-ball ';
+		var _class 	= 'chrome-color-ball ';
 
 		if ( className ) _class += className;
 

@@ -71,6 +71,15 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_initStyle : function () {
 
+		this.layerType = 'cube';
+
+		if ( this.layerType == 'cube' ) {
+			this._initRasterLayer();
+			return;
+		}
+
+
+
 		// Get layer meta
 		this.getLayerMeta();
 
@@ -82,6 +91,23 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Init legend options
 		this._initLegendOptions();
+
+	},
+
+
+	_initRasterLayer : function () {
+
+		var options = {
+			carto 	  : this._carto,
+			layer 	  : this._layer,
+			project   : this._project,
+			styler 	  : this,
+			meta 	  : this._meta,
+			columns   : this._columns,
+			container : this._fieldsWrapper
+		};
+
+		this.rasterStyler = new Wu.RasterStyler(options);
 
 	},
 
@@ -332,6 +358,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		console.log('update_style');
 
+		if ( this.layerType == 'cube' ) {
+			this._updateCube();
+			return;
+		}
+
 		// Update point
 		this._pointStyler.setCarto(this._carto.point);
 		this._pointStyler.updateStyle();
@@ -350,6 +381,52 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Unmark changed
 		this.unmarkChanged();
 		
+	},
+
+	_updateCube : function () {
+
+		var stops = this.rasterStyler.stops;
+
+		stops[0].val;
+		stops[0].col;
+		stops[1].val;
+		stops[1].col;
+
+
+		var style = 	'#layer {' +
+				'raster-opacity: 1;' + 
+				'raster-colorizer-default-mode: linear;' + 
+				'raster-colorizer-default-color: transparent;' +
+				'raster-comp-op: color-dodge;' +
+				'raster-colorizer-stops:' +
+				'stop(' + (stops[0].val-1) + ', rgba(0,0,0,0))' + 
+				'stop(' + stops[0].val + ', ' + stops[0].col + ')' + 
+				'stop(' + stops[1].val + ', ' + stops[1].col + ')' +
+				'stop(255, rgba(0,0,0,0), exact);' +
+				'}';
+
+
+
+		var saveJson = JSON.stringify(stops);				
+
+
+		console.log('%c*********************', 'background: hotpink; color: white;');;
+		console.log('%cSave this json string =>', 'color: green;');
+		console.log(saveJson);
+		console.log('%c=====================', 'color: hotpink;');
+		console.log('%cSave this style', 'color: green');
+		console.log(style);
+		console.log('%c*********************', 'background: hotpink; color: white;');;
+		
+
+		this._layer.updateStyle(style);
+
+
+		// console.log('this._layer', );
+
+
+
+
 	},
 
 	_refresh : function () {

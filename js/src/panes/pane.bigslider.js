@@ -107,7 +107,22 @@ Wu.BigSlider = Wu.Class.extend({
 		}.bind(this))
 
 
-		// Find last day
+
+		// Year Names
+		this.yearNames = [];
+		for ( var y in this.years ) {
+			var _y = parseInt(y);
+			if ( !isNaN(_y) ) {
+				this.yearNames.push(_y);
+			}
+		}
+
+		this.currentYear = this.yearNames[this.yearNames.length-1];
+
+
+		// SAVE THE LAST DAY IN THE TIME LINE
+		// SAVE THE LAST DAY IN THE TIME LINE
+		// SAVE THE LAST DAY IN THE TIME LINE
 		
 		// Get object
 		var lastDay = this.allYears[this.allYears.length-1];
@@ -141,9 +156,43 @@ Wu.BigSlider = Wu.Class.extend({
 		}
 
 
-		this.tickStart = this.ticks.length-13;
-		this.tickEnd = this.ticks.length;
-		this.currentSliderValue = 365;
+		// SAVE THE FIRST DAY IN THE TIME LINE
+		// SAVE THE FIRST DAY IN THE TIME LINE
+		// SAVE THE FIRST DAY IN THE TIME LINE
+
+
+		// Get object
+		var firstDay = this.allYears[0];
+
+		// Get last year
+		var firstYear = firstDay.Year;
+
+		// Get last day of year
+		var firstDoy = firstDay.Doy;
+
+		// Get last month name
+		var firstMonth = this.getMonthName(firstDoy, firstYear);
+
+		// Set date, so that we can get month number, and day of month number
+	  	var blankDate = new Date(firstYear, 0);
+  		var setDate = new Date(blankDate.setDate(firstDoy));
+
+  		// Get last month number
+		var firstDofMonth = setDate.getDate();
+
+		// Get last day of last month
+		var firstMonthNo = setDate.getMonth()+1;
+
+
+		this.firstDay = {
+			Year    : firstYear,
+			Month   : firstMonth,
+			Day     : firstDofMonth,
+			Doy     : firstDoy,
+			MonthNo : firstMonthNo
+		}
+	
+		this.currentSliderValue = this.finalDay.Doy;
 
 	},
 
@@ -182,29 +231,48 @@ Wu.BigSlider = Wu.Class.extend({
 		this.sliderOuterContainer = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
 
 		var sliderInnerContainer = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
-		this.playButton = Wu.DomUtil.create('div', 'big-slider-play-button', sliderInnerContainer, '<i class="fa fa-play"></i>');
-
 
 		var slider = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
 
-		this.stepForward = Wu.DomUtil.create('div', 'big-slider-step-forward', sliderInnerContainer, '<i class="fa fa-step-forward"></i>');
-		this.stepBackward = Wu.DomUtil.create('div', 'big-slider-step-backward', sliderInnerContainer, '<i class="fa fa-step-backward"></i>');
+
+
+
+		this.sliderButtonsContainer = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
+
+		this.stepBackward = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
+		this.tapBackward = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
+		this.playButton = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');		
+		this.tapForward = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
+		this.stepForward = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');					
 
 		this.currentDateContainer = Wu.DomUtil.create('div', 'big-slider-current-date', sliderInnerContainer);
 
 		this.tickContainer = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
 
-		this.updateTicks();
+		// this.updateTicks();
 		this.updateButtons();
 
 
 		this.slider = noUiSlider.create(slider, {
 			start: [this.currentSliderValue],
+			limit: 365,
 			range: {
-				'min': 0,
+				'min': 1,
 				'max': 365
 			}
 		});
+
+
+		// this.slider = noUiSlider.create(slider, {
+		// 	start: [this.currentSliderValue],
+		// 	limit: 365,
+		// 	range: {
+		// 		'min': 1,
+		// 		'max': 365
+		// 	}
+		// });
+
+
 
 
 	},
@@ -258,10 +326,6 @@ Wu.BigSlider = Wu.Class.extend({
 		this.dayNameTitle = Wu.DomUtil.create('div', 'big-graph-current-day', graphInfoContainer);
 
 		this.currentSCF = Wu.DomUtil.create('div', 'big-graph-current-scf inline', graphInfoContainer);
-		// this.cloud = Wu.DomUtil.create('div', 'big-graph-current-cloud inline', graphInfoContainer);
-		// this.age = Wu.DomUtil.create('div', 'big-graph-current-age inline', graphInfoContainer);
-		// this.maxSCF = Wu.DomUtil.create('div', 'big-graph-current-maxscf inline', graphInfoContainer);
-		// this.minSCF = Wu.DomUtil.create('div', 'big-graph-current-minscf inline', graphInfoContainer);
 
 		var graphInnerContainer = Wu.DomUtil.create('div', 'big-graph-inner-container', graphOuterContainer)
 
@@ -355,22 +419,12 @@ Wu.BigSlider = Wu.Class.extend({
 
 	updateGraph : function () {
 
-		// console.error('updateGraph');
 
 		// Current year
 		var year = this.currentYear;
 
 		// Day on slider (this can be more than 365, as it can start in the middle of the year).
 		var day = this.currentDay;
-
-		// Check how many days it's in the current year
-		var daysInYear = this.years[year].length;
-
-		// Skip over to next year at end of year
-		if ( day > daysInYear ) {
-			day -= daysInYear;
-			year ++;
-		}
 
 		// Reset graph data
 		this.graphData = [];
@@ -380,7 +434,6 @@ Wu.BigSlider = Wu.Class.extend({
 			var doy = i+1;
 			if ( doy < day ) this.graphData.push(d);
 		}.bind(this));
-
 
 		// If we're at the end of the road
 		if ( !this.years[year][day-1] ) {
@@ -398,14 +451,10 @@ Wu.BigSlider = Wu.Class.extend({
 		dc.redrawAll()
 
 		var scf = Math.round(this.years[year][day-1].SCF * 100) / 100;
-		// var cloud = Math.round(this.years[year][day-1].Cloud * 10) / 10;
-		// var age = Math.round(this.years[year][day-1].Age * 10) / 10;
 
 		// // Update HTML
 		this.dayNameTitle.innerHTML = this.dayName;
 		this.currentSCF.innerHTML = 'SCF: ' + scf + '%';
-		// this.cloud.innerHTML = 'Cloud: ' + cloud;
-		// this.age.innerHTML = 'Age: ' + age;
 
 
 
@@ -415,13 +464,18 @@ Wu.BigSlider = Wu.Class.extend({
 	addHooks : function () {
 
 		Wu.DomEvent.on(this.stepBackward, 'click', this.moveBackward, this);
+		Wu.DomEvent.on(this.tapBackward, 'click', this.stepOneBackward, this);
 		Wu.DomEvent.on(this.stepForward, 'click', this.moveForward, this);
+		Wu.DomEvent.on(this.tapForward, 'click', this.stepOneForward, this);
+
 		Wu.DomEvent.on(this.playButton, 'click', this.play, this);
-	
-		this.slider.on('change', function( values, handle ) {
+
+
+		this.slider.on('slide', function( values, handle ) {
 			this.currentSliderValue = Math.round(values);
 			this.updateDayOfYear();
 		}.bind(this));
+
 
 	},
 
@@ -464,40 +518,21 @@ Wu.BigSlider = Wu.Class.extend({
 		Wu.Mixin.Events.fire('animationStop');
 	},
 
+
 	updateDayOfYear : function () {
+
 
 		// Month names
 		var monthNames = [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember" ];
 
-
-		// What is wrong here?
-		// We calculate from the beginning of the year,
-		// when we should ALWAYS count from the last day
-		// we've got, and work our ways backwards from
-		// there...
-
-		var lastDayObj  = this.finalDay,
-		    lastYear    = lastDayObj.Year,
-		    lastMonth   = lastDayObj.Month,
-		    lastDay     = lastDayObj.Day,
-		    lastDoy     = lastDayObj.Doy,
-		    lastMonthNo = lastDayObj.MonthNo;
-
-		var _firstDay   = lastDoy - 365;
-
-
-		// Find out where we start
-		var tickStartMonthName = this.ticks[this.tickStart].month;
-		var tickStartMonthNo   = monthNames.indexOf(tickStartMonthName);
-		var tickStartYear      = this.ticks[this.tickStart].year;
-
-		var startDay = 365 + _firstDay;
-		
-
-
 		// Start figuring out what day we are showing
-		var year = this.currentYear = tickStartYear;
-		var day  = this.currentDay  = this.currentSliderValue + startDay - 1;
+		var year = this.currentYear;
+		var day  = this.currentDay  = this.currentSliderValue;	
+
+		// Check how many days it's in the current year
+		var daysInYear = this.years[this.currentYear].length-1;		
+
+		if ( day > daysInYear || !day ) day = this.currentDay = daysInYear;	
 	
 	  	var blankDate = new Date(year, 0);
   		var date = new Date(blankDate.setDate(day));
@@ -510,41 +545,46 @@ Wu.BigSlider = Wu.Class.extend({
 
 		this.updateGraph();
 
+			
+
 	},
+
+	stepOneForward : function () {
+		
+		this.currentSliderValue++;
+		this.updateButtons();
+		this.updateDayOfYear();
+		this.slider.set([this.currentSliderValue]);
+
+	},
+
+	stepOneBackward : function () {
+
+		this.currentSliderValue--;
+		this.updateButtons();
+		this.updateDayOfYear();
+
+		this.slider.set([this.currentSliderValue]);
+	},
+
 
 
 	moveBackward : function () {
 
 		if ( this.diableBackward ) return;
 
-		this.tickEnd--;
-		this.tickStart--;
-
-	
-		var finalDay = this.ticks[this.tickEnd-1];
-		var finalYear     = finalDay.year;
-		var finalDoy      = finalDay.doy;
-		var finalMonth    = this.getMonthName(finalDoy, finalYear);
-		var blankDate     = new Date(finalYear, 0);
-		var setDate       = new Date(blankDate.setDate(finalDoy));
-		var finalDofMonth = setDate.getDate();
-		var finalMonthNo  = setDate.getMonth()+1;
-		var _finalDay     = {
-			Year    : finalYear,
-			Month   : finalMonth,
-			Day     : finalDofMonth,
-			Doy     : finalDoy,
-			MonthNo : finalMonthNo
+		// var finalYear = this.yearNames[this.yearNames.length-1];
+		this.currentYear--;
+		var currentDay = this.years[this.currentYear][this.currentDay-1];
+		if ( !currentDay ) {
+			this.currentSliderValue = this.finalDay.Doy;
+			this.slider.set([this.currentSliderValue]);
 		}
-		this.finalDay = _finalDay;
 
-
-
-		this.updateTicks();
 		this.updateButtons();
 		this.updateDayOfYear();
 
-
+		this.slider.set([this.currentSliderValue]);
 
 	},
 
@@ -553,102 +593,47 @@ Wu.BigSlider = Wu.Class.extend({
 
 		if ( this.diableForward ) return;
 
-		this.tickEnd++;
-		this.tickStart++;
+		this.currentYear++;
 
-		this.updateTicks();
+		var currentDay = this.years[this.currentYear][this.currentDay-1];
+		if ( !currentDay ) {
+			this.currentSliderValue = this.finalDay.Doy;
+			this.slider.set([this.currentSliderValue]);
+		}
+	
+
 		this.updateButtons();
+		this.updateDayOfYear();	
 
-		this.updateDayOfYear();		
+		this.slider.set([this.currentSliderValue]);			
 
 	},	
 
 
-	// xoxoxoxoxoxoxoxoxoxox
-	updateTicks : function () {
-
-
-		var lastDayObj  = this.finalDay,
-		    lastYear    = lastDayObj.Year,		    
-		    lastDay     = lastDayObj.Day,
-		    lastMonthNo = lastDayObj.MonthNo,
-		    daysInMonth = new Date(lastYear, lastMonthNo, 0).getDate(),
-		    diffDays    = daysInMonth - lastDay;
-
-
-
-		// Now we need to figure out how many days it adds up to...
-		var allDays = 0;
-		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {	// how many months we itterate
-			var daysInMonth = new Date(this.ticks[i].year, this.ticks[i].monthNo, 0).getDate();
-			allDays += daysInMonth;
-		}
-
-		// Get start date
-		var firstMonth = this.ticks[this.tickStart];	
-		var daysInFirstMonth = new Date(firstMonth.year, firstMonth.monthNo, 0).getDate();
-		var _firstDay = new Date(firstMonth.year, firstMonth.monthNo, (daysInFirstMonth-diffDays));
-
-		// Do I even need this?
-		var _lastMonth = this.ticks[this.tickEnd-1];
-		var _daysInLastMonth = new Date(_lastMonth.year, _lastMonth.monthNo, 0).getDate();
-		var _lastDay = new Date(_lastMonth.year, _lastMonth.monthNo, lastDay);
-
-
-		this.tickContainer.innerHTML = '';
-	
-		var year = '';
-
-
-		for ( var i = this.tickStart; i < this.tickEnd; i++ ) {
-
-			var _i = i;
-
-			var month = this.ticks[_i].month.substr(0,3);
-			var _tick = Wu.DomUtil.create('div', 'big-slider-tick', this.tickContainer, month);
-
-			if ( year != this.ticks[_i].year ) {
-				var newYear = Wu.DomUtil.create('div', 'big-slider-year-tick', _tick, this.ticks[_i].year);
-				year = this.ticks[_i].year;	
-			}
-
-			// Days in this month...
-			var DIM = new Date(year, this.ticks[_i].monthNo, 0).getDate();
-
-			if ( i == this.tickStart ) DIM -= (daysInFirstMonth-diffDays);
-			if ( i == this.tickEnd-1 ) DIM -= diffDays;
-
-			var dimprop = (DIM / 365) * 99;
-			
-			_tick.style.width = dimprop + '%';
-
-		}
-
-
-
-	
-	},
 
 	updateButtons : function () {
 
 
-		if ( this.tickEnd == this.ticks.length ) {
+		// Wu.DomUtil.addClass(this.stepForward, 'disable-button');
+
+
+		if ( this.currentYear == this.yearNames[this.yearNames.length-1] ) {
 			this.diableForward = true;
-			Wu.DomUtil.addClass(this.stepForward, 'disable-button');
+			Wu.DomUtil.addClass(this.stepForward, 'disable-button');			
 		} else {
 			this.diableForward = false;
 			Wu.DomUtil.removeClass(this.stepForward, 'disable-button');
 		}
 
-		if ( this.tickStart == 0 ) {
+
+		if ( this.currentYear == this.yearNames[0] ) {
 			this.diableBackward = true;
 			Wu.DomUtil.addClass(this.stepBackward, 'disable-button');
 		} else {
 			this.diableBackward = false;
 			Wu.DomUtil.removeClass(this.stepBackward, 'disable-button');
 		}
-		
-		
+
 
 	},
 
@@ -659,23 +644,6 @@ Wu.BigSlider = Wu.Class.extend({
 
 	remove : function (id) {
 	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	getMaxSCF : function (days) { 
 
@@ -756,14 +724,9 @@ Wu.BigSlider = Wu.Class.extend({
 				years[currentYear] = [];
 			}
 
-			// console.log('each', each);
 			var thisYear = {
 				SCF : each.SCF,
-				// Year : each.Year,
-				// Doy : each.Doy,
 				date : this._dateFromNo(each.Doy)
-				// Cloud : each.Clod,
-				// Age : each.Age
 			}
 
 			years[currentYear].push(thisYear)
