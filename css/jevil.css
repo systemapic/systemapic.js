@@ -2582,3 +2582,11 @@ input.chrome-field-input {
     text-align: center;
     left: 0;    
 }
+
+#field_mini_input_cube-input-left {
+    left: -13px;
+}
+
+#field_mini_input_cube-input-right {
+    left: -33px;
+}

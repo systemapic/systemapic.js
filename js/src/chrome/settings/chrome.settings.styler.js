@@ -395,10 +395,23 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var stops = this._rasterStyler.stops;
 
-		stops[0].val;
-		stops[0].col;
-		stops[1].val;
-		stops[1].col;
+		// stops[0].val;
+		// stops[0].col;
+		// stops[0].opacity;
+
+		// stops[1].val;
+		// stops[1].col;
+		// stops[1].opacity;
+
+		if ( !stops[0].opacity ) stops[0].opacity = 1;
+		var RGB_one = Wu.Tools.color2RGB(stops[0].col);
+		var RGBA_one = 'rgba(' + RGB_one.r + ',' + RGB_one.g + ',' + RGB_one.b + ',' + stops[0].opacity + ')';
+
+		if ( !stops[1].opacity ) stops[1].opacity = 1;			
+		var RGB_two = Wu.Tools.color2RGB(stops[1].col);
+		var RGBA_two = 'rgba(' + RGB_two.r + ',' + RGB_two.g + ',' + RGB_two.b + ',' + stops[1].opacity + ')';
+
+		
 
 
 		var styleCSS = 	'#layer {' +
@@ -408,8 +421,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 				'raster-comp-op: color-dodge;' +
 				'raster-colorizer-stops:' +
 				'stop(' + (stops[0].val-1) + ', rgba(0,0,0,0))' + 
-				'stop(' + stops[0].val + ', ' + stops[0].col + ')' + 
-				'stop(' + stops[1].val + ', ' + stops[1].col + ')' +
+				'stop(' + stops[0].val + ', ' + RGBA_one + ')' + 
+				'stop(' + stops[1].val + ', ' + RGBA_two + ')' +
 				'stop(255, rgba(0,0,0,0), exact);' +
 				'}';
 
