@@ -1767,5 +1767,19 @@ input.target-input.polygon {
 
 
 .cube-dataset-wrapper {
-    margin: 10px;
+    padding: 10px;
+    cursor: pointer;
 }
+.cube-dataset-wrapper:nth-child(even) {
+    background: #F9F9F9;
+}
+.cube-dataset-hover {
+    background: #C7CACF !important;
+}
+.cube-dataset-sortable-dragging {
+    background: white;
+}
+
+
+
+

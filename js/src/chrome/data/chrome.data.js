@@ -1238,9 +1238,20 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var dataset_name = Wu.DomUtil.create('div', 'cube-dataset-name', dataset_wrapper, name);
 			var dataset_time = Wu.DomUtil.create('div', 'cube-dataset-time', dataset_wrapper, timestamp);
 
-			
 		}, this);
 
+
+		// enable sortable
+		var sort = $('.cube-datasets-list-wrapper').sortable({
+			placeholderClass : 'cube-dataset-sortable-dragging',
+			forcePlaceholderSize : true,
+			hoverClass : 'cube-dataset-hover'
+		})
+
+		// bind update event
+		sort.bind('sortupdate', function(e, ui) {
+			console.log('sort update', e, ui);
+		});
 
 		// return wrapper
 		return toggles_wrapper;
