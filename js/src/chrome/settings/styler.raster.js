@@ -6,9 +6,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		this.options = options;
 
-		this.stops = [{ val : 80,  col : '#FF0000' },
-			      { val : 180, col : '#00FF00' }];
-
+		this.stops = options.carto ? options.carto : [{ val : 80,  col : '#FF0000' },{ val : 180, col : '#00FF00' }];
 
 		this._initContainer();
 		this.updateStyle();

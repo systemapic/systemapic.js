@@ -902,11 +902,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 			cube_id : this.getCubeId(),
 			style : style
 		}
-<<<<<<< HEAD
-
-		app.api.updateCube(options, function (err, response) {
-			if (err) return console.error('Error updating Cube Style:', err, response);
-=======
 		app.api.updateCube(options, function (err, cubeJSON) {
 			if (err) return console.error('Error updating Cube Style:', err, cubeJSON);
 			console.log('updateCube, err, cubeJSON', err, cubeJSON);
@@ -915,7 +910,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 			var cube = Wu.parse(cubeJSON)
 			this._saveCube(cube);
 
->>>>>>> 83f4626f6bf46aea92fa1c94d8963d9c351f747e
 			// refresh layers
 			this._refreshLayer();
 		}.bind(this));

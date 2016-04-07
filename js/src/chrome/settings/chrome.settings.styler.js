@@ -90,6 +90,15 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_initCubeStyler : function () {
 
+		// console.error('_initCubeStyler');
+		// console.log('this._layer.getStyling()', this._layer.getStyling());
+		// console.log('this._carto');
+
+		this._carto = this._layer.getStyling();
+
+		// pølse
+		
+
 		var options = {
 			carto 	  : this._carto,
 			layer 	  : this._layer,
@@ -380,6 +389,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		
 	},
 
+
+
 	_updateCube : function () {
 
 		var stops = this._rasterStyler.stops;
@@ -408,33 +419,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var styleJSON = stops;				
 
 
-<<<<<<< HEAD
-		// console.log('%c*********************', 'background: hotpink; color: white;');;
-		// console.log('%cSave this json string =>', 'color: green;');
-		// console.log(saveJson);
-		// console.log('%c=====================', 'color: hotpink;');
-		// console.log('%cSave this style', 'color: green');
-		// console.log(style);
-		// console.log('%c*********************', 'background: hotpink; color: white;');;
-		
+		// this._layer.updateStyle(style);
 
-		this._layer.updateStyle(style);
-
-		// this.setCarto();
-
-
-		// console.log('%c FETTA ', 'background: hotpink; color: white;');
-		// console.log('this._layer', this._layer);
-		// console.log('this._carto', this._carto);
-		// console.log('%c FETTA ', 'background: hotpink; color: white;');		
-
-
-		// this._rasterStyler.setCarto(this.carto);
-
-
-		// console.log('this._layer', );
-
-=======
 		console.log('%c*********************', 'background: hotpink; color: white;');;
 		console.log('%cSave this json string =>', 'color: green;');
 		console.log(styleJSON);
@@ -446,7 +432,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// update pile layer
 		this._layer.updateStyle(styleCSS);
->>>>>>> 83f4626f6bf46aea92fa1c94d8963d9c351f747e
+
 
 		// save JSON style to `model.style` -> https://github.com/systemapic/wu/blob/master/models/layer.js#L66
 		this._layer.setStyling(stops); // will be stringified in setStyling fn
@@ -538,17 +524,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		if ( this._layer.isCube() ) {
 			
 			// add GUI for cube styling here!
-<<<<<<< HEAD
 			this._initCubeStyler();
-=======
-			
-			this._initStyle(); // debug
-		} else {
-
-			// init style json
-			this._initStyle();
->>>>>>> 83f4626f6bf46aea92fa1c94d8963d9c351f747e
-
 
 		} else {
 
