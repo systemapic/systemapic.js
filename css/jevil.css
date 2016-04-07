@@ -2053,11 +2053,11 @@ input.chrome-field-input {
     top: auto;
     }
 
-.layer-list-container .file-popup-trigger {
+/*.layer-list-container .file-popup-trigger {
     display: none;
     opacity: 0;
     visibility: hidden;
-    }
+    }*/
 
 .data-list-line.processing, 
 .data-list-line.processing:hover {

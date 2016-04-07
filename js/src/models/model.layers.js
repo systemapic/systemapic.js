@@ -360,6 +360,10 @@ Wu.Model.Layer = Wu.Model.extend({
 		if (this.store.data) return this.store.data.cartoid;
 	},
 
+	getName : function () {
+		return this.getTitle();
+	},
+
 	// set postgis styling 
 	setLayerStyle : function (options, callback) {
 

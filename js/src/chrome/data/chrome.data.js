@@ -1109,12 +1109,143 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._refreshFiles();
 	},
 
-	// Enable popup on file (when clicking on "..." button)
+	// Enable popup on file (when clicking on "(...)" button)
 	enableFilePopUp : function (uuid) {
 
 		// open fullscreen file options
 		this._openFileOptionsFullscreen(uuid);
 	},
+
+	_openCubeLayerEditFullscreen : function (layer) {
+
+		// create fullscreen
+		var fullscreen = this._fullscreen = new Wu.Fullscreen({
+			title : '<i class="fa fa-bars file-option"></i>Timeseries options for ' + layer.getTitle(),
+			titleClassName : 'slim-font'
+		});
+
+		// return;
+
+		// shortcuts
+		this._fullscreen._layer = layer;
+		var content = this._fullscreen._content;
+
+		
+
+		this._createCubeDatasetsBox({
+			container : content,
+			layer : layer
+		});
+
+
+		return;
+
+
+
+
+		// // name box
+		// var nameContainer = this._createNameBox({
+		// 	container : content,
+		// 	file : layer
+		// });
+
+
+		// // if vector
+		// if (file.isVector()) {
+
+		// 	// vector meta
+		// 	this._createVectorMetaBox({
+		// 		container : nameContainer,
+		// 		file : file
+		// 	});
+		// }
+
+
+		// // if raster
+		// if (file.isRaster()) {
+
+		// 	// raster meta
+		// 	this._createRasterMetaBox({
+		// 		container : nameContainer,
+		// 		file : file
+		// 	});
+
+		// 	// transparency box
+		// 	this._createTransparencyBox({
+		// 		container : content,
+		// 		file : file
+		// 	});
+
+		// 	// vectorize box
+		// 	this._createVectorizeBox({
+		// 		container : content,
+		// 		file : file
+		// 	});
+
+		// }
+
+		// // share button
+		// this._createShareBox({
+		// 	container : content,
+		// 	file : file,
+		// 	fullscreen : fullscreen
+		// });
+
+
+		// // download button
+		// this._createDownloadBox({
+		// 	container : content,
+		// 	file : file,
+		// 	fullscreen : fullscreen
+		// });
+
+		// // delete button
+		// this._createDeleteBox({
+		// 	container : content,
+		// 	file : file,
+		// 	fullscreen : fullscreen
+		// });
+
+
+	},
+
+	_createCubeDatasetsBox : function (options) {
+
+		var container = options.container;
+		var layer = options.layer;
+
+		// create divs
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Datasets in timeseries');
+
+
+		// create list of datasets
+		var datasets_wrapper = Wu.DomUtil.create('div', 'cube-datasets-list-wrapper', toggles_wrapper);
+
+		// get datasets
+		var datasets = layer.getDatasets();
+		console.log('datasets::: ', datasets);
+
+		datasets.forEach(function (dataset) {
+
+			// get data
+			var name = dataset.meta.text;
+			var timestamp = dataset.meta.date;
+			var uuid = dataset.uuid;
+
+			// create divs
+			var dataset_wrapper = Wu.DomUtil.create('div', 'cube-dataset-wrapper', datasets_wrapper);
+			var dataset_name = Wu.DomUtil.create('div', 'cube-dataset-name', dataset_wrapper, name);
+			var dataset_time = Wu.DomUtil.create('div', 'cube-dataset-time', dataset_wrapper, timestamp);
+
+			
+		}, this);
+
+
+		// return wrapper
+		return toggles_wrapper;
+	},
+
 
 	_openFileOptionsFullscreen : function (uuid) {
 
@@ -1159,12 +1290,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				container : nameContainer,
 				file : file
 			});
-
-			// // tileset box 	// removed since we're going with pg_rasters
-			// this._createTilesetBox({
-			// 	container : content,
-			// 	file : file
-			// });
 
 			// transparency box
 			this._createTransparencyBox({
@@ -2340,9 +2465,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				.exit()
 				.remove();
 
-		// Create Toggle Button (layer/baselayer)
-		// this.createLayerToggleButton(dataListLine, library);
-
+		// create layermenu toggle 
 		this.createLayerToggleSwitch(dataListLine, library);
 
 		// Create Radio Button
@@ -2758,15 +2881,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// Little "..." button next to layer name
 
-	createLayerPopUpTrigger : function (parent, library) {
+	createLayerPopUpTrigger : function (parent, type) {
 
-		if ( library != 'postgis' ) return;
+		console.log('createLayerPopUpTrigger', type);
+
+		if ( type != 'postgis' && type != 'cube') return;
 
 		// Bind
 		var popupTrigger =
 				parent
-						.selectAll('.file-popup-trigger')
-						.data(function(d) { return [d] });
+				.selectAll('.file-popup-trigger')
+				.data(function(d) { return [d] });
 
 		// Enter
 		popupTrigger
@@ -2860,7 +2985,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				disabled : !canEdit
 			},
 			changeName : {
-				name : 'Change Name',
+				name : 'Rename...',
 				disabled : !canEdit
 			},
 			download : {
@@ -2873,6 +2998,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			}
 		};
 
+		if (library == 'cube') {
+			action.editCube = {
+				name : 'Edit timeseries',
+				disabled : !canEdit
+			}
+		}
+
 
 		for (var f in action) {
 
@@ -2881,28 +3013,28 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// Bind
 			var fileAction =
-					parent
-							.selectAll('.' + className)
-							.data(function(d) { return [d] });
+				parent
+				.selectAll('.' + className)
+				.data(function(d) { return [d] });
 
 			// Enter
 			fileAction
-					.enter()
-					.append('div')
-					.classed(className, true)
-					.classed('file-action', true)
-					.classed('displayNone', action[f].disabled)
-					.attr('trigger', f)
-					.html(name)
-					.on('click', function (d) {
-						var trigger = this.getAttribute('trigger');
-						that.layerActionTriggered(trigger, d, that, library)
-					});
+				.enter()
+				.append('div')
+				.classed(className, true)
+				.classed('file-action', true)
+				.classed('displayNone', action[f].disabled)
+				.attr('trigger', f)
+				.html(name)
+				.on('click', function (d) {
+					var trigger = this.getAttribute('trigger');
+					that.layerActionTriggered(trigger, d, that, library)
+				});
 
 			// Exit
 			fileAction
-					.exit()
-					.remove();
+				.exit()
+				.remove();
 		}
 	},
 
@@ -2933,10 +3065,19 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// delete
 		if (trigger == 'style') this.styleLayer(layer);
 
+		// delete
+		if (trigger == 'editCube') this._editCube(layer);
+
 		// refresh
 		this.showLayerActionFor = false;
 		this.selectedLayers = [];
 		this._refreshLayers();
+	},
+
+	_editCube : function (layer) {
+		console.log('_editCube', layer);
+
+		this._openCubeLayerEditFullscreen(layer);
 	},
 
 	styleLayer : function (layer) {
