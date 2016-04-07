@@ -53,10 +53,14 @@ Wu.Styler = Wu.Class.extend({
 		return this.options.carto[this.type];
 	},
 
+
 	setCarto : function (carto) {
+
 		console.error('setCarto', carto, this);
 		this.options.carto[this.type] = carto;
+
 	},
+
 
 	initialize : function (options) {
 
@@ -1135,8 +1139,18 @@ Wu.Styler = Wu.Class.extend({
 		// get sql
 		var sql = layer.getSQL();
 
-		console.error('lyaer.getSQL', sql);
-		console.log('layuer: ', layer);
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');		
+		console.error('layer.getSQL', sql);
+		console.log('layer: ', layer);
+		console.log('carto', carto);
+		console.log('this.options.carto', this.options.carto);
+		console.log('');
+		console.log('');
+		console.log('');		
+		console.log('');
 
 		// request new layer
 		var layerOptions = {

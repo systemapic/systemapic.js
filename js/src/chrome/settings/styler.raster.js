@@ -1,5 +1,7 @@
 Wu.RasterStyler = Wu.Class.extend({
 
+	type : 'cube',
+
 	initialize : function (options) {
 
 		this.options = options;
@@ -129,7 +131,12 @@ Wu.RasterStyler = Wu.Class.extend({
 		this._rightNumber.innerHTML = this.stops[1].val;
 
 
-	}
+	},
+
+	setCarto : function (carto) {
+		console.log('%c setCarto ', 'background: hotpink; color: white;');;
+		this.options.carto = carto;
+	},	
 
 })
 

@@ -2525,7 +2525,7 @@ input.chrome-field-input {
     /*right: 30px;*/
     }
 
-.noUi-horizontal {
+.big-slider-outer-container .noUi-horizontal {
     height: 9px;    
     }
 
@@ -2538,14 +2538,14 @@ input.chrome-field-input {
     font-size: 10px;
 }    
 
-.noUi-horizontal .noUi-handle {
+.big-slider-outer-container .noUi-horizontal .noUi-handle {
     width: 21px;
     height: 18px;
     left: -10px;
     top: -6px;    
 }
 
-.noUi-origin:before {
+.big-slider-outer-container .noUi-origin:before {
     content: '';
     position: absolute;
     width: 1px;

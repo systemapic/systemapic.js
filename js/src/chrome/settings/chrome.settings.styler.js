@@ -66,18 +66,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Mark inited
 		this._inited = true;
+
 	},
 
 
 	_initStyle : function () {
-
-		this.layerType = 'cube';
-
-		if ( this.layerType == 'cube' ) {
-			this._initRasterLayer();
-			return;
-		}
-
 
 
 		// Get layer meta
@@ -95,7 +88,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	_initRasterLayer : function () {
+	_initCubeStyler : function () {
 
 		var options = {
 			carto 	  : this._carto,
@@ -107,7 +100,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			container : this._fieldsWrapper
 		};
 
-		this.rasterStyler = new Wu.RasterStyler(options);
+		this._rasterStyler = new Wu.RasterStyler(options);
 
 	},
 
@@ -358,8 +351,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		console.log('update_style');
 
-		if ( this.layerType == 'cube' ) {
+		if ( this._layer.isCube() ) {
+
+			this.type = 'cube';
+			this._rasterStyler.setCarto(this._rasterStyler.stops);
 			this._updateCube();
+
 			return;
 		}
 
@@ -385,7 +382,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateCube : function () {
 
-		var stops = this.rasterStyler.stops;
+		var stops = this._rasterStyler.stops;
 
 		stops[0].val;
 		stops[0].col;
@@ -410,16 +407,27 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var saveJson = JSON.stringify(stops);				
 
 
-		console.log('%c*********************', 'background: hotpink; color: white;');;
-		console.log('%cSave this json string =>', 'color: green;');
-		console.log(saveJson);
-		console.log('%c=====================', 'color: hotpink;');
-		console.log('%cSave this style', 'color: green');
-		console.log(style);
-		console.log('%c*********************', 'background: hotpink; color: white;');;
+		// console.log('%c*********************', 'background: hotpink; color: white;');;
+		// console.log('%cSave this json string =>', 'color: green;');
+		// console.log(saveJson);
+		// console.log('%c=====================', 'color: hotpink;');
+		// console.log('%cSave this style', 'color: green');
+		// console.log(style);
+		// console.log('%c*********************', 'background: hotpink; color: white;');;
 		
 
 		this._layer.updateStyle(style);
+
+		// this.setCarto();
+
+
+		// console.log('%c FETTA ', 'background: hotpink; color: white;');
+		// console.log('this._layer', this._layer);
+		// console.log('this._carto', this._carto);
+		// console.log('%c FETTA ', 'background: hotpink; color: white;');		
+
+
+		// this._rasterStyler.setCarto(this.carto);
 
 
 		// console.log('this._layer', );
@@ -485,7 +493,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get layer
 		this._layer = this._project.getLayer(this.layerUuid);
 
-		console.log('this._layer', this._layer);
+		// console.log('this._layer', this._layer);
 
 		// return if no layer
 		if (!this._layer || !this._layer.isStylable()) return;
@@ -496,7 +504,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
 
-		console.log('style: ', style);
+		// console.log('style: ', style);
 
 		// define tab
 		this.tabindex = 1;
@@ -508,15 +516,16 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.oldLegendObj = false;
 		this.legendObj = false;
 
-		if (this._layer.isCube()) {
+		if ( this._layer.isCube() ) {
 			
-			// init style json
-			this._initStyle();
+			// add GUI for cube styling here!
+			this._initCubeStyler();
+
+
 		} else {
 
-			// add GUI for cube styling here!
-			
-
+			// init style json
+			this._initStyle();
 		}
 
 		// Add temp layer

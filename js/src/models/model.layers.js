@@ -466,6 +466,14 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	setStyling : function (styleJSON) {
+
+		console.log('');
+		console.log('');
+		console.log('%c setStyling ', 'background: blue; color: white;')
+		console.log('styleJSON', styleJSON);
+		console.log('');
+		console.log('');
+
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
@@ -542,6 +550,14 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	// save updates to layer (like description, style)
 	save : function (field) {
+
+		console.log('');
+		console.log('');
+		console.log('');
+		console.error('save');
+		console.log('field', field);
+		console.log('');
+		console.log('');
 
 		var json = {};
 		json[field] = this.store[field];
@@ -880,13 +896,15 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 	},
 
 	updateStyle : function (style) {
+
+		// console.error('updateStyle');
 		var options = {
 			cube_id : this.getCubeId(),
 			style : style
 		}
+
 		app.api.updateCube(options, function (err, response) {
 			if (err) return console.error('Error updating Cube Style:', err, response);
-
 			// refresh layers
 			this._refreshLayer();
 		}.bind(this));
@@ -968,6 +986,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	// on change in style editor, etc.
 	updateStyle : function (style) {
+
 		var layerUuid = style.layerUuid;
 		var postgisOptions = style.options;
 
