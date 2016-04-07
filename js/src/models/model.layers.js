@@ -902,12 +902,31 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 			cube_id : this.getCubeId(),
 			style : style
 		}
+<<<<<<< HEAD
 
 		app.api.updateCube(options, function (err, response) {
 			if (err) return console.error('Error updating Cube Style:', err, response);
+=======
+		app.api.updateCube(options, function (err, cubeJSON) {
+			if (err) return console.error('Error updating Cube Style:', err, cubeJSON);
+			console.log('updateCube, err, cubeJSON', err, cubeJSON);
+
+			// save updated cube
+			var cube = Wu.parse(cubeJSON)
+			this._saveCube(cube);
+
+>>>>>>> 83f4626f6bf46aea92fa1c94d8963d9c351f747e
 			// refresh layers
 			this._refreshLayer();
 		}.bind(this));
+	},
+
+	_saveCube : function (cube) {
+		this.store.data.cube = JSON.stringify(cube);
+		this.save('data');
+
+		// hack: must parse again, cause cube is currently stored as JSON
+		this.store.data.cube = cube;
 	},
 
 	_refreshLayer : function () {
@@ -990,12 +1009,13 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		var layerUuid = style.layerUuid;
 		var postgisOptions = style.options;
 
+		console.log('update style: ', style);
+
 		// save 
 		this.setStyle(postgisOptions);
 
 		// update layer option
 		this._refreshLayer(layerUuid);
-
 	},
 
 	_getLayerUuid : function () {
@@ -1074,7 +1094,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		
 		var layerUuid = this._getLayerUuid();
 		var url = app.options.servers.tiles.uri + "{layerUuid}/{z}/{x}/{y}.grid" + access_token;
-
 
 		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {

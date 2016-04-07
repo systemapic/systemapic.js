@@ -390,7 +390,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		stops[1].col;
 
 
-		var style = 	'#layer {' +
+		var styleCSS = 	'#layer {' +
 				'raster-opacity: 1;' + 
 				'raster-colorizer-default-mode: linear;' + 
 				'raster-colorizer-default-color: transparent;' +
@@ -404,9 +404,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 
-		var saveJson = JSON.stringify(stops);				
+		// var styleJSON = JSON.stringify(stops);				
+		var styleJSON = stops;				
 
 
+<<<<<<< HEAD
 		// console.log('%c*********************', 'background: hotpink; color: white;');;
 		// console.log('%cSave this json string =>', 'color: green;');
 		// console.log(saveJson);
@@ -432,9 +434,26 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// console.log('this._layer', );
 
+=======
+		console.log('%c*********************', 'background: hotpink; color: white;');;
+		console.log('%cSave this json string =>', 'color: green;');
+		console.log(styleJSON);
+		console.log('%c=====================', 'color: hotpink;');
+		console.log('%cSave this styleCSS', 'color: green');
+		console.log(styleCSS);
+		console.log('%c*********************', 'background: hotpink; color: white;');;
+		
 
+		// update pile layer
+		this._layer.updateStyle(styleCSS);
+>>>>>>> 83f4626f6bf46aea92fa1c94d8963d9c351f747e
 
+		// save JSON style to `model.style` -> https://github.com/systemapic/wu/blob/master/models/layer.js#L66
+		this._layer.setStyling(stops); // will be stringified in setStyling fn
 
+		// @jorgen: use `this._layer.getStyling() to get styleJSON 
+
+		// todo: renmae setStyling to setStyleJSON... (must update many places)
 	},
 
 	_refresh : function () {
@@ -519,7 +538,16 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		if ( this._layer.isCube() ) {
 			
 			// add GUI for cube styling here!
+<<<<<<< HEAD
 			this._initCubeStyler();
+=======
+			
+			this._initStyle(); // debug
+		} else {
+
+			// init style json
+			this._initStyle();
+>>>>>>> 83f4626f6bf46aea92fa1c94d8963d9c351f747e
 
 
 		} else {
