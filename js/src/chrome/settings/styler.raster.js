@@ -51,8 +51,6 @@ Wu.RasterStyler = Wu.Class.extend({
 
 
 
-
-
 		this.leftBall = new Wu.button({
 			appendTo  : this._colorSelectorLeft,
 			type      : 'colorball',
@@ -100,6 +98,8 @@ Wu.RasterStyler = Wu.Class.extend({
 
 			this.stops[0].val = min;
 			this.stops[1].val = max;
+
+			app.Tools.Styler.markChanged();
 
 			this.updateStyle();
 

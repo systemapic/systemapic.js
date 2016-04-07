@@ -2239,7 +2239,7 @@ input.chrome-field-input {
     left: 24px;
     position: absolute;
     font-size: 32px;
-    top: 24px;
+    top: 23px;
     cursor: pointer;
     }
 
@@ -2247,14 +2247,14 @@ input.chrome-field-input {
     position: absolute;
     right: 24px;
     font-size: 32px;
-    top: 24px;     
+    top: 23px;     
     cursor: pointer;
     }
 
 .big-slider-step-backward {
     position: absolute;
     font-size: 32px;
-    top: 24px; 
+    top: 23px; 
     right: 65px;
     cursor: pointer;
     }
@@ -2476,3 +2476,109 @@ input.chrome-field-input {
 
 
 
+
+
+
+
+.big-graph-outer-container {
+    right: 0;
+    /*bottom: 100px*/
+    /*bottom: 65px;*/
+    /*bottom: 52px;*/
+    bottom: 35px;
+    }
+
+.big-slider-outer-container {
+    width: auto;
+    padding-right: 0;
+    padding-left: 0;
+    right: 50px;
+    z-index: 5;  
+    }
+
+.big-slider-inner-container {
+    width: 520px;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 10px;
+    z-index: 10;    
+
+    /*border-top: 1px solid #CFCFCF;*/
+    border-radius: 0px 0px 5px 5px;    
+    }
+
+.big-slider-play-button {
+    /*font-size: 21px;*/
+    /*top: 23px;*/
+    /*left: 17px;*/
+    }
+
+.big-slider-step-forward {
+    /*right: 13px;*/
+    /*font-size: 21px;*/
+    /*top: 23px;    */
+    }
+
+.big-slider-step-backward {
+    /*font-size: 21px;*/
+    /*top: 23px;*/
+    /*right: 30px;*/
+    }
+
+.noUi-horizontal {
+    height: 9px;    
+    }
+
+.big-slider-year-tick {
+    top: -53px;
+    font-size: 14px;
+    }
+
+.big-slider-tick {
+    font-size: 10px;
+}    
+
+.noUi-horizontal .noUi-handle {
+    width: 21px;
+    height: 18px;
+    left: -10px;
+    top: -6px;    
+}
+
+.noUi-origin:before {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 227px;
+    left: 0;
+    bottom: 0;
+    background-color: blue;
+    opacity: 0.3;
+}
+
+.big-slider-play-button,
+.big-slider-step-forward,
+.big-slider-tap-forward,
+.big-slider-step-backward,
+.big-slider-tap-backward {
+    font-size: 21px;    
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+
+.big-slider-button-container {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    text-align: center;
+    left: 0;    
+}
