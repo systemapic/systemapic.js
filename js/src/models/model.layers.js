@@ -59,8 +59,6 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	add : function (type) {
 
-		console.log('add', this);
-
 		// mark as base or layermenu layer
 		this._isBase = (type == 'baselayer');
 		
@@ -69,7 +67,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	addTo : function () {
-		console.log('addTo', this);
 		if (!this._inited) this.initLayer();
 
 		// add to map
@@ -80,7 +77,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	_addTo : function (type) {
-		console.log('_addTo', this);
 		if (!this._inited) this.initLayer();
 
 		var map = app._map;
@@ -109,7 +105,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	_addThin: function () {
-		console.log('_addThin', this);
 		if (!this._inited) this.initLayer();
 
 		var map = app._map;
@@ -470,14 +465,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	setStyling : function (styleJSON) {
-
-		console.log('');
-		console.log('');
-		console.log('%c setStyling ', 'background: blue; color: white;')
-		console.log('styleJSON', styleJSON);
-		console.log('');
-		console.log('');
-
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
@@ -554,20 +541,10 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	// save updates to layer (like description, style)
 	save : function (field) {
-
-		console.log('');
-		console.log('');
-		console.log('');
-		console.error('save');
-		console.log('field', field);
-		console.log('');
-		console.log('');
-
 		var json = {};
 		json[field] = this.store[field];
 		json.layer  = this.store.uuid;
 		json.uuid   = app.activeProject.getUuid(); // project uuid
-
 		this._save(json);
 	},
 
@@ -676,8 +653,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	initialize : function (store) {
 
-		console.log('Wu.CubeLayer --> ', store, this);
-
 		// set store
 		this._setStore(store);
 
@@ -751,8 +726,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 		}, this);
 
-		console.log('added all datasets: ', this._layers);
-
 		// set first layer as default
 		this._showLayer(this._layers[0]);
 	},
@@ -771,8 +744,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 	},
 
 	playAnimation : function () {
-
-		console.log('playin!', this);
 
 		// debug: start on layer 0
 		this._currentFrame = this._layers[0];
@@ -852,8 +823,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	_addTo : function (type) {
 
-		console.log('cube _addTo', this);
-
 		if (!this._inited) this.initLayer();
 
 		var map = app._map;
@@ -901,14 +870,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 	updateStyle : function (style) {
 
-		// console.error('updateStyle');
 		var options = {
 			cube_id : this.getCubeId(),
 			style : style
 		}
 		app.api.updateCube(options, function (err, cubeJSON) {
 			if (err) return console.error('Error updating Cube Style:', err, cubeJSON);
-			console.log('updateCube, err, cubeJSON', err, cubeJSON);
 
 			// save updated cube
 			var cube = Wu.parse(cubeJSON)
@@ -916,6 +883,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
 			// refresh layers
 			this._refreshLayer();
+			
 		}.bind(this));
 	},
 
@@ -1006,8 +974,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 		var layerUuid = style.layerUuid;
 		var postgisOptions = style.options;
-
-		console.log('update style: ', style);
 
 		// save 
 		this.setStyle(postgisOptions);

@@ -1,3149 +1,3151 @@
 Wu.Chrome.Data = Wu.Chrome.extend({
 
-	_ : 'data',
+        _ : 'data',
 
-	options : {
-		defaultWidth : 400
-	},
+        options : {
+                defaultWidth : 400
+        },
 
-	// When a new layer is created, we make a background fade on it
-	newLayer : false,
+        // When a new layer is created, we make a background fade on it
+        newLayer : false,
 
-	_initialize : function () {
+        _initialize : function () {
 
-		// init container
-		this._initContainer();
+                // init container
+                this._initContainer();
 
-		// init content
-		this._initContent();
+                // init content
+                this._initContent();
 
-		// register buttons
-		this._registerButton();
+                // register buttons
+                this._registerButton();
 
-		// hide by default
-		this._hide();
+                // hide by default
+                this._hide();
 
-		// shortcut
-		app.Tools = app.Tools || {};
-		app.Tools.DataLibrary = this;
+                // shortcut
+                app.Tools = app.Tools || {};
+                app.Tools.DataLibrary = this;
 
-	},
+        },
 
-	_onLayerAdded : function (options) {
+        _onLayerAdded : function (options) {
 
-		var uuid = options.detail.layerUuid;
+                var uuid = options.detail.layerUuid;
 
-		// remember
-		this.newLayer = uuid;
+                // remember
+                this.newLayer = uuid;
 
-		// Get layer object
-		var layer = this._project.getLayer(uuid);
+                // Get layer object
+                var layer = this._project.getLayer(uuid);
 
-		if (!layer.store.metadata) {
-			app.feedback.setError({
-				title : 'Missing metadata',
-				description : 'layer ' + uuid + ' has no associated metadata'
-			});
-			layer.store.metadata = '{}';
-		}
+                if (!layer.store.metadata) {
+                        app.feedback.setError({
+                                title : 'Missing metadata',
+                                description : 'layer ' + uuid + ' has no associated metadata'
+                        });
+                        layer.store.metadata = '{}';
+                }
 
-		// Get layer meta
-		var layerMeta = Wu.parse(layer.store.metadata);
+                // Get layer meta
+                var layerMeta = Wu.parse(layer.store.metadata);
 
-		// Build tooltip object
-		var tooltipMeta = app.Tools.Tooltip._buildTooltipMeta(layerMeta); // TODO: use event?
+                // Build tooltip object
+                var tooltipMeta = app.Tools.Tooltip._buildTooltipMeta(layerMeta); // TODO: use event?
 
-		// Create tooltip meta...
-		layer.setTooltip(tooltipMeta);
+                // Create tooltip meta...
+                layer.setTooltip(tooltipMeta);
 
-		// refresh
-		this._refresh();
-	},
+                // refresh
+                this._refresh();
+        },
 
-	_onFileDeleted : function () {
-		this._refresh();
-	},
+        _onFileDeleted : function () {
+                this._refresh();
+        },
 
-	_onLayerDeleted : function () {
-		this._refresh();
-	},
+        _onLayerDeleted : function () {
+                this._refresh();
+        },
 
-	_onLayerEdited : function () {
-		this._refresh();
-	},
+        _onLayerEdited : function () {
+                this._refresh();
+        },
 
-	_initContainer : function () {
+        _initContainer : function () {
 
-		// create the container (just a div to hold errythign)
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content data', this.options.appendTo);
+                // create the container (just a div to hold errythign)
+                this._container = Wu.DomUtil.create('div', 'chrome chrome-content data', this.options.appendTo);
 
-		// Middle container
-		this._innerContainer = Wu.DomUtil.create('div', 'chrome-data-inner', this._container);
+                // Middle container
+                this._innerContainer = Wu.DomUtil.create('div', 'chrome-data-inner', this._container);
 
-		// LAYER LIST OUTER SCROLLER
-		this._listOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
-		this._listOuterScroller.style.height = '100%';
+                // LAYER LIST OUTER SCROLLER
+                this._listOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
+                this._listOuterScroller.style.height = '100%';
 
-		// List container
-		this._listContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._listOuterScroller);
+                // List container
+                this._listContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._listOuterScroller);
 
-		// LAYER LIST
-		this._initLayerListContainer();
+                // LAYER LIST
+                this._initLayerListContainer();
 
-		// FILE LIST
-		this._initFileListContainer();
+                // FILE LIST
+                this._initFileListContainer();
 
-		// Top container (with upload button)
-		this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
+                // Top container (with upload button)
+                this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
 
-		// close event
-		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
-		Wu.DomEvent.on(document.getElementById("app"), 'click', function () {
-			Wu.Mixin.Events.fire('appClick');
-		});
-	},
+                // close event
+                Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
+                Wu.DomEvent.on(document.getElementById("app"), 'click', function () {
+                        Wu.Mixin.Events.fire('appClick');
+                });
+        },
 
 
-	// Layer list container
-	_initLayerListContainer : function () {
+        // Layer list container
+        _initLayerListContainer : function () {
 
-		this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer);
+                this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer);
 
-		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Layers');
+                this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Layers');
 
-		// Containers
-		this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListWrapper);
+                // Containers
+                this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListWrapper);
 
-		// base layers
-		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Background layer');
-		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListWrapper);
+                // base layers
+                this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Background layer');
+                this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListWrapper);
 
-		// Background color selector
-		this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);
+                // Background color selector
+                this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);
 
-		// Lines
-		this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListWrapper);
+                // Lines
+                this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListWrapper);
 
-	},
+        },
 
-	// File list container
-	_initFileListContainer : function () {
+        // File list container
+        _initFileListContainer : function () {
 
-		// HEADER
-		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title layer-list', this._listContainer, '<i class="fa fa-database"></i> My Datasets');
+                // HEADER
+                this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title layer-list', this._listContainer, '<i class="fa fa-database"></i> My Datasets');
 
-		// Upload button container
-		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._listContainer);
+                // Upload button container
+                this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._listContainer);
 
-		// Containers
-		this._filesContainerHeader = Wu.DomUtil.create('div', 'files-container-header', this._listContainer);
-		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._listContainer);
-	},
+                // Containers
+                this._filesContainerHeader = Wu.DomUtil.create('div', 'files-container-header', this._listContainer);
+                this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._listContainer);
+        },
 
-	_initContent : function () {
+        _initContent : function () {
 
-		// add hooks
-		this._addEvents();
-	},
+                // add hooks
+                this._addEvents();
+        },
 
-	_registerButton : function () {
+        _registerButton : function () {
 
-		// register button in top chrome
-		var top = app.Chrome.Top;
+                // register button in top chrome
+                var top = app.Chrome.Top;
 
-		// add a button to top chrome
-		this._topButton = top._registerButton({
-			name : 'data',
-			className : 'chrome-button datalib',
-			trigger : this._togglePane,
-			context : this,
-			project_dependent : true
-		});
+                // add a button to top chrome
+                this._topButton = top._registerButton({
+                        name : 'data',
+                        className : 'chrome-button datalib',
+                        trigger : this._togglePane,
+                        context : this,
+                        project_dependent : true
+                });
 
-		// css experiement
-		this._topButton.innerHTML = '<i class="top-button fa fa-cloud"></i>Data';
+                // css experiement
+                this._topButton.innerHTML = '<i class="top-button fa fa-cloud"></i>Data';
 
-	},
+        },
 
-	_togglePane : function () {
+        _togglePane : function () {
 
-		// right chrome
-		var chrome = this.options.chrome;
+                // right chrome
+                var chrome = this.options.chrome;
 
-		// open/close
-		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
+                // open/close
+                this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 
-		if (this._isOpen) {
+                if (this._isOpen) {
 
-			// fire event
-			app.Socket.sendUserEvent({
-				user : app.Account.getFullName(),
-				event : 'opened',
-				description : 'the data library',
-				timestamp : Date.now()
-			});
-		}
-	},
+                        // fire event
+                        app.Socket.sendUserEvent({
+                                user : app.Account.getFullName(),
+                                event : 'opened',
+                                description : 'the data library',
+                                timestamp : Date.now()
+                        });
+                }
+        },
 
-	_show : function () {
+        _show : function () {
 
-		// Open layer menu
-		app.MapPane._controls.layermenu.open();
+                // Open layer menu
+                app.MapPane._controls.layermenu.open();
 
-		// mark button active
-		Wu.DomUtil.addClass(this._topButton, 'active');
-		this._container.style.display = 'block';
-		this._isOpen = true;
+                // mark button active
+                Wu.DomUtil.addClass(this._topButton, 'active');
+                this._container.style.display = 'block';
+                this._isOpen = true;
 
-		// enable edit of layer menu...
-		var layerMenu = app.MapPane.getControls().layermenu;
-		if (this._project.isEditable()) layerMenu.enableEditSwitch();
+                // enable edit of layer menu...
+                var layerMenu = app.MapPane.getControls().layermenu;
+                if (this._project.isEditable()) layerMenu.enableEditSwitch();
 
-		// open if closed
-		if (!layerMenu._layerMenuOpen) app.Chrome.Top._openLayerMenu();
-	},
+                // open if closed
+                if (!layerMenu._layerMenuOpen) app.Chrome.Top._openLayerMenu();
+        },
 
-	_hide : function () {
+        _hide : function () {
 
-		// mark button inactive
-		Wu.DomUtil.removeClass(this._topButton, 'active');
-		this._container.style.display = 'none';
+                // mark button inactive
+                Wu.DomUtil.removeClass(this._topButton, 'active');
+                this._container.style.display = 'none';
 
-		if (this._isOpen) {
-			var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
-			if (layerMenu) layerMenu.disableEditSwitch();
-		}
+                if (this._isOpen) {
+                        var layerMenu = app.MapPane.getControls().layermenu;     // move to settings selector
+                        if (layerMenu) layerMenu.disableEditSwitch();
+                }
 
-		this._isOpen = false;
-	},
+                this._isOpen = false;
+        },
 
-	onOpened : function () {
-	},
-	onClosed : function () {
-	},
-	_addEvents : function () {
-	},
-	_removeEvents : function () {
-	},
-	_onWindowResize : function () {
-	},
+        onOpened : function () {
+        },
+        onClosed : function () {
+        },
+        _addEvents : function () {
+        },
+        _removeEvents : function () {
+        },
+        _onWindowResize : function () {
+        },
 
-	getDimensions : function () {
-		var dims = {
-			width : this.options.defaultWidth,
-			height : this._container.offsetHeight
-		};
-		return dims;
-	},
+        getDimensions : function () {
+                var dims = {
+                        width : this.options.defaultWidth,
+                        height : this._container.offsetHeight
+                };
+                return dims;
+        },
 
-	_onFileImported : function (e) {
+        _onFileImported : function (e) {
 
-		console.error('_onFileImported', e.detail.file);
+                // refresh DOM
+                this._refresh();
 
-		// refresh DOM
-		this._refresh();
+                // get file
+                var file = e.detail.file;
 
-		// get file
-		var file = e.detail.file;
+                // automatically create layer
+                file._createLayer(this._project, function (err, layer) {
 
-		// automatically create layer
-		file._createLayer(this._project, function (err, layer) {
+                        // automatically add layer to layermenu
+                        this._addOnImport(layer);
 
-			// automatically add layer to layermenu
-			this._addOnImport(layer);
+                }.bind(this));
+        },
 
-		}.bind(this));
-	},
 
+        _addOnImport : function (layer) {
 
-	_addOnImport : function (layer) {
+                // add
+                this.addLayer(layer);
 
-		console.log('_addOnImport', layer);
+                // enable layer
+                this.enableLayer(layer);
 
-		// add
-		this.addLayer(layer);
+                // fly to
+                layer.flyTo();
 
-		// enable layer
-		this.enableLayer(layer);
+                // refresh
+                this._refreshLayers();
 
-		// fly to
-		layer.flyTo();
+                // open styler if postgis
+                if (layer.isVector()) {
+                        app.Tools.SettingsSelector.open();
+                }
 
-		// refresh
-		this._refreshLayers();
+        },
 
-		// open styler if postgis
-		if (layer.isVector()) {
-			app.Tools.SettingsSelector.open();
-		}
 
-	},
+        _refresh : function () {
 
+                if (!this._project) return;
 
-	_refresh : function () {
+                // remove temp files
+                _.each(this._tempFiles, function (tempFile, etc) {
+                        Wu.DomUtil.remove(tempFile.datawrap);
+                });
+                this._tempFiles = {};
 
-		if (!this._project) return;
+                // Empty containers
+                if ( this._layersContainer ) this._layersContainer.innerHTML = 'Currently no layers. Add data below.';
+                if ( this._filesContainer )  this._filesContainer.innerHTML = '';
 
-		// remove temp files
-		_.each(this._tempFiles, function (tempFile, etc) {
-			Wu.DomUtil.remove(tempFile.datawrap);
-		});
-		this._tempFiles = {};
+                // only update list if project is editable
+                if (this._project.isEditable()) {
 
-		// Empty containers
-		if ( this._layersContainer ) this._layersContainer.innerHTML = 'Currently no layers. Add data below.';
-		if ( this._filesContainer )  this._filesContainer.innerHTML = '';
+                        // Layer list
+                        this._initLayerList();
+                        this._refreshLayers();
+                }
 
-		// only update list if project is editable
-		if (this._project.isEditable()) {
+                this._refreshBaseLayerList();
 
-			// Layer list
-			this._initLayerList();
-			this._refreshLayers();
-		}
+                // File list
+                this._initFileLists();
+                this._refreshFiles();
 
-		this._refreshBaseLayerList();
+                // Upload button
+                this._initUploadButton();
 
-		// File list
-		this._initFileLists();
-		this._refreshFiles();
+                if (_.toArray(this.fileProviders.postgis.getFiles()).length >= 10) {
+                        this._filesContainerHeader.style.display = 'block';
+                        this._initSortButtons();
+                } else {
+                        this._filesContainerHeader.style.display = 'none';
+                        if (this.searchInput) {
+                                this.searchInput.value = '';
+                        }
+                }
 
-		// Upload button
-		this._initUploadButton();
+                // layer title
+                var projectName = this._project.getTitle();
+                this._layerListTitle.innerHTML = 'Layers for ' + projectName;
 
-		if (_.toArray(this.fileProviders.postgis.getFiles()).length >= 10) {
-			this._filesContainerHeader.style.display = 'block';
-			this._initSortButtons();
-		} else {
-			this._filesContainerHeader.style.display = 'none';
-			if (this.searchInput) {
-				this.searchInput.value = '';
-			}
-		}
+                // hide layers if not editor
+                if (!this._project.isEditable()) {
+                        // todo: put layers in wrapper and hide
+                        Wu.DomUtil.addClass(this._layerListWrapper, 'displayNone');
+                } else {
+                        Wu.DomUtil.removeClass(this._layerListWrapper, 'displayNone');
+                }
 
-		// layer title
-		var projectName = this._project.getTitle();
-		this._layerListTitle.innerHTML = 'Layers for ' + projectName;
+        },
 
-		// hide layers if not editor
-		if (!this._project.isEditable()) {
-			// todo: put layers in wrapper and hide
-			Wu.DomUtil.addClass(this._layerListWrapper, 'displayNone');
-		} else {
-			Wu.DomUtil.removeClass(this._layerListWrapper, 'displayNone');
-		}
+        _initUploadButton : function () {
 
-	},
+                // Return if upload button already exists
+                if (this.uploadButton) return;
 
-	_initUploadButton : function () {
+                // get upload button
+                this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this._uploadButtonContainer);
 
-		// Return if upload button already exists
-		if (this.uploadButton) return;
+                // set title
+                this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
+        },
 
-		// get upload button
-		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this._uploadButtonContainer);
+        _initSortButtons : function () {
+                var sortType = {
+                        'name': 'name',
+                        'date': 'lastUpdated',
+                        'size': 'dataSize'
+                };
 
-		// set title
-		this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
-	},
+                this.reverse = false;
 
-	_initSortButtons : function () {
-		var sortType = {
-			'name': 'name',
-			'date': 'lastUpdated',
-			'size': 'dataSize'
-		};
+                if (this.sortMenu) {
+                        return;
+                }
 
-		this.reverse = false;
+                this.sortMenu = Wu.DomUtil.create('div', 'files-sort-menu', this._filesContainerHeader);
+                this.sortSelect = Wu.DomUtil.create('div', 'files-sort-select', this._filesContainerHeader, 'Sort');
+                this.expendedContaner = Wu.DomUtil.create('div', 'expended-container', this._filesContainerHeader);
+                this.searchInputWraper = Wu.DomUtil.create('div', 'files-search-input-wraper', this._filesContainerHeader);
 
-		if (this.sortMenu) {
-			return;
-		}
+                var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper);
 
-		this.sortMenu = Wu.DomUtil.create('div', 'files-sort-menu', this._filesContainerHeader);
-		this.sortSelect = Wu.DomUtil.create('div', 'files-sort-select', this._filesContainerHeader, 'Sort');
-		this.expendedContaner = Wu.DomUtil.create('div', 'expended-container', this._filesContainerHeader);
-		this.searchInputWraper = Wu.DomUtil.create('div', 'files-search-input-wraper', this._filesContainerHeader);
+                this.searchInput = Wu.DomUtil.create('input', 'files-search-input', this.searchInputWraper);
+                this.searchInput.placeholder = 'sort: date';
+                this.currentSort = 'lastUpdated';
 
-		var searchIcon = Wu.DomUtil.create('i', 'fa fa-search search-files', this.searchInputWraper);
+                Wu.DomEvent.on(this.searchInput, 'keyup', this._onKeyup, this);
 
-		this.searchInput = Wu.DomUtil.create('input', 'files-search-input', this.searchInputWraper);
-		this.searchInput.placeholder = 'sort: date';
-		this.currentSort = 'lastUpdated';
+                Wu.DomEvent.on(this.sortSelect, 'click', this._onSortSelectClick, this);
 
-		Wu.DomEvent.on(this.searchInput, 'keyup', this._onKeyup, this);
+                this.sortOptions = Wu.DomUtil.create('div', 'files-sort-options', this.expendedContaner);
 
-		Wu.DomEvent.on(this.sortSelect, 'click', this._onSortSelectClick, this);
+                _.forEach(_.keys(sortType), function (type) {
+                        var option = Wu.DomUtil.create('div', 'sort-option', this.sortOptions);
+                        option.innerHTML = 'Sort by ' + type;
 
-		this.sortOptions = Wu.DomUtil.create('div', 'files-sort-options', this.expendedContaner);
+                        Wu.DomEvent.on(option, 'click', function (e) {
+                                Wu.DomEvent.stop(e);
+                                this.searchInput.placeholder = 'sort: ' + type;
+                                this.currentSort = sortType[type];
+                                this._sortFiles();
+                        }, this);
+                }.bind(this));
 
-		_.forEach(_.keys(sortType), function (type) {
-			var option = Wu.DomUtil.create('div', 'sort-option', this.sortOptions);
-			option.innerHTML = 'Sort by ' + type;
+                this.sortOrderWraper = Wu.DomUtil.create('div', 'files-sort-order-switch-wraper', this.sortOptions);
 
-			Wu.DomEvent.on(option, 'click', function (e) {
-				Wu.DomEvent.stop(e);
-				this.searchInput.placeholder = 'sort: ' + type;
-				this.currentSort = sortType[type];
-				this._sortFiles();
-			}, this);
-		}.bind(this));
+                var sort_order_toggle_label = Wu.DomUtil.create('div', 'sort-order-label');
 
-		this.sortOrderWraper = Wu.DomUtil.create('div', 'files-sort-order-switch-wraper', this.sortOptions);
+                this.orderSwitch = new Wu.button({
+                        id: 'order-switch',
+                        type: 'switch',
+                        isOn: this.reverse,
+                        right: false,
+                        disabled: false,
+                        appendTo: this.sortOrderWraper,
+                        fn: this._toggleSortOrder.bind(this),
+                        className: 'sort-order-switch'
+                });
 
-		var sort_order_toggle_label = Wu.DomUtil.create('div', 'sort-order-label');
+                this.sortOptions.style.display = 'none';
 
-		this.orderSwitch = new Wu.button({
-			id: 'order-switch',
-			type: 'switch',
-			isOn: this.reverse,
-			right: false,
-			disabled: false,
-			appendTo: this.sortOrderWraper,
-			fn: this._toggleSortOrder.bind(this),
-			className: 'sort-order-switch'
-		});
+                // close dropdown on any click
+                Wu.DomEvent.on(app._appPane, 'click', function (e) {
 
-		this.sortOptions.style.display = 'none';
+                        // only if target == self
+                        var relevantTarget = e.target == this.expendedContaner || e.target == this.sortOptions || e.target == this.sortOrderWraper;
+                        if (!relevantTarget) this._closeSortSelect();
 
-		// close dropdown on any click
-		Wu.DomEvent.on(app._appPane, 'click', function (e) {
+                }, this);
 
-			// only if target == self
-			var relevantTarget = e.target == this.expendedContaner || e.target == this.sortOptions || e.target == this.sortOrderWraper;
-			if (!relevantTarget) this._closeSortSelect();
+                Wu.DomEvent.on(this._filesContainerHeader, 'click', function (e) {
+                        this._closeSortSelect();
+                        Wu.DomEvent.stop(e);
+                }, this);
+        },
 
-		}, this);
+        _toggleSortOrder : function (e, isOn) {
+                isOn ? this.reverse = true : this.reverse = false;
+                if (e) {
+                        Wu.DomEvent.stop(e);
+                }
+                this._refreshFiles();
+        },
 
-		Wu.DomEvent.on(this._filesContainerHeader, 'click', function (e) {
-			this._closeSortSelect();
-			Wu.DomEvent.stop(e);
-		}, this);
-	},
+        _onSortSelectClick : function (e) {
+                this.sortOptions.style.display === 'none' ? this.sortOptions.style.display = 'block' : this.sortOptions.style.display = 'none';
 
-	_toggleSortOrder : function (e, isOn) {
-		isOn ? this.reverse = true : this.reverse = false;
-		if (e) {
-			Wu.DomEvent.stop(e);
-		}
-		this._refreshFiles();
-	},
+                var toggleClass = Wu.DomUtil.hasClass(this.sortSelect, 'expanded') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
+                toggleClass(this.sortSelect, 'expanded');
+                if (e) {
+                        Wu.DomEvent.stop(e);
+                }
+        },
 
-	_onSortSelectClick : function (e) {
-		this.sortOptions.style.display === 'none' ? this.sortOptions.style.display = 'block' : this.sortOptions.style.display = 'none';
+        _closeSortSelect : function () {
+                this.sortOptions.style.display = 'none';
+                Wu.DomUtil.removeClass(this.sortSelect, 'expanded');
+        },
 
-		var toggleClass = Wu.DomUtil.hasClass(this.sortSelect, 'expanded') ? Wu.DomUtil.removeClass : Wu.DomUtil.addClass;
-		toggleClass(this.sortSelect, 'expanded');
-		if (e) {
-			Wu.DomEvent.stop(e);
-		}
-	},
+        _onKeyup : function (e) {
+                this._refreshFiles({
+                        sortBy: this.currentSort,
+                        reverse: this.reverse,
+                        filter: this.searchInput.value.toLowerCase()
+                });
+        },
 
-	_closeSortSelect : function () {
-		this.sortOptions.style.display = 'none';
-		Wu.DomUtil.removeClass(this.sortSelect, 'expanded');
-	},
+        _sortFiles : function (type) {
+                this._refreshFiles({
+                        sortBy: this.currentSort,
+                        reverse: this.reverse,
+                        filter: this.searchInput.value.toLowerCase()
+                });
 
-	_onKeyup : function (e) {
-		this._refreshFiles({
-			sortBy: this.currentSort,
-			reverse: this.reverse,
-			filter: this.searchInput.value.toLowerCase()
-		});
-	},
+                this._onSortSelectClick();
+        },
 
-	_sortFiles : function (type) {
-		this._refreshFiles({
-			sortBy: this.currentSort,
-			reverse: this.reverse,
-			filter: this.searchInput.value.toLowerCase()
-		});
+        // When clicking on container, close popups
+        _closeActionPopUps : function (e) {
 
-		this._onSortSelectClick();
-	},
+                var classes = e.target.classList;
+                var stop = false;
+                var actions = ['file-action', 'file-popup-trigger', 'file-popup', 'toggle-button'];
 
-	// When clicking on container, close popups
-	_closeActionPopUps : function (e) {
+                // Stop when clicking on these classes
+                if (classes.forEach) {
+                        classes.forEach(function(c) {
+                                if ( actions.indexOf(c) !== -1) stop = true;
+                        });
+                }
 
-		var classes = e.target.classList;
-		var stop = false;
-		var actions = ['file-action', 'file-popup-trigger', 'file-popup', 'toggle-button'];
+                // Stop if we're editing name
+                if (e.target.name == this.editingFileName) stop = true;
+                if (e.target.name == this.editingLayerName) stop = true;
 
-		// Stop when clicking on these classes
-		if (classes.forEach) {
-			classes.forEach(function(c) {
-				if ( actions.indexOf(c) !== -1) stop = true;
-			});
-		}
+                if (stop) return;
 
-		// Stop if we're editing name
-		if (e.target.name == this.editingFileName) stop = true;
-		if (e.target.name == this.editingLayerName) stop = true;
+                // Reset
+                this.showFileActionFor = false;
 
-		if (stop) return;
+                this.showLayerActionFor = false;
+                this.selectedLayers = [];
 
-		// Reset
-		this.showFileActionFor = false;
+                this._refreshFiles();
+                this._refreshLayers();
+        },
 
-		this.showLayerActionFor = false;
-		this.selectedLayers = [];
+        _initFileLists : function () {
 
-		this._refreshFiles();
-		this._refreshLayers();
-	},
+                // Holds each section (project files, my files, etc)
+                // Currently only "my files"
+                this.fileListContainers = {};
 
-	_initFileLists : function () {
+                // Show file actions for this specific file (i.e. download, rename, etc)
+                this.showFileActionFor = false;
 
-		// Holds each section (project files, my files, etc)
-		// Currently only "my files"
-		this.fileListContainers = {};
+                // Edit file name for this file
+                this.editingFileName = false;
 
-		// Show file actions for this specific file (i.e. download, rename, etc)
-		this.showFileActionFor = false;
+                // File list (global)
+                this.fileProviders = {};
 
-		// Edit file name for this file
-		this.editingFileName = false;
+                this.fileProviders.postgis = {
+                        name : 'Data Library',
+                        data : [],
+                        getFiles : function () {
+                                return app.Account.getFiles();
+                        }
+                };
 
-		// File list (global)
-		this.fileProviders = {};
+                // Create FILE LIST section, with D3 container
+                for (var f in this.fileProviders ) {
 
-		this.fileProviders.postgis = {
-			name : 'Data Library',
-			data : [],
-			getFiles : function () {
-				return app.Account.getFiles();
-			}
-		};
+                        this.fileListContainers[f] = {};
 
-		// Create FILE LIST section, with D3 container
-		for (var f in this.fileProviders ) {
+                        // Create wrapper
+                        this.fileListContainers[f].wrapper = Wu.DomUtil.create('div', 'file-list-container', this._filesContainer);
 
-			this.fileListContainers[f] = {};
+                        // D3 Container
+                        this.fileListContainers[f].fileList = Wu.DomUtil.create('div', 'file-list-container-file-list', this.fileListContainers[f].wrapper);
+                        this.fileListContainers[f].D3container = d3.select(this.fileListContainers[f].fileList);
+                }
 
-			// Create wrapper
-			this.fileListContainers[f].wrapper = Wu.DomUtil.create('div', 'file-list-container', this._filesContainer);
+        },
 
-			// D3 Container
-			this.fileListContainers[f].fileList = Wu.DomUtil.create('div', 'file-list-container-file-list', this.fileListContainers[f].wrapper);
-			this.fileListContainers[f].D3container = d3.select(this.fileListContainers[f].fileList);
-		}
 
-	},
+        _refreshFiles : function (options) {
+                options = options || {};
 
+                // FILES
+                for (var p in this.fileProviders) {
+                        var provider = this.fileProviders[p];
+                        var files = provider.getFiles();
+                        var sortBy = options.sortBy || this.currentSort || 'lastUpdated'
+                        var reverse = options.reverse || this.reverse || false;
+                        var filter = options.filter || this.searchInput && this.searchInput.value && this.searchInput.value.toLowerCase() || '';
 
-	_refreshFiles : function (options) {
-		options = options || {};
+                        if (filter) {
+                                provider.data = _.filter(_.toArray(files), function (file) {
+                                        return file.store.name.toLowerCase().indexOf(filter) !== -1 || app.Users[file.store.createdBy].getFullName().toLowerCase().indexOf(filter) !== -1;
+                                });
+                                files = provider.data;
+                        }
 
-		// FILES
-		for (var p in this.fileProviders) {
-			var provider = this.fileProviders[p];
-			var files = provider.getFiles();
-			var sortBy = options.sortBy || this.currentSort || 'lastUpdated'
-			var reverse = options.reverse || this.reverse || false;
-			var filter = options.filter || this.searchInput && this.searchInput.value && this.searchInput.value.toLowerCase() || '';
+                        // get file list, sorted by last updated
+                        provider.data = _.sortBy(_.toArray(files), function (f) {
+                                if (sortBy === 'dataSize') {
+                                        return parseInt(f.store[sortBy]);
+                                }
 
-			if (filter) {
-				provider.data = _.filter(_.toArray(files), function (file) {
-					return file.store.name.toLowerCase().indexOf(filter) !== -1 || app.Users[file.store.createdBy].getFullName().toLowerCase().indexOf(filter) !== -1;
-				});
-				files = provider.data;
-			}
+                                return f.store[sortBy];
+                        });
 
-			// get file list, sorted by last updated
-			provider.data = _.sortBy(_.toArray(files), function (f) {
-				if (sortBy === 'dataSize') {
-					return parseInt(f.store[sortBy]);
-				}
+                        if (reverse !== true) {
+                                provider.data = provider.data.reverse();
+                        }
 
-				return f.store[sortBy];
-			});
+                        // containers
+                        var D3container = this.fileListContainers[p].D3container;
+                        var data = this.fileProviders[p].data;
+                        this.initFileList(D3container, data, p);
+                }
 
-			if (reverse !== true) {
-				provider.data = provider.data.reverse();
-			}
+        },
 
-			// containers
-			var D3container = this.fileListContainers[p].D3container;
-			var data = this.fileProviders[p].data;
-			this.initFileList(D3container, data, p);
-		}
+        // create temp file holder in file list while processing
+        _onFileProcessing : function (e) {
+                var file = e.detail.file;
+                var unique_id = file.uniqueIdentifier;
+                var filename = file.fileName;
 
-	},
+                // add temp file holder
+                var datawrap = Wu.DomUtil.create('div', 'data-list-line processing');
+                var title = Wu.DomUtil.create('div', 'file-name-content processing', datawrap, filename);
+                var feedback = Wu.DomUtil.create('div', 'file-feedback processing', datawrap);
+                var percent = Wu.DomUtil.create('div', 'file-feedback-percent processing', datawrap);
 
-	// create temp file holder in file list while processing
-	_onFileProcessing : function (e) {
-		var file = e.detail.file;
-		var unique_id = file.uniqueIdentifier;
-		var filename = file.fileName;
+                // remember
+                this._tempFiles = this._tempFiles || {};
+                this._tempFiles[unique_id] = {
+                        feedback : feedback,
+                        percent : percent,
+                        file : file,
+                        datawrap : datawrap
+                };
 
-		// add temp file holder
-		var datawrap = Wu.DomUtil.create('div', 'data-list-line processing');
-		var title = Wu.DomUtil.create('div', 'file-name-content processing', datawrap, filename);
-		var feedback = Wu.DomUtil.create('div', 'file-feedback processing', datawrap);
-		var percent = Wu.DomUtil.create('div', 'file-feedback-percent processing', datawrap);
+                // get file list
+                var file_list = this.fileListContainers.postgis.wrapper;
 
-		// remember
-		this._tempFiles = this._tempFiles || {};
-		this._tempFiles[unique_id] = {
-			feedback : feedback,
-			percent : percent,
-			file : file,
-			datawrap : datawrap
-		};
+                // prepend
+                file_list.insertBefore(datawrap, file_list.firstChild);
+        },
 
-		// get file list
-		var file_list = this.fileListContainers.postgis.wrapper;
+        _onProcessingProgress : function (e) {
 
-		// prepend
-		file_list.insertBefore(datawrap, file_list.firstChild);
-	},
+                var data = e.detail;
+                var percent = data.percent;
+                var text = data.text;
+                var uniqueIdentifier = data.uniqueIdentifier;
 
-	_onProcessingProgress : function (e) {
+                // get temp file divs
+                var tempfile = this._tempFiles[uniqueIdentifier];
 
-		var data = e.detail;
-		var percent = data.percent;
-		var text = data.text;
-		var uniqueIdentifier = data.uniqueIdentifier;
+                if (!tempfile) return;
 
-		// get temp file divs
-		var tempfile = this._tempFiles[uniqueIdentifier];
+                // set feedback
+                tempfile.feedback.innerHTML = text;
+                tempfile.percent.innerHTML = percent + '% done';
 
-		if (!tempfile) return;
+        },
 
-		// set feedback
-		tempfile.feedback.innerHTML = text;
-		tempfile.percent.innerHTML = percent + '% done';
+        _onProcessingError : function (e) {
 
-	},
+                var error = e.detail;
+                var uniqueIdentifier = error.uniqueIdentifier;
 
-	_onProcessingError : function (e) {
+                // get temp file divs
+                var tempfile = this._tempFiles[uniqueIdentifier];
 
-		var error = e.detail;
-		var uniqueIdentifier = error.uniqueIdentifier;
+                // set feedback
+                var feedbackText = _.isObject(error.description) ? 'Error code: ' + error.description.code : error.description;
+                tempfile.feedback.innerHTML = feedbackText;
+                tempfile.percent.innerHTML = 'Upload failed';
 
-		console.error('error:', error);
+                // add error class
+                Wu.DomUtil.addClass(tempfile.datawrap, 'upload-error');
 
-		// get temp file divs
-		var tempfile = this._tempFiles[uniqueIdentifier];
+                // close on click
+                Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);
+        },
 
-		// set feedback
-		var feedbackText = _.isObject(error.description) ? 'Error code: ' + error.description.code : error.description;
-		tempfile.feedback.innerHTML = feedbackText;
-		tempfile.percent.innerHTML = 'Upload failed';
 
-		// add error class
-		Wu.DomUtil.addClass(tempfile.datawrap, 'upload-error');
 
-		// close on click
-		Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);
-	},
+        // ┌─┐┌─┐┌─┐┬ ┬  ┌─┐┬┬  ┌─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
+        // ├┤ ├─┤│  ├─┤  ├┤ ││  ├┤   │││├┬┘├─┤├─┘├─┘├┤ ├┬┘
+        // └─┘┴ ┴└─┘┴ ┴  └  ┴┴─┘└─┘  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─
+        initFileList : function (D3container, data, library) {
 
 
+                // BIND
+                var dataListLine = D3container
+                .selectAll('.data-list-line')
+                .data(data);
 
-	// ┌─┐┌─┐┌─┐┬ ┬  ┌─┐┬┬  ┌─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
-	// ├┤ ├─┤│  ├─┤  ├┤ ││  ├┤   │││├┬┘├─┤├─┘├─┘├┤ ├┬┘
-	// └─┘┴ ┴└─┘┴ ┴  └  ┴┴─┘└─┘  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─
-	initFileList : function (D3container, data, library) {
+                // ENTER
+                dataListLine
+                .enter()
+                .append('div')
+                .classed('data-list-line', true);
 
+                // UPDATE
+                dataListLine
+                .classed('file-selected', function (d) {
 
-		// BIND
-		var dataListLine =
-				D3container
-						.selectAll('.data-list-line')
-						.data(data);
+                        var uuid = d.getUuid();
 
-		// ENTER
-		dataListLine
-				.enter()
-				.append('div')
-				.classed('data-list-line', true);
+                        // If selected by single click
+                        if ( uuid == this.showFileActionFor ) return true;
 
-		// UPDATE
-		dataListLine
-				.classed('file-selected', function (d) {
+                        // Else no selection
+                        return false;
 
-					var uuid = d.getUuid();
+                }.bind(this));
 
-					// If selected by single click
-					if ( uuid == this.showFileActionFor ) return true;
 
-					// Else no selection
-					return false;
+                dataListLine
+                .classed('editingFileName', function (d) {
+                        var uuid = d.getUuid();
+                        if ( this.editingFileName == uuid ) {
+                                return true;
+                        }
 
-				}.bind(this));
+                        return false;
+                }.bind(this));
 
+                // EXIT
+                dataListLine
+                .exit()
+                .remove();
 
-		dataListLine
-				.classed('editingFileName', function (d) {
-					var uuid = d.getUuid();
-					if ( this.editingFileName == uuid ) {
-						return true;
-					}
 
-					return false;
-				}.bind(this));
+                // CREATE NAME CONTENT (file name)
+                this.createFileNameContent(dataListLine, library);
 
-		// EXIT
-		dataListLine
-				.exit()
-				.remove();
+                // CREATE FILE META (date and size)
+                this.createFileMetaContent(dataListLine, library);
 
+                // CREATE POP-UP TRIGGER (the "..." button)
+                this.createFilePopUpTrigger(dataListLine, library);
 
-		// CREATE NAME CONTENT (file name)
-		this.createFileNameContent(dataListLine, library);
+                // CREATE FILE ACTION POP-UP (download, delete, etc)
+                this.createFileActionPopUp(dataListLine, library)
 
-		// CREATE FILE META (date and size)
-		this.createFileMetaContent(dataListLine, library);
+        },
 
-		// CREATE POP-UP TRIGGER (the "..." button)
-		this.createFilePopUpTrigger(dataListLine, library);
 
-		// CREATE FILE ACTION POP-UP (download, delete, etc)
-		this.createFileActionPopUp(dataListLine, library)
+        // ┌─┐┬┬  ┌─┐  ┌┬┐┌─┐┌┬┐┌─┐
+        // ├┤ ││  ├┤   │││├┤  │ ├─┤
+        // └  ┴┴─┘└─┘  ┴ ┴└─┘ ┴ ┴ ┴
 
-	},
+        createFileMetaContent : function (parent, library) {
 
+                var that = this;
 
-	// ┌─┐┬┬  ┌─┐  ┌┬┐┌─┐┌┬┐┌─┐
-	// ├┤ ││  ├┤   │││├┤  │ ├─┤
-	// └  ┴┴─┘└─┘  ┴ ┴└─┘ ┴ ┴ ┴
+                // Bind
+                var nameContent = parent
+                .selectAll('.file-meta-content')
+                .data(function(d) { return [d] });
 
-	createFileMetaContent : function (parent, library) {
+                // Enter
+                nameContent
+                .enter()
+                .append('div')
+                .classed('file-meta-content', true);
 
-		var that = this;
 
-		// Bind
-		var nameContent =
-				parent
-						.selectAll('.file-meta-content')
-						.data(function(d) { return [d] });
+                // Update
+                nameContent
+                .html(function (d) {
 
-		// Enter
-		nameContent
-				.enter()
-				.append('div')
-				.classed('file-meta-content', true);
+                        var _str = '';
 
+                        // User
+                        var userId = d.getCreatedBy();
+                        var userName = app.Users[userId].getFullName();
 
-		// Update
-		nameContent
-				.html(function (d) {
+                        _str += '<span class="file-meta-author">' + userName + '</span>';
 
-					var _str = '';
+                        // Date
+                        // var date = moment(d.getCreated()).format('DD MMMM YYYY');
+                        var date = d.getCreatedPretty();
+                        _str += '- <span class="file-meta-date">' + date + '</span>';
 
-					// User
-					var userId = d.getCreatedBy();
-					var userName = app.Users[userId].getFullName();
+                        // Size
+                        var bytes = d.getStore().dataSize;
+                        var size = Wu.Util.bytesToSize(bytes);
+                        _str += ' – <span class="file-meta-size">' + size + '</span>';
 
-					_str += '<span class="file-meta-author">' + userName + '</span>';
+                        return _str;
 
-					// Date
-					// var date = moment(d.getCreated()).format('DD MMMM YYYY');
-					var date = d.getCreatedPretty();
-					_str += '- <span class="file-meta-date">' + date + '</span>';
+                }.bind(this));
 
-					// Size
-					var bytes = d.getStore().dataSize;
-					var size = Wu.Util.bytesToSize(bytes);
-					_str += ' – <span class="file-meta-size">' + size + '</span>';
 
-					return _str;
+                // Exit
+                nameContent
+                .exit()
+                .remove();
 
-				}.bind(this));
+        },
 
 
-		// Exit
-		nameContent
-				.exit()
-				.remove();
 
-	},
 
+        // ┌─┐┬┬  ┌─┐  ┌┐┌┌─┐┌┬┐┌─┐
+        // ├┤ ││  ├┤   │││├─┤│││├┤
+        // └  ┴┴─┘└─┘  ┘└┘┴ ┴┴ ┴└─┘
 
+        createFileNameContent : function (parent, library) {
+                // Bind
+                var nameContent = parent
+                .selectAll('.file-name-content')
+                .data(function(d) { return [d] });
 
+                // Enter
+                nameContent
+                .enter()
+                .append('div')
+                .classed('file-name-content', true);
 
-	// ┌─┐┬┬  ┌─┐  ┌┐┌┌─┐┌┬┐┌─┐
-	// ├┤ ││  ├┤   │││├─┤│││├┤
-	// └  ┴┴─┘└─┘  ┘└┘┴ ┴┴ ┴└─┘
 
-	createFileNameContent : function (parent, library) {
-		// Bind
-		var nameContent =
-				parent
-						.selectAll('.file-name-content')
-						.data(function(d) { return [d] });
+                // Update
+                nameContent
+                .html(function (d) {
+                        return d.getTitle();
+                }.bind(this))
+                .on('dblclick', function (d) {
+                        this.activateFileInput(d, library);
+                }.bind(this));
 
-		// Enter
-		nameContent
-				.enter()
-				.append('div')
-				.classed('file-name-content', true);
+                // Exit
+                nameContent
+                .exit()
+                .remove();
 
+                // Create input field (for editing file name)
+                this.createFileInputField(nameContent, library);
 
-		// Update
-		nameContent
-				.html(function (d) {
-					return d.getTitle();
-				}.bind(this))
-				.on('dblclick', function (d) {
-					this.activateFileInput(d, library);
-				}.bind(this));
+        },
 
-		// Exit
-		nameContent
-				.exit()
-				.remove();
 
-		// Create input field (for editing file name)
-		this.createFileInputField(nameContent, library);
+        // ┌─┐┬┬  ┌─┐  ┬┌┐┌┌─┐┬ ┬┌┬┐
+        // ├┤ ││  ├┤   ││││├─┘│ │ │
+        // └  ┴┴─┘└─┘  ┴┘└┘┴  └─┘ ┴
 
-	},
+        // For editing file name
 
+        createFileInputField : function (parent, library) {
+                var that = this;
+               
+                // Bind
+                var nameInput = parent
+                .selectAll('.file-name-input')
+                .data(function (d) {
+                        var uuid = d.getUuid();
+                        if ( this.editingFileName == uuid ) return [d];
+                        return false;
+                }.bind(this));
 
-	// ┌─┐┬┬  ┌─┐  ┬┌┐┌┌─┐┬ ┬┌┬┐
-	// ├┤ ││  ├┤   ││││├─┘│ │ │
-	// └  ┴┴─┘└─┘  ┴┘└┘┴  └─┘ ┴
+                // Enter
+                nameInput
+                .enter()
+                .append('input')
+                .attr('type', 'text')
+                .classed('file-name-input', true);
 
-	// For editing file name
 
-	createFileInputField : function (parent, library) {
-		var that = this;
-		// Bind
-		var nameInput =
-				parent
-						.selectAll('.file-name-input')
-						.data(function (d) {
-							var uuid = d.getUuid();
-							if ( this.editingFileName == uuid ) return [d];
-							return false;
-						}.bind(this));
+                // Update
+                nameInput
+                .attr('placeholder', function (d) {
+                        if ( library == 'layers' ) return d.getTitle();
+                        return d.getName();
+                })
+                .attr('name', function (d) {
+                        return d.getUuid()
+                })
+                .html(function (d) {
+                        if ( library == 'layers' ) return d.getTitle();
+                        return d.getName();
+                })
+                .classed('displayNone', function (d) {
+                        var uuid = d.getUuid();
+                        if ( that.editingFileName == uuid ) return false;
+                        return true;
+                })
+                .on('blur', function (d) {
+                        var newName = this.value;
+                        that.saveFileName(newName, d, library);
+                })
+                .on('keydown', function (d) {
+                        var keyPressed = window.event.keyCode;
+                        var newName = this.value;
+                        if ( keyPressed == 13 ) this.blur(); // Save on enter
+                });
 
-		// Enter
-		nameInput
-				.enter()
-				.append('input')
-				.attr('type', 'text')
-				.classed('file-name-input', true);
+                // Exit
+                nameInput
+                .exit()
+                .remove();
 
 
-		// Update
-		nameInput
-				.attr('placeholder', function (d) {
-					if ( library == 'layers' ) return d.getTitle();
-					return d.getName();
-				})
-				.attr('name', function (d) {
-					return d.getUuid()
-				})
-				.html(function (d) {
-					if ( library == 'layers' ) return d.getTitle();
-					return d.getName();
-				})
-				.classed('displayNone', function (d) {
-					var uuid = d.getUuid();
-					if ( that.editingFileName == uuid ) return false;
-					return true;
-				})
-				.on('blur', function (d) {
-					var newName = this.value;
-					that.saveFileName(newName, d, library);
-				})
-				.on('keydown', function (d) {
-					var keyPressed = window.event.keyCode;
-					var newName = this.value;
-					if ( keyPressed == 13 ) this.blur(); // Save on enter
-				});
+                // Hacky, but works...
+                // Select text in input field...
+                if ( nameInput ) {
+                        nameInput.forEach(function(ni) {
+                                if ( ni[0] ) {
+                                        ni[0].select();
+                                        return;
+                                }
+                        })
+                }
 
-		// Exit
-		nameInput
-				.exit()
-				.remove();
+        },
 
 
-		// Hacky, but works...
-		// Select text in input field...
-		if ( nameInput ) {
-			nameInput.forEach(function(ni) {
-				if ( ni[0] ) {
-					ni[0].select();
-					return;
-				}
-			})
-		}
 
-	},
 
+        // ┌─┐┌─┐┌─┐┬ ┬┌─┐  ┌┬┐┬─┐┬┌─┐┌─┐┌─┐┬─┐
+        // ├─┘│ │├─┘│ │├─┘   │ ├┬┘││ ┬│ ┬├┤ ├┬┘
+        // ┴  └─┘┴  └─┘┴     ┴ ┴└─┴└─┘└─┘└─┘┴└─
 
+        // The little "..." next to file name
 
+        createFilePopUpTrigger : function (parent, library) {
 
-	// ┌─┐┌─┐┌─┐┬ ┬┌─┐  ┌┬┐┬─┐┬┌─┐┌─┐┌─┐┬─┐
-	// ├─┘│ │├─┘│ │├─┘   │ ├┬┘││ ┬│ ┬├┤ ├┬┘
-	// ┴  └─┘┴  └─┘┴     ┴ ┴└─┴└─┘└─┘└─┘┴└─
+                // open file options button
 
-	// The little "..." next to file name
+                // Bind
+                var popupTrigger = parent
+                .selectAll('.file-popup-trigger')
+                .data(function(d) { return [d] });
 
-	createFilePopUpTrigger : function (parent, library) {
+                // Enter
+                popupTrigger
+                .enter()
+                .append('div')
+                .classed('file-popup-trigger', true)
+                .html('<i class="fa fa-bars file-trigger"></i>Options')
 
 
-		// open file options button
+                // Update
+                popupTrigger
+                .classed('active', function (d) {
+                        var uuid = d.getUuid();
+                        if ( uuid == this.showFileActionFor ) return true;
+                        return false;
+                }.bind(this))
+                .on('click', function (d) {
+                        var uuid = d.getUuid();
+                        this.enableFilePopUp(uuid)
+                }.bind(this));
 
-		// Bind
-		var popupTrigger =
-				parent
-						.selectAll('.file-popup-trigger')
-						.data(function(d) { return [d] });
 
-		// Enter
-		popupTrigger
-				.enter()
-				.append('div')
-				.classed('file-popup-trigger', true)
-				.html('<i class="fa fa-bars file-trigger"></i>Options')
+                // Exit
+                popupTrigger
+                .exit()
+                .remove();
 
 
-		// Update
-		popupTrigger
-				.classed('active', function (d) {
-					var uuid = d.getUuid();
-					if ( uuid == this.showFileActionFor ) return true;
-					return false;
-				}.bind(this))
-				.on('click', function (d) {
-					var uuid = d.getUuid();
-					this.enableFilePopUp(uuid)
-				}.bind(this));
 
+                // add layer button
 
-		// Exit
-		popupTrigger
-				.exit()
-				.remove();
+                // Bind
+                var addTrigger = parent
+                .selectAll('.file-popup-trigger.add-layer')
+                .data(function(d) { return [d] });
 
+                // Enter
+                addTrigger
+                .enter()
+                .append('div')
+                .classed('file-popup-trigger add-layer', true)
+                .html('<i class="fa fa-plus-square add-trigger"></i>Add layer');
 
 
-		// add layer button
+                // Update
+                addTrigger
+                .classed('active', function (d) {
+                        var uuid = d.getUuid();
+                        if ( uuid == this.showFileActionFor ) return true;
+                        return false;
+                }.bind(this))
+                .on('click', function (file) {
+                        file._createLayer(app.activeProject);
+                }.bind(this));
 
-		// Bind
-		var addTrigger =
-				parent
-						.selectAll('.file-popup-trigger.add-layer')
-						.data(function(d) { return [d] });
 
-		// Enter
-		addTrigger
-				.enter()
-				.append('div')
-				.classed('file-popup-trigger add-layer', true)
-				.html('<i class="fa fa-plus-square add-trigger"></i>Add layer');
+                // Exit
+                addTrigger
+                .exit()
+                .remove();
 
 
-		// Update
-		addTrigger
-				.classed('active', function (d) {
-					var uuid = d.getUuid();
-					if ( uuid == this.showFileActionFor ) return true;
-					return false;
-				}.bind(this))
-				.on('click', function (file) {
-					file._createLayer(app.activeProject);
-				}.bind(this));
+        },
 
 
-		// Exit
-		addTrigger
-				.exit()
-				.remove();
+        // ┌─┐┬┬  ┌─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌  ┌─┐┌─┐┌─┐┬ ┬┌─┐
+        // ├┤ ││  ├┤   ├─┤│   │ ││ ││││  ├─┘│ │├─┘│ │├─┘
+        // └  ┴┴─┘└─┘  ┴ ┴└─┘ ┴ ┴└─┘┘└┘  ┴  └─┘┴  └─┘┴
 
+        // The "download, delete, etc" pop-up
 
-	},
+        createFileActionPopUp : function (parent, library) {
 
+                // Bind
+                var dataListLineAction = parent
+                .selectAll('.file-popup')
+                .data(function(d) { return [d] });
 
-	// ┌─┐┬┬  ┌─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌  ┌─┐┌─┐┌─┐┬ ┬┌─┐
-	// ├┤ ││  ├┤   ├─┤│   │ ││ ││││  ├─┘│ │├─┘│ │├─┘
-	// └  ┴┴─┘└─┘  ┴ ┴└─┘ ┴ ┴└─┘┘└┘  ┴  └─┘┴  └─┘┴
+                // Enter
+                dataListLineAction
+                .enter()
+                .append('div')
+                .classed('file-popup', true);
 
-	// The "download, delete, etc" pop-up
 
-	createFileActionPopUp : function (parent, library) {
+                // Update
+                dataListLineAction
+                .classed('displayNone', function (d) {
+                        var uuid = d.getUuid();
+                        if ( uuid == this.showFileActionFor ) return false;
+                        return true;
+                }.bind(this));
 
-		// Bind
-		var dataListLineAction =
-				parent
-						.selectAll('.file-popup')
-						.data(function(d) { return [d] });
+                // Exit
+                dataListLineAction
+                .exit()
+                .remove();
 
-		// Enter
-		dataListLineAction
-				.enter()
-				.append('div')
-				.classed('file-popup', true);
 
+                this.initFileActions(dataListLineAction, library);
 
-		// Update
-		dataListLineAction
-				.classed('displayNone', function (d) {
-					var uuid = d.getUuid();
-					if ( uuid == this.showFileActionFor ) return false;
-					return true;
-				}.bind(this));
+        },
 
-		// Exit
-		dataListLineAction
-				.exit()
-				.remove();
 
+        // ┌─┐┬┬  ┌─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
+        // ├┤ ││  ├┤   ├─┤│   │ ││ ││││└─┐
+        // └  ┴┴─┘└─┘  ┴ ┴└─┘ ┴ ┴└─┘┘└┘└─┘
 
-		this.initFileActions(dataListLineAction, library);
+        // AKA pop-up content
 
-	},
+        initFileActions : function (parent, library) {
 
+                // Disable actions for Layers
+                var canEdit = this._project.isEditor();
+                var that = this;
 
-	// ┌─┐┬┬  ┌─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
-	// ├┤ ││  ├┤   ├─┤│   │ ││ ││││└─┐
-	// └  ┴┴─┘└─┘  ┴ ┴└─┘ ┴ ┴└─┘┘└┘└─┘
+                var action = {
+                        createLayer : {
+                                name : 'Add To Project',
+                                disabled : !canEdit
+                        },
+                        share : {
+                                name : 'Share with...',         // todo: implement sharing of data
+                                disabled : true
+                        },
+                        changeName : {
+                                name : 'Change Name',
+                                disabled : true
+                        },
+                        download : {
+                                name : 'Download',
+                                disabled : false
+                        },
+                        delete : {
+                                name : 'Delete',
+                                disabled : false
+                        }
+                };
 
-	// AKA pop-up content
+                for (var f in action) {
 
-	initFileActions : function (parent, library) {
+                        var name = action[f].name;
+                        var className = 'file-action-' + f;
 
-		// Disable actions for Layers
-		var canEdit = this._project.isEditor();
-		var that = this;
+                        // Bind
+                        var fileAction = parent
+                        .selectAll('.' + className)
+                        .data(function(d) { return [d] });
 
-		var action = {
-			createLayer : {
-				name : 'Add To Project',
-				disabled : !canEdit
-			},
-			share : {
-				name : 'Share with...', 	// todo: implement sharing of data
-				disabled : true
-			},
-			changeName : {
-				name : 'Change Name',
-				disabled : true
-			},
-			download : {
-				name : 'Download',
-				disabled : false
-			},
-			delete : {
-				name : 'Delete',
-				disabled : false
-			}
-		};
+                        // Enter
+                        fileAction
+                        .enter()
+                        .append('div')
+                        .classed(className, true)
+                        .classed('file-action', true)
+                        .classed('displayNone', action[f].disabled)
+                        .attr('trigger', f)
+                        .html(name)
+                        .on('click', function (d) {
+                                var trigger = this.getAttribute('trigger');
+                                that.fileActionTriggered(trigger, d, that, library)
+                        });
 
-		for (var f in action) {
+                        // Exit
+                        fileAction
+                        .exit()
+                        .remove();
+                }
+        },
 
-			var name = action[f].name;
-			var className = 'file-action-' + f;
 
-			// Bind
-			var fileAction =
-					parent
-							.selectAll('.' + className)
-							.data(function(d) { return [d] });
 
-			// Enter
-			fileAction
-					.enter()
-					.append('div')
-					.classed(className, true)
-					.classed('file-action', true)
-					.classed('displayNone', action[f].disabled)
-					.attr('trigger', f)
-					.html(name)
-					.on('click', function (d) {
-						var trigger = this.getAttribute('trigger');
+        // ╔═╗╦╦  ╔═╗  ╔═╗╦  ╦╔═╗╦╔═  ╔═╗╦  ╦╔═╗╔╗╔╔╦╗╔═╗
+        // ╠╣ ║║  ║╣   ║  ║  ║║  ╠╩╗  ║╣ ╚╗╔╝║╣ ║║║ ║ ╚═╗
+        // ╚  ╩╩═╝╚═╝  ╚═╝╩═╝╩╚═╝╩ ╩  ╚═╝ ╚╝ ╚═╝╝╚╝ ╩ ╚═╝
 
-						that.fileActionTriggered(trigger, d, that, library)
-					});
+        fileActionTriggered : function (trigger, file, context, library) {
 
-			// Exit
-			fileAction
-					.exit()
-					.remove();
-		}
-	},
+                return this._fileActionTriggered(trigger, file, context, library);
+        },
 
+        _fileActionTriggered : function (trigger, file, context, library) {
 
+                var fileUuid = file.getUuid();
+                var project = context._project;
 
-	// ╔═╗╦╦  ╔═╗  ╔═╗╦  ╦╔═╗╦╔═  ╔═╗╦  ╦╔═╗╔╗╔╔╦╗╔═╗
-	// ╠╣ ║║  ║╣   ║  ║  ║║  ╠╩╗  ║╣ ╚╗╔╝║╣ ║║║ ║ ╚═╗
-	// ╚  ╩╩═╝╚═╝  ╚═╝╩═╝╩╚═╝╩ ╩  ╚═╝ ╚╝ ╚═╝╝╚╝ ╩ ╚═╝
+                // set name
+                if (trigger == 'changeName') context.editingFileName = fileUuid;
 
-	fileActionTriggered : function (trigger, file, context, library) {
+                // create layer
+                if (trigger == 'createLayer') file._createLayer(project);
 
-		return this._fileActionTriggered(trigger, file, context, library);
-	},
+                // share
+                if (trigger == 'share') file._shareFile();
 
-	_fileActionTriggered : function (trigger, file, context, library) {
+                // download
+                if (trigger == 'download') file._downloadFile();
 
-		var fileUuid = file.getUuid();
-		var project = context._project;
+                // delete
+                if (trigger == 'delete') file._deleteFile();
 
-		// set name
-		if (trigger == 'changeName') context.editingFileName = fileUuid;
+                // Reset
+                this.showFileActionFor = false;
+                this._refreshFiles();
+        },
 
-		// create layer
-		if (trigger == 'createLayer') file._createLayer(project);
+        // Enable input field for changing file name
+        activateFileInput : function (d, library) {
+                this.editingFileName = d.getUuid();
+                this.showFileActionFor = false;
+                this._refreshFiles();
+        },
 
-		// share
-		if (trigger == 'share') file._shareFile();
+        // Enable popup on file (when clicking on "(...)" button)
+        enableFilePopUp : function (uuid) {
 
-		// download
-		if (trigger == 'download') file._downloadFile();
+                // open fullscreen file options
+                this._openFileOptionsFullscreen(uuid);
+        },
 
-		// delete
-		if (trigger == 'delete') file._deleteFile();
+        _openCubeLayerEditFullscreen : function (layer) {
 
-		// Reset
-		this.showFileActionFor = false;
-		this._refreshFiles();
-	},
+                // create fullscreen
+                var fullscreen = this._fullscreen = new Wu.Fullscreen({
+                        title : '<i class="fa fa-bars file-option"></i>Timeseries: ' + layer.getTitle(),
+                        titleClassName : 'slim-font'
+                });
 
-	// Enable input field for changing file name
-	activateFileInput : function (d, library) {
-		this.editingFileName = d.getUuid();
-		this.showFileActionFor = false;
-		this._refreshFiles();
-	},
+                // shortcuts
+                this._fullscreen._layer = layer;
+                var content = this._fullscreen._content;
+                
+                // create cubeset list
+                this._createCubesetBox({
+                        container : content,
+                        layer : layer
+                });
 
-	// Enable popup on file (when clicking on "(...)" button)
-	enableFilePopUp : function (uuid) {
+        },
 
-		// open fullscreen file options
-		this._openFileOptionsFullscreen(uuid);
-	},
+        _createCubesetBox : function (options) {
 
-	_openCubeLayerEditFullscreen : function (layer) {
+                var container = options.container;
+                var layer = options.layer;
 
-		// create fullscreen
-		var fullscreen = this._fullscreen = new Wu.Fullscreen({
-			title : '<i class="fa fa-bars file-option"></i>Timeseries options for ' + layer.getTitle(),
-			titleClassName : 'slim-font'
-		});
+                // create divs
+                var toggles_wrapper = this._cubesetBoxWrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Datasets in timeseries');
 
-		// return;
+                // add-button
+                var addBtn = Wu.DomUtil.create('div', 'cubesets-add-btn', toggles_wrapper, '<i class="fa fa-plus"></i>&nbsp;&nbsp;Add dataset ');
 
-		// shortcuts
-		this._fullscreen._layer = layer;
-		var content = this._fullscreen._content;
+                Wu.DomEvent.on(addBtn, 'click', function () {
+                        this._addCubesetDropdown(layer);
+                }, this);
 
-		
+                // create list of datasets
+                this._cubesetContainer = Wu.DomUtil.create('div', 'cubesets-list-wrapper', toggles_wrapper);
 
-		this._createCubeDatasetsBox({
-			container : content,
-			layer : layer
-		});
+                // create cubeset list
+                this._refreshCubeset(layer);
+            
+                // bind update event
+                this._cubesetSort.bind('sortupdate', function(e, ui) {
 
+                        // save new order of dataset array
+                        this._updateCubesetOrder();
 
-		return;
+                }.bind(this));
 
+                // return wrapper
+                return toggles_wrapper;
+        },
 
+        _updateCubesetOrder : function () {
 
+                var list = this._cubesetContainer.children;
+                var layer = this._fullscreen._layer;
+                var datasets = layer.getDatasets();
+                var order = [];
 
-		// // name box
-		// var nameContainer = this._createNameBox({
-		// 	container : content,
-		// 	file : layer
-		// });
+                // iterate and update
+                for (var i=0; i < list.length; i++) {
+                        var uuid = list[i].getAttribute('dataset-uuid');
+                        var meta = _.find(datasets, function (d) {
+                                return d.uuid == uuid;
+                        }).meta;
 
+                        order.push({
+                                uuid : uuid,
+                                meta : meta
+                        });
+                }
 
-		// // if vector
-		// if (file.isVector()) {
+                // save to server
+                app.api.updateCube({
+                        datasets : order,
+                        cube_id : layer.getCubeId()
+                }, function (err, updatedCube) {
+                        if (err) return console.error(err);
+                       
+                        // parse
+                        var cube = Wu.parse(updatedCube);
 
-		// 	// vector meta
-		// 	this._createVectorMetaBox({
-		// 		container : nameContainer,
-		// 		file : file
-		// 	});
-		// }
+                        // update Wu.CubeLayer
+                        layer._saveCube(cube);
 
+                        // refresh list
+                        this._refreshCubeset(layer);
 
-		// // if raster
-		// if (file.isRaster()) {
+                }.bind(this));
 
-		// 	// raster meta
-		// 	this._createRasterMetaBox({
-		// 		container : nameContainer,
-		// 		file : file
-		// 	});
+        },
 
-		// 	// transparency box
-		// 	this._createTransparencyBox({
-		// 		container : content,
-		// 		file : file
-		// 	});
+        _refreshCubeset : function (layer) {
 
-		// 	// vectorize box
-		// 	this._createVectorizeBox({
-		// 		container : content,
-		// 		file : file
-		// 	});
+                // remove old
+                this._cubesetContainer.innerHTML = '';
 
-		// }
+                // get datasets
+                var datasets = layer.getDatasets();
 
-		// // share button
-		// this._createShareBox({
-		// 	container : content,
-		// 	file : file,
-		// 	fullscreen : fullscreen
-		// });
+                // create list
+                datasets.forEach(function (dataset, i) {
 
+                        // create list item
+                        this._createCubesetItem({
+                                dataset : dataset, 
+                                appendTo : this._cubesetContainer,
+                                index : i
+                        });
 
-		// // download button
-		// this._createDownloadBox({
-		// 	container : content,
-		// 	file : file,
-		// 	fullscreen : fullscreen
-		// });
+                }, this);
 
-		// // delete button
-		// this._createDeleteBox({
-		// 	container : content,
-		// 	file : file,
-		// 	fullscreen : fullscreen
-		// });
+                // gc old sortable
+                if (this._cubesetSort) {
+                        delete this._cubesetSort;
+                }
 
+                // enable sortable
+                this._cubesetSort = $('.cubesets-list-wrapper').sortable({
+                        placeholderClass : 'cubeset-sortable-placeholder',
+                        hoverClass : 'cubeset-hover'
+                });
+        },
 
-	},
 
-	_createCubeDatasetsBox : function (options) {
+        _createCubesetItem : function (options) {
 
-		var container = options.container;
-		var layer = options.layer;
+                // get options
+                var dataset = options.dataset;
+                var appendTo = options.appendTo;
+                var index = (options.index + 1).toString();
 
-		// create divs
-		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Datasets in timeseries');
+                // get meta
+                var name = dataset.meta ? dataset.meta.text : 'error';
+                var timestamp = dataset.meta ? dataset.meta.date : 'error';
+                var uuid = dataset.uuid;
 
+                // wrapper
+                var wrap = Wu.DomUtil.create('div', 'cubeset-wrapper', appendTo);
+                wrap.setAttribute('dataset-uuid', uuid);
 
-		// create list of datasets
-		var datasets_wrapper = Wu.DomUtil.create('div', 'cube-datasets-list-wrapper', toggles_wrapper);
+                // content
+                // var count = Wu.DomUtil.create('div', 'cubeset-count', wrap, index);
+                var dataset_name = Wu.DomUtil.create('div', 'cubeset-name', wrap, name);
+                var dataset_time = Wu.DomUtil.create('div', 'cubeset-time', wrap, timestamp);
 
-		// get datasets
-		var datasets = layer.getDatasets();
-		console.log('datasets::: ', datasets);
+                // buttons
+                var removeBtn = Wu.DomUtil.create('div', 'cubeset-remove-btn', wrap, '<i class="fa fa-trash-o"></i>');
 
-		datasets.forEach(function (dataset) {
+                // btn click
+                Wu.DomEvent.on(removeBtn, 'click', function () {
+                        this._removeCubesetItem(dataset);
+                }, this);
 
-			// get data
-			var name = dataset.meta.text;
-			var timestamp = dataset.meta.date;
-			var uuid = dataset.uuid;
+        },
 
-			// create divs
-			var dataset_wrapper = Wu.DomUtil.create('div', 'cube-dataset-wrapper', datasets_wrapper);
-			var dataset_name = Wu.DomUtil.create('div', 'cube-dataset-name', dataset_wrapper, name);
-			var dataset_time = Wu.DomUtil.create('div', 'cube-dataset-time', dataset_wrapper, timestamp);
+        _addCubesetDropdown : function (layer) {
 
-		}, this);
+                var container = Wu.DomUtil.create('div', 'cubeset-dropdown-container', this._cubesetBoxWrapper);
 
+                // create dropdown
+                this._cubesetDrowdown = new Wu.Dropdown({
+                        fn: this._addCubesetItemByUuid.bind(this),
+                        appendTo: container,
+                        content: this._getDropdownDatasets(),
+                        className : 'cubeset-dropdown'
+                });
+        },
 
-		// enable sortable
-		var sort = $('.cube-datasets-list-wrapper').sortable({
-			placeholderClass : 'cube-dataset-sortable-dragging',
-			forcePlaceholderSize : true,
-			hoverClass : 'cube-dataset-hover'
-		})
+        _addCubesetItemByUuid : function (fileUuid) {
 
-		// bind update event
-		sort.bind('sortupdate', function(e, ui) {
-			console.log('sort update', e, ui);
-		});
+                var file = app.Account.getFile(fileUuid);
 
-		// return wrapper
-		return toggles_wrapper;
-	},
+                var dataset = {
+                        uuid : file.getUuid(),
+                        meta : {
+                                text : 'Filename : ' + file.getTitle(),
+                                date : file.getCreated()
+                        }
+                }
 
+                // create list item
+                this._createCubesetItem({
+                        dataset : dataset, 
+                        appendTo : this._cubesetContainer,
+                        index : this._cubesetContainer.children.length
+                });
 
-	_openFileOptionsFullscreen : function (uuid) {
+                // add on server
+                this._addCubesetItem(dataset);
 
-		// get file
-		var file = app.Account.getFile(uuid);
+                // refresh sortable
+                $('.cubesets-list-wrapper').sortable();
 
-		// create fullscreen
-		var fullscreen = this._fullscreen = new Wu.Fullscreen({
-			title : '<i class="fa fa-bars file-option"></i>Options for ' + file.getName(),
-			titleClassName : 'slim-font'
-		});
+                // remove dropdown
+                Wu.DomUtil.remove(this._cubesetDrowdown._baseLayerDropdownContainer);
+                delete this._cubesetDrowdown;
 
-		// shortcuts
-		this._fullscreen._file = file;
-		this._currentFile = file;
-		var content = this._fullscreen._content;
+        },
 
-		// name box
-		var nameContainer = this._createNameBox({
-			container : content,
-			file : file
-		});
+        _getDropdownDatasets : function () {
 
+                // get rasters
+                var files = app.Account.getFiles();
+                var datasets = _.filter(files, function (f) {
+                        if (!f) return false;
+                        if (!f.store) return false;
+                        if (!f.store.data) return false;
+                        if (!f.store.data.postgis) return false;
+                        if (!f.store.data.postgis.data_type) return false;
+                        return f.store.data.postgis.data_type == 'raster';
+                });
 
+                // create dropdown content
+                var content = [];
+                datasets.forEach(function (d) {
+                        content.push({
+                                title : d.getTitle(),
+                                disabled : false,
+                                value : d.getUuid(),
+                                isSelected : false
+                        });
+                });
 
-		// if vector
-		if (file.isVector()) {
+                return content;
+        },
 
-			// vector meta
-			this._createVectorMetaBox({
-				container : nameContainer,
-				file : file
-			});
-		}
+        _removeCubesetItem : function (dataset) {
 
+                // confirm
+                var name = dataset.meta ? dataset.meta.text : 'error';
+                if (!confirm("Are you sure you want to remove dataset " + name + " from the timeseries?")) return;
+        
+                var layer = this._fullscreen._layer;
 
-		// if raster
-		if (file.isRaster()) {
+                var options = {
+                    cube_id : layer.getCubeId(),
+                    datasets : [{
+                        uuid : dataset.uuid
+                    }]
+                }
 
-			// raster meta
-			this._createRasterMetaBox({
-				container : nameContainer,
-				file : file
-			});
+                app.api.removeFromCube(options, function (err, updatedCube) {
+                        if (err) return console.error(err);
 
-			// transparency box
-			this._createTransparencyBox({
-				container : content,
-				file : file
-			});
+                        // parse cube
+                        var cube = Wu.parse(updatedCube);
 
-			// vectorize box
-			this._createVectorizeBox({
-				container : content,
-				file : file
-			});
+                        // update Wu.CubeLayer
+                        layer._saveCube(cube);
 
-		}
+                        // refresh list
+                        this._refreshCubeset(layer);
 
-		// share button
-		this._createShareBox({
-			container : content,
-			file : file,
-			fullscreen : fullscreen
-		});
+                }.bind(this));
+        },
 
+        // add on server
+        _addCubesetItem : function (dataset) {
 
-		// download button
-		this._createDownloadBox({
-			container : content,
-			file : file,
-			fullscreen : fullscreen
-		});
+                var layer = this._fullscreen._layer;
 
-		// delete button
-		this._createDeleteBox({
-			container : content,
-			file : file,
-			fullscreen : fullscreen
-		});
+                var options = {
+                    cube_id : layer.getCubeId(),
+                    datasets : [dataset]
+                }
 
+                app.api.addToCube(options, function (err, updatedCube) {
+                        if (err) return console.error(err);
 
-	},
+                        // parse cube
+                        var cube = Wu.parse(updatedCube);
 
-	_createNameBox : function (options) {
-		var container = options.container;
-		var file = options.file;
+                        // update Wu.CubeLayer
+                        layer._saveCube(cube);
 
-		// create divs
-		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Dataset name');
-		var name_input = Wu.DomUtil.create('input', 'smooth-input smaller-input', toggles_wrapper);
-		name_input.setAttribute('placeholder', 'Enter name here');
-		name_input.value = file.getName();
-		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
+                        // refresh list
+                        this._refreshCubeset(layer);
 
-		// return wrapper
-		return toggles_wrapper;
-	},
+                }.bind(this));
+        },
 
-	_createVectorMetaBox : function (options) {
-		var container = options.container;
-		var file = options.file;
-		var meta = file.getMeta();
-		var toggles_wrapper = container;
 
-		// meta info
-		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta');
-		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Vector');
-		var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
-		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
-		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
+        _openFileOptionsFullscreen : function (uuid) {
 
-	},
+                // get file
+                var file = app.Account.getFile(uuid);
 
-	_createRasterMetaBox : function (options) {
-		var container = options.container;
-		var file = options.file;
-		var meta = file.getMeta();
-		var toggles_wrapper = container;
+                // create fullscreen
+                var fullscreen = this._fullscreen = new Wu.Fullscreen({
+                        title : '<i class="fa fa-bars file-option"></i>Options for ' + file.getName(),
+                        titleClassName : 'slim-font'
+                });
 
-		// if no meta
-		if (!meta) return;
+                // shortcuts
+                this._fullscreen._file = file;
+                this._currentFile = file;
+                var content = this._fullscreen._content;
 
-		var sizeX = meta.size ? meta.size.x : 'n/a';
-		var sizeY = meta.size ? meta.size.y : 'n/a';
+                // name box
+                var nameContainer = this._createNameBox({
+                        container : content,
+                        file : file
+                });
 
-		// meta info
-		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta');
-		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
-		var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
-		var bands_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Bands:</span> ' + meta.bands);
-		var size_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Raster size:</span> ' + sizeX + 'x' + sizeY);
-		var projection_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Projection:</span> ' + meta.projection);
-		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
-		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
-	},
+                // if vector
+                if (file.isVector()) {
 
-	_createTilesetBox : function (options) {
-		var container = options.container;
-		var file = options.file;
-		var meta = file.getMeta();
+                        // vector meta
+                        this._createVectorMetaBox({
+                                container : nameContainer,
+                                file : file
+                        });
+                }
 
-		// nice border box
-		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var tiles_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Tileset');
-		var generated_tiles_title = Wu.DomUtil.create('div', 'file-option title generated-tiles', toggles_wrapper, 'Generated tile-range');
+                // if raster
+                if (file.isRaster()) {
 
-		// zoom levels
-		var zoomlevels_wrapper = Wu.DomUtil.create('div', 'zoomlevels-wrapper', toggles_wrapper);
-		var zoom_levels = _.sortBy(meta.zoom_levels);
-		var zoom_min = _.first(zoom_levels);
-		var zoom_max = _.last(zoom_levels);
-		var zoom_levels_text = zoom_min	 + ' to ' + zoom_max;
-		var zoomlevels_div = Wu.DomUtil.create('div', 'file-option sub padding-top-10', zoomlevels_wrapper, '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text);
+                        // raster meta
+                        this._createRasterMetaBox({
+                                container : nameContainer,
+                                file : file
+                        });
 
-		// create slider
-		var stepSlider = Wu.DomUtil.create('div', 'tiles-slider', zoomlevels_wrapper);
-		noUiSlider.create(stepSlider, {
-			start: [zoom_min, zoom_max],
-			step: 1,
-			range: {
-				'min': [2],
-				'max': [19]
-			},
-			pips: {
-				mode: 'count',
-				values: [18],
-				density : 18,
-				stepped : true
-			}
-		});
+                        // transparency box
+                        this._createTransparencyBox({
+                                container : content,
+                                file : file
+                        });
 
-		// total tiles div
-		var totaltiles_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Total tiles:</span> ' + meta.total_tiles);
-		var tilesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Tileset size:</span> ');
+                        // vectorize box
+                        this._createVectorizeBox({
+                                container : content,
+                                file : file
+                        });
 
-		// error feedback
-		var generated_tiles_error = this._generated_tiles_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-error', toggles_wrapper);
+                }
 
-		// generate button
-		var generateBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-22', toggles_wrapper);
-		var generateBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save generate-tiles', generateBtnWrap, 'Generate tiles');
+                // share button
+                this._createShareBox({
+                        container : content,
+                        file : file,
+                        fullscreen : fullscreen
+                });
 
-		// slider events
-		stepSlider.noUiSlider.on('update', function (values, handle) {
+                // download button
+                this._createDownloadBox({
+                        container : content,
+                        file : file,
+                        fullscreen : fullscreen
+                });
 
-			// set zoom levels
-			var z_min = parseInt(values[0]);
-			var z_max = parseInt(values[1]);
-			var zoom_levels_text = z_min + ' to ' + z_max;
-			zoomlevels_div.innerHTML = '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text;
+                // delete button
+                this._createDeleteBox({
+                        container : content,
+                        file : file,
+                        fullscreen : fullscreen
+                });
+        },
 
-			// check tile count (local)
-			this.calculateTileCount({
-				zoom_min : z_min,
-				zoom_max : z_max,
-				file_id : file.getUuid()
-			}, function (err, tile_count) {
+        _createNameBox : function (options) {
+                var container = options.container;
+                var file = options.file;
 
-				// check tiles
-				if (tile_count > 11000) { // todo: make account dependent
+                // create divs
+                var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Dataset name');
+                var name_input = Wu.DomUtil.create('input', 'smooth-input smaller-input', toggles_wrapper);
+                name_input.setAttribute('placeholder', 'Enter name here');
+                name_input.value = file.getName();
+                var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
 
-					// mark too high tile-count
-					totaltiles_div.innerHTML = '<span class="bold-font red-font">Total tiles: ' + tile_count + '</span>';
+                // return wrapper
+                return toggles_wrapper;
+        },
 
-					// set error feedback
-					generated_tiles_error.innerHTML = '<span class="bold-font">The tile count is too high. Please select a lower zoom-level.</span>';
+        _createVectorMetaBox : function (options) {
+                var container = options.container;
+                var file = options.file;
+                var meta = file.getMeta();
+                var toggles_wrapper = container;
 
-					// disable button
-					Wu.DomUtil.addClass(generateBtn, 'disabled-btn');
+                // meta info
+                var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta');
+                var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Vector');
+                var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
+                var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
+                var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
 
-				} else {
+        },
 
-					// set tile count
-					totaltiles_div.innerHTML = '<span class="bold-font">Total tiles:</span> ' + tile_count;
+        _createRasterMetaBox : function (options) {
+                var container = options.container;
+                var file = options.file;
+                var meta = file.getMeta();
+                var toggles_wrapper = container;
 
-					// set error feedback
-					generated_tiles_error.innerHTML = '';
+                // if no meta
+                if (!meta) return;
 
-					// enable button
-					Wu.DomUtil.removeClass(generateBtn, 'disabled-btn');
-				}
-			});
+                var sizeX = meta.size ? meta.size.x : 'n/a';
+                var sizeY = meta.size ? meta.size.y : 'n/a';
 
-		}.bind(this));
+                // meta info
+                var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta');
+                var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
+                var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
+                var bands_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Bands:</span> ' + meta.bands);
+                var size_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Raster size:</span> ' + sizeX + 'x' + sizeY);
+                var projection_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Projection:</span> ' + meta.projection);
+                var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
+                var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
+        },
 
-		// generate button event
-		Wu.DomEvent.on(generateBtn, 'click', function () {
+        _createTilesetBox : function (options) {
+                var container = options.container;
+                var file = options.file;
+                var meta = file.getMeta();
 
-			// set zoom levels
-			var values = stepSlider.noUiSlider.get();
-			var z_min = parseInt(values[0]);
-			var z_max = parseInt(values[1]);
+                // nice border box
+                var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var tiles_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Tileset');
+                var generated_tiles_title = Wu.DomUtil.create('div', 'file-option title generated-tiles', toggles_wrapper, 'Generated tile-range');
 
-			// double check tile count (local)
-			this.calculateTileCount({
-				zoom_min : z_min,
-				zoom_max : z_max,
-				file_id : file.getUuid()
-			}, function (err, tile_count) {
+                // zoom levels
+                var zoomlevels_wrapper = Wu.DomUtil.create('div', 'zoomlevels-wrapper', toggles_wrapper);
+                var zoom_levels = _.sortBy(meta.zoom_levels);
+                var zoom_min = _.first(zoom_levels);
+                var zoom_max = _.last(zoom_levels);
+                var zoom_levels_text = zoom_min  + ' to ' + zoom_max;
+                var zoomlevels_div = Wu.DomUtil.create('div', 'file-option sub padding-top-10', zoomlevels_wrapper, '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text);
 
-				// check tile count
-				if (tile_count > 11000) return; // todo: account dependent
+                // create slider
+                var stepSlider = Wu.DomUtil.create('div', 'tiles-slider', zoomlevels_wrapper);
+                noUiSlider.create(stepSlider, {
+                        start: [zoom_min, zoom_max],
+                        step: 1,
+                        range: {
+                                'min': [2],
+                                'max': [19]
+                        },
+                        pips: {
+                                mode: 'count',
+                                values: [18],
+                                density : 18,
+                                stepped : true
+                        }
+                });
 
-				// generate tiles
-				app.Socket.send('generate_tiles', {
-					zoom_min : z_min,
-					zoom_max : z_max,
-					file_id : file.getUuid()
-				});
+                // total tiles div
+                var totaltiles_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Total tiles:</span> ' + meta.total_tiles);
+                var tilesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Tileset size:</span> ');
 
-				// set feedback
-				generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Generating tiles. This will take a few minutes...</span>';
-			});
-		}, this);
+                // error feedback
+                var generated_tiles_error = this._generated_tiles_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-error', toggles_wrapper);
 
-	},
+                // generate button
+                var generateBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-22', toggles_wrapper);
+                var generateBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save generate-tiles', generateBtnWrap, 'Generate tiles');
 
-	_createShareBox : function (options) {
-		var container = options.container;
+                // slider events
+                stepSlider.noUiSlider.on('update', function (values, handle) {
 
-		// wrapper-5: share box
-		var toggles_wrapper5 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                        // set zoom levels
+                        var z_min = parseInt(values[0]);
+                        var z_max = parseInt(values[1]);
+                        var zoom_levels_text = z_min + ' to ' + z_max;
+                        zoomlevels_div.innerHTML = '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text;
 
-		// create user list input
-		this._createInviteUsersInput({
-			type : 'read',
-			label : 'Share Dataset',
-			content : toggles_wrapper5,
-			container : this._fullscreen._inner,
-			sublabel : 'Users get their own copy of your dataset.'
-		});
+                        // check tile count (local)
+                        this.calculateTileCount({
+                                zoom_min : z_min,
+                                zoom_max : z_max,
+                                file_id : file.getUuid()
+                        }, function (err, tile_count) {
 
-		// share button
-		var shareBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper5);
-		var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share dataset');
+                                // check tiles
+                                if (tile_count > 11000) { // todo: make account dependent
 
-		// feedback
-		var share_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label label-share_feedback', toggles_wrapper5, '');
+                                        // mark too high tile-count
+                                        totaltiles_div.innerHTML = '<span class="bold-font red-font">Total tiles: ' + tile_count + '</span>';
 
-		// remember
-		this._divs.share_feedback = share_feedback;
+                                        // set error feedback
+                                        generated_tiles_error.innerHTML = '<span class="bold-font">The tile count is too high. Please select a lower zoom-level.</span>';
 
-		// download button
-		Wu.DomEvent.on(shareBtn, 'click', this._shareDataset, this);
-	},
+                                        // disable button
+                                        Wu.DomUtil.addClass(generateBtn, 'disabled-btn');
 
-	_createDownloadBox : function (options) {
-		var container = options.container;
-		var file = options.file;
+                                } else {
 
-		// wrapper-3: download box
-		var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
+                                        // set tile count
+                                        totaltiles_div.innerHTML = '<span class="bold-font">Total tiles:</span> ' + tile_count;
 
-		// download button
-		var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
-		var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
+                                        // set error feedback
+                                        generated_tiles_error.innerHTML = '';
 
-		// download button
-		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
-	},
+                                        // enable button
+                                        Wu.DomUtil.removeClass(generateBtn, 'disabled-btn');
+                                }
+                        });
 
-	_createVectorizeBox : function (options) {
-		var container = options.container;
-		var file = options.file;
+                }.bind(this));
 
-		// wrapper-3: download box
-		var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Vectorize dataset');
+                // generate button event
+                Wu.DomEvent.on(generateBtn, 'click', function () {
 
-		var feedbackText = 'A new layer will be created with the raster data converted into vector format.';
-		var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper3, feedbackText);
+                        // set zoom levels
+                        var values = stepSlider.noUiSlider.get();
+                        var z_min = parseInt(values[0]);
+                        var z_max = parseInt(values[1]);
 
-		// download button
-		var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
-		var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Vectorize');
+                        // double check tile count (local)
+                        this.calculateTileCount({
+                                zoom_min : z_min,
+                                zoom_max : z_max,
+                                file_id : file.getUuid()
+                        }, function (err, tile_count) {
 
-		// download button
-		Wu.DomEvent.on(downloadBtn, 'click', file._vectorizeDataset, file);
-	},
+                                // check tile count
+                                if (tile_count > 11000) return; // todo: account dependent
 
-	_createDeleteBox : function (options) {
+                                // generate tiles
+                                app.Socket.send('generate_tiles', {
+                                        zoom_min : z_min,
+                                        zoom_max : z_max,
+                                        file_id : file.getUuid()
+                                });
 
-		var container = options.container;
-		var file = options.file;
-		var fullscreen = options.fullscreen;
+                                // set feedback
+                                generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Generating tiles. This will take a few minutes...</span>';
+                        });
+                }, this);
 
-		// wrapper-4: delete box
-		var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var delete_title = Wu.DomUtil.create('div', 'file-option title red-font', toggles_wrapper4, 'Delete');
+        },
 
-		// download button
-		var deleteBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper4);
-		var deleteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', deleteBtnWrap, 'Delete');
+        _createShareBox : function (options) {
+                var container = options.container;
 
-		// deleete button event
-		Wu.DomEvent.on(deleteBtn, 'click', function (e) {
+                // wrapper-5: share box
+                var toggles_wrapper5 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
 
-			// confirm dialog
-			Wu.confirm('Are you sure you want to delete this dataset? This cannot be undone!', function (confirmed) {
-				if (!confirmed) return;
+                // create user list input
+                this._createInviteUsersInput({
+                        type : 'read',
+                        label : 'Share Dataset',
+                        content : toggles_wrapper5,
+                        container : this._fullscreen._inner,
+                        sublabel : 'Users get their own copy of your dataset.'
+                });
 
-				// delete file
-				file._deleteFile(function (err, removedFile) {
+                // share button
+                var shareBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper5);
+                var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share dataset');
 
-					// close fullscreen
-					fullscreen.close();
+                // feedback
+                var share_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label label-share_feedback', toggles_wrapper5, '');
 
-					// delete successful
-					if (!err && removedFile && removedFile.success) {
-						app.feedback.setMessage({
-							title : 'Dataset deleted!',
-							description : file.getName() + ' was deleted.'
-						});
-					} else {
-						app.feedback.setError({
-							title : 'Something went wrong.',
-							description : 'Dataset not deleted.'
-						});
-					}
-				});
+                // remember
+                this._divs.share_feedback = share_feedback;
 
-			}.bind(this))
+                // download button
+                Wu.DomEvent.on(shareBtn, 'click', this._shareDataset, this);
+        },
 
-		}, this);
-	},
+        _createDownloadBox : function (options) {
+                var container = options.container;
+                var file = options.file;
 
+                // wrapper-3: download box
+                var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
 
-	_createTransparencyBox : function (options) {
-		var container = options.container;
-		var file = options.file;
+                // download button
+                var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
+                var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
 
-		// create divs
-		var toggles_wrapper9 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-		var ralpha_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper9, 'Transparency');
-		// var alpha_input = Wu.DomUtil.create('input', 'invite-input-form alpha-input', toggles_wrapper9);
-		// alpha_input.setAttribute('placeholder', 'Enter color or #hex value');
-		var feedbackText = 'A new layer will be created with the cut color.';
-		var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper9, feedbackText);
-		var alphaBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper9);
-		var whiteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', alphaBtnWrap, 'Cut white');
-		// var blackBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save left140', alphaBtnWrap, 'Cut black');
+                // download button
+                Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
+        },
 
-		// on click
-		Wu.DomEvent.on(whiteBtn, 'click', function (e) {
-			// var color = alpha_input.value;
+        _createVectorizeBox : function (options) {
+                var container = options.container;
+                var file = options.file;
 
-			// cut raster
-			this._cutRaster({
-				file : file,
-				color : 'white'
-			}, function (err, layer) {
+                // wrapper-3: download box
+                var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Vectorize dataset');
 
-				// set feedback text
-				transparency_feedback.innerHTML = 'New layer created and added to project!';
-			});
+                var feedbackText = 'A new layer will be created with the raster data converted into vector format.';
+                var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper3, feedbackText);
 
-		}, this);
+                // download button
+                var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
+                var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Vectorize');
+
+                // download button
+                Wu.DomEvent.on(downloadBtn, 'click', file._vectorizeDataset, file);
+        },
 
-		// // on click
-		// Wu.DomEvent.on(blackBtn, 'click', function (e) {
-		// 	// var color = alpha_input.value;
+        _createDeleteBox : function (options) {
 
-		// 	// cut raster
-		// 	this._cutRaster({
-		// 		file : file,
-		// 		color : 'black'
-		// 	});
+                var container = options.container;
+                var file = options.file;
+                var fullscreen = options.fullscreen;
 
-		// }, this);
+                // wrapper-4: delete box
+                var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var delete_title = Wu.DomUtil.create('div', 'file-option title red-font', toggles_wrapper4, 'Delete');
 
-	},
+                // download button
+                var deleteBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper4);
+                var deleteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', deleteBtnWrap, 'Delete');
 
-	_cutRaster : function (options, done) {
-		var file = options.file;
-		var color = options.color;
+                // deleete button event
+                Wu.DomEvent.on(deleteBtn, 'click', function (e) {
 
-		// cut raster
-		file.cutRasterColor({
-			color : color,
-			project : this._project
-		}, function (err, layer) {
-			if (err) return console.error(err);
+                        // confirm dialog
+                        Wu.confirm('Are you sure you want to delete this dataset? This cannot be undone!', function (confirmed) {
+                                if (!confirmed) return;
 
-			// rename layer
-			var layerName = layer.getTitle();
-			layerName += ' (white areas cut)';
-			layer.setTitle(layerName);
+                                // delete file
+                                file._deleteFile(function (err, removedFile) {
 
-			// automatically add layer to layermenu
-			this._addOnImport(layer);
+                                        // close fullscreen
+                                        fullscreen.close();
 
-			// done
-			done && done(err, layer);
+                                        // delete successful
+                                        if (!err && removedFile && removedFile.success) {
+                                                app.feedback.setMessage({
+                                                        title : 'Dataset deleted!',
+                                                        description : file.getName() + ' was deleted.'
+                                                });
+                                        } else {
+                                                app.feedback.setError({
+                                                        title : 'Something went wrong.',
+                                                        description : 'Dataset not deleted.'
+                                                });
+                                        }
+                                });
 
-		}.bind(this));
-	},
+                        }.bind(this))
 
-	_highlightFullscreenElement : function (elem) {
+                }, this);
+        },
 
-		// hide fullscreen
-		jss.set('.smooth-fullscreen', {
-			'visibility' : 'hidden',
-			'overflow' : 'hidden'
-		});
 
-		// hide chrome
-		jss.set('.chrome-right', {
-			'visibility' : 'hidden'
-		});
+        _createTransparencyBox : function (options) {
+                var container = options.container;
+                var file = options.file;
 
-		// hide controls
-		jss.set('.leaflet-control-container', {
-			'visibility' : 'hidden'
-		});
+                // create divs
+                var toggles_wrapper9 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var ralpha_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper9, 'Transparency');
+                // var alpha_input = Wu.DomUtil.create('input', 'invite-input-form alpha-input', toggles_wrapper9);
+                // alpha_input.setAttribute('placeholder', 'Enter color or #hex value');
+                var feedbackText = 'A new layer will be created with the cut color.';
+                var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper9, feedbackText);
+                var alphaBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper9);
+                var whiteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', alphaBtnWrap, 'Cut white');
+                // var blackBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save left140', alphaBtnWrap, 'Cut black');
 
-		// show only one element
-		elem.style.visibility = 'visible';
-		elem.style.background = '#FCFCFC';
+                // on click
+                Wu.DomEvent.on(whiteBtn, 'click', function (e) {
+                        // var color = alpha_input.value;
 
-		// disable map zoom
-		app._map.scrollWheelZoom.disable()
+                        // cut raster
+                        this._cutRaster({
+                                file : file,
+                                color : 'white'
+                        }, function (err, layer) {
 
-	},
+                                // set feedback text
+                                transparency_feedback.innerHTML = 'New layer created and added to project!';
+                        });
 
-	_unhighlightFullscreenElement : function () {
-		jss.remove('.smooth-fullscreen');
-		jss.remove('.chrome-right');
-		jss.remove('.leaflet-control-container');
+                }, this);
 
-		// enable map zoom
-		app._map.scrollWheelZoom.enable()
-	},
+        },
 
-	_onCloseFullscreen : function () {
-		this._divs = {
-			users : []
-		};
-	},
+        _cutRaster : function (options, done) {
+                var file = options.file;
+                var color = options.color;
 
-	_divs : {
-		users : []
-	},
+                // cut raster
+                file.cutRasterColor({
+                        color : color,
+                        project : this._project
+                }, function (err, layer) {
+                        if (err) return console.error(err);
 
-	_createInviteUsersInput : function (options) {
+                        // rename layer
+                        var layerName = layer.getTitle();
+                        layerName += ' (white areas cut)';
+                        layer.setTitle(layerName);
 
-		// invite users
-		var me = this;
-		var content = options.content || me._fullscreen._content;
-		var container = me._fullscreen._container;
-		var project = options.project;
+                        // automatically add layer to layermenu
+                        this._addOnImport(layer);
 
-		// label
-		var invite_label = options.label;
-		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label', content, invite_label);
+                        // done
+                        done && done(err, layer);
+
+                }.bind(this));
+        },
 
-		// container
-		var invite_container = Wu.DomUtil.create('div', 'invite-container', content);
+        _highlightFullscreenElement : function (elem) {
 
-		// sub-label
-		var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
+                // hide fullscreen
+                jss.set('.smooth-fullscreen', {
+                        'visibility' : 'hidden',
+                        'overflow' : 'hidden'
+                });
+
+                // hide chrome
+                jss.set('.chrome-right', {
+                        'visibility' : 'hidden'
+                });
+
+                // hide controls
+                jss.set('.leaflet-control-container', {
+                        'visibility' : 'hidden'
+                });
+
+                // show only one element
+                elem.style.visibility = 'visible';
+                elem.style.background = '#FCFCFC';
+
+                // disable map zoom
+                app._map.scrollWheelZoom.disable()
+
+        },
+
+        _unhighlightFullscreenElement : function () {
+                jss.remove('.smooth-fullscreen');
+                jss.remove('.chrome-right');
+                jss.remove('.leaflet-control-container');
+
+                // enable map zoom
+                app._map.scrollWheelZoom.enable()
+        },
+
+        _onCloseFullscreen : function () {
+                this._divs = {
+                        users : []
+                };
+        },
+
+        _divs : {
+                users : []
+        },
+
+        _createInviteUsersInput : function (options) {
+
+                // invite users
+                var me = this;
+                var content = options.content || me._fullscreen._content;
+                var container = me._fullscreen._container;
+                var project = options.project;
+
+                // label
+                var invite_label = options.label;
+                var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label', content, invite_label);
+
+                // container
+                var invite_container = Wu.DomUtil.create('div', 'invite-container', content);
+
+                // sub-label
+                var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
+
+                var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
+                var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+
+                // input box
+                var invite_input = Wu.DomUtil.create('input', 'invite-input-form', invite_input_container);
+
+                // invite list
+                var invite_list_container = Wu.DomUtil.create('div', 'invite-list-container', invite_container);
+                var invite_list_inner = Wu.DomUtil.create('div', 'invite-list-inner', invite_list_container);
+
+                // remember div
+                me._divs.invite_list_container = invite_list_container;
+
+                // for manual scrollbar (js)
+                var monkey_scroll_bar = Wu.DomUtil.create('div', 'monkey-scroll-bar', invite_list_inner);
+
+                // for holding list
+                var monkey_scroll_hider = Wu.DomUtil.create('div', 'monkey-scroll-hider', invite_list_inner);
+                var monkey_scroll_inner = Wu.DomUtil.create('div', 'monkey-scroll-inner', monkey_scroll_hider);
+                var monkey_scroll_list = Wu.DomUtil.create('div', 'monkey-scroll-list', monkey_scroll_inner);
+
+                // list of all users
+                var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
+                        return u.store.firstName;
+                });
+                var itemsContainers = [];
+                var checkedUsers = {};
+                me._onKeyUpparameters = {
+                        itemsContainers: itemsContainers,
+                        checkedUsers: checkedUsers,
+                        invite_input: invite_input
+                };
+
+                _.each(allUsers, function (user) {
+
+                        if (user.getUuid() == app.Account.getUuid()) return;
+
+                        // divs
+                        var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container', monkey_scroll_list);
+                        var avatar_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar-container', list_item_container);
+                        var avatar = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar default-avatar', avatar_container);
+                        var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container', list_item_container);
+                        var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold', name_container);
+                        var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
 
-		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
-		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+                        // set name
+                        name_bold.innerHTML = user.getFullName();
+                        name_subtle.innerHTML = user.getEmail();
 
-		// input box
-		var invite_input = Wu.DomUtil.create('input', 'invite-input-form', invite_input_container);
+                        // click event
+                        Wu.DomEvent.on(list_item_container, 'click', function () {
+                                // dont allow adding self
+                                if (user.getUuid() == app.Account.getUuid()) return;
 
-		// invite list
-		var invite_list_container = Wu.DomUtil.create('div', 'invite-list-container', invite_container);
-		var invite_list_inner = Wu.DomUtil.create('div', 'invite-list-inner', invite_list_container);
+                                // add selected user item to input box
+                                checkedUsers[user.getFullName()] = user;
+                                this._addUserAccessItem({
+                                        input : invite_input,
+                                        user : user,
+                                        type : options.type,
+                                        itemsContainers: itemsContainers,
+                                        checkedUsers: checkedUsers,
+                                        invite_list_container: invite_list_container
+                                });
 
-		// remember div
-		me._divs.invite_list_container = invite_list_container;
+                                invite_input.value = '';
+                                me._onKeyUp();
+
+                        }, this);
 
-		// for manual scrollbar (js)
-		var monkey_scroll_bar = Wu.DomUtil.create('div', 'monkey-scroll-bar', invite_list_inner);
+                        itemsContainers.push({
+                                name: user.getFullName(),
+                                container: list_item_container
+                        });
+                }, this);
+
+
+                // events
+
+                // input focus, show dropdown
+                Wu.DomEvent.on(invite_input, 'focus', function () {
+                        me._onKeyUp();
+                }, this);
 
-		// for holding list
-		var monkey_scroll_hider = Wu.DomUtil.create('div', 'monkey-scroll-hider', invite_list_inner);
-		var monkey_scroll_inner = Wu.DomUtil.create('div', 'monkey-scroll-inner', monkey_scroll_hider);
-		var monkey_scroll_list = Wu.DomUtil.create('div', 'monkey-scroll-list', monkey_scroll_inner);
+                // focus input on any click
+                Wu.DomEvent.on(invite_input_container, 'click', function () {
+                        invite_input.focus();
+                }, this);
 
-		// list of all users
-		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
-			return u.store.firstName;
-		});
-		var itemsContainers = [];
-		var checkedUsers = {};
-		me._onKeyUpparameters = {
-			itemsContainers: itemsContainers,
-			checkedUsers: checkedUsers,
-			invite_input: invite_input
-		};
+                // input keyup
+                Wu.DomEvent.on(invite_input, 'keydown', function (e) {
 
-		_.each(allUsers, function (user) {
+                        // get which key
+                        var key = event.which ? event.which : event.keyCode;
 
-			if (user.getUuid() == app.Account.getUuid()) return;
+                        // get string length
+                        var value = invite_input.value;
+                        var text_length = value.length;
+                        if (text_length <= 0) text_length = 1;
 
-			// divs
-			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container', monkey_scroll_list);
-			var avatar_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar-container', list_item_container);
-			var avatar = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar default-avatar', avatar_container);
-			var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container', list_item_container);
-			var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold', name_container);
-			var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
+                        // set width of input dynamically
+                        invite_input.style.width = 30 + (text_length * 20) + 'px';
 
-			// set name
-			name_bold.innerHTML = user.getFullName();
-			name_subtle.innerHTML = user.getEmail();
+                        // backspace on empty field: delete added user
+                        if (key == 8 && value.length == 0 && _.keys(me._onKeyUpparameters.checkedUsers).length) {
 
-			// click event
-			Wu.DomEvent.on(list_item_container, 'click', function () {
-				// dont allow adding self
-				if (user.getUuid() == app.Account.getUuid()) return;
+                                var popped = _.find(me._divs.users, function (user) {
+                                        return user.user.getFullName() === me._onKeyUpparameters.checkedUsers[_.last(_.keys(me._onKeyUpparameters.checkedUsers))].getFullName();
+                                });
 
-				// add selected user item to input box
-				checkedUsers[user.getFullName()] = user;
-				this._addUserAccessItem({
-					input : invite_input,
-					user : user,
-					type : options.type,
-					itemsContainers: itemsContainers,
-					checkedUsers: checkedUsers,
-					invite_list_container: invite_list_container
-				});
+                                delete me._onKeyUpparameters.checkedUsers[_.last(_.keys(me._onKeyUpparameters.checkedUsers))];
+                                me._divs.users.pop();
+                                Wu.DomUtil.remove(popped.user_container);
+                        }
 
-				invite_input.value = '';
-				me._onKeyUp();
+                        // enter: blur input
+                        if (key == 13 || key == 27) {
+                                invite_input.blur();
+                                invite_input.value = '';
+                                this._closeInviteInputs();
+                        }
 
-			}, this);
+                }.bind(this), this);
 
-			itemsContainers.push({
-				name: user.getFullName(),
-				container: list_item_container
-			});
-		}, this);
+                Wu.DomEvent.on(invite_input, 'keyup', me._onKeyUp, me);
 
+                // close dropdown on any click
+                Wu.DomEvent.on(container, 'click', function (e) {
 
-		// events
+                        // only if target == self
+                        var relevantTarget =    e.target == container ||
+                                        e.target == this._fullscreen._inner ||
+                                        e.target == name ||
+                                        e.target == this._fullscreen._content;
 
-		// input focus, show dropdown
-		Wu.DomEvent.on(invite_input, 'focus', function () {
-			me._onKeyUp();
-		}, this);
+                        if (relevantTarget) this._closeInviteInputs();
 
-		// focus input on any click
-		Wu.DomEvent.on(invite_input_container, 'click', function () {
-			invite_input.focus();
-		}, this);
+                }, this);
 
-		// input keyup
-		Wu.DomEvent.on(invite_input, 'keydown', function (e) {
+        },
 
-			// get which key
-			var key = event.which ? event.which : event.keyCode;
+        _closeInviteInputs : function () {
+        },
 
-			// get string length
-			var value = invite_input.value;
-			var text_length = value.length;
-			if (text_length <= 0) text_length = 1;
+        _closeInviteInputs : function () {
+                var container = this._divs.invite_list_container;
+                if (container) container.style.display = 'none';
+        },
 
-			// set width of input dynamically
-			invite_input.style.width = 30 + (text_length * 20) + 'px';
+        _showInviteInputs : function () {
+                var container = this._divs.invite_list_container;
+                if (container) container.style.display = 'block';
+        },
 
-			// backspace on empty field: delete added user
-			if (key == 8 && value.length == 0 && _.keys(me._onKeyUpparameters.checkedUsers).length) {
+        _currentFile : {},
 
-				var popped = _.find(me._divs.users, function (user) {
-					return user.user.getFullName() === me._onKeyUpparameters.checkedUsers[_.last(_.keys(me._onKeyUpparameters.checkedUsers))].getFullName();
-				});
+        _onKeyUp : function (e) {
+                var me = this;
+                var filterUsers = [];
 
-				delete me._onKeyUpparameters.checkedUsers[_.last(_.keys(me._onKeyUpparameters.checkedUsers))];
-				me._divs.users.pop();
-				Wu.DomUtil.remove(popped.user_container);
-			}
+                _.each(me._onKeyUpparameters.itemsContainers, function (user) {
+                        if (user.name.toLowerCase().indexOf(me._onKeyUpparameters.invite_input.value.toLowerCase()) === -1 || _.keys(me._onKeyUpparameters.checkedUsers).indexOf(user.name) !== -1) {
+                                user.container.style.display = 'none';
+                        } else {
+                                user.container.style.display = 'block';
+                                filterUsers.push(user);
+                        }
+                });
 
-			// enter: blur input
-			if (key == 13 || key == 27) {
-				invite_input.blur();
-				invite_input.value = '';
-				this._closeInviteInputs();
-			}
+                if (_.isEmpty(filterUsers)) {
+                        this._closeInviteInputs();
+                } else {
+                        this._showInviteInputs();
+                }
+        },
 
-		}.bind(this), this);
+        _shareDataset : function () {
 
-		Wu.DomEvent.on(invite_input, 'keyup', me._onKeyUp, me);
+                var users = this._divs.users;
+                var dataset = this._fullscreen._file;
 
-		// close dropdown on any click
-		Wu.DomEvent.on(container, 'click', function (e) {
 
-			// only if target == self
-			var relevantTarget = 	e.target == container ||
-					e.target == this._fullscreen._inner ||
-					e.target == name ||
-					e.target == this._fullscreen._content;
+                if (!users.length) return;
 
-			if (relevantTarget) this._closeInviteInputs();
+                var userNames = [];
+                users.forEach(function (user) {
+                        userNames.push(user.user.getFullName());
+                });
 
-		}, this);
+                var names = userNames.join(', ');
 
-	},
+                if (Wu.confirm('Are you sure you want to share the dataset with ' + names + '?')) {
 
-	_closeInviteInputs : function () {
-	},
+                        var userUuids = [];
+                        users.forEach(function (u) {
+                                userUuids.push(u.user.getUuid());
+                        });
 
-	_closeInviteInputs : function () {
-		var container = this._divs.invite_list_container;
-		if (container) container.style.display = 'none';
-	},
+                        app.api.shareDataset({
+                                dataset : dataset.getUuid(),
+                                users : userUuids
+                        }, function (err, result) {
+                                if (err) console.error('err', err);
 
-	_showInviteInputs : function () {
-		var container = this._divs.invite_list_container;
-		if (container) container.style.display = 'block';
-	},
+                                var result = Wu.parse(result);
 
-	_currentFile : {},
+                                if (result.err || !result.success) {
+                                        console.error('something went worng', result);
 
-	_onKeyUp : function (e) {
-		var me = this;
-		var filterUsers = [];
+                                        // set feedback
+                                        this._divs.share_feedback.innerHTML = 'Something went wrong.';
+                                } else {
 
-		_.each(me._onKeyUpparameters.itemsContainers, function (user) {
-			if (user.name.toLowerCase().indexOf(me._onKeyUpparameters.invite_input.value.toLowerCase()) === -1 || _.keys(me._onKeyUpparameters.checkedUsers).indexOf(user.name) !== -1) {
-				user.container.style.display = 'none';
-			} else {
-				user.container.style.display = 'block';
-				filterUsers.push(user);
-			}
-		});
+                                        // set feedback
+                                        this._divs.share_feedback.innerHTML = 'Dataset shared with ' + names + '!';
+                                }
 
-		if (_.isEmpty(filterUsers)) {
-			this._closeInviteInputs();
-		} else {
-			this._showInviteInputs();
-		}
-	},
 
-	_shareDataset : function () {
+                        }.bind(this));
+                }
 
-		var users = this._divs.users;
-		var dataset = this._fullscreen._file;
+        },
+        _addUserAccessItem : function (options) {
 
+                var invite_input = options.input;
+                var user = options.user;
+                var me = this;
 
-		if (!users.length) return;
+                // if user deleted. todo: clean up deleting
+                if (!user) return;
 
-		var userNames = [];
-		users.forEach(function (user) {
-			userNames.push(user.user.getFullName());
-		});
+                // focus input
+                invite_input.focus();
 
-		var names = userNames.join(', ');
+                // don't add twice
+                var existing = _.find(this._divs.users, function (i) {
+                        return i.user == user;
+                });
+                if (existing) return;
 
-		if (Wu.confirm('Are you sure you want to share the dataset with ' + names + '?')) {
+                // insert user box in input area
+                var user_container = Wu.DomUtil.create('div', 'mini-user-container');
+                var user_inner = Wu.DomUtil.create('div', 'mini-user-inner', user_container);
+                var user_avatar = Wu.DomUtil.create('div', 'mini-user-avatar default-avatar', user_inner);
+                var user_name = Wu.DomUtil.create('div', 'mini-user-name', user_inner, user.getFullName());
+                var user_kill = Wu.DomUtil.create('div', 'mini-user-kill', user_inner, 'x');
 
-			var userUuids = [];
-			users.forEach(function (u) {
-				userUuids.push(u.user.getUuid());
-			});
+                // insert before input
+                var invite_input_container = invite_input.parentNode;
+                invite_input_container.insertBefore(user_container, invite_input);
 
-			app.api.shareDataset({
-				dataset : dataset.getUuid(),
-				users : userUuids
-			}, function (err, result) {
 
+                // click event (kill)
+                Wu.DomEvent.on(user_container, 'click', function () {
 
-				if (err) console.error('err', err);
+                        // remove div
+                        Wu.DomUtil.remove(user_container);
 
-				var result = Wu.parse(result);
+                        // remove from array
+                        _.remove(this._divs.users, function (i) {
+                                return i.user == user;
+                        });
+                        delete options.checkedUsers[user.getFullName()];
+                        me._onKeyUp();
+                }, this);
 
-				if (result.err || !result.success) {
-					console.error('something went worng', result);
+                // add to array
+                this._divs.users.push({
+                        user : user,
+                        user_container : user_container
+                });
 
-					// set feedback
-					this._divs.share_feedback.innerHTML = 'Something went wrong.';
-				} else {
 
-					// set feedback
-					this._divs.share_feedback.innerHTML = 'Dataset shared with ' + names + '!';
-				}
+        },
 
+        calculateTileCount : function (options, done) {
 
-			}.bind(this));
-		}
+                var file_id = options.file_id;
+                var zoom_min = options.zoom_min;
+                var zoom_max = options.zoom_max;
+                var all_levels_count = this._calcTileCount(file_id);
+                var zoom_range = _.range(zoom_min, zoom_max + 1);
 
-	},
-	_addUserAccessItem : function (options) {
+                // add zoom levels
+                var tile_count = 0;
+                zoom_range.forEach(function (zr) {
+                        tile_count += all_levels_count[zr];
+                });
 
-		var invite_input = options.input;
-		var user = options.user;
-		var me = this;
+                // done
+                done(null, tile_count);
 
-		// if user deleted. todo: clean up deleting
-		if (!user) return;
 
-		// focus input
-		invite_input.focus();
+                app.Socket.send('tileset_meta', {
+                        file_id : file_id
+                });
 
-		// don't add twice
-		var existing = _.find(this._divs.users, function (i) {
-			return i.user == user;
-		});
-		if (existing) return;
+        },
 
-		// insert user box in input area
-		var user_container = Wu.DomUtil.create('div', 'mini-user-container');
-		var user_inner = Wu.DomUtil.create('div', 'mini-user-inner', user_container);
-		var user_avatar = Wu.DomUtil.create('div', 'mini-user-avatar default-avatar', user_inner);
-		var user_name = Wu.DomUtil.create('div', 'mini-user-name', user_inner, user.getFullName());
-		var user_kill = Wu.DomUtil.create('div', 'mini-user-kill', user_inner, 'x');
+        _calcTileCount : function (file_id) {
 
-		// insert before input
-		var invite_input_container = invite_input.parentNode;
-		invite_input_container.insertBefore(user_container, invite_input);
+                // set options
+                var zoom_max = 20;
+                var zoom_levels = _.range(0, zoom_max + 1);
+                var total_tiles = [];
 
+                // get file extent
+                var file = app.Account.getFile(file_id);
+                var meta = file.getMeta();
+                var extent = meta.extent;
 
-		// click event (kill)
-		Wu.DomEvent.on(user_container, 'click', function () {
+                // return if no meta
+                if (!meta) return;
 
-			// remove div
-			Wu.DomUtil.remove(user_container);
+                // get edges
+                var north_edge = extent[3];
+                var south_edge = extent[1];
+                var west_edge = extent[0];
+                var east_edge = extent[2];
 
-			// remove from array
-			_.remove(this._divs.users, function (i) {
-				return i.user == user;
-			});
-			delete options.checkedUsers[user.getFullName()];
-			me._onKeyUp();
-		}, this);
+                // calculate tiles per zoom-level
+                zoom_levels.forEach(function (z) {
+                        var zoom = z;
+                        var top_tile = this._lat2tile(north_edge, zoom);
+                        var left_tile = this._lon2tile(west_edge, zoom);
+                        var bottom_tile = this._lat2tile(south_edge, zoom);
+                        var right_tile = this._lon2tile(east_edge, zoom);
+                        var width = Math.abs(left_tile - right_tile) + 1;
+                        var height = Math.abs(top_tile - bottom_tile) + 1;
+                        var total_tiles_at_zoom = width * height;
 
-		// add to array
-		this._divs.users.push({
-			user : user,
-			user_container : user_container
-		});
+                        total_tiles.push(total_tiles_at_zoom);
 
+                }, this);
 
-	},
+                return total_tiles;
 
-	calculateTileCount : function (options, done) {
+        },
 
-		var file_id = options.file_id;
-		var zoom_min = options.zoom_min;
-		var zoom_max = options.zoom_max;
-		var all_levels_count = this._calcTileCount(file_id);
-		var zoom_range = _.range(zoom_min, zoom_max + 1);
+        _lon2tile : function (lon,zoom) { return (Math.floor((lon+180)/360*Math.pow(2,zoom))); },
+        _lat2tile : function (lat,zoom)  { return (Math.floor((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom))); },
 
-		// add zoom levels
-		var tile_count = 0;
-		zoom_range.forEach(function (zr) {
-			tile_count += all_levels_count[zr];
-		});
+        _onGeneratedTiles : function (e) {
 
-		// done
-		done(null, tile_count);
+                var data = e.detail.data;
+                var meta = data.metadata;
+                var file_id = data.file_id;
+                var file = app.Account.getFile(file_id);
 
+                // set meta
+                file.setMetadata(meta);
 
-		app.Socket.send('tileset_meta', {
-			file_id : file_id
-		});
+                // feedback
+                this._generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Done!</span>';
 
-	},
+        },
 
-	_calcTileCount : function (file_id) {
+        // Save file name
+        saveFileName : function (newName, d, library) {
 
-		// set options
-		var zoom_max = 20;
-		var zoom_levels = _.range(0, zoom_max + 1);
-		var total_tiles = [];
+                if ( !newName || newName == '' ) newName = d.getName();
+                d.setName(newName);
 
-		// get file extent
-		var file = app.Account.getFile(file_id);
-		var meta = file.getMeta();
-		var extent = meta.extent;
+                this.editingFileName = false;
+                this._refreshFiles();
+        },
 
-		// return if no meta
-		if (!meta) return;
+        // ┬┌┐┌┬┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
+        // │││││ │   │  ├─┤└┬┘├┤ ├┬┘└─┐
+        // ┴┘└┘┴ ┴   ┴─┘┴ ┴ ┴ └─┘┴└─└─┘
 
-		// get edges
-		var north_edge = extent[3];
-		var south_edge = extent[1];
-		var west_edge = extent[0];
-		var east_edge = extent[2];
+        _initLayerList : function () {
 
-		// calculate tiles per zoom-level
-		zoom_levels.forEach(function (z) {
-			var zoom = z;
-			var top_tile = this._lat2tile(north_edge, zoom);
-			var left_tile = this._lon2tile(west_edge, zoom);
-			var bottom_tile = this._lat2tile(south_edge, zoom);
-			var right_tile = this._lon2tile(east_edge, zoom);
-			var width = Math.abs(left_tile - right_tile) + 1;
-			var height = Math.abs(top_tile - bottom_tile) + 1;
-			var total_tiles_at_zoom = width * height;
+                // Holds each section (mapbox, cartoDB, etc);
+                this.layerListContainers = {};
 
-			total_tiles.push(total_tiles_at_zoom);
+                // Holds layers that we've selected
+                this.selectedLayers = [];
 
-		}, this);
+                // Show layer actions for this specific layer
+                this.showLayerActionFor = false;
 
-		return total_tiles;
+                // Edit layer name
+                this.editingLayerName = false;
 
-	},
+                // Layer providers
+                this.layerProviders = {};
 
-	_lon2tile : function (lon,zoom) { return (Math.floor((lon+180)/360*Math.pow(2,zoom))); },
-	_lat2tile : function (lat,zoom)  { return (Math.floor((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom))); },
+                // Empty layers container
+                this._layersContainer.innerHTML = '';
 
-	_onGeneratedTiles : function (e) {
+                // Create PROJECT LAYERS section, with D3 container
+                var sortedLayers = this.sortedLayers = this.sortLayers(this._project.layers);
 
-		var data = e.detail.data;
-		var meta = data.metadata;
-		var file_id = data.file_id;
-		var file = app.Account.getFile(file_id);
+                sortedLayers.forEach(function (layerBundle) {
 
-		// set meta
-		file.setMetadata(meta);
+                        var provider = layerBundle.key;
 
-		// feedback
-		this._generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Done!</span>';
+                        // only do our layers
+                        if (provider == 'postgis' || provider == 'cube') {
 
-	},
+                                var layers = layerBundle.layers;
 
-	// Save file name
-	saveFileName : function (newName, d, library) {
+                                if ( layers.length < 1 ) return;
 
-		if ( !newName || newName == '' ) newName = d.getName();
-		d.setName(newName);
+                                this.layerProviders[provider] = {
+                                        name : provider,
+                                        layers : layers
+                                };
 
-		this.editingFileName = false;
-		this._refreshFiles();
-	},
+                                this.layerListContainers[provider] = {};
 
-	// ┬┌┐┌┬┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
-	// │││││ │   │  ├─┤└┬┘├┤ ├┬┘└─┐
-	// ┴┘└┘┴ ┴   ┴─┘┴ ┴ ┴ └─┘┴└─└─┘
+                                // Create wrapper
+                                this.layerListContainers[provider].wrapper = Wu.DomUtil.create('div', 'layer-list-container', this._layersContainer);
 
-	_initLayerList : function () {
+                                // D3 Container
+                                this.layerListContainers[provider].layerList = Wu.DomUtil.create('div', 'layer-list-container-layer-list', this.layerListContainers[provider].wrapper);
+                                this.layerListContainers[provider].D3container = d3.select(this.layerListContainers[provider].layerList);
+                        }
 
-		// Holds each section (mapbox, cartoDB, etc);
-		this.layerListContainers = {};
+                }.bind(this));
 
-		// Holds layers that we've selected
-		this.selectedLayers = [];
+        },
 
-		// Show layer actions for this specific layer
-		this.showLayerActionFor = false;
 
-		// Edit layer name
-		this.editingLayerName = false;
+        // ┬─┐┌─┐┌─┐┬─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
+        // ├┬┘├┤ ├┤ ├┬┘├┤ └─┐├─┤  │  ├─┤└┬┘├┤ ├┬┘└─┐
+        // ┴└─└─┘└  ┴└─└─┘└─┘┴ ┴  ┴─┘┴ ┴ ┴ └─┘┴└─└─┘
 
-		// Layer providers
-		this.layerProviders = {};
+        _refreshLayers : function () {
 
-		// Empty layers container
-		this._layersContainer.innerHTML = '';
+                // FILES
+                for (var p in this.layerProviders) {
+                        var provider = this.layerProviders[p];
+                        var layers = provider.layers;
+                        provider.data = _.toArray(layers);
+                        var D3container = this.layerListContainers[p].D3container;
+                        var data = this.layerProviders[p].data;
+                        this.initLayerList(D3container, data, p);
+                }
 
-		// Create PROJECT LAYERS section, with D3 container
-		var sortedLayers = this.sortedLayers = this.sortLayers(this._project.layers);
+        },
 
-		sortedLayers.forEach(function (layerBundle) {
 
-			console.log('layerbundle key', layerBundle.key);
+        // ┌─┐┌─┐┬─┐┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐  ┌┐ ┬ ┬  ┌─┐┬─┐┌─┐┬  ┬┬┌┬┐┌─┐┬─┐
+        // └─┐│ │├┬┘ │   │  ├─┤└┬┘├┤ ├┬┘└─┐  ├┴┐└┬┘  ├─┘├┬┘│ │└┐┌┘│ ││├┤ ├┬┘
+        // └─┘└─┘┴└─ ┴   ┴─┘┴ ┴ ┴ └─┘┴└─└─┘  └─┘ ┴   ┴  ┴└─└─┘ └┘ ┴─┴┘└─┘┴└─
 
-			var provider = layerBundle.key;
+        sortLayers : function (layers) {
 
-			// only do our layers
-			if (provider == 'postgis' || provider == 'cube') {
+                var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube'];
+                var results = [];
 
-				var layers = layerBundle.layers;
+                keys.forEach(function (key) {
+                        var sort = {
+                                key : key,
+                                layers : []
+                        };
+                        for (var l in layers) {
+                                var layer = layers[l];
+                                if (layer) {
+                                        if (layer.store && layer.store.data.hasOwnProperty(key)) {
+                                                sort.layers.push(layer)
+                                        }
+                                }
+                        }
+                        results.push(sort);
+                }, this);
 
-				if ( layers.length < 1 ) return;
+                this.numberOfProviders = results.length;
+                return results;
+        },
 
-				this.layerProviders[provider] = {
-					name : provider,
-					layers : layers
-				};
 
-				this.layerListContainers[provider] = {};
+        // ██████╗  █████╗ ███████╗███████╗    ██╗      █████╗ ██╗   ██╗███████╗██████╗ ███████╗
+        // ██╔══██╗██╔══██╗██╔════╝██╔════╝    ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗██╔════╝
+        // ██████╔╝███████║███████╗█████╗      ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝███████╗
+        // ██╔══██╗██╔══██║╚════██║██╔══╝      ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗╚════██║
+        // ██████╔╝██║  ██║███████║███████╗    ███████╗██║  ██║   ██║   ███████╗██║  ██║███████║
+        // ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝    ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
 
-				// Create wrapper
-				this.layerListContainers[provider].wrapper = Wu.DomUtil.create('div', 'layer-list-container', this._layersContainer);
 
-				// D3 Container
-				this.layerListContainers[provider].layerList = Wu.DomUtil.create('div', 'layer-list-container-layer-list', this.layerListContainers[provider].wrapper);
-				this.layerListContainers[provider].D3container = d3.select(this.layerListContainers[provider].layerList);
-			}
+        _initBaseLayerList : function () {
+                this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false);
+        },
 
-		}.bind(this));
+        _refreshBaseLayerList : function () {
 
-	},
+                // clear
+                this._baseLayerDropdownContainer.innerHTML = '';
 
+                // only create if editable
+                if (this._project.isEditable()) {
+                        this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
+                }
 
-	// ┬─┐┌─┐┌─┐┬─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
-	// ├┬┘├┤ ├┤ ├┬┘├┤ └─┐├─┤  │  ├─┤└┬┘├┤ ├┬┘└─┐
-	// ┴└─└─┘└  ┴└─└─┘└─┘┴ ┴  ┴─┘┴ ┴ ┴ └─┘┴└─└─┘
+                // init color selector
+                this._initColorSelector();
+        },
 
-	_refreshLayers : function () {
+        _initLayout_activeLayers : function (title, subtitle, container, layers) {
+                var sortedLayers = [];
 
-		// FILES
-		for (var p in this.layerProviders) {
-			var provider = this.layerProviders[p];
-			var layers = provider.layers;
-			provider.data = _.toArray(layers);
-			var D3container = this.layerListContainers[p].D3container;
-			var data = this.layerProviders[p].data;
-			this.initLayerList(D3container, data, p);
-		}
+                // Create select options
 
-	},
+                this.sortedLayers.forEach(function(provider) {
 
+                        // Do not allow postgis layers to be in the baselayer dropdown
+                        if ( provider.key == "postgis" ) return;
+                        if ( provider.key == "raster"  ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
 
-	// ┌─┐┌─┐┬─┐┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐  ┌┐ ┬ ┬  ┌─┐┬─┐┌─┐┬  ┬┬┌┬┐┌─┐┬─┐
-	// └─┐│ │├┬┘ │   │  ├─┤└┬┘├┤ ├┬┘└─┐  ├┴┐└┬┘  ├─┘├┬┘│ │└┐┌┘│ ││├┤ ├┬┘
-	// └─┘└─┘┴└─ ┴   ┴─┘┴ ┴ ┴ └─┘┴└─└─┘  └─┘ ┴   ┴  ┴└─└─┘ └┘ ┴─┴┘└─┘┴└─
+                        // Get each provider (mapbox, google, etc)
+                        provider.layers.forEach(function(layer) {
+                                sortedLayers.push({
+                                        title: layer.getTitle(),
+                                        value: layer.getUuid(),
+                                        isSelected: this.isBaseLayerOn(layer.getUuid())
+                                });
 
-	sortLayers : function (layers) {
+                        }.bind(this))
+                }.bind(this));
 
-		var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube'];
-		var results = [];
+                sortedLayers.push({
+                        title: "----------------------------------------------------------------------------",
+                        disabled: true
+                });
 
-		keys.forEach(function (key) {
-			var sort = {
-				key : key,
-				layers : []
-			};
-			for (var l in layers) {
-				var layer = layers[l];
-				if (layer) {
-					if (layer.store && layer.store.data.hasOwnProperty(key)) {
-						sort.layers.push(layer)
-					}
-				}
-			}
-			results.push(sort);
-		}, this);
+                sortedLayers.push({
+                        title: "Solid background color",
+                        value: "Solid background color"
+                });
 
-		this.numberOfProviders = results.length;
-		return results;
-	},
+                this._backgroundLayerDropdown = new Wu.Dropdown({
+                        fn: this._selectedActiveLayer.bind(this),
+                        appendTo: container,
+                        content: sortedLayers,
+                        project: this._project
+                });
 
+                if ( this._project.store.baseLayers.length == 0 ) {
+                        this._backgroundLayerDropdown.setValue({
+                                title: "Solid background color",
+                                value: "Solid background color"
+                        });
+                        this._enableColorSelector();
+                } else {
+                        this._disableColorSelector();
+                }
 
-	// ██████╗  █████╗ ███████╗███████╗    ██╗      █████╗ ██╗   ██╗███████╗██████╗ ███████╗
-	// ██╔══██╗██╔══██╗██╔════╝██╔════╝    ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗██╔════╝
-	// ██████╔╝███████║███████╗█████╗      ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝███████╗
-	// ██╔══██╗██╔══██║╚════██║██╔══╝      ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗╚════██║
-	// ██████╔╝██║  ██║███████║███████╗    ███████╗██║  ██║   ██║   ███████╗██║  ██║███████║
-	// ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝    ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
+                // select event
+                return this._backgroundLayerDropdown;
 
+        },
 
-	_initBaseLayerList : function () {
-		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false);
-	},
+        _selectedActiveLayer : function (value) {
 
-	_refreshBaseLayerList : function () {
+                // Remove active baselayers
+                var baselayers = this._project.getBaselayers();
 
-		// clear
-		this._baseLayerDropdownContainer.innerHTML = '';
+                // Force array
+                var _baselayers = _.isArray(baselayers) ? baselayers : [baselayers];
+                _baselayers.forEach(function (baselayer) {
+                        var uuid = baselayer.uuid;
+                        var layer = this._project.getLayer(uuid);
+                        layer.disable();
+                }.bind(this));
 
-		// only create if editable
-		if (this._project.isEditable()) {
-			this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
-		}
+                // Add to map
+                var uuid = value;
+                var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : this.oldSolidBackgroundColor || '#000';
 
-		// init color selector
-		this._initColorSelector();
-	},
+                this.oldSolidBackgroundColor = bgc;
 
-	_initLayout_activeLayers : function (title, subtitle, container, layers) {
-		var sortedLayers = [];
+                if ( uuid == 'Solid background color' ) {
+                        this._project.setBaseLayer([]);
+                        this._enableColorSelector();
+                        this._updateColor(bgc);
+                        return;
+                }
 
-		// Create select options
+                this._setDefaultBackgroundColor();
 
-		this.sortedLayers.forEach(function(provider) {
+                this._disableColorSelector();
 
-			// Do not allow postgis layers to be in the baselayer dropdown
-			if ( provider.key == "postgis" ) return;
-			if ( provider.key == "raster"  ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
 
-			// Get each provider (mapbox, google, etc)
-			provider.layers.forEach(function(layer) {
-				sortedLayers.push({
-					title: layer.getTitle(),
-					value: layer.getUuid(),
-					isSelected: this.isBaseLayerOn(layer.getUuid())
-				});
+                var layer = this._project.getLayer(uuid);
+                layer._addTo('baselayer');
 
-			}.bind(this))
-		}.bind(this));
+                // Save to server
+                this._project.setBaseLayer([{
+                        uuid : uuid,
+                        zIndex : 1,
+                        opacity : 1
+                }]);
+        },
 
-		sortedLayers.push({
-			title: "----------------------------------------------------------------------------",
-			disabled: true
-		});
+        _setDefaultBackgroundColor : function () {
+                if (app.MapPane._container.style.removeProperty) {
+                        app.MapPane._container.style.removeProperty('background');
+                } else {
+                        app.MapPane._container.style.removeAttribute('background');
+                }
+                this._project.setBackgroundColor('');
+        },
 
-		sortedLayers.push({
-			title: "Solid background color",
-			value: "Solid background color"
-		});
+        _initColorSelector : function () {
 
-		this._backgroundLayerDropdown = new Wu.Dropdown({
-			fn: this._selectedActiveLayer.bind(this),
-			appendTo: container,
-			content: sortedLayers,
-			project: this._project
-		});
 
-		if ( this._project.store.baseLayers.length == 0 ) {
-			this._backgroundLayerDropdown.setValue({
-				title: "Solid background color",
-				value: "Solid background color"
-			});
-			this._enableColorSelector();
-		} else {
-			this._disableColorSelector();
-		}
+                this._colorSelectorWrapper.innerHTML = '';
 
-		// select event
-		return this._backgroundLayerDropdown;
+                // Get color
+                var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#000';
 
-	},
+                // Create color selector
+                this._colorSelector = new Wu.button({
+                        id       : 'background-color',
+                        type     : 'colorball',
+                        right    : true,
+                        isOn     : true,
+                        appendTo : this._colorSelectorWrapper,
+                        fn       : this._updateColor.bind(this),
+                        value    : bgc,
+                        colors   : '',
+                        className: 'target-color-box'
+                });
 
-	_selectedActiveLayer : function (value) {
+                // Create color selector title
+                this._colorSelectorTitle = Wu.DomUtil.create('div', 'base-layer-color-title', this._colorSelectorWrapper, 'Background color');
 
-		// Remove active baselayers
-		var baselayers = this._project.getBaselayers();
+        },
 
-		// Force array
-		var _baselayers = _.isArray(baselayers) ? baselayers : [baselayers];
-		_baselayers.forEach(function (baselayer) {
-			var uuid = baselayer.uuid;
-			var layer = this._project.getLayer(uuid);
-			layer.disable();
-		}.bind(this));
+        _enableColorSelector : function () {
 
-		// Add to map
-		var uuid = value;
-		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : this.oldSolidBackgroundColor || '#000';
+                // Show wrapper
+                Wu.DomUtil.removeClass(this._colorSelectorWrapper, 'displayNone');
 
-		this.oldSolidBackgroundColor = bgc;
+        },
 
-		if ( uuid == 'Solid background color' ) {
-			this._project.setBaseLayer([]);
-			this._enableColorSelector();
-			this._updateColor(bgc);
-			return;
-		}
+        _disableColorSelector : function () {
 
-		this._setDefaultBackgroundColor();
+                // Hide wrapper
+                Wu.DomUtil.addClass(this._colorSelectorWrapper, 'displayNone');
 
-		this._disableColorSelector();
+        },
 
+        _updateColor : function (hex, key, wrapper) {
 
-		var layer = this._project.getLayer(uuid);
-		layer._addTo('baselayer');
+                app.MapPane._container.style.background = hex;
+                this._project.setBackgroundColor(hex);
 
-		// Save to server
-		this._project.setBaseLayer([{
-			uuid : uuid,
-			zIndex : 1,
-			opacity : 1
-		}]);
-	},
+        },
 
-	_setDefaultBackgroundColor : function () {
-		if (app.MapPane._container.style.removeProperty) {
-			app.MapPane._container.style.removeProperty('background');
-		} else {
-			app.MapPane._container.style.removeAttribute('background');
-		}
-		this._project.setBackgroundColor('');
-	},
 
-	_initColorSelector : function () {
+        // ┌─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
+        // ├┤ ├─┤│  ├─┤  │  ├─┤└┬┘├┤ ├┬┘  │││├┬┘├─┤├─┘├─┘├┤ ├┬┘
+        // └─┘┴ ┴└─┘┴ ┴  ┴─┘┴ ┴ ┴ └─┘┴└─  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─
 
+        initLayerList : function (D3container, data, library) {
 
-		this._colorSelectorWrapper.innerHTML = '';
+                // BIND
+                var dataListLine =
+                                D3container
+                                                .selectAll('.data-list-line')
+                                                .data(data);
 
-		// Get color
-		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#000';
+                // ENTER
+                dataListLine
+                                .enter()
+                                .append('div')
+                                .classed('data-list-line', true);
 
-		// Create color selector
-		this._colorSelector = new Wu.button({
-			id 	 : 'background-color',
-			type 	 : 'colorball',
-			right    : true,
-			isOn 	 : true,
-			appendTo : this._colorSelectorWrapper,
-			fn       : this._updateColor.bind(this),
-			value    : bgc,
-			colors   : '',
-			className: 'target-color-box'
-		});
+                // UPDATE
+                dataListLine
+                                .classed('file-selected', function(d) {
 
-		// Create color selector title
-		this._colorSelectorTitle = Wu.DomUtil.create('div', 'base-layer-color-title', this._colorSelectorWrapper, 'Background color');
+                                        var uuid = d.getUuid();
 
-	},
+                                        // If selected with CMD or SHIFT
+                                        var index = this.selectedLayers.indexOf(uuid);
+                                        if (index > -1) return true;
 
-	_enableColorSelector : function () {
+                                        // If selected by single click
+                                        if ( uuid == this.showLayerActionFor ) return true;
 
-		// Show wrapper
-		Wu.DomUtil.removeClass(this._colorSelectorWrapper, 'displayNone');
+                                        // Else no selection
+                                        return false;
 
-	},
+                                }.bind(this))
 
-	_disableColorSelector : function () {
+                                // Add flash to new layer
+                                .classed('new-layer-list-item', function (d) {
+                                        var uuid = d.getUuid();
+                                        if ( this.newLayer == uuid ) {
+                                                return true;
+                                                this.newLayer = false;
+                                        }
+                                        return false;
+                                }.bind(this))
 
-		// Hide wrapper
-		Wu.DomUtil.addClass(this._colorSelectorWrapper, 'displayNone');
+                                .classed('editingName', function (d) {
+                                        var uuid = d.getUuid();
 
-	},
+                                        return this.editingLayerName == uuid;
+                                }.bind(this));
 
-	_updateColor : function (hex, key, wrapper) {
 
-		app.MapPane._container.style.background = hex;
-		this._project.setBackgroundColor(hex);
+                // EXIT
+                dataListLine
+                                .exit()
+                                .remove();
 
-	},
+                // create layermenu toggle 
+                this.createLayerToggleSwitch(dataListLine, library);
 
+                // Create Radio Button
+                this.createRadioButton(dataListLine, library);
 
-	// ┌─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
-	// ├┤ ├─┤│  ├─┤  │  ├─┤└┬┘├┤ ├┬┘  │││├┬┘├─┤├─┘├─┘├┤ ├┬┘
-	// └─┘┴ ┴└─┘┴ ┴  ┴─┘┴ ┴ ┴ └─┘┴└─  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─
+                // Create Name content
+                this.createLayerNameContent(dataListLine, library);
 
-	initLayerList : function (D3container, data, library) {
+                // CREATE POP-UP TRIGGER
+                this.createLayerPopUpTrigger(dataListLine, library);
 
-		// BIND
-		var dataListLine =
-				D3container
-						.selectAll('.data-list-line')
-						.data(data);
+                // CREATE FILE ACTION POP-UP
+                this.createLayerActionPopUp(dataListLine, library)
 
-		// ENTER
-		dataListLine
-				.enter()
-				.append('div')
-				.classed('data-list-line', true);
 
-		// UPDATE
-		dataListLine
-				.classed('file-selected', function(d) {
+        },
 
-					var uuid = d.getUuid();
 
-					// If selected with CMD or SHIFT
-					var index = this.selectedLayers.indexOf(uuid);
-					if (index > -1) return true;
+        // ┬─┐┌─┐┌┬┐┬┌─┐  ┌┐ ┬ ┬┌┬┐┌┬┐┌─┐┌┐┌
+        // ├┬┘├─┤ ││││ │  ├┴┐│ │ │  │ │ ││││
+        // ┴└─┴ ┴─┴┘┴└─┘  └─┘└─┘ ┴  ┴ └─┘┘└┘
 
-					// If selected by single click
-					if ( uuid == this.showLayerActionFor ) return true;
+        // Sets layers to be on by default
 
-					// Else no selection
-					return false;
+        createRadioButton : function(parent, library) {
 
-				}.bind(this))
+                // Bind
+                var radioButton =
+                                parent
+                                                .selectAll('.layer-on-radio-button-container')
+                                                .data(function(d) { return [d] });
 
-				// Add flash to new layer
-				.classed('new-layer-list-item', function (d) {
-					var uuid = d.getUuid();
-					if ( this.newLayer == uuid ) {
-						return true;
-						this.newLayer = false;
-					}
-					return false;
-				}.bind(this))
+                // Enter
+                radioButton
+                                .enter()
+                                .append('div')
+                                .classed('layer-on-radio-button-container layer-radio', true)
+                                .on('click', function(d) {
+                                        this._toggleRadio(d);
+                                }.bind(this));
 
-				.classed('editingName', function (d) {
-					var uuid = d.getUuid();
 
-					return this.editingLayerName == uuid;
-				}.bind(this));
+                // Update
+                radioButton
+                // Display radio button
+                                .classed('displayNone', function(d) {
+                                        var uuid = d.getUuid();
+                                        var on = this.isLayerOn(uuid);
+                                        return !on;
+                                }.bind(this))
 
+                                // Enabled by default
+                                .classed('radio-on', function(d) {
+                                        var uuid = d.getUuid();
+                                        // Check if layer is on by default
+                                        var layermenuItem = _.find(this._project.store.layermenu, function (l) {
+                                                return l.layer == uuid;
+                                        });
+                                        var enabledByDefault = layermenuItem && layermenuItem.enabled;
+                                        return enabledByDefault;
+                                }.bind(this));
 
-		// EXIT
-		dataListLine
-				.exit()
-				.remove();
+                // Exit
+                radioButton
+                                .exit()
+                                .remove();
 
-		// create layermenu toggle 
-		this.createLayerToggleSwitch(dataListLine, library);
+        },
 
-		// Create Radio Button
-		this.createRadioButton(dataListLine, library);
+        // TOGGLE RADIO BUTTON
+        _toggleRadio : function (layer) {
+                var uuid = layer.getUuid();
+                var item = _.find(this._project.store.layermenu, function (l) {
+                        return l.layer == uuid;
+                });
+                var on = item && item.enabled;
+                on ? this.radioOff(uuid) : this.radioOn(uuid);
+        },
 
-		// Create Name content
-		this.createLayerNameContent(dataListLine, library);
+        // RADIO ON
+        radioOn : function (uuid) {
+                var layerMenu = app.MapPane.getControls().layermenu;
+                layerMenu._setEnabledOnInit(uuid, true);
+        },
 
-		// CREATE POP-UP TRIGGER
-		this.createLayerPopUpTrigger(dataListLine, library);
+        // RADIO OFF
+        radioOff : function (uuid) {
+                var layerMenu = app.MapPane.getControls().layermenu;
+                layerMenu._setEnabledOnInit(uuid, false);
+        },
 
-		// CREATE FILE ACTION POP-UP
-		this.createLayerActionPopUp(dataListLine, library)
 
 
-	},
+        // ┌┬┐┌─┐┌─┐┌─┐┬  ┌─┐  ┬  ┌─┐┬ ┬┌─┐┬─┐
+        //  │ │ ││ ┬│ ┬│  ├┤   │  ├─┤└┬┘├┤ ├┬┘
+        //  ┴ └─┘└─┘└─┘┴─┘└─┘  ┴─┘┴ ┴ ┴ └─┘┴└─
 
+        createLayerToggleSwitch : function (parent, library) {
 
-	// ┬─┐┌─┐┌┬┐┬┌─┐  ┌┐ ┬ ┬┌┬┐┌┬┐┌─┐┌┐┌
-	// ├┬┘├─┤ ││││ │  ├┴┐│ │ │  │ │ ││││
-	// ┴└─┴ ┴─┴┘┴└─┘  └─┘└─┘ ┴  ┴ └─┘┘└┘
+                // Bind container
+                var toggleButton =
+                                parent
+                                                .selectAll('.chrome-switch-container')
+                                                .data(function(d) { return [d] });
 
-	// Sets layers to be on by default
+                // Enter container
+                toggleButton
+                                .enter()
+                                .append('div')
+                                .classed('chrome-switch-container', true);
 
-	createRadioButton : function(parent, library) {
+                toggleButton
+                                .classed('switch-on', function (d) {
+                                        var uuid = d.getUuid();
+                                        var on = this.isLayerOn(uuid);
+                                        return on;
+                                }.bind(this));
 
-		// Bind
-		var radioButton =
-				parent
-						.selectAll('.layer-on-radio-button-container')
-						.data(function(d) { return [d] });
+                toggleButton
+                                .on('click', function(d) {
+                                        this.toggleLayer(d);
+                                }.bind(this));
 
-		// Enter
-		radioButton
-				.enter()
-				.append('div')
-				.classed('layer-on-radio-button-container layer-radio', true)
-				.on('click', function(d) {
-					this._toggleRadio(d);
-				}.bind(this));
+                // Exit
+                toggleButton
+                                .exit()
+                                .remove();
 
+        },
 
-		// Update
-		radioButton
-		// Display radio button
-				.classed('displayNone', function(d) {
-					var uuid = d.getUuid();
-					var on = this.isLayerOn(uuid);
-					return !on;
-				}.bind(this))
 
-				// Enabled by default
-				.classed('radio-on', function(d) {
-					var uuid = d.getUuid();
-					// Check if layer is on by default
-					var layermenuItem = _.find(this._project.store.layermenu, function (l) {
-						return l.layer == uuid;
-					});
-					var enabledByDefault = layermenuItem && layermenuItem.enabled;
-					return enabledByDefault;
-				}.bind(this));
+        // TOGGLE LAYERS
+        // TOGGLE LAYERS
+        // TOGGLE LAYERS
 
-		// Exit
-		radioButton
-				.exit()
-				.remove();
+        toggleLayer : function (layer) {
+                var uuid = layer.getUuid();
+                var on = this.isLayerOn(uuid);
+                on ? this.removeLayer(layer) : this.addLayer(layer);
 
-	},
+                this._refreshLayers();
+        },
 
-	// TOGGLE RADIO BUTTON
-	_toggleRadio : function (layer) {
-		var uuid = layer.getUuid();
-		var item = _.find(this._project.store.layermenu, function (l) {
-			return l.layer == uuid;
-		});
-		var on = item && item.enabled;
-		on ? this.radioOff(uuid) : this.radioOn(uuid);
-	},
+        addAfterImport : function (layer) {
 
-	// RADIO ON
-	radioOn : function (uuid) {
-		var layerMenu = app.MapPane.getControls().layermenu;
-		layerMenu._setEnabledOnInit(uuid, true);
-	},
+                // in layermenu
+                var layerMenu = app.MapPane.getControls().layermenu;
+                layerMenu._enableLayerByUuid(layer.getUuid());
 
-	// RADIO OFF
-	radioOff : function (uuid) {
-		var layerMenu = app.MapPane.getControls().layermenu;
-		layerMenu._setEnabledOnInit(uuid, false);
-	},
+                // in data meny
 
 
+        },
 
-	// ┌┬┐┌─┐┌─┐┌─┐┬  ┌─┐  ┬  ┌─┐┬ ┬┌─┐┬─┐
-	//  │ │ ││ ┬│ ┬│  ├┤   │  ├─┤└┬┘├┤ ├┬┘
-	//  ┴ └─┘└─┘└─┘┴─┘└─┘  ┴─┘┴ ┴ ┴ └─┘┴└─
+        enableLayer : function (layer) {
+                // in layermenu
+                var layerMenu = app.MapPane.getControls().layermenu;
+                layerMenu._enableLayerByUuid(layer.getUuid());
+        },
 
-	createLayerToggleSwitch : function (parent, library) {
+        // Add layer
+        addLayer : function (layer) {
+                var layerMenu = app.MapPane.getControls().layermenu;
+                return layerMenu.add(layer);
+        },
 
-		// Bind container
-		var toggleButton =
-				parent
-						.selectAll('.chrome-switch-container')
-						.data(function(d) { return [d] });
+        // Remove layer
+        removeLayer : function (layer) {
+                var uuid = layer.getUuid();
+                var layerMenu = app.MapPane.getControls().layermenu;
+                layerMenu._remove(uuid);
+        },
 
-		// Enter container
-		toggleButton
-				.enter()
-				.append('div')
-				.classed('chrome-switch-container', true);
+        // Check if layer is on
+        isLayerOn : function (uuid) {
+                var on = false;
+                this._project.store.layermenu.forEach(function (b) {
+                        if ( uuid == b.layer ) { on = true; }
+                }, this);
+                return on;
+        },
 
-		toggleButton
-				.classed('switch-on', function (d) {
-					var uuid = d.getUuid();
-					var on = this.isLayerOn(uuid);
-					return on;
-				}.bind(this));
 
-		toggleButton
-				.on('click', function(d) {
-					this.toggleLayer(d);
-				}.bind(this));
+        // Check if base layer is on
+        isBaseLayerOn : function (uuid) {
+                var on = false;
+                this._project.store.baseLayers.forEach(function (b) {
+                        if ( uuid == b.uuid ) { on = true; }
+                }.bind(this));
+                return on;
+        },
 
-		// Exit
-		toggleButton
-				.exit()
-				.remove();
 
-	},
 
 
-	// TOGGLE LAYER BUTTONS
+        // ┬  ┌─┐┬ ┬┌─┐┬─┐  ┌┐┌┌─┐┌┬┐┌─┐
+        // │  ├─┤└┬┘├┤ ├┬┘  │││├─┤│││├┤
+        // ┴─┘┴ ┴ ┴ └─┘┴└─  ┘└┘┴ ┴┴ ┴└─┘
 
-	// createLayerToggleButton : function (parent, library) {
+        createLayerNameContent : function (parent, library) {
 
-	// 	// Bind container
-	// 	var toggleButton =
-	// 		parent
-	// 		.selectAll('.chrome-toggle-button-container')
-	// 		.data(function(d) { return [d] });
+                // Bind
+                var nameContent =
+                                parent
+                                                .selectAll('.layer-name-content')
+                                                .data(function(d) { return [d] });
 
-	// 	// Enter container
-	// 	toggleButton
-	// 		.enter()
-	// 		.append('div')
-	// 		.classed('chrome-toggle-button-container', true);
+                // Enter
+                nameContent
+                                .enter()
+                                .append('div')
+                                .classed('layer-name-content', true);
 
-	// 	// Exit
-	// 	toggleButton
-	// 		.exit()
-	// 		.remove();
 
+                // Update
+                nameContent
+                                .html(function (d) {
+                                        return d.getTitle();
+                                }.bind(this))
+                                .on('dblclick', function (d) {
+                                        var editable = (library == 'postgis' || library == 'raster');
+                                        editable && this.activateLayerInput(d, library);
+                                }.bind(this));
 
-	// 	// LAYER BUTTON
-	// 	// LAYER BUTTON
-	// 	// LAYER BUTTON
 
-	// 	// Bind layer button
-	// 	var option1 =
-	// 		toggleButton
-	// 		.selectAll('.toggle-button-option-one')
-	// 		.data(function(d) { return [d] });
+                // Exit
+                nameContent
+                                .exit()
+                                .remove();
 
-	// 	// Enter layer button
-	// 	option1
-	// 		.enter()
-	// 		.append('div')
-	// 		.classed('toggle-button', true)
-	// 		.classed('toggle-button-option-one', true)
-	// 		.html('layer')
-	// 		.on('click', function(d) {
-	// 			this.toggleLayer(d);
-	// 		}.bind(this));
 
+                // Create input field
+                this.createLayerInputField(nameContent, library);
+        },
 
-	// 	// Update layer button
-	// 	option1
-	// 		.classed('toggle-button-active', function (d) {
-	// 			var uuid = d.getUuid();
-	// 			var on = this.isLayerOn(uuid);
-	// 			return on;
-	// 		}.bind(this))
 
+        // ┬  ┌─┐┬ ┬┌─┐┬─┐  ┬┌┐┌┌─┐┬ ┬┌┬┐
+        // │  ├─┤└┬┘├┤ ├┬┘  ││││├─┘│ │ │
+        // ┴─┘┴ ┴ ┴ └─┘┴└─  ┴┘└┘┴  └─┘ ┴
 
-	// 	// Exit layer button
-	// 	option1
-	// 		.exit()
-	// 		.remove()
+        createLayerInputField : function (parent, library) {
 
+                var that = this;
 
+                // Bind
+                var nameInput =
+                                parent
+                                                .selectAll('.layer-name-input')
+                                                .data(function (d) {
+                                                        var uuid = d.getUuid();
+                                                        if ( this.editingLayerName == uuid ) return [d];
+                                                        return false;
+                                                }.bind(this))
 
-	// 	// BASE LAYER BUTTON
-	// 	// BASE LAYER BUTTON
-	// 	// BASE LAYER BUTTON
+                // Enter
+                nameInput
+                                .enter()
+                                // .append('textarea')
+                                .append('input')
+                                .attr('type', 'text')
+                                .classed('layer-name-input', true);
 
-	// 	// Bind base layer button
-	// 	var option2 =
-	// 		toggleButton
-	// 		.selectAll('.toggle-button-option-two')
-	// 		.data(function(d) { return [d] });
 
-	// 	// Enter base layer button
-	// 	option2
-	// 		.enter()
-	// 		.append('div')
-	// 		.classed('toggle-button', true)
-	// 		.classed('toggle-button-option-two', true)
-	// 		.html('base')
-	// 		.on('click', function(d) {
-	// 			this.toggleBaseLayer(d);
-	// 		}.bind(this));
+                // Update
+                nameInput
+                                .attr('placeholder', function (d) {
+                                        return d.getTitle();
+                                })
+                                .attr('name', function (d) {
+                                        return d.getUuid()
+                                })
+                                .html(function (d) {
+                                        return d.getTitle();
+                                })
+                                .classed('displayNone', function (d) {
+                                        var uuid = d.getUuid();
+                                        if ( that.editingLayerName == uuid ) return false;
+                                        return true;
+                                })
+                                .on('blur', function (d) {
+                                        var newName = this.value;
+                                        that.saveLayerName(newName, d, library);
+                                })
+                                .on('keydown', function (d) {
+                                        var keyPressed = window.event.keyCode;
+                                        var newName = this.value;
+                                        if ( keyPressed == 13 ) this.blur(); // Save on enter
+                                });
 
-	// 	// Update base layer button
-	// 	option2
-	// 		.classed('toggle-button-active', function (d) {
-	// 			var uuid = d.getUuid();
-	// 			var on = this.isBaseLayerOn(uuid);
-	// 			return on;
-	// 		}.bind(this))
 
-	// 	// Exit base layer button
-	// 	option2
-	// 		.exit()
-	// 		.remove()
-	// },
+                nameInput
+                                .exit()
+                                .remove();
 
 
-	// TOGGLE LAYERS
-	// TOGGLE LAYERS
-	// TOGGLE LAYERS
+                // Hacky, but works...
+                // Select text in input field...
+                if ( nameInput ) {
+                        nameInput.forEach(function(ni) {
+                                if ( ni[0] ) {
+                                        ni[0].select();
+                                        return;
+                                }
+                        })
+                }
 
-	toggleLayer : function (layer) {
-		var uuid = layer.getUuid();
-		var on = this.isLayerOn(uuid);
-		on ? this.removeLayer(layer) : this.addLayer(layer);
+        },
 
-		// Toggle base layer off
-		// var baseOn = this.isBaseLayerOn(uuid);
-		// if ( baseOn ) this.removeBaseLayer(layer);
 
-		this._refreshLayers();
-	},
+        // ┌─┐┌─┐┌─┐┬ ┬┌─┐  ┌┬┐┬─┐┬┌─┐┌─┐┌─┐┬─┐
+        // ├─┘│ │├─┘│ │├─┘   │ ├┬┘││ ┬│ ┬├┤ ├┬┘
+        // ┴  └─┘┴  └─┘┴     ┴ ┴└─┴└─┘└─┘└─┘┴└─
 
-	addAfterImport : function (layer) {
+        // Little "..." button next to layer name
 
-		// in layermenu
-		var layerMenu = app.MapPane.getControls().layermenu;
-		layerMenu._enableLayerByUuid(layer.getUuid());
+        createLayerPopUpTrigger : function (parent, type) {
 
-		// in data meny
+                if ( type != 'postgis' && type != 'cube') return;
 
+                // Bind
+                var popupTrigger =
+                                parent
+                                .selectAll('.file-popup-trigger')
+                                .data(function(d) { return [d] });
 
-	},
+                // Enter
+                popupTrigger
+                                .enter()
+                                .append('div')
+                                .classed('file-popup-trigger', true);
 
-	enableLayer : function (layer) {
-		// in layermenu
-		var layerMenu = app.MapPane.getControls().layermenu;
-		layerMenu._enableLayerByUuid(layer.getUuid());
-	},
+                // Update
+                popupTrigger
+                                .classed('active', function (d) {
+                                        var uuid = d.getUuid();
+                                        if ( uuid == this.showLayerActionFor ) return true;
+                                        return false;
+                                }.bind(this))
+                                .on('click', function (d) {
+                                        var uuid = d.getUuid();
+                                        this.enableLayerPopup(uuid)
+                                }.bind(this));
 
-	// Add layer
-	addLayer : function (layer) {
-		var layerMenu = app.MapPane.getControls().layermenu;
-		return layerMenu.add(layer);
-	},
 
-	// Remove layer
-	removeLayer : function (layer) {
-		var uuid = layer.getUuid();
-		var layerMenu = app.MapPane.getControls().layermenu;
-		layerMenu._remove(uuid);
-	},
+                // Exit
+                popupTrigger
+                                .exit()
+                                .remove();
 
-	// Check if layer is on
-	isLayerOn : function (uuid) {
-		var on = false;
-		this._project.store.layermenu.forEach(function (b) {
-			if ( uuid == b.layer ) { on = true; }
-		}, this);
-		return on;
-	},
 
+        },
 
-	// Check if base layer is on
-	isBaseLayerOn : function (uuid) {
-		var on = false;
-		this._project.store.baseLayers.forEach(function (b) {
-			if ( uuid == b.uuid ) { on = true; }
-		}.bind(this));
-		return on;
-	},
 
+        // ┬  ┌─┐┬ ┬┌─┐┬─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌  ┌─┐┌─┐┌─┐┬ ┬┌─┐
+        // │  ├─┤└┬┘├┤ ├┬┘  ├─┤│   │ ││ ││││  ├─┘│ │├─┘│ │├─┘
+        // ┴─┘┴ ┴ ┴ └─┘┴└─  ┴ ┴└─┘ ┴ ┴└─┘┘└┘  ┴  └─┘┴  └─┘┴
 
+        // download, delete, etc
 
+        createLayerActionPopUp : function (parent, library) {
 
-	// ┬  ┌─┐┬ ┬┌─┐┬─┐  ┌┐┌┌─┐┌┬┐┌─┐
-	// │  ├─┤└┬┘├┤ ├┬┘  │││├─┤│││├┤
-	// ┴─┘┴ ┴ ┴ └─┘┴└─  ┘└┘┴ ┴┴ ┴└─┘
+                // Bind
+                var dataListLineAction =
+                                parent
+                                                .selectAll('.file-popup')
+                                                .data(function(d) { return [d] });
 
-	createLayerNameContent : function (parent, library) {
+                // Enter
+                dataListLineAction
+                                .enter()
+                                .append('div')
+                                .classed('file-popup', true);
 
-		// Bind
-		var nameContent =
-				parent
-						.selectAll('.layer-name-content')
-						.data(function(d) { return [d] });
 
-		// Enter
-		nameContent
-				.enter()
-				.append('div')
-				.classed('layer-name-content', true);
+                // Update
+                dataListLineAction
+                                .classed('displayNone', function (d) {
+                                        var uuid = d.getUuid();
+                                        if ( uuid == this.showLayerActionFor ) return false;
+                                        return true;
+                                }.bind(this));
 
+                // Exit
+                dataListLineAction
+                                .exit()
+                                .remove();
 
-		// Update
-		nameContent
-				.html(function (d) {
-					return d.getTitle();
-				}.bind(this))
-				.on('dblclick', function (d) {
-					var editable = (library == 'postgis' || library == 'raster');
-					editable && this.activateLayerInput(d, library);
-				}.bind(this));
 
+                this.initLayerActions(dataListLineAction, library);
 
-		// Exit
-		nameContent
-				.exit()
-				.remove();
+        },
 
 
-		// Create input field
-		this.createLayerInputField(nameContent, library);
-	},
+        // ┬  ┌─┐┬ ┬┌─┐┬─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
+        // │  ├─┤└┬┘├┤ ├┬┘  ├─┤│   │ ││ ││││└─┐
+        // ┴─┘┴ ┴ ┴ └─┘┴└─  ┴ ┴└─┘ ┴ ┴└─┘┘└┘└─┘
 
+        // AKA pop-up content
 
-	// ┬  ┌─┐┬ ┬┌─┐┬─┐  ┬┌┐┌┌─┐┬ ┬┌┬┐
-	// │  ├─┤└┬┘├┤ ├┬┘  ││││├─┘│ │ │
-	// ┴─┘┴ ┴ ┴ └─┘┴└─  ┴┘└┘┴  └─┘ ┴
+        initLayerActions : function (parent, library) {
 
-	createLayerInputField : function (parent, library) {
+                // Disable actions for Layers
+                var canEdit = this._project.isEditable(),
+                                canDownload = this._project.isDownloadable(),
+                                that = this;
 
-		var that = this;
+                var action = {
 
-		// Bind
-		var nameInput =
-				parent
-						.selectAll('.layer-name-input')
-						.data(function (d) {
-							var uuid = d.getUuid();
-							if ( this.editingLayerName == uuid ) return [d];
-							return false;
-						}.bind(this))
+                        share : {
+                                name : 'Share with...',
+                                disabled : false
+                        },
+                        style : {
+                                name : 'Style Layer',
+                                disabled : !canEdit
+                        },
+                        changeName : {
+                                name : 'Rename...',
+                                disabled : !canEdit
+                        },
+                        download : {
+                                name : 'Download',
+                                disabled : !canDownload
+                        },
+                        delete : {
+                                name : 'Delete',
+                                disabled : !canEdit
+                        }
+                };
 
-		// Enter
-		nameInput
-				.enter()
-				// .append('textarea')
-				.append('input')
-				.attr('type', 'text')
-				.classed('layer-name-input', true);
+                if (library == 'cube') {
+                        action.editCube = {
+                                name : 'Edit timeseries',
+                                disabled : !canEdit
+                        }
+                }
 
 
-		// Update
-		nameInput
-				.attr('placeholder', function (d) {
-					return d.getTitle();
-				})
-				.attr('name', function (d) {
-					return d.getUuid()
-				})
-				.html(function (d) {
-					return d.getTitle();
-				})
-				.classed('displayNone', function (d) {
-					var uuid = d.getUuid();
-					if ( that.editingLayerName == uuid ) return false;
-					return true;
-				})
-				.on('blur', function (d) {
-					var newName = this.value;
-					that.saveLayerName(newName, d, library);
-				})
-				.on('keydown', function (d) {
-					var keyPressed = window.event.keyCode;
-					var newName = this.value;
-					if ( keyPressed == 13 ) this.blur(); // Save on enter
-				});
+                for (var f in action) {
 
+                        var name = action[f].name;
+                        var className = 'file-action-' + f;
 
-		nameInput
-				.exit()
-				.remove();
+                        // Bind
+                        var fileAction = parent
+                        .selectAll('.' + className)
+                        .data(function(d) { return [d] });
 
+                        // Enter
+                        fileAction
+                        .enter()
+                        .append('div')
+                        .classed(className, true)
+                        .classed('file-action', true)
+                        .classed('displayNone', action[f].disabled)
+                        .attr('trigger', f)
+                        .html(name)
+                        .on('click', function (d) {
+                                var trigger = this.getAttribute('trigger');
+                                that.layerActionTriggered(trigger, d, that, library)
+                        });
 
-		// Hacky, but works...
-		// Select text in input field...
-		if ( nameInput ) {
-			nameInput.forEach(function(ni) {
-				if ( ni[0] ) {
-					ni[0].select();
-					return;
-				}
-			})
-		}
+                        // Exit
+                        fileAction
+                        .exit()
+                        .remove();
+                }
+        },
 
-	},
 
 
-	// ┌─┐┌─┐┌─┐┬ ┬┌─┐  ┌┬┐┬─┐┬┌─┐┌─┐┌─┐┬─┐
-	// ├─┘│ │├─┘│ │├─┘   │ ├┬┘││ ┬│ ┬├┤ ├┬┘
-	// ┴  └─┘┴  └─┘┴     ┴ ┴└─┴└─┘└─┘└─┘┴└─
+        // ╦  ╔═╗╦ ╦╔═╗╦═╗  ╔═╗╦  ╦╔═╗╦╔═  ╔═╗╦  ╦╔═╗╔╗╔╔╦╗╔═╗
+        // ║  ╠═╣╚╦╝║╣ ╠╦╝  ║  ║  ║║  ╠╩╗  ║╣ ╚╗╔╝║╣ ║║║ ║ ╚═╗
+        // ╩═╝╩ ╩ ╩ ╚═╝╩╚═  ╚═╝╩═╝╩╚═╝╩ ╩  ╚═╝ ╚╝ ╚═╝╝╚╝ ╩ ╚═╝
 
-	// Little "..." button next to layer name
+        layerActionTriggered : function (trigger, file, context, library) {
+                return this._layerActionTriggered(trigger, file, context, library);
+        },
 
-	createLayerPopUpTrigger : function (parent, type) {
+        _layerActionTriggered : function (trigger, layer, ctx, library) {
 
-		console.log('createLayerPopUpTrigger', type);
+                // rename
+                if (trigger == 'changeName') ctx.editingLayerName = layer.getUuid();
 
-		if ( type != 'postgis' && type != 'cube') return;
+                // share
+                if (trigger == 'share') layer.shareLayer();
 
-		// Bind
-		var popupTrigger =
-				parent
-				.selectAll('.file-popup-trigger')
-				.data(function(d) { return [d] });
+                // download
+                if (trigger == 'download') layer.downloadLayer();
 
-		// Enter
-		popupTrigger
-				.enter()
-				.append('div')
-				.classed('file-popup-trigger', true);
+                // delete
+                if (trigger == 'delete') layer.deleteLayer();
 
-		// Update
-		popupTrigger
-				.classed('active', function (d) {
-					var uuid = d.getUuid();
-					if ( uuid == this.showLayerActionFor ) return true;
-					return false;
-				}.bind(this))
-				.on('click', function (d) {
-					var uuid = d.getUuid();
-					this.enableLayerPopup(uuid)
-				}.bind(this));
+                // delete
+                if (trigger == 'style') this.styleLayer(layer);
 
+                // delete
+                if (trigger == 'editCube') this._editCube(layer);
 
-		// Exit
-		popupTrigger
-				.exit()
-				.remove();
+                // refresh
+                this.showLayerActionFor = false;
+                this.selectedLayers = [];
+                this._refreshLayers();
+        },
 
+        _editCube : function (layer) {
 
-	},
+                this._openCubeLayerEditFullscreen(layer);
+        },
 
+        styleLayer : function (layer) {
 
-	// ┬  ┌─┐┬ ┬┌─┐┬─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌  ┌─┐┌─┐┌─┐┬ ┬┌─┐
-	// │  ├─┤└┬┘├┤ ├┬┘  ├─┤│   │ ││ ││││  ├─┘│ │├─┘│ │├─┘
-	// ┴─┘┴ ┴ ┴ └─┘┴└─  ┴ ┴└─┘ ┴ ┴└─┘┘└┘  ┴  └─┘┴  └─┘┴
+                var uuid = layer.getUuid();
 
-	// download, delete, etc
+                // Close this pane (data library)
+                this._togglePane();
 
-	createLayerActionPopUp : function (parent, library) {
+                // Store layer id
+                app.Tools.Styler._storeActiveLayerUuid(uuid);
 
-		// Bind
-		var dataListLineAction =
-				parent
-						.selectAll('.file-popup')
-						.data(function(d) { return [d] });
+                // Open styler pane
+                app.Tools.SettingsSelector._togglePane();
 
-		// Enter
-		dataListLineAction
-				.enter()
-				.append('div')
-				.classed('file-popup', true);
+        },
 
+        // Sets which layer we are editing
+        activateLayerInput : function (d, library) {
+                this.editingLayerName = d.getUuid();
+                this.showLayerActionFor = false;
+                this.selectedLayers = [];
+                this._refreshLayers();
+        },
 
-		// Update
-		dataListLineAction
-				.classed('displayNone', function (d) {
-					var uuid = d.getUuid();
-					if ( uuid == this.showLayerActionFor ) return false;
-					return true;
-				}.bind(this));
+        // Enable layer popup (delete, download, etc) on click
+        enableLayerPopup : function (uuid) {
 
-		// Exit
-		dataListLineAction
-				.exit()
-				.remove();
+                // Deselect
+                if ( this.showLayerActionFor == uuid ) {
+                        this.showLayerActionFor = false;
+                        this.selectedLayers = [];
+                        this._refreshLayers();
+                        return;
+                }
 
+                // Select
+                this.showLayerActionFor = uuid;
+                this.selectedLayers = uuid;
+                this._refreshLayers();
+        },
 
-		this.initLayerActions(dataListLineAction, library);
+        // Save layer name
+        saveLayerName : function (newName, d, library) {
 
-	},
+                if ( !newName || newName == '' ) newName = d.getTitle();
+                d.setTitle(newName);
 
+                this.editingLayerName = false;
 
-	// ┬  ┌─┐┬ ┬┌─┐┬─┐  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
-	// │  ├─┤└┬┘├┤ ├┬┘  ├─┤│   │ ││ ││││└─┐
-	// ┴─┘┴ ┴ ┴ └─┘┴└─  ┴ ┴└─┘ ┴ ┴└─┘┘└┘└─┘
+                // fire layer edited
+                Wu.Mixin.Events.fire('layerEdited', {detail : {
+                        layer: d
+                }});
 
-	// AKA pop-up content
-
-	initLayerActions : function (parent, library) {
-
-		// Disable actions for Layers
-		var canEdit = this._project.isEditable(),
-				canDownload = this._project.isDownloadable(),
-				that = this;
-
-		var action = {
-
-			share : {
-				name : 'Share with...',
-				disabled : false
-			},
-			style : {
-				name : 'Style Layer',
-				disabled : !canEdit
-			},
-			changeName : {
-				name : 'Rename...',
-				disabled : !canEdit
-			},
-			download : {
-				name : 'Download',
-				disabled : !canDownload
-			},
-			delete : {
-				name : 'Delete',
-				disabled : !canEdit
-			}
-		};
-
-		if (library == 'cube') {
-			action.editCube = {
-				name : 'Edit timeseries',
-				disabled : !canEdit
-			}
-		}
-
-
-		for (var f in action) {
-
-			var name = action[f].name;
-			var className = 'file-action-' + f;
-
-			// Bind
-			var fileAction =
-				parent
-				.selectAll('.' + className)
-				.data(function(d) { return [d] });
-
-			// Enter
-			fileAction
-				.enter()
-				.append('div')
-				.classed(className, true)
-				.classed('file-action', true)
-				.classed('displayNone', action[f].disabled)
-				.attr('trigger', f)
-				.html(name)
-				.on('click', function (d) {
-					var trigger = this.getAttribute('trigger');
-					that.layerActionTriggered(trigger, d, that, library)
-				});
-
-			// Exit
-			fileAction
-				.exit()
-				.remove();
-		}
-	},
-
-
-
-	// ╦  ╔═╗╦ ╦╔═╗╦═╗  ╔═╗╦  ╦╔═╗╦╔═  ╔═╗╦  ╦╔═╗╔╗╔╔╦╗╔═╗
-	// ║  ╠═╣╚╦╝║╣ ╠╦╝  ║  ║  ║║  ╠╩╗  ║╣ ╚╗╔╝║╣ ║║║ ║ ╚═╗
-	// ╩═╝╩ ╩ ╩ ╚═╝╩╚═  ╚═╝╩═╝╩╚═╝╩ ╩  ╚═╝ ╚╝ ╚═╝╝╚╝ ╩ ╚═╝
-
-	layerActionTriggered : function (trigger, file, context, library) {
-		return this._layerActionTriggered(trigger, file, context, library);
-	},
-
-	_layerActionTriggered : function (trigger, layer, ctx, library) {
-
-		// rename
-		if (trigger == 'changeName') ctx.editingLayerName = layer.getUuid();
-
-		// share
-		if (trigger == 'share') layer.shareLayer();
-
-		// download
-		if (trigger == 'download') layer.downloadLayer();
-
-		// delete
-		if (trigger == 'delete') layer.deleteLayer();
-
-		// delete
-		if (trigger == 'style') this.styleLayer(layer);
-
-		// delete
-		if (trigger == 'editCube') this._editCube(layer);
-
-		// refresh
-		this.showLayerActionFor = false;
-		this.selectedLayers = [];
-		this._refreshLayers();
-	},
-
-	_editCube : function (layer) {
-		console.log('_editCube', layer);
-
-		this._openCubeLayerEditFullscreen(layer);
-	},
-
-	styleLayer : function (layer) {
-
-		var uuid = layer.getUuid();
-
-		// Close this pane (data library)
-		this._togglePane();
-
-		// Store layer id
-		app.Tools.Styler._storeActiveLayerUuid(uuid);
-
-		// Open styler pane
-		app.Tools.SettingsSelector._togglePane();
-
-	},
-
-	// Sets which layer we are editing
-	activateLayerInput : function (d, library) {
-		this.editingLayerName = d.getUuid();
-		this.showLayerActionFor = false;
-		this.selectedLayers = [];
-		this._refreshLayers();
-	},
-
-	// Enable layer popup (delete, download, etc) on click
-	enableLayerPopup : function (uuid) {
-
-		// Deselect
-		if ( this.showLayerActionFor == uuid ) {
-			this.showLayerActionFor = false;
-			this.selectedLayers = [];
-			this._refreshLayers();
-			return;
-		}
-
-		// Select
-		this.showLayerActionFor = uuid;
-		this.selectedLayers = uuid;
-		this._refreshLayers();
-	},
-
-	// Save layer name
-	saveLayerName : function (newName, d, library) {
-
-		if ( !newName || newName == '' ) newName = d.getTitle();
-		d.setTitle(newName);
-
-		this.editingLayerName = false;
-
-		// fire layer edited
-		Wu.Mixin.Events.fire('layerEdited', {detail : {
-			layer: d
-		}});
-
-	}
+        }
 
 });
