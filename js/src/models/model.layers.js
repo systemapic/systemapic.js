@@ -292,6 +292,14 @@ Wu.Model.Layer = Wu.Model.extend({
 		this.save('title');
 
 		this.setLegendsTitle(title);
+
+		// fire layer edited
+		// todo: set this to all updated, and remove fn's like setLegendsTitle
+        Wu.Mixin.Events.fire('layerEdited', {detail : {
+                layer: this
+        }});
+
+		return this;
 	},
 
 	getDescription : function () {
@@ -559,12 +567,15 @@ Wu.Model.Layer = Wu.Model.extend({
 
 			var result = Wu.parse(result);
 
+			console.log('udpated layer result', result);
 			if (!result || result.error) {
 				return app.feedback.setError({
 					title : 'Something went wrong',
 					description : err
 				});
 			}
+
+			
 		}.bind(this));
 	},
 
@@ -770,6 +781,14 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 	_onSetFPS : function (e) {
 		var fps = e.detail.fps;
 		this.options.fps = fps;
+	},
+
+	_onAnimationSlide : function (e) {
+		if (!this._added) return;
+
+		var value = e.detail.value;
+
+		console.log('_onAnimationSlide', value);
 	},
 
 	_onAnimationPlay : function () {

@@ -385,6 +385,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
                                 this._openCubeLayerEditFullscreen(layer);
 
+
+
                                 // automatically add layer to layermenu
                                 // this._addOnImport(cubeLayer);
 
@@ -1227,6 +1229,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 var container = options.container;
                 var layer = options.layer;
 
+                console.log('-- layer', layer);
+
                 // create divs
                 var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
                 var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Dataset name');
@@ -1242,9 +1246,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
                         console.log('updatedName', updatedName);
 
-                        layer.setTitle(updatedName);
+                        var updatedLayer = layer.setTitle(updatedName);
+
+                        console.log('updatedLayer', updatedLayer);
 
                         this._refreshLayers();
+
+                       
 
                 }.bind(this), 1000), this);
 

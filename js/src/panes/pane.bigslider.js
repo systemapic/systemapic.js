@@ -279,7 +279,7 @@ Wu.BigSlider = Wu.Evented.extend({
 		var yMinDim = xDim.group().reduceSum(function(d) { return d.min });
 		var yAvgDim = xDim.group().reduceSum(function(d) { return d.avg });
 
-    		var minDate = xDim.bottom(1)[0].date;
+    	var minDate = xDim.bottom(1)[0].date;
 		var maxDate = xDim.top(1)[0].date;
 
 		// DATA FOR CURRENT YEAR
@@ -458,10 +458,17 @@ Wu.BigSlider = Wu.Evented.extend({
 		Wu.DomEvent.on(this.playButton, 'click', this.play, this);
 
 
-		this.slider.on('slide', function( values, handle ) {
+		this.slider.on('slide', _.throttle(function( values, handle ) {
 			this.currentSliderValue = Math.round(values);
 			this.updateDayOfYear();
-		}.bind(this));
+
+			// fire sliding event
+			Wu.Mixin.Events.fire('animationSlide', {detail : {
+                layer: this._currentLayer,
+                value : this.currentSliderValue
+        	}});
+
+		}.bind(this), 100));
 
 
 	},
@@ -724,9 +731,19 @@ Wu.BigSlider = Wu.Evented.extend({
 
 	_layerEnabled : function (e) {
 		var layer = e.detail.layer;
+		this._currentLayer = layer;
 		var show = e.detail.showSlider;
 		console.log('_layerEnabled', e.detail);
 		if (show) this.show();
+	},
+
+	_layerDisabled : function (e) {
+		var layer = e.detail.layer;
+		if (layer.getUuid() == this._currentLayer.getUuid()) {
+				var show = e.detail.showSlider;
+				this.hide();
+		}
+	
 	},
 
 
