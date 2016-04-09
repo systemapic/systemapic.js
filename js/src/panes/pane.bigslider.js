@@ -310,6 +310,8 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		var graphInfoContainer = Wu.DomUtil.create('div', 'big-graph-info-container', graphOuterContainer);
 
+		this._title = Wu.DomUtil.create('div', 'big-graph-title', graphInfoContainer);
+
 		this.dayNameTitle = Wu.DomUtil.create('div', 'big-graph-current-day', graphInfoContainer);
 
 		this.currentSCF = Wu.DomUtil.create('div', 'big-graph-current-scf inline', graphInfoContainer);
@@ -733,7 +735,11 @@ Wu.BigSlider = Wu.Evented.extend({
 		var layer = e.detail.layer;
 		this._currentLayer = layer;
 		var show = e.detail.showSlider;
-		console.log('_layerEnabled', e.detail);
+
+		// set title 
+		this.setTitle(layer.getTitle());
+
+		// show
 		if (show) this.show();
 	},
 
@@ -746,6 +752,13 @@ Wu.BigSlider = Wu.Evented.extend({
 	
 	},
 
+	setTitle : function (title) {
+		if (!this._currentLayer) return;
+		if (!this._title) return;
+
+		// set title
+		this._title.innerHTML = title;
+	},
 
 });
 
