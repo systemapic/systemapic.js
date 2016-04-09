@@ -54,7 +54,6 @@ Wu.Data = Wu.Class.extend({
 			parent : this._buttonContainer,
 			dropdown : optionsDropdownDiv,
 			createCube : createCube,
-
 		}
 
 		// return button

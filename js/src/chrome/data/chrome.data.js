@@ -1393,8 +1393,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             fn: this._addCubesetItemByUuid.bind(this),
             appendTo: container,
             content: this._getDropdownDatasets(),
-            className : 'cubeset-dropdown'
+            className : 'cubeset-dropdown',
         });
+
+        setTimeout(function () {
+            this._cubesetDrowdown._toggleListItems();
+        }.bind(this), 100);
     },
 
     _addCubesetItemByUuid : function (fileUuid) {
