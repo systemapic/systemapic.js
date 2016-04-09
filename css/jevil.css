@@ -2545,16 +2545,6 @@ input.chrome-field-input {
     top: -6px;    
 }
 
-.big-slider-outer-container .noUi-origin:before {
-    content: '';
-    position: absolute;
-    width: 1px;
-    height: 227px;
-    left: 0;
-    bottom: 0;
-    background-color: blue;
-    opacity: 0.3;
-}
 
 .big-slider-play-button,
 .big-slider-step-forward,
