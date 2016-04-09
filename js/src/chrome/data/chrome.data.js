@@ -217,16 +217,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 this._isOpen = false;
         },
 
-        onOpened : function () {
-        },
-        onClosed : function () {
-        },
-        _addEvents : function () {
-        },
-        _removeEvents : function () {
-        },
-        _onWindowResize : function () {
-        },
+        onOpened : function () {},
+        onClosed : function () {},
+        _addEvents : function () {},
+        _removeEvents : function () {},
+        _onWindowResize : function () {},
 
         getDimensions : function () {
                 var dims = {
@@ -334,13 +329,114 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         _initUploadButton : function () {
 
                 // Return if upload button already exists
-                if (this.uploadButton) return;
+                if (this._uploadButton) return;
 
                 // get upload button
-                this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this._uploadButtonContainer);
+                this._uploadButton = app.Data.getUploadButton('chrome-upload-button', this._uploadButtonContainer);
 
                 // set title
-                this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
+                this._uploadButton.uploadDiv.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
+
+                // set event for options button
+                Wu.DomEvent.on(this._uploadButton.optionsDiv, 'mousedown', this._optionsBtnClick, this);
+
+                // set event for create-cube item
+                Wu.DomEvent.on(this._uploadButton.createCube, 'mousedown', this._createCubeClick, this);
+
+        },
+
+        _createCubeClick : function () {
+                console.log('create cube!!');
+
+                var project = app.activeProject;
+
+                // create cube
+                app.api.createCube({}, function (err, cubeJSON) {
+                        if (err) return console.error('createCube err: ', err);
+
+                        var cube = Wu.parse(cubeJSON);
+
+                        // create Wu.CubeLayer
+                        var cubeLayer = {
+                                projectUuid : project.getUuid(), // pass to automatically attach to project
+                                data : { cube : cube },
+                                metadata : null,
+                                title : 'New cube layer',
+                                description : 'Cube layer description',
+                                file : 'file-' + cube.cube_id,
+                                style : JSON.stringify(this.get_default_cube_cartocss()) // save default json style
+                        }
+
+                        // create Wu layer
+                        app.api.createLayer(cubeLayer, function (err, cubeLayerJSON) {
+                                console.log('createCubeLayer', err, cubeLayerJSON);
+
+                                var cubeLayer = Wu.parse(cubeLayerJSON);
+
+                                console.log('cubeLa', cubeLayer);
+
+                                var layer = project.addLayer(cubeLayer);
+
+                                // select project
+                                Wu.Mixin.Events.fire('layerAdded', { detail : {
+                                        projectUuid : project.getUuid(),
+                                        layerUuid : cubeLayer.uuid
+                                }});
+
+                                this._openCubeLayerEditFullscreen(layer);
+
+                                // automatically add layer to layermenu
+                                // this._addOnImport(cubeLayer);
+
+                        }.bind(this));
+
+                }.bind(this));
+
+                // toggle dropdown
+                this._optionsBtnClick();
+        },
+
+        // todo: refactor to server side
+        get_default_cube_cartocss : function () {
+                // raster debug
+                var defaultCartocss = '';
+                defaultCartocss += '#layer {'
+                defaultCartocss += 'raster-opacity: 1; '; 
+                // defaultCartocss += 'raster-scaling: gaussian; '; 
+                defaultCartocss += 'raster-colorizer-default-mode: linear; '; 
+                defaultCartocss += 'raster-colorizer-default-color: transparent; '; 
+                defaultCartocss += 'raster-comp-op: color-dodge;';
+                defaultCartocss += 'raster-colorizer-stops: '; 
+                // white to blue
+                defaultCartocss += '  stop(20, rgba(0,0,0,0)) '; 
+                defaultCartocss += '  stop(21, #dddddd) '; 
+                defaultCartocss += '  stop(100, #0078ff) '; 
+                defaultCartocss += '  stop(200, #000E56) '; 
+                defaultCartocss += '  stop(255, rgba(0,0,0,0), exact); '; 
+                defaultCartocss += ' }';
+                return defaultCartocss;
+        },
+
+        _optionsBtnClick : function () {
+                console.log('_optionsBtnClick');
+
+                if (this._optionsDropdownOpen) {
+
+                        // remove dropdown
+                        Wu.DomUtil.addClass(this._uploadButton.dropdown, 'displayNone');
+
+                        // mark closed
+                        this._optionsDropdownOpen = false;
+
+                } else {
+                        
+                        // show dropdown
+                        Wu.DomUtil.removeClass(this._uploadButton.dropdown, 'displayNone');
+                     
+                        // mark open
+                        this._optionsDropdownOpen = true;
+                }
+
         },
 
         _initSortButtons : function () {
@@ -1114,11 +1210,46 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 var content = this._fullscreen._content;
                 
                 // create cubeset list
+                this._createCubeNameBox({
+                        container : content,
+                        layer : layer
+                });
+
+                // create cubeset list
                 this._createCubesetBox({
                         container : content,
                         layer : layer
                 });
 
+        },
+
+        _createCubeNameBox : function (options) {
+                var container = options.container;
+                var layer = options.layer;
+
+                // create divs
+                var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+                var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Dataset name');
+                var name_input = Wu.DomUtil.create('input', 'smooth-input smaller-input', toggles_wrapper);
+                name_input.setAttribute('placeholder', 'Enter name here');
+                name_input.value = layer.getName();
+                var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
+
+                // event
+                Wu.DomEvent.on(name_input, 'keyup', _.throttle(function () {
+                        console.log('change');
+                        var updatedName = name_input.value;
+
+                        console.log('updatedName', updatedName);
+
+                        layer.setTitle(updatedName);
+
+                        this._refreshLayers();
+
+                }.bind(this), 1000), this);
+
+                // return wrapper
+                return toggles_wrapper;
         },
 
         _createCubesetBox : function (options) {

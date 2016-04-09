@@ -310,6 +310,12 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	createCube : function (options, done) {
+		var path = '/v2/cubes/create';
+		this.post(path, options, done);
+	},
+
+	
 	// TILES
 	// [pile]
 	createTileLayer : function (options, done) {

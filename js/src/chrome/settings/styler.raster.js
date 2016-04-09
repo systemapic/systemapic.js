@@ -6,7 +6,8 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		this.options = options;
 
-		this.stops = options.carto ? options.carto : [{ val : 80,  col : '#FF0000', opacity : 1 },{ val : 180, col : '#00FF00', opacity : 1 }];
+		// todo: carto is saved wrong, should be object, not cartocss. perpahs on server.
+		this.stops = _.isObject(options.carto) ? options.carto : [{ val : 80,  col : '#FF0000', opacity : 1 },{ val : 180, col : '#00FF00', opacity : 1 }];
 
 		this._initContainer();
 		this.updateStyle();
