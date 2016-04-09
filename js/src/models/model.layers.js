@@ -567,7 +567,6 @@ Wu.Model.Layer = Wu.Model.extend({
 
             var result = Wu.parse(result);
 
-            console.log('udpated layer result', result);
             if (!result || result.error) {
                 return app.feedback.setError({
                     title : 'Something went wrong',
@@ -700,10 +699,16 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         return this.store.data.cube.cube_id;
     },  
 
+
+    _refreshCube : function () {
+        this._prepareRaster();
+    },
+
     _prepareRaster : function () {
 
         // cube has array of layers
-        this._layers = this._layers || [];
+        // this._layers = this._layers || [];
+        this._layers = [];
 
         // get vars
         var datasets = this.getDatasets();
@@ -912,6 +917,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // hack: must parse again, cause cube is currently stored as JSON
         this.store.data.cube = cube;
+
+        // Wu.Mixin.Events.fire('layerEdited', {detail : {
+        //         layer: this
+        // }});
+
+        return this;
     },
 
     _refreshLayer : function () {

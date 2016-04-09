@@ -346,7 +346,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
     _createCubeClick : function () {
-        console.log('create cube!!');
 
         var project = app.activeProject;
 
@@ -369,11 +368,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
             // create Wu layer
             app.api.createLayer(cubeLayer, function (err, cubeLayerJSON) {
-                console.log('createCubeLayer', err, cubeLayerJSON);
 
                 var cubeLayer = Wu.parse(cubeLayerJSON);
-
-                console.log('cubeLa', cubeLayer);
 
                 var layer = project.addLayer(cubeLayer);
 
@@ -383,12 +379,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                     layerUuid : cubeLayer.uuid
                 }});
 
+                // open fullscreen for editing
                 this._openCubeLayerEditFullscreen(layer);
-
-
-
-                // automatically add layer to layermenu
-                // this._addOnImport(cubeLayer);
 
             }.bind(this));
 
@@ -420,7 +412,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
     _optionsBtnClick : function () {
-        console.log('_optionsBtnClick');
 
         if (this._optionsDropdownOpen) {
 
@@ -1229,8 +1220,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var container = options.container;
         var layer = options.layer;
 
-        console.log('-- layer', layer);
-
         // create divs
         var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
         var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Dataset name');
@@ -1241,18 +1230,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // event
         Wu.DomEvent.on(name_input, 'keyup', _.throttle(function () {
-            console.log('change');
             var updatedName = name_input.value;
 
-            console.log('updatedName', updatedName);
-
+            // set title
             var updatedLayer = layer.setTitle(updatedName);
-
-            console.log('updatedLayer', updatedLayer);
-
-            this._refreshLayers();
-
-               
 
         }.bind(this), 1000), this);
 
@@ -1324,11 +1305,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             // parse
             var cube = Wu.parse(updatedCube);
 
+
+
             // update Wu.CubeLayer
-            layer._saveCube(cube);
+            var updatedLayer = layer._saveCube(cube);
 
             // refresh list
-            this._refreshCubeset(layer);
+            this._refreshCubeset(updatedLayer);
+
+            // refresh cube
+            updatedLayer._refreshCube();
 
         }.bind(this));
 
@@ -1491,10 +1477,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             var cube = Wu.parse(updatedCube);
 
             // update Wu.CubeLayer
-            layer._saveCube(cube);
+            var updatedLayer = layer._saveCube(cube);
 
             // refresh list
-            this._refreshCubeset(layer);
+            this._refreshCubeset(updatedLayer);
+
+            // refresh cube
+            updatedLayer._refreshCube();
 
         }.bind(this));
     },
@@ -1516,10 +1505,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             var cube = Wu.parse(updatedCube);
 
             // update Wu.CubeLayer
-            layer._saveCube(cube);
+            var updatedLayer = this._fullscreen._layer = layer._saveCube(cube);
 
             // refresh list
-            this._refreshCubeset(layer);
+            this._refreshCubeset(updatedLayer);
+
+            // refresh cube
+            updatedLayer._refreshCube();
 
         }.bind(this));
     },
