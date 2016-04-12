@@ -49,16 +49,12 @@ Wu.Styler = Wu.Class.extend({
 	_content : {},
 
 	carto : function () {
-		console.log('this.lopitons.carto', this.options.carto, this.type);
 		return this.options.carto[this.type];
 	},
 
 
 	setCarto : function (carto) {
-
-		console.error('setCarto', carto, this);
 		this.options.carto[this.type] = carto;
-
 	},
 
 
@@ -82,16 +78,12 @@ Wu.Styler = Wu.Class.extend({
 
 	_refresh : function () {
 
-		console.error('_refresh', this);
-
 		this._wrapper.innerHTML = '';
 
 		// create 
 		this.options.carto[this.type] = this.carto() || {};
 
 		this._content[this.type] = {};
-
-		console.log('carto()', this.carto());
 
 		// Get on/off state
 		var isOn = this.carto().enabled;
@@ -457,17 +449,6 @@ Wu.Styler = Wu.Class.extend({
 			staticVal : val
 		};
 	},
-
-    //clearBuggyFiles : function () {
- 	//	// Get file ID
- 	//	var fileId = this._layer.store.file;
-    //
- 	//	// Get file
- 	//	var file = app.Account.getFile(fileId);
-    //
- 	//	file.setStyleTemplates([]);
-    //
- 	//},
 
 	_addColorFields : function (column) {
 
@@ -1138,19 +1119,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// get sql
 		var sql = layer.getSQL();
-
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');		
-		console.error('layer.getSQL', sql);
-		console.log('layer: ', layer);
-		console.log('carto', carto);
-		console.log('this.options.carto', this.options.carto);
-		console.log('');
-		console.log('');
-		console.log('');		
-		console.log('');
 
 		// request new layer
 		var layerOptions = {

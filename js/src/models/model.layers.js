@@ -622,23 +622,19 @@ Wu.Model.Layer = Wu.Model.extend({
     },
 
     isVector : function () {
-        if (!this.store.data || !this.store.data.postgis) return false;
-        if (this.store.data.postgis.data_type == 'vector') return true;
-        return false;
-    },
-    isRaster : function () {
-        if (!this.store.data || !this.store.data.postgis) return false;
-        if (this.store.data.postgis.data_type == 'raster') return true;
-        return false;
-    },
-    
-    isStylable : function () {
-        if (this.isVector()) return true;
         return false;
     },
 
+    isRaster : function () {
+        return false;
+    },
+  
     isCube : function () {
         return false;
+    },
+    
+    isStyleable : function () {
+        return this.isVector() || this.isRaster() || this.isCube();
     },
 
     getAttributionControl : function () {
@@ -647,10 +643,6 @@ Wu.Model.Layer = Wu.Model.extend({
     
     _invalidateTiles : function () {
         return;
-    },
-
-    styleAsRaster : function () {
-        return false;
     },
 
 });
@@ -885,10 +877,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         app._map.removeLayer(this.layer);
     },
 
-    isStylable : function () {
-        return true;
-    },
-
     isCube : function () {
         return true;
     },
@@ -935,9 +923,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // TODO: add to queue etc. with websocket implementation
     },
 
-    styleAsRaster : function () {
-        return true;
-    },
+  
 });
 
 
@@ -965,7 +951,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     _onLayerLoaded : function () {
         var loadTime = Date.now() - this._loadStart;
 
-
+        // fire loaded event
         app.Analytics._eventLayerLoaded({
             layer : this.getTitle(),
             load_time : loadTime
@@ -988,9 +974,9 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         if (options && options.enable) {
             map.addLayer(this.layer);
             this.layer.bringToFront();
-
         }
 
+        // callback
         callback && callback();
     },
 
@@ -1012,6 +998,15 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
 
         // update layer option
         this._refreshLayer(layerUuid);
+    },
+
+    _refreshLayer : function (layerUuid) {
+
+        this.layer.setOptions({
+            layerUuid : layerUuid
+        });
+
+        this.layer.redraw();
     },
 
     _getLayerUuid : function () {
@@ -1039,20 +1034,10 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         return this.store.data.postgis;
     },
 
-    _refreshLayer : function (layerUuid) {
-
-        this.layer.setOptions({
-            layerUuid : layerUuid
-        });
-
-        this.layer.redraw();
-    },
-
     _prepareRaster : function () {
 
-        // set ids
-        var fileUuid    = this._fileUuid;   // file id of geojson
-        var subdomains  = app.options.servers.tiles.subdomains;
+        var fileUuid = this._fileUuid;
+        var subdomains = app.options.servers.tiles.subdomains;
         var access_token = '?access_token=' + app.tokens.access_token;
         var layerUuid = this._getLayerUuid();
         var url = app.options.servers.tiles.uri + '{layerUuid}/{z}/{x}/{y}.png' + access_token;
@@ -1119,6 +1104,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
             access_token : app.tokens.access_token
         };
 
+        // fetch data from server
         app.api.dbFetch(options, callback.bind(this));
     },
 
@@ -1212,7 +1198,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         var path = app.options.servers.portal;
         path += 'api/file/download/';
         path += '?file=' + filepath;
-        // path += '?raw=true'; // add raw to path
         path += '&type=shp';
         path += '&access_token=' + app.tokens.access_token;
 
@@ -1242,14 +1227,11 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         // delete layer
         project.deleteLayer(this);
     },
-
-    styleAsRaster : function () {
-        return this.isRaster();
-    },
     
-    isStylable : function () {
+    isVector : function () {
         return true;
     },
+
 });
 
 
@@ -1380,13 +1362,10 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
         console.log('raster downloadLayer');
     },
 
-    styleAsRaster : function () {
+    isRaster : function () {
         return true;
     },
 
-    isStylable : function () {
-        return true;
-    },
 });
 
 
