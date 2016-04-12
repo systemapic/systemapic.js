@@ -69,15 +69,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-
-	_initRasterStyler : function () {
-		console.error('TODO!');
-
-		// put raster styler here, (same as cube styler, but with different save options)
-	},
-
 	_initVectorStyler : function () {
-
 
 		// Get layer meta
 		this.getLayerMeta();
@@ -90,12 +82,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Init legend options
 		this._initLegendOptions();
-
 	},
 
 	_initCubeStyler : function () {
 
-		this._carto = this._layer.getStyleJSON(); // css? 
+		this._carto = this._layer.getStyleJSON();
 
 		var options = {
 			carto 	  : this._carto,
@@ -108,8 +99,25 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		};
 
 		this._rasterStyler = new Wu.RasterStyler(options);
-
 	},
+
+	_initRasterStyler : function () {
+
+		this._carto = this._layer.getStyleJSON();
+
+		var options = {
+			carto 	  : this._carto,
+			layer 	  : this._layer,
+			project   : this._project,
+			styler 	  : this,
+			meta 	  : this._meta,
+			columns   : this._columns,
+			container : this._fieldsWrapper
+		};
+
+		this._rasterStyler = new Wu.RasterStyler(options);
+	},
+
 
 	_initStylingOptions : function () {
 
@@ -270,7 +278,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-
 	_refreshTemplates : function () {
 
 		this.templates = [];
@@ -339,7 +346,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-
 	// Marks button to changed state
 	markChanged : function () {
 		Wu.DomUtil.addClass(this._updateStyleButton, 'marked-changed');
@@ -352,15 +358,23 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// Update style
 	_updateStyle : function (newLegend) {
+		if (this._layer.isCube()) return this._updateCube();
+		if (this._layer.isVector()) return this._updateVector();
+		if (this._layer.isRaster()) return this._updateRaster();
+		console.error('invalid data type');
+	},
 
-		if ( this._layer.isCube() ) {
+	_updateRaster : function () {
+		console.log('TODO!');
 
-			this.type = 'cube';
-			this._rasterStyler.setCarto(this._rasterStyler.stops);
-			this._updateCube();
+		// create cartocss
+		// get styleJSON
 
-			return;
-		}
+		// save to pile layer (ie. create new pile layer and update wu layer with it)
+		// save styleJSON to wu layer
+	},
+
+	_updateVector : function () {
 
 		// Update point
 		this._pointStyler.setCarto(this._carto.point);
@@ -379,55 +393,45 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Unmark changed
 		this.unmarkChanged();
-		
 	},
-
-
 
 	_updateCube : function () {
 
+		// todo: is this needed?
+		this.type = 'cube';
+		this._rasterStyler.setCarto(this._rasterStyler.stops);
+
+		// get stops
 		var stops = this._rasterStyler.stops;
 
-		// stops[0].val;
-		// stops[0].col;
-		// stops[0].opacity;
-
-		// stops[1].val;
-		// stops[1].col;
-		// stops[1].opacity;
-
+		// ensure opacity is a number between 0 and 1 (todo: rewrite)
 		if ( !stops[0].opacity && _.isNaN(stops[0].opacity)) stops[0].opacity = 1;
+		if ( !stops[1].opacity && _.isNaN(stops[1].opacity)) stops[1].opacity = 1;			
+
+		// get colors
 		var RGB_one = Wu.Tools.color2RGB(stops[0].col);
 		var RGBA_one = 'rgba(' + RGB_one.r + ',' + RGB_one.g + ',' + RGB_one.b + ',' + stops[0].opacity + ')';
-
-		if ( !stops[1].opacity && _.isNaN(stops[1].opacity)) stops[1].opacity = 1;			
 		var RGB_two = Wu.Tools.color2RGB(stops[1].col);
 		var RGBA_two = 'rgba(' + RGB_two.r + ',' + RGB_two.g + ',' + RGB_two.b + ',' + stops[1].opacity + ')';
 
-		
-
+		// set css
 		var styleCSS = 	'#layer {' +
-				'raster-opacity: 1;' + 
-				'raster-colorizer-default-mode: linear;' + 
-				'raster-colorizer-default-color: transparent;' +
-				'raster-comp-op: color-dodge;' +
-				'raster-colorizer-stops:' +
-				'stop(' + (stops[0].val-1) + ', rgba(0,0,0,0))' + 
-				'stop(' + stops[0].val + ', ' + RGBA_one + ')' + 
-				'stop(' + stops[1].val + ', ' + RGBA_two + ')' +
-				'stop(255, rgba(0,0,0,0), exact);' +
-				'}';
-
-
-
-		// var styleJSON = JSON.stringify(stops);				
-		var styleJSON = stops;				
+			'raster-opacity: 1;' + 
+			'raster-colorizer-default-mode: linear;' + 
+			'raster-colorizer-default-color: transparent;' +
+			'raster-comp-op: color-dodge;' +
+			'raster-colorizer-stops:' +
+			'stop(' + (stops[0].val-1) + ', rgba(0,0,0,0))' + 
+			'stop(' + stops[0].val + ', ' + RGBA_one + ')' + 
+			'stop(' + stops[1].val + ', ' + RGBA_two + ')' +
+			'stop(255, rgba(0,0,0,0), exact);' +
+			'}';
 
 		// update pile layer
 		this._layer.updateStyle(styleCSS);
 
-		// save JSON style to `model.style` -> https://github.com/systemapic/wu/blob/master/models/layer.js#L66
-		this._layer.setStyling(stops); // will be stringified in setStyling fn
+		// save styleJSON to wu layer
+		this._layer.setStyling(stops); // will be stringified in setStyling fn, 
 
 	},
 
