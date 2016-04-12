@@ -2210,6 +2210,19 @@ Wu.Tools = {
 
 	},
 
+	componentToHex : function (c) {
+    		var hex = c.toString(16);
+    		return hex.length == 1 ? "0" + hex : hex;
+	},	
+
+	rgb2HEX : function (rgb) {
+		var r = this.componentToHex(rgb.r);
+		var g = this.componentToHex(rgb.g);
+		var b = this.componentToHex(rgb.b);
+
+		return '#' + r + g + b;
+	},
+
 	// Creates RGB from hex
 	hex2RGB : function (hex) {
 

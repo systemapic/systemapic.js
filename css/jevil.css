@@ -2590,3 +2590,22 @@ input.chrome-field-input {
 #field_mini_input_cube-input-right {
     left: -33px;
 }
+
+
+.add-color-stop-button {
+    padding: 10px;
+    background: #FFC200;
+    cursor: pointer;
+    position: absolute;
+    bottom: -125px;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: 5px;
+    box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.1);
+}
+
+.add-color-stop-button:active {
+   box-shadow: none;
+}
+
+

@@ -27,9 +27,13 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);
 
+		// this._addStopButton = Wu.DomUtil.create('div', 'add-color-stop-button', this._sliderContainer, 'Add stop');
+
+
 		this.slider = noUiSlider.create(this._sliderContainer, {
 			start: [this.stops[0].val, this.stops[1].val],
 			connect : true,
+			behaviour: 'drag',
 			range: {
 				'min': 0,
 				'max': 256
@@ -74,8 +78,6 @@ Wu.RasterStyler = Wu.Class.extend({
 		});
 
 
-
-
 		this.rightBall = new Wu.button({
 			appendTo  : this._colorSelectorRight,
 			type      : 'colorball',
@@ -102,7 +104,12 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	},
 
+
+
 	_updateOpacity : function (e) {
+
+		if ( e.target.value > 1 ) e.target.value = 1;
+		if ( e.target.value < 0 ) e.target.value = 0;
 
 		if ( e.target == this.leftMiniInput.input ) {
 			this.stops[0].opacity = parseFloat(e.target.value)
@@ -144,8 +151,60 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		}.bind(this));		
 
+
+		// Wu.DomEvent.on(this._addStopButton, 'click', this.addStop, this);
+
 		
 	},
+
+
+	// addStop : function () {
+
+	// 	// Add new stop between these two stops:
+	// 	var addHere = 1;
+
+	// 	var val1 = this.stops[addHere-1].val;
+	// 	var col1 = this.stops[addHere-1].col;
+	// 	var opacity1 = this.stops[addHere-1].opacity;
+
+	// 	var val2 = this.stops[addHere].val;
+	// 	var col2 = this.stops[addHere].col;
+	// 	var opacity2 = this.stops[addHere].opacity;
+
+	// 	var newStop = {}
+
+	// 	// SET NEW VALUE
+	// 	newStop.val = Math.round((val1+val2)/2);
+
+	// 	// SET NEW COLOR
+	// 	var col1_RGB = Wu.Tools.color2RGB(col1);
+	// 	var col2_RGB = Wu.Tools.color2RGB(col2);
+
+	// 	var newRGB = {}
+	// 	newRGB.r = Math.round((col1_RGB.r+col2_RGB.r)/2);
+	// 	newRGB.g = Math.round((col1_RGB.g+col2_RGB.g)/2);
+	// 	newRGB.b = Math.round((col1_RGB.b+col2_RGB.b)/2);
+
+	// 	newStop.col = Wu.Tools.rgb2HEX(newRGB);
+
+	// 	// SET NEW OPACITY
+	// 	newStop.opacity = (opacity1+opacity2)/2;
+
+		
+	// 	this.stops.splice(addHere, 0, newStop);
+
+
+	// 	this.resetSlider();
+		
+
+	// },
+
+	// resetSlider : function () {
+
+	// 	// this.slider.destroy();
+
+
+	// },
 
 	updateStyle : function () {
 		

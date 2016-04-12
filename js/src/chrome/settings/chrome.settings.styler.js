@@ -358,8 +358,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// Update style
 	_updateStyle : function (newLegend) {
 
-		console.log('update_style');
-
 		if ( this._layer.isCube() ) {
 
 			this.type = 'cube';
@@ -395,19 +393,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var stops = this._rasterStyler.stops;
 
-		// stops[0].val;
-		// stops[0].col;
-		// stops[0].opacity;
 
-		// stops[1].val;
-		// stops[1].col;
-		// stops[1].opacity;
-
-		if ( !stops[0].opacity ) stops[0].opacity = 1;
+		// if ( !stops[0].opacity ) stops[0].opacity = 1;
 		var RGB_one = Wu.Tools.color2RGB(stops[0].col);
 		var RGBA_one = 'rgba(' + RGB_one.r + ',' + RGB_one.g + ',' + RGB_one.b + ',' + stops[0].opacity + ')';
 
-		if ( !stops[1].opacity ) stops[1].opacity = 1;			
+		// if ( !stops[1].opacity ) stops[1].opacity = 1;			
 		var RGB_two = Wu.Tools.color2RGB(stops[1].col);
 		var RGBA_two = 'rgba(' + RGB_two.r + ',' + RGB_two.g + ',' + RGB_two.b + ',' + stops[1].opacity + ')';
 
@@ -431,28 +422,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// var styleJSON = JSON.stringify(stops);				
 		var styleJSON = stops;				
 
-
-		// this._layer.updateStyle(style);
-
-		console.log('%c*********************', 'background: hotpink; color: white;');;
-		console.log('%cSave this json string =>', 'color: green;');
-		console.log(styleJSON);
-		console.log('%c=====================', 'color: hotpink;');
-		console.log('%cSave this styleCSS', 'color: green');
-		console.log(styleCSS);
-		console.log('%c*********************', 'background: hotpink; color: white;');;
-		
-
 		// update pile layer
 		this._layer.updateStyle(styleCSS);
-
 
 		// save JSON style to `model.style` -> https://github.com/systemapic/wu/blob/master/models/layer.js#L66
 		this._layer.setStyling(stops); // will be stringified in setStyling fn
 
-		// @jorgen: use `this._layer.getStyling() to get styleJSON 
-
 		// todo: renmae setStyling to setStyleJSON... (must update many places)
+
 	},
 
 	_refresh : function () {
