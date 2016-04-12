@@ -23,7 +23,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		this._rangeMarks = Wu.DomUtil.create('div', 'raster-range-marks', this._wrapper);
 		this._maxMark = Wu.DomUtil.create('div', 'raster-range-max-mark', this._rangeMarks, '0');
-		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, '256');
+		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, '256'); // todo: shouldn't be hardcoded
 
 
 		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);
@@ -33,7 +33,7 @@ Wu.RasterStyler = Wu.Class.extend({
 			connect : true,
 			range: {
 				'min': 0,
-				'max': 256
+				'max': 256 // todo: hardcoded
 			}
 		});
 
@@ -47,14 +47,14 @@ Wu.RasterStyler = Wu.Class.extend({
 		this._rightNumber = Wu.DomUtil.create('div', 'raster-color-number', this._colorSelectorRight)
 
 
-		if ( !this.stops[0].opacity ) this.stops[0].opacity = 1;
+		if ( !this.stops[0].opacity ) this.stops[0].opacity = 1; // todo: this fails if opacity is set to 0
 		if ( !this.stops[1].opacity ) this.stops[1].opacity = 1;
 
 		this.leftBall = new Wu.button({
 			appendTo  : this._colorSelectorLeft,
 			type      : 'colorball',
 			id        : 'cube-color-left',
-			fn 	  : this.changeItLeft.bind(this),
+			fn 	  	  : this.changeItLeft.bind(this),
 			right     : false,
 			value     : this.stops[0].col,
 			className : 'raster-color',
@@ -65,20 +65,20 @@ Wu.RasterStyler = Wu.Class.extend({
 			id          : 'cube-input-left',
 			type        : 'miniInput',
 			appendTo    : this._colorSelectorLeft,
-			fn 	    : this.changeItLeft.bind(this),
+			fn 	    	: this.changeItLeft.bind(this),
 			right 	    : true,
 			isOn        : true,
 			value       : this.stops[0].opacity,
 			className   : 'raster-color-input',
 			placeholder : 1,
-			fn 	    : this._updateOpacity.bind(this)
+			fn 	    	: this._updateOpacity.bind(this)
 		});
 
 		this.rightBall = new Wu.button({
 			appendTo  : this._colorSelectorRight,
 			type      : 'colorball',
 			id        : 'cube-color-right',
-			fn 	  : this.changeItRight.bind(this),
+			fn 	  	  : this.changeItRight.bind(this),
 			right     : false,
 			value     : this.stops[1].col,
 			className : 'raster-color',
@@ -89,29 +89,30 @@ Wu.RasterStyler = Wu.Class.extend({
 			id          : 'cube-input-right',
 			type        : 'miniInput',
 			appendTo    : this._colorSelectorRight,
-			fn 	    : this.changeItLeft.bind(this),
+			fn 	    	: this.changeItLeft.bind(this),
 			right 	    : true,
 			isOn        : true,
 			value       : this.stops[1].opacity,
 			className   : 'raster-color-input',
 			placeholder : 1,
-			fn 	    : this._updateOpacity.bind(this)
+			fn 	    	: this._updateOpacity.bind(this)
 		});
 
 	},
 
 	_updateOpacity : function (e) {
+		var box = e.target;
 
-		if ( e.target == this.leftMiniInput.input ) {
-			this.stops[0].opacity = parseFloat(e.target.value)
+		if (box == this.leftMiniInput.input) {
+			this.stops[0].opacity = parseFloat(box.value)
 		}
 		
-		if ( e.target == this.rightMiniInput.input ) {
-			this.stops[1].opacity = parseFloat(e.target.value);
+		if (box == this.rightMiniInput.input) {
+			this.stops[1].opacity = parseFloat(box.value);
 		}
 
+		// update
 		this.updateStyle();
-
 	},
 
 	changeItLeft : function (hex, key, wrapper) {
@@ -147,7 +148,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	updateStyle : function () {
 		
-		var percent = 100/256;
+		var percent = 100/256; // todo: this is hardcoded, not necessarily 0-255;
 		var left = percent * this.stops[0].val;
 		var width = (percent * this.stops[1].val) - (percent * this.stops[0].val);
 
@@ -156,8 +157,8 @@ Wu.RasterStyler = Wu.Class.extend({
 			    'background: -moz-linear-gradient(right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');' +
 			    'background: linear-gradient(to right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
 
-		    style += 'left: ' + left + '%;';
-		    style += 'width: ' + width + '%;';
+	    style += 'left: ' + left + '%;';
+	    style += 'width: ' + width + '%;';
 
 		this._colorRange.setAttribute('style', style);
 
