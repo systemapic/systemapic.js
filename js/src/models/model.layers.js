@@ -464,6 +464,11 @@ Wu.Model.Layer = Wu.Model.extend({
         this.save('tooltip');
     },
 
+    getStyleJSON : function () {
+        return this.getStyling();
+    },
+
+    // todo: remove
     getStyling : function () {
         var json = this.store.style;
         if (!json) return false;
@@ -471,10 +476,15 @@ Wu.Model.Layer = Wu.Model.extend({
         return styleJSON;
     },
 
+    setStyleJSON : function (styleJSON) {
+        return this.setStyling(styleJSON);
+    },
+    // todo: remove
     setStyling : function (styleJSON) {
         this.store.style = JSON.stringify(styleJSON);
         this.save('style');
     },
+    
 
     getLegends : function () {
         var meta = this.store.legends;

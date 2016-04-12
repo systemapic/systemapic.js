@@ -6,37 +6,33 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		this.options = options;
 
-		// todo: carto is saved wrong, should be object, not cartocss. perpahs on server.
-		// @jorgen: virker OK nå...? 
+		// 
 		this.stops = _.isObject(options.carto) ? options.carto : [{ val : 80,  col : '#FF0000', opacity : 1 },{ val : 180, col : '#00FF00', opacity : 1 }];
 
-
+		// create dom
 		this._initContainer();
-		this.updateStyle();
+		
+		// set slider color
+		this.setSliderColor();
 
+		// add events
 		this.addHooks();
 
 	},
 
 	_initContainer : function () {
 
+		// create divs
 		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper raster-styler', this.options.container);
-
-
 		this._rangeMarks = Wu.DomUtil.create('div', 'raster-range-marks', this._wrapper);
 		this._maxMark = Wu.DomUtil.create('div', 'raster-range-max-mark', this._rangeMarks, '0');
 		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, '256'); // todo: shouldn't be hardcoded
-
-
 		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);
 
-		// this._addStopButton = Wu.DomUtil.create('div', 'add-color-stop-button', this._sliderContainer, 'Add stop');
-
-
+		// create slider
 		this.slider = noUiSlider.create(this._sliderContainer, {
 			start: [this.stops[0].val, this.stops[1].val],
 			connect : true,
-			behaviour: 'drag',
 			range: {
 				'min': 0,
 				'max': 256 // todo: hardcoded
@@ -52,9 +48,15 @@ Wu.RasterStyler = Wu.Class.extend({
 		this._colorSelectorRight = Wu.DomUtil.create('div', 'raster-color-selector right', this._colorRange);
 		this._rightNumber = Wu.DomUtil.create('div', 'raster-color-number', this._colorSelectorRight)
 
-
-		if ( !this.stops[0].opacity ) this.stops[0].opacity = 1; // todo: this fails if opacity is set to 0
-		if ( !this.stops[1].opacity ) this.stops[1].opacity = 1;
+		console.log('checking stops', this.stops[0].opacity)
+		if ( !this.stops[0].opacity && _.isNaN(this.stops[0].opacity)) {
+			console.log('isnannana 0');
+			this.stops[0].opacity = 1; // todo: this fails if opacity is set to 0
+		}
+		if ( !this.stops[1].opacity && _.isNaN(this.stops[1].opacity)) {
+			console.log('isnannana 1');
+			this.stops[1].opacity = 1;
+		}
 
 		this.leftBall = new Wu.button({
 			appendTo  : this._colorSelectorLeft,
@@ -106,13 +108,8 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	},
 
-
-
 	_updateOpacity : function (e) {
 		var box = e.target;
-
-		if ( box.value > 1 ) box.value = 1;
-		if ( box.value < 0 ) box.value = 0;
 
 		if (box == this.leftMiniInput.input) {
 			this.stops[0].opacity = parseFloat(box.value)
@@ -123,20 +120,18 @@ Wu.RasterStyler = Wu.Class.extend({
 		}
 
 		// update
-		this.updateStyle();
+		this.setSliderColor();
 	},
 
 	changeItLeft : function (hex, key, wrapper) {
 		this.stops[0].col = hex;
-		this.updateStyle();
+		this.setSliderColor();
 	},
 
 	changeItRight : function (hex, key, wrapper) {
 		this.stops[1].col = hex;
-		this.updateStyle();
+		this.setSliderColor();
 	},
-
-
 
 	addHooks : function () {
 
@@ -150,85 +145,32 @@ Wu.RasterStyler = Wu.Class.extend({
 
 			app.Tools.Styler.markChanged();
 
-			this.updateStyle();
+			this.setSliderColor();
 
 		}.bind(this));		
-
-
-		// Wu.DomEvent.on(this._addStopButton, 'click', this.addStop, this);
-
 		
 	},
 
-
-	// addStop : function () {
-
-	// 	// Add new stop between these two stops:
-	// 	var addHere = 1;
-
-	// 	var val1 = this.stops[addHere-1].val;
-	// 	var col1 = this.stops[addHere-1].col;
-	// 	var opacity1 = this.stops[addHere-1].opacity;
-
-	// 	var val2 = this.stops[addHere].val;
-	// 	var col2 = this.stops[addHere].col;
-	// 	var opacity2 = this.stops[addHere].opacity;
-
-	// 	var newStop = {}
-
-	// 	// SET NEW VALUE
-	// 	newStop.val = Math.round((val1+val2)/2);
-
-	// 	// SET NEW COLOR
-	// 	var col1_RGB = Wu.Tools.color2RGB(col1);
-	// 	var col2_RGB = Wu.Tools.color2RGB(col2);
-
-	// 	var newRGB = {}
-	// 	newRGB.r = Math.round((col1_RGB.r+col2_RGB.r)/2);
-	// 	newRGB.g = Math.round((col1_RGB.g+col2_RGB.g)/2);
-	// 	newRGB.b = Math.round((col1_RGB.b+col2_RGB.b)/2);
-
-	// 	newStop.col = Wu.Tools.rgb2HEX(newRGB);
-
-	// 	// SET NEW OPACITY
-	// 	newStop.opacity = (opacity1+opacity2)/2;
-
-		
-	// 	this.stops.splice(addHere, 0, newStop);
-
-
-	// 	this.resetSlider();
-		
-
-	// },
-
-	// resetSlider : function () {
-
-	// 	// this.slider.destroy();
-
-
-	// },
-
-	updateStyle : function () {
+	setSliderColor : function () {
 		
 		var percent = 100/256; // todo: this is hardcoded, not necessarily 0-255;
 		var left = percent * this.stops[0].val;
 		var width = (percent * this.stops[1].val) - (percent * this.stops[0].val);
 
-		var style = 'background: -webkit-linear-gradient(left, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');' +
-			    'background: -o-linear-gradient(right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');' +
-			    'background: -moz-linear-gradient(right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');' +
-			    'background: linear-gradient(to right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
-
+		// calc style
+		var style = 'background: -webkit-linear-gradient(left, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
+		style += 'background: -o-linear-gradient(right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
+		style += 'background: -moz-linear-gradient(right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
+		style += 'background: linear-gradient(to right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
 	    style += 'left: ' + left + '%;';
 	    style += 'width: ' + width + '%;';
 
+	    // set style to colorrange
 		this._colorRange.setAttribute('style', style);
 
+		// set opacity to input divs
 		this._leftNumber.innerHTML = this.stops[0].val;	
 		this._rightNumber.innerHTML = this.stops[1].val;
-
-
 	},
 
 	setCarto : function (carto) {
