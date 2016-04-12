@@ -74,9 +74,6 @@ Wu.RasterStyler = Wu.Class.extend({
 			fn 	    : this._updateOpacity.bind(this)
 		});
 
-
-
-
 		this.rightBall = new Wu.button({
 			appendTo  : this._colorSelectorRight,
 			type      : 'colorball',
@@ -176,10 +173,5 @@ Wu.RasterStyler = Wu.Class.extend({
 		this.options.carto = carto;
 	},	
 
-})
-
-
-
-
-
+});
 

@@ -506,7 +506,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.oldLegendObj = false;
 		this.legendObj = false;
 
-		if ( this._layer.isCube() ) {
+		// if ( this._layer.isCube() ) {
+		console.log('styleAsRaster??', this._layer.styleAsRaster(), this);
+		if ( this._layer.styleAsRaster() ) {
 			
 			// add GUI for cube styling here!
 			this._initCubeStyler();

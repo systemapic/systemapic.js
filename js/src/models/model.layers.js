@@ -648,13 +648,17 @@ Wu.Model.Layer = Wu.Model.extend({
     
     _invalidateTiles : function () {
         return;
-    }
+    },
+
+    styleAsRaster : function () {
+        return false;
+    },
 
 });
 
 
 
-
+// metalayer with several postgis raster layers 
 Wu.CubeLayer = Wu.Model.Layer.extend({
 
     options : {
@@ -937,10 +941,15 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // TODO: add to queue etc. with websocket implementation
     },
+
+    styleAsRaster : function () {
+        return true;
+    },
 });
 
 
-Wu.PostGISLayer = Wu.Model.Layer.extend({
+// postgis vector layer
+Wu.VectorLayer = Wu.Model.Layer.extend({
 
     initLayer : function () {
         this.update();
@@ -1239,15 +1248,21 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
         // delete layer
         project.deleteLayer(this);
-    }
-    
+    },
 
+    styleAsRaster : function () {
+        return this.isRaster();
+    },
+    
+    isStylable : function () {
+        return true;
+    },
 });
 
 
 
 
-// systemapic layers
+// postgis raster layer
 Wu.RasterLayer = Wu.Model.Layer.extend({
 
     initialize : function (layer) {
@@ -1370,7 +1385,15 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 
     downloadLayer : function () {
         console.log('raster downloadLayer');
-    }
+    },
+
+    styleAsRaster : function () {
+        return true;
+    },
+
+    isStylable : function () {
+        return true;
+    },
 });
 
 
@@ -1687,12 +1710,12 @@ Wu.ErrorLayer = Wu.Model.Layer.extend({
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
     if (!layer.data) {
-        console.error('no layer - weird:', layer);
+        console.error('ErrorLayer (1):', layer);
         return new Wu.ErrorLayer();
     }
     // postgis vector
     if (layer.data.postgis && layer.data.postgis.geom_type == 'geometry') {
-        return new Wu.PostGISLayer(layer);
+        return new Wu.VectorLayer(layer);
     }
 
     // postgis raster
@@ -1715,15 +1738,13 @@ Wu.createLayer = function (layer) {
     // topojson
     if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
 
-    // raster
-    if (layer.data.raster) return new Wu.RasterLayer(layer);
-
-    // raster
+    // norkart
     if (layer.data.norkart) return new Wu.NorkartLayer(layer);
 
-    // raster
+    // google
     if (layer.data.google) return new Wu.GoogleLayer(layer);
 
+    console.error('ErrorLayer (2):', layer);
     return new Wu.ErrorLayer();
 };
 
