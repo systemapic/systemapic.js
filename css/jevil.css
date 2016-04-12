@@ -819,7 +819,7 @@ input.chrome-field-input {
 
 .layer-name-content {
     width: auto;
-    max-width: 360px;
+    max-width: 320px;
     }
 
 .chrome-color-range {
@@ -2053,11 +2053,11 @@ input.chrome-field-input {
     top: auto;
     }
 
-.layer-list-container .file-popup-trigger {
+/*.layer-list-container .file-popup-trigger {
     display: none;
     opacity: 0;
     visibility: hidden;
-    }
+    }*/
 
 .data-list-line.processing, 
 .data-list-line.processing:hover {
@@ -2545,16 +2545,6 @@ input.chrome-field-input {
     top: -6px;    
 }
 
-.big-slider-outer-container .noUi-origin:before {
-    content: '';
-    position: absolute;
-    width: 1px;
-    height: 227px;
-    left: 0;
-    bottom: 0;
-    background-color: blue;
-    opacity: 0.3;
-}
 
 .big-slider-play-button,
 .big-slider-step-forward,

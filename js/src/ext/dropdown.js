@@ -1,4 +1,5 @@
 Wu.Dropdown = Wu.Class.extend({
+    
     // this function will run automatically on new Wu.Dropdown()
 	initialize : function (options) {
   		Wu.setOptions(this, options); // will put options in this.options
@@ -6,12 +7,17 @@ Wu.Dropdown = Wu.Class.extend({
 	},
 
 	_initLayout : function () {
-		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this.options.appendTo);
+		// set class name
+		var className = 'base-layer-dropdown-container ';
+		if (this.options.className) className += this.options.className;
+
+		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', className, this.options.appendTo);
 		this._initLayoutActiveLayers();
 		this._initEventsListners();
 	},
 
 	_initLayoutActiveLayers : function (options) {
+		
 		this._activeLayersWrap = Wu.DomUtil.create('div', 'baselayer-dropdown-wrapper', this._baseLayerDropdownContainer);
 		this._selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', this._activeLayersWrap);
 		this._select = Wu.DomUtil.create('div', 'form-combobox_inner', this._selectWrap);
@@ -56,7 +62,6 @@ Wu.Dropdown = Wu.Class.extend({
 		this._form_combobox_input.setAttribute("tabindex", 1);
 		Wu.DomEvent.on(this._form_combobox_input, 'keydown', this._onKeydown, this);
 		
-		// Wu.DomEvent.on(me._select, 'change', me.options.fn, me.options.scope || this);
 	},
 
 	_initEventsListners : function () {

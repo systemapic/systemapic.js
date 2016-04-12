@@ -26,7 +26,9 @@ Wu.Model = Wu.Class.extend({
 		Wu.Mixin.Events.on('projectChanged',  this._onProjectChanged, this);
 		Wu.Mixin.Events.on('animationPlay',   this._onAnimationPlay, this);
 		Wu.Mixin.Events.on('animationStop',   this._onAnimationStop, this);
-		Wu.Mixin.Events.on('setFPS',   		this._onSetFPS, this);
+		Wu.Mixin.Events.on('animationSlide',  this._onAnimationSlide, this);
+		Wu.Mixin.Events.on('setFPS',   		  this._onSetFPS, this);
+		// Wu.Mixin.Events.on('cubeEdited',   	  this._onCubeEdited, this);
 
 		// file events
 		var event_id = 'downloadReady-' + this.getUuid();
@@ -68,6 +70,8 @@ Wu.Model = Wu.Class.extend({
 	_onProjectChanged: function () {},
 	_onAnimationPlay: function () {},
 	_onAnimationStop: function () {},
+	_onAnimationSlide: function () {},
 	_onSetFPS: function () {},
+	_onCubeEdited: function () {},
 
 });

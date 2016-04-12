@@ -87,17 +87,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-
 	_initCubeStyler : function () {
 
-		// console.error('_initCubeStyler');
-		// console.log('this._layer.getStyling()', this._layer.getStyling());
-		// console.log('this._carto');
-
 		this._carto = this._layer.getStyling();
-
-		// pølse
-		
 
 		var options = {
 			carto 	  : this._carto,
@@ -301,10 +293,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var selected = e.target.value;
 
-		console.log('_selectTemplate', selected);
-
 		this.templates.forEach(function (template) {
-			console.log('tempalte:', template);
 			if ( template.uuid == selected ) {
 				this._carto = template.carto;
 				this._legend = template.legend;
@@ -488,8 +477,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get layer
 		this._layer = this._project.getLayer(this.layerUuid);
 
-		// console.log('this._layer', this._layer);
-
 		// return if no layer
 		if (!this._layer || !this._layer.isStylable()) return;
 
@@ -498,8 +485,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
-
-		// console.log('style: ', style);
 
 		// define tab
 		this.tabindex = 1;
@@ -511,7 +496,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.oldLegendObj = false;
 		this.legendObj = false;
 
-		if ( this._layer.isCube() ) {
+		// if ( this._layer.isCube() ) {
+		console.log('styleAsRaster??', this._layer.styleAsRaster(), this);
+		if ( this._layer.styleAsRaster() ) {
 			
 			// add GUI for cube styling here!
 			this._initCubeStyler();
