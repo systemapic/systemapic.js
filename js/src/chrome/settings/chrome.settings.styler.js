@@ -70,7 +70,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	_initStyle : function () {
+	_initRasterStyler : function () {
+		console.error('TODO!');
+
+		// put raster styler here, (same as cube styler, but with different save options)
+	},
+
+	_initVectorStyler : function () {
 
 
 		// Get layer meta
@@ -208,7 +214,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}.bind(this));
 
 
-		if (error) return;
+		if (error) return console.error(error);
 		
 		// save
 		this._saveTemplate(val);
@@ -417,8 +423,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// save JSON style to `model.style` -> https://github.com/systemapic/wu/blob/master/models/layer.js#L66
 		this._layer.setStyling(stops); // will be stringified in setStyling fn
 
-		// todo: renmae setStyling to setStyleJSON... (must update many places)
-
 	},
 
 	_refresh : function () {
@@ -461,7 +465,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._tempRemoveLayers();
 	},	
 
-
 	// event run when layer selected 
 	_selectedActiveLayer : function (value, uuid) {
 
@@ -478,7 +481,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._layer = this._project.getLayer(this.layerUuid);
 
 		// return if no layer
-		if (!this._layer || !this._layer.isStylable()) return;
+		if (!this._layer || !this._layer.isStyleable()) return;
 
 		// remember layer for other tabs
 		this._storeActiveLayerUuid(this.layerUuid);		
@@ -489,24 +492,31 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// define tab
 		this.tabindex = 1;
 
-		// set local cartoJSON
+		// set local cartoCSS
 		this._carto = style || {};
 
 		// Clear legend objects
 		this.oldLegendObj = false;
 		this.legendObj = false;
 
-		// if ( this._layer.isCube() ) {
-		console.log('styleAsRaster??', this._layer.styleAsRaster(), this);
-		if ( this._layer.styleAsRaster() ) {
+
+		// cube styler
+		if (this._layer.isCube()) {
 			
-			// add GUI for cube styling here!
+			// init cube styler
 			this._initCubeStyler();
 
-		} else {
+		// vector styler
+		} else if (this._layer.isVector()) {
 
-			// init style json
-			this._initStyle();
+			// init vector styler
+			this._initVectorStyler();
+
+		// raster styler
+		} else if (this._layer.isRaster()) {
+
+			// init raster styler
+			this._initRasterStyler();
 		}
 
 		// Add temp layer
@@ -550,14 +560,5 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get carto from server
 		app.api.json2carto(options, callback.bind(this));
 	},
-
-	// UNUSED Function
-	//clearBuggyFiles : function () {
-	//	// Get file ID
-	//	var fileId = this._layer.store.file;
-	//	// Get file
-	//	var file = app.Account.getFile(fileId);
-	//	file.setStyleTemplates([]);
-	//}
 
  });
