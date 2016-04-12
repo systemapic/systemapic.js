@@ -10,6 +10,7 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		// fetching data is async, so must wait for callback
 		this.initData(function (err) {
+			if (err) return console.error('BigSlider init err:', err);
 
 			this.initSlider();
 
@@ -26,15 +27,13 @@ Wu.BigSlider = Wu.Evented.extend({
 		
 	},
 		
-
 	initData : function (done) {
 
 		// get data from server
 		app.api.getCustomData({
 			name : this.options.data
 		}, function (err, data) {
-
-			if ( err ) console.error(err);
+			if (err) return done(err);
 
 			// parse
 			var allYears = Wu.parse(data);
@@ -94,7 +93,7 @@ Wu.BigSlider = Wu.Evented.extend({
 			var day = date.getDate();
 			var monthNo = date.getMonth()+1;			
 
-			if ( currentMonth != month ) {
+			if (currentMonth != month) {
 				currentMonth = month;
 				
 				this.ticks.push({ 
@@ -102,7 +101,7 @@ Wu.BigSlider = Wu.Evented.extend({
 					year    : year,
 					doy     : doy,
 					monthNo : monthNo
-				})
+				});
 			}
 
 		}.bind(this))
@@ -194,7 +193,6 @@ Wu.BigSlider = Wu.Evented.extend({
 		}
 	
 		this.currentSliderValue = this.finalDay.Doy;
-
 	},
 
 	setFPS : function (fps) {
@@ -230,29 +228,19 @@ Wu.BigSlider = Wu.Evented.extend({
 	initSlider : function () {
 
 		this.sliderOuterContainer = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
-
 		var sliderInnerContainer = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
-
 		var slider = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
-
-
-
-
 		this.sliderButtonsContainer = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
-
 		this.stepBackward = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
 		this.tapBackward = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
 		this.playButton = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');		
 		this.tapForward = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
 		this.stepForward = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');					
-
 		this.currentDateContainer = Wu.DomUtil.create('div', 'big-slider-current-date', sliderInnerContainer);
-
 		this.tickContainer = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
 
 		// this.updateTicks();
 		this.updateButtons();
-
 
 		this.slider = noUiSlider.create(slider, {
 			start: [this.currentSliderValue],
@@ -324,90 +312,78 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		// Run graph
 		hitslineChart
-			.width(500).height(220)
-			.dimension(xDim)
-		
-			.x(d3.time.scale().domain([minDate,maxDate]))
-		 	.y(d3.scale.linear().domain([0, 100]))
+		.width(500).height(220)
+		.dimension(xDim)
+	
+		.x(d3.time.scale().domain([minDate,maxDate]))
+	 	.y(d3.scale.linear().domain([0, 100]))
 
-			.clipPadding(10)   	
-			.elasticY(false)
-			.elasticX(false)
-			.brushOn(false)
-			.transitionDuration(0)			
+		.clipPadding(10)   	
+		.elasticY(false)
+		.elasticX(false)
+		.brushOn(false)
+		.transitionDuration(0)			
 
-			
-			// Each of these will be a new graph
-			.compose([
+		// Each of these will be a new graph
+		.compose([
 
-				// MAX value
-				dc.lineChart(hitslineChart)
-					.group(yMaxDim)
-					.colors('#DDDDDD')
-					.renderArea(true)   	
-					.renderDataPoints(false)
-					.xyTipsOn(false)			
-				,
+			// MAX value
+			dc.lineChart(hitslineChart)
+				.group(yMaxDim)
+				.colors('#DDDDDD')
+				.renderArea(true)   	
+				.renderDataPoints(false)
+				.xyTipsOn(false),
 
-				// MIN value
-				dc.lineChart(hitslineChart)
-					.group(yMinDim)
-					.colors('#ffffff')
-					.renderArea(true)   	
-					.renderDataPoints(false)
-					.xyTipsOn(false)			
-				,
+			// MIN value
+			dc.lineChart(hitslineChart)
+				.group(yMinDim)
+				.colors('#ffffff')
+				.renderArea(true)   	
+				.renderDataPoints(false)
+				.xyTipsOn(false),
 
-				// AVERAGE value
-				dc.lineChart(hitslineChart)
-					.group(yAvgDim)
-					.colors('#999999')
-					.renderDataPoints(false)
-					.xyTipsOn(false)			
-				,
+			// AVERAGE value
+			dc.lineChart(hitslineChart)
+				.group(yAvgDim)
+				.colors('#999999')
+				.renderDataPoints(false)
+				.xyTipsOn(false),
 
-				// THIS YEAR value – LINE
-				dc.lineChart(hitslineChart)
-					.group(yThisDim)
-					.colors('#ff6666')
-					.renderDataPoints(false)
-					.xyTipsOn(false)
-				,
+			// THIS YEAR value – LINE
+			dc.lineChart(hitslineChart)
+				.group(yThisDim)
+				.colors('#ff6666')
+				.renderDataPoints(false)
+				.xyTipsOn(false),
 
-				// THIS YEAR value – LAST DATE (DOT)
-				dc.scatterPlot(hitslineChart)
-					.group(scatterDim)
-					.symbolSize(8)
-					.excludedOpacity(0)
-					.colors('#ff0000')
-					.symbol('triangle-up')
-					.keyAccessor(function(d) {
-						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
-						return false;
-					}.bind(this))
-					.valueAccessor(function(d) {
-						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
-						return false;
-					}.bind(this))
-			
-			])
-
-
-		
-			hitslineChart
-				.xUnits(d3.time.months)
-				.xAxis()
-				.tickFormat(d3.time. format('%b'))
-
-
+			// THIS YEAR value – LAST DATE (DOT)
+			dc.scatterPlot(hitslineChart)
+				.group(scatterDim)
+				.symbolSize(8)
+				.excludedOpacity(0)
+				.colors('#ff0000')
+				.symbol('triangle-up')
+				.keyAccessor(function(d) {
+					if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
+					return false;
+				}.bind(this))
+				.valueAccessor(function(d) {
+					if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
+					return false;
+				}.bind(this))
+		]);
+	
+		hitslineChart
+		.xUnits(d3.time.months)
+		.xAxis()
+		.tickFormat(d3.time. format('%b'))
 
 		dc.renderAll(); 
-
 
 	},
 
 	updateGraph : function () {
-
 
 		// Current year
 		var year = this.currentYear;
@@ -441,14 +417,11 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		var scf = Math.round(this.years[year][day-1].SCF * 100) / 100;
 
-		// // Update HTML
+		// Update HTML
 		this.dayNameTitle.innerHTML = this.dayName;
 		this.currentSCF.innerHTML = 'SCF: ' + scf + '%';
 
-
-
 	},
-
 
 	addHooks : function () {
 
@@ -456,7 +429,6 @@ Wu.BigSlider = Wu.Evented.extend({
 		Wu.DomEvent.on(this.tapBackward, 'click', this.stepOneBackward, this);
 		Wu.DomEvent.on(this.stepForward, 'click', this.moveForward, this);
 		Wu.DomEvent.on(this.tapForward, 'click', this.stepOneForward, this);
-
 		Wu.DomEvent.on(this.playButton, 'click', this.play, this);
 
 
@@ -471,15 +443,11 @@ Wu.BigSlider = Wu.Evented.extend({
         	}});
 
 		}.bind(this), 100));
-
-
 	},
 
 
 	play : function () {		
-
 		this.playing ? this.stopPlaying() : this.startPlaying();
-	
 	},
 
 	startPlaying : function () {
@@ -517,7 +485,6 @@ Wu.BigSlider = Wu.Evented.extend({
 
 	updateDayOfYear : function () {
 
-
 		// Month names
 		var monthNames = [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember" ];
 
@@ -541,8 +508,6 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		this.updateGraph();
 
-			
-
 	},
 
 	stepOneForward : function () {
@@ -563,13 +528,10 @@ Wu.BigSlider = Wu.Evented.extend({
 		this.slider.set([this.currentSliderValue]);
 	},
 
-
-
 	moveBackward : function () {
 
 		if ( this.diableBackward ) return;
 
-		// var finalYear = this.yearNames[this.yearNames.length-1];
 		this.currentYear--;
 		var currentDay = this.years[this.currentYear][this.currentDay-1];
 		if ( !currentDay ) {
@@ -608,10 +570,6 @@ Wu.BigSlider = Wu.Evented.extend({
 
 
 	updateButtons : function () {
-
-
-		// Wu.DomUtil.addClass(this.stepForward, 'disable-button');
-
 
 		if ( this.currentYear == this.yearNames[this.yearNames.length-1] ) {
 			this.diableForward = true;
@@ -715,7 +673,7 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		allYears.forEach(function (each) {
 			// New year!
-			if (  currentYear != each.Year ) {
+			if (currentYear != each.Year) {
 				currentYear = each.Year;
 				years[currentYear] = [];
 			}

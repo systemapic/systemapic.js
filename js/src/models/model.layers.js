@@ -156,7 +156,6 @@ Wu.Model.Layer = Wu.Model.extend({
         map.fitBounds(bounds, flyOptions);
     },
 
-
     addToControls : function () {
         if (this._isBase) return;
         this._addToDescription();

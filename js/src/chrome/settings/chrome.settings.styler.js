@@ -87,7 +87,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-
 	_initCubeStyler : function () {
 
 		this._carto = this._layer.getStyling();
