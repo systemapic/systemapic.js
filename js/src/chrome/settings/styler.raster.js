@@ -1,6 +1,8 @@
 Wu.RasterStyler = Wu.Class.extend({
 
 	type : 'cube',
+	rangeMin : 0,
+	rangeMax : 256,
 
 	initialize : function (options) {
 
@@ -29,82 +31,124 @@ Wu.RasterStyler = Wu.Class.extend({
 		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, '256'); // todo: shouldn't be hardcoded
 		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);
 
-		// create slider
+
+		// If slider exists, destroy it
+		if ( this.slider ) this.slider.destroy();
+
+		var sliderStops = [];
+		this.stops.forEach(function (stop) { sliderStops.push(stop.val) });
+
+		// Create slider
 		this.slider = noUiSlider.create(this._sliderContainer, {
-			start: [this.stops[0].val, this.stops[1].val],
-			connect : true,
+			start: sliderStops,
+			animate: false,
 			range: {
-				'min': 0,
-				'max': 256 // todo: hardcoded
+				'min': this.rangeMin,
+				'max': this.rangeMax
 			}
 		});
 
+
+		// console.log('this.slider', this.slider);
+
 		this._rangeWrapper = Wu.DomUtil.create('div', 'raster-color-range-wrapper', this._wrapper);
-		this._colorRange = Wu.DomUtil.create('div', 'raster-color-range', this._rangeWrapper);
+		// this._colorRange = Wu.DomUtil.create('div', 'raster-color-range', this._rangeWrapper);
 
-		this._colorSelectorLeft = Wu.DomUtil.create('div', 'raster-color-selector left', this._colorRange);
-		this._leftNumber = Wu.DomUtil.create('div', 'raster-color-number', this._colorSelectorLeft)
 
-		this._colorSelectorRight = Wu.DomUtil.create('div', 'raster-color-selector right', this._colorRange);
-		this._rightNumber = Wu.DomUtil.create('div', 'raster-color-number', this._colorSelectorRight)
+		this.stops.forEach(function (stop, i) { 
 
-		console.log('checking stops', this.stops[0].opacity)
-		if ( !this.stops[0].opacity && _.isNaN(this.stops[0].opacity)) {
-			console.log('isnannana 0');
-			this.stops[0].opacity = 1; // todo: this fails if opacity is set to 0
-		}
-		if ( !this.stops[1].opacity && _.isNaN(this.stops[1].opacity)) {
-			console.log('isnannana 1');
-			this.stops[1].opacity = 1;
-		}
+			stop.DOM = {}
+			stop.DOM.container = Wu.DomUtil.create('div', 'raster-color-selector', this._rangeWrapper);
+			// stop.DOM.number    = Wu.DomUtil.create('div', 'raster-color-number', stop.DOM.container)
 
-		this.leftBall = new Wu.button({
-			appendTo  : this._colorSelectorLeft,
-			type      : 'colorball',
-			id        : 'cube-color-left',
-			fn 	  	  : this.changeItLeft.bind(this),
-			right     : false,
-			value     : this.stops[0].col,
-			className : 'raster-color',
-			on        : true
-		});
+			stop.DOM.colorBall = new Wu.button({
+				appendTo  : stop.DOM.container,
+				type      : 'colorball',
+				id        : 'cube-color-' + i,
+				fn 	  : this._updateColor.bind(this),
+				right     : false,
+				value     : this.stops[i].col,
+				className : 'raster-color',
+				on        : true
+			});
 
-		this.leftMiniInput = new Wu.button({
-			id          : 'cube-input-left',
-			type        : 'miniInput',
-			appendTo    : this._colorSelectorLeft,
-			fn 	    	: this.changeItLeft.bind(this),
-			right 	    : true,
-			isOn        : true,
-			value       : this.stops[0].opacity,
-			className   : 'raster-color-input',
-			placeholder : 1,
-			fn 	    	: this._updateOpacity.bind(this)
-		});
+			// stop.DOM.miniInput = new Wu.button({
+			// 	appendTo    : stop.DOM.container,
+			// 	type        : 'miniInput',
+			// 	id          : 'cube-input-' + i,
+			// 	right 	    : true,
+			// 	isOn        : true,
+			// 	value       : this.stops[i].opacity,
+			// 	className   : 'raster-color-input',
+			// 	placeholder : 1,
+			// 	fn 	    : this._updateOpacity.bind(this)
+			// });
 
-		this.rightBall = new Wu.button({
-			appendTo  : this._colorSelectorRight,
-			type      : 'colorball',
-			id        : 'cube-color-right',
-			fn 	  	  : this.changeItRight.bind(this),
-			right     : false,
-			value     : this.stops[1].col,
-			className : 'raster-color',
-			on        : true
-		});
 
-		this.rightMiniInput = new Wu.button({
-			id          : 'cube-input-right',
-			type        : 'miniInput',
-			appendTo    : this._colorSelectorRight,
-			fn 	    	: this.changeItLeft.bind(this),
-			right 	    : true,
-			isOn        : true,
-			value       : this.stops[1].opacity,
-			className   : 'raster-color-input',
-			placeholder : 1,
-			fn 	    	: this._updateOpacity.bind(this)
-		});
+		}.bind(this));
+
+
+
+		// this._colorSelectorLeft = Wu.DomUtil.create('div', 'raster-color-selector left', this._colorRange);
+		// this._leftNumber = Wu.DomUtil.create('div', 'raster-color-number', this._colorSelectorLeft)
+
+		// this._colorSelectorRight = Wu.DomUtil.create('div', 'raster-color-selector right', this._colorRange);
+		// this._rightNumber = Wu.DomUtil.create('div', 'raster-color-number', this._colorSelectorRight)
+		
+		// if ( !this.stops[0].opacity && _.isNaN(this.stops[0].opacity)) {
+		// 	this.stops[0].opacity = 1; // todo: this fails if opacity is set to 0
+		// }
+		// if ( !this.stops[1].opacity && _.isNaN(this.stops[1].opacity)) {
+		// 	this.stops[1].opacity = 1;
+		// }
+
+		// this.leftBall = new Wu.button({
+		// 	appendTo  : this._colorSelectorLeft,
+		// 	type      : 'colorball',
+		// 	id        : 'cube-color-left',
+		// 	fn 	  : this.changeItLeft.bind(this),
+		// 	right     : false,
+		// 	value     : this.stops[0].col,
+		// 	className : 'raster-color',
+		// 	on        : true
+		// });
+
+		// this.leftMiniInput = new Wu.button({
+		// 	id          : 'cube-input-left',
+		// 	type        : 'miniInput',
+		// 	appendTo    : this._colorSelectorLeft,
+		// 	fn 	    : this.changeItLeft.bind(this),
+		// 	right 	    : true,
+		// 	isOn        : true,
+		// 	value       : this.stops[0].opacity,
+		// 	className   : 'raster-color-input',
+		// 	placeholder : 1,
+		// 	fn 	    	: this._updateOpacity.bind(this)
+		// });
+
+		// this.rightBall = new Wu.button({
+		// 	appendTo  : this._colorSelectorRight,
+		// 	type      : 'colorball',
+		// 	id        : 'cube-color-right',
+		// 	fn 	  : this.changeItRight.bind(this),
+		// 	right     : false,
+		// 	value     : this.stops[1].col,
+		// 	className : 'raster-color',
+		// 	on        : true
+		// });
+
+		// this.rightMiniInput = new Wu.button({
+		// 	id          : 'cube-input-right',
+		// 	type        : 'miniInput',
+		// 	appendTo    : this._colorSelectorRight,
+		// 	fn 	    : this.changeItLeft.bind(this),
+		// 	right 	    : true,
+		// 	isOn        : true,
+		// 	value       : this.stops[1].opacity,
+		// 	className   : 'raster-color-input',
+		// 	placeholder : 1,
+		// 	fn 	    : this._updateOpacity.bind(this)
+		// });
 
 	},
 
@@ -123,32 +167,63 @@ Wu.RasterStyler = Wu.Class.extend({
 		this.setSliderColor();
 	},
 
-	changeItLeft : function (hex, key, wrapper) {
-		this.stops[0].col = hex;
-		this.setSliderColor();
+	_updateColor : function (e) {
+
 	},
 
-	changeItRight : function (hex, key, wrapper) {
-		this.stops[1].col = hex;
-		this.setSliderColor();
-	},
+	// changeItLeft : function (hex, key, wrapper) {
+	// 	this.stops[0].col = hex;
+	// 	this.setSliderColor();
+	// },
+
+	// changeItRight : function (hex, key, wrapper) {
+	// 	this.stops[1].col = hex;
+	// 	this.setSliderColor();
+	// },
 
 	addHooks : function () {
 
 		this.slider.on('slide', function( values, handle ) {
 
-			var min = Math.round(parseInt(values[0]));
-			var max = Math.round(parseInt(values[1]));
 
-			this.stops[0].val = min;
-			this.stops[1].val = max;
+			// console.log('values', values);
+
+			values.forEach(function (v, i) {
+				this.stops[i].val = parseInt(v);
+			}.bind(this))
+
+			// console.log('');
+			// console.log('');
+
+
+			// var min = Math.round(parseInt(values[0]));
+			// var max = Math.round(parseInt(values[1]));
+
+			// this.stops[0].val = min;
+			// this.stops[1].val = max;
 
 			app.Tools.Styler.markChanged();
-
-			this.setSliderColor();
+			this._setSliderColor();
 
 		}.bind(this));		
 		
+	},
+
+
+	_setSliderColor : function () {
+
+		this.stops.forEach(function (stop) {
+			var v = stop.val;
+			var span = this.rangeMax - this.rangeMin;
+			var percentFromLeft = Math.round(v/span * 100);
+
+			// console.log('precent from left =>', percentFromLeft);
+			stop.DOM.container.style.left = percentFromLeft + '%';
+
+
+		}.bind(this))
+
+
 	},
 
 	setSliderColor : function () {
@@ -162,15 +237,15 @@ Wu.RasterStyler = Wu.Class.extend({
 		style += 'background: -o-linear-gradient(right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
 		style += 'background: -moz-linear-gradient(right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
 		style += 'background: linear-gradient(to right, ' + this.stops[0].col + ' , ' + this.stops[1].col + ');';
-	    style += 'left: ' + left + '%;';
-	    style += 'width: ' + width + '%;';
+		style += 'left: ' + left + '%;';
+		style += 'width: ' + width + '%;';
 
-	    // set style to colorrange
-		this._colorRange.setAttribute('style', style);
+	    	// set style to colorrange
+		// this._colorRange.setAttribute('style', style);
 
 		// set opacity to input divs
-		this._leftNumber.innerHTML = this.stops[0].val;	
-		this._rightNumber.innerHTML = this.stops[1].val;
+		// this._leftNumber.innerHTML = this.stops[0].val;	
+		// this._rightNumber.innerHTML = this.stops[1].val;
 	},
 
 	setCarto : function (carto) {

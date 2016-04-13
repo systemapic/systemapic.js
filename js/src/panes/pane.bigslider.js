@@ -120,7 +120,7 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		this.slider = noUiSlider.create(slider, {
 			start: [this.currentSliderValue],
-			limit: this.dataLength,
+			// limit: this.dataLength,
 			range: {
 				'min': 1,
 				'max': this.dataLength

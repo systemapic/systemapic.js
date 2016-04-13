@@ -2599,3 +2599,10 @@ input.chrome-field-input {
 }
 
 
+
+
+
+.raster-color-selector {
+    padding: 3px;
+    background: red;    
+}
