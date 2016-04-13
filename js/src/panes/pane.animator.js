@@ -1,13 +1,5 @@
 Wu.Animator = Wu.Evented.extend({
 
-
-	// ██╗███╗   ██╗██╗████████╗
-	// ██║████╗  ██║██║╚══██╔══╝
-	// ██║██╔██╗ ██║██║   ██║   
-	// ██║██║╚██╗██║██║   ██║   
-	// ██║██║ ╚████║██║   ██║   
-	// ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝   
-
 	options : {
 
 		// Animation frames per second
@@ -43,11 +35,6 @@ Wu.Animator = Wu.Evented.extend({
 		
 	},
 
-
-	// ┌─┐┌─┐┌┬┐  ┌┬┐┌─┐┌┬┐┌─┐
-	// │ ┬├┤  │    ││├─┤ │ ├─┤
-	// └─┘└─┘ ┴   ─┴┘┴ ┴ ┴ ┴ ┴	
-		
 	// Initialize data
 	initData : function (done) {
 
@@ -97,10 +84,6 @@ Wu.Animator = Wu.Evented.extend({
 	},
 
 
-	// ┬ ┬┬─┐┬┌┬┐┌─┐  ┌─┐┬  ┬┌┬┐┌─┐┬─┐  ┌┬┐┌─┐┌┬┐
-	// │││├┬┘│ │ ├┤   └─┐│  │ ││├┤ ├┬┘   │││ ││││
-	// └┴┘┴└─┴ ┴ └─┘  └─┘┴─┘┴─┴┘└─┘┴└─  ─┴┘└─┘┴ ┴
-
 	initSlider : function () {
 
 		this.sliderOuterContainer = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
@@ -122,33 +105,26 @@ Wu.Animator = Wu.Evented.extend({
 				'max': this.dataLength
 			}
 		});
-
 	},
 
 
-	// ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
-	// ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
-	// █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
-	// ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
-	// ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
-	// ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
-
 	// Overlaps a tad with "ACTIONS" underneath
-
 	addHooks : function () {
 
+		// dom events
 		Wu.DomEvent.on(this.stepBackward, 'click', this.moveBackward, this);
 		Wu.DomEvent.on(this.tapBackward,  'click', this.stepOneBackward, this);
 		Wu.DomEvent.on(this.stepForward,  'click', this.moveForward, this);
 		Wu.DomEvent.on(this.tapForward,   'click', this.stepOneForward, this);
 		Wu.DomEvent.on(this.playButton,   'click', this.play, this);
 
+		// slider event
 		this.slider.on('slide', _.throttle(function( values, handle ) {
 			this.currentSliderValue = Math.round(values);
 			this.slideEvent();
 		}.bind(this), 100));
 
-
+		// listen for events
 		Wu.Mixin.Events.on('setSlider', this.setSlider, this);
 		Wu.Mixin.Events.on('updateSliderButtons', this.updateButtons, this);
 	},
@@ -201,11 +177,17 @@ Wu.Animator = Wu.Evented.extend({
 		var disableForward  = e.detail.diableForward;
 		var disableBackward = e.detail.diableBackward
 
-		if ( disableForward ) { Wu.DomUtil.addClass(this.stepForward, 'disable-button');
-		} else { Wu.DomUtil.removeClass(this.stepForward, 'disable-button'); }
+		if ( disableForward ) { 
+			Wu.DomUtil.addClass(this.stepForward, 'disable-button');
+		} else { 
+			Wu.DomUtil.removeClass(this.stepForward, 'disable-button'); 
+		}
 
-		if ( disableBackward ) { Wu.DomUtil.addClass(this.stepBackward, 'disable-button');
-		} else { Wu.DomUtil.removeClass(this.stepBackward, 'disable-button'); }
+		if ( disableBackward ) { 
+			Wu.DomUtil.addClass(this.stepBackward, 'disable-button');
+		} else { 
+			Wu.DomUtil.removeClass(this.stepBackward, 'disable-button'); 
+		}
 
 	},
 
@@ -218,17 +200,7 @@ Wu.Animator = Wu.Evented.extend({
 	},
 
 
-
-	//  █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
-	// ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
-	// ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
-	// ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
-	// ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
-	// ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-
 	// These are the actions for the play, pause, step forward and backward buttons
-
-
 	play : function () {		
 		this.playing ? this.stopPlaying() : this.startPlaying();
 	},
@@ -270,7 +242,6 @@ Wu.Animator = Wu.Evented.extend({
 		this.currentSliderValue++;
 		this.slideEvent();
 		this.slider.set([this.currentSliderValue]);
-
 	},
 
 	stepOneBackward : function () {
@@ -286,16 +257,6 @@ Wu.Animator = Wu.Evented.extend({
 	moveForward : function () {
 		Wu.Mixin.Events.fire('sliderMoveForward');
 	},	
-
-
-
-
-	//  ██████╗ ████████╗██╗  ██╗███████╗██████╗ 
-	// ██╔═══██╗╚══██╔══╝██║  ██║██╔════╝██╔══██╗
-	// ██║   ██║   ██║   ███████║█████╗  ██████╔╝
-	// ██║   ██║   ██║   ██╔══██║██╔══╝  ██╔══██╗
-	// ╚██████╔╝   ██║   ██║  ██║███████╗██║  ██║
-	//  ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
 
 	// Update message box, if it exists before
 	update : function (message, severity) {
@@ -313,8 +274,4 @@ Wu.Animator = Wu.Evented.extend({
 	},	
 
 });
-
-
-
-
 
