@@ -1,12 +1,10 @@
 Wu.RasterStyler = Wu.Class.extend({
 
-	type : 'cube',
-
 	initialize : function (options) {
 
 		this.options = options;
 
-		// 
+		// get stops
 		this.stops = _.isObject(options.carto) ? options.carto : [{ val : 80,  col : '#FF0000', opacity : 1 },{ val : 180, col : '#00FF00', opacity : 1 }];
 
 		// create dom

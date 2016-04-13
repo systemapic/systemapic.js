@@ -429,11 +429,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateCube : function () {
 
-		// todo: is this needed?
-		this.type = 'cube';
-		// todo: is this needed?
-		this._rasterStyler.setCarto(this._rasterStyler.stops);
-
 		// get stops
 		var stops = this._rasterStyler.stops;
 
