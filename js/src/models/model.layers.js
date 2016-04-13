@@ -668,6 +668,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         fps : 4,
     },
 
+    _layers : [],
+
     initialize : function (store) {
 
         // set store
@@ -895,6 +897,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     updateStyle : function (style) {
 
+        console.log('udpateStyle', style);
+
         var options = {
             cube_id : this.getCubeId(),
             style : style
@@ -936,6 +940,57 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // TODO: add to queue etc. with websocket implementation
     },
+
+    setDatasetDate : function (options, done) {
+
+        // get date, dataset
+        var date = options.date;
+        var dataset = options.dataset;
+
+        // set new date (format: "2016-04-01T00:00:00+02:00")
+        dataset.meta.date = moment(date).format();
+
+        // get all datasets
+        var datasets = this.getDatasets();
+
+        // find index 
+        var idx = _.findIndex(datasets, function (d) {
+            return d.uuid == dataset.uuid;
+        });
+
+        // update dataset
+        datasets[idx] = dataset;
+
+        // save cube on server
+        this.updateDataset(datasets, done);
+    },
+
+    updateDataset : function (datasets, done) {
+
+        var options = {
+            cube_id : this.getCubeId(),
+            datasets : datasets
+        }
+
+        // update cube on server
+        app.api.updateCube(options, function (err, cubeJSON) {
+            if (err) return console.error('Error updating Cube Style:', err, cubeJSON);
+
+            // parse
+            var cube = Wu.parse(cubeJSON)
+
+            // save updated cube
+            this._saveCube(cube);
+
+            // refresh layers
+            this._refreshLayer();
+
+            // return
+            done && done(err, cube);
+            
+        }.bind(this));
+    },
+
 });
 
 

@@ -1357,6 +1357,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var dataset = options.dataset;
         var appendTo = options.appendTo;
         var index = (options.index + 1).toString();
+        var layer = this._fullscreen._layer;
 
         // get meta
         var name = dataset.meta ? dataset.meta.text : 'error';
@@ -1382,18 +1383,66 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // change date click
         Wu.DomEvent.on(dataset_time, 'dblclick', function () {
-            console.log('edit time!');
 
-            // date picker
-            var picker = new Pikaday({
-                field: dataset_time,
-                format: 'D MMM YYYY',
-                onSelect: function() {
-                    console.log(this.getMoment().format('Do MMMM YYYY'));
-                }
+            this._addDatePicker({
+                dataset : dataset,
+                div : dataset_time,
+                layer : layer,
+                container : wrap
             });
 
         }, this);
+
+    },
+
+    _addDatePicker : function (options) {
+        var dataset = options.dataset;
+        var currentDate = dataset.meta ? dataset.meta.date : new Date();
+        var div = options.div;
+        var container = options.container;
+        var layer = options.layer;
+
+        console.log('currentDate', currentDate);
+
+        // clear old
+        if (this._datePicker) {
+            this._datePicker.destroy();
+            delete this._datePicker;
+        }
+
+        // create date picker
+        var picker = this._datePicker = new Pikaday({
+            firstDay : 1,
+            defaultDate : moment(currentDate).toDate(),
+            setDefaultDate : true,
+            yearRange : 3,
+            onSelect: function(date) {
+
+                // set date to dataset in cube
+                layer.setDatasetDate({
+                    dataset : dataset,
+                    date : date
+                }, function (err, updatedCube) {
+                    if (err) return console.error('Could not set date for dataset!');
+
+                    // update list
+                    var timestamp = moment(date).format("MMMM Do YYYY");
+                    div.innerHTML = timestamp;
+                });
+
+                // destroy
+                picker.destroy();
+
+                // remove close event
+                Wu.DomEvent.off(container, 'click', picker.destroy, picker);
+            }
+        });
+
+        // add to DOM
+        div.parentNode.insertBefore(this._datePicker.el, div.nextSibling);
+
+        // add close event
+        Wu.DomEvent.on(container, 'click', picker.destroy, picker);
 
     },
 
