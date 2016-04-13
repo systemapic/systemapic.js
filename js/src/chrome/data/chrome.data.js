@@ -1383,6 +1383,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // change date click
         Wu.DomEvent.on(dataset_time, 'dblclick', function () {
             console.log('edit time!');
+
+            // date picker
+            var picker = new Pikaday({
+                field: dataset_time,
+                format: 'D MMM YYYY',
+                onSelect: function() {
+                    console.log(this.getMoment().format('Do MMMM YYYY'));
+                }
+            });
+
         }, this);
 
     },
@@ -1420,6 +1430,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     _addCubesetItemByUuid : function (fileUuid) {
 
         var file = app.Account.getFile(fileUuid);
+
+        // get date from filename (todo: make more flexible, with option to choose)
         var date = this.parse_date_YYYY_DDD(file.getTitle());
 
         var dataset = {
