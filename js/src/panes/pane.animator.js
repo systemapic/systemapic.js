@@ -1,4 +1,4 @@
-Wu.BigSlider = Wu.Evented.extend({
+Wu.Animator = Wu.Evented.extend({
 
 
 	// ██╗███╗   ██╗██╗████████╗
@@ -34,8 +34,7 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		// fetching data is async, so must wait for callback
 		this.initData(function (err) {
-		
-			if (err) return console.error('BigSlider init err:', err);
+			if (err) return console.error('Wu.Animator init err:', err);
 
 			// hide by default is option set
 			if (this.options.hide) this.hide();
@@ -54,11 +53,8 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		// get data from server
 		app.api.getCustomData({
-			
 			name : this.options.data
-
 		}, function (err, d) {
-
 			if (err) return done(err);
 
 			// parse
@@ -79,7 +75,9 @@ Wu.BigSlider = Wu.Evented.extend({
 
 		// Set slider steps
 		this.dataLength = data.length;
-		if ( this.dataLength > this.options.maxLength ) this.dataLength = this.options.maxLength;
+		if ( this.dataLength > this.options.maxLength ) {
+			this.dataLength = this.options.maxLength;
+		}
 
 		// Initialize slider
 		this.initSlider();
@@ -91,13 +89,11 @@ Wu.BigSlider = Wu.Evented.extend({
 		this.addHooks();		
 
 		// Create graph
-		this.graph = new Wu.BigSliderGraph({
+		this.graph = new Wu.Graph.Year({
 			data     : data,
 			appendTo : this.sliderOuterContainer,
 			type     : this.options.graphType
-		})
-
-
+		});
 	},
 
 
