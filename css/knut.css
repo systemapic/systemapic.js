@@ -1796,6 +1796,12 @@ input.target-input.polygon {
 .cubeset-time {
     position: relative;
     left: 20px;
+    cursor: context-menu;
+    max-width: 150px;
+}
+
+.cubeset-time:hover {
+    color: black;
 }
 
 .cubeset-remove-btn {

@@ -1305,8 +1305,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             // parse
             var cube = Wu.parse(updatedCube);
 
-
-
             // update Wu.CubeLayer
             var updatedLayer = layer._saveCube(cube);
 
@@ -1362,7 +1360,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // get meta
         var name = dataset.meta ? dataset.meta.text : 'error';
-        var timestamp = dataset.meta ? dataset.meta.date : 'error';
+        var timestamp = dataset.meta ? moment(dataset.meta.date).format("MMMM Do YYYY") : 'error';
         var uuid = dataset.uuid;
 
         // wrapper
@@ -1377,9 +1375,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // buttons
         var removeBtn = Wu.DomUtil.create('div', 'cubeset-remove-btn', wrap, '<i class="fa fa-trash-o"></i>');
 
-        // btn click
+        // remove click
         Wu.DomEvent.on(removeBtn, 'click', function () {
             this._removeCubesetItem(dataset);
+        }, this);
+
+        // change date click
+        Wu.DomEvent.on(dataset_time, 'dblclick', function () {
+            console.log('edit time!');
         }, this);
 
     },
@@ -1401,15 +1404,29 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         }.bind(this), 100);
     },
 
+    parse_date_YYYY_DDD : function (f) {
+        // f is eg. "SCF_MOD_2014_002.tif"
+        var a = f.split('.');
+        var b = a[0].split('_');
+        var year = b[2];
+        var day = b[3];
+        var yd = year + '-' + day;
+        var date = moment(yd, "YYYY-DDDD");
+        var dateString = date.format();
+        if (date.isValid()) return dateString;
+        return false;
+    },
+
     _addCubesetItemByUuid : function (fileUuid) {
 
         var file = app.Account.getFile(fileUuid);
+        var date = this.parse_date_YYYY_DDD(file.getTitle());
 
         var dataset = {
             uuid : file.getUuid(),
             meta : {
-                text : 'Filename : ' + file.getTitle(),
-                date : file.getCreated()
+                text : file.getTitle(),
+                date : date || file.getCreated()
             }
         }
 
