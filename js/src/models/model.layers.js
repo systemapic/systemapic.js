@@ -287,13 +287,14 @@ Wu.Model.Layer = Wu.Model.extend({
 
     setTitle : function (title) {
 
+        // save title
         this.store.title = title;
         this.save('title');
 
+        // set on legend
         this.setLegendsTitle(title);
 
         // fire layer edited
-        // todo: set this to all updated, and remove fn's like setLegendsTitle
         Wu.Mixin.Events.fire('layerEdited', {detail : {
                 layer: this
         }});
@@ -354,11 +355,13 @@ Wu.Model.Layer = Wu.Model.extend({
     },
 
     setCartoid : function (cartoid) {
+        console.error('deprecated??');
         this.store.data.cartoid = cartoid;
         this.save('data');
     },
 
     getCartoid : function () {
+        console.error('deprecated??');
         if (this.store.data) return this.store.data.cartoid;
     },
 
@@ -368,12 +371,12 @@ Wu.Model.Layer = Wu.Model.extend({
 
     // set postgis styling 
     setLayerStyle : function (options, callback) {
-
+        console.error('deprecated??');
     },
 
     // set json representation of style in editor (for easy conversion)
     setEditorStyle : function (options, callback) {
-
+        console.error('deprecated??');
     },
 
     getEditorStyle : function () {
@@ -404,6 +407,7 @@ Wu.Model.Layer = Wu.Model.extend({
     },
 
     setCartoCSS : function (json, callback) {
+        console.error('deprecated??');
 
         // send to server
         app.api.setCartocss(json, callback.bind(this));
@@ -413,6 +417,7 @@ Wu.Model.Layer = Wu.Model.extend({
     },
 
     getCartoCSS : function (cartoid, callback) {
+        console.error('deprecated??');
 
         var json = {
             cartoid : cartoid
@@ -467,17 +472,14 @@ Wu.Model.Layer = Wu.Model.extend({
     getStyleJSON : function () {
         return this.getStyling();
     },
+    setStyleJSON : function (styleJSON) {
+        return this.setStyling(styleJSON);
+    },
 
     // todo: remove
     getStyling : function () {
         var json = this.store.style;
-        if (!json) return false;
-        var styleJSON = Wu.parse(json);
-        return styleJSON;
-    },
-
-    setStyleJSON : function (styleJSON) {
-        return this.setStyling(styleJSON);
+        return Wu.parse(json);
     },
     // todo: remove
     setStyling : function (styleJSON) {
@@ -485,6 +487,7 @@ Wu.Model.Layer = Wu.Model.extend({
         this.save('style');
     },
     
+    setStyle : function () {},
 
     getLegends : function () {
         var meta = this.store.legends;
@@ -513,9 +516,6 @@ Wu.Model.Layer = Wu.Model.extend({
         this.setLegends(legends);
     },
 
-    setStyle : function () {
-
-    },
 
     createLegends : function (callback) {
         var layerID = this._getLayerUuid();
@@ -527,6 +527,7 @@ Wu.Model.Layer = Wu.Model.extend({
             accessToken : accessToken
         };
 
+        // create legends on server
         app.api.createLegends(options, callback)
     },
 
@@ -543,6 +544,7 @@ Wu.Model.Layer = Wu.Model.extend({
             cartoid : this.getCartoid()
         });
 
+        // get from server
         app.api.getfeaturesvalues(json, callback.bind(ctx))
     },
 
@@ -897,6 +899,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             cube_id : this.getCubeId(),
             style : style
         }
+
+        // update cube on server
         app.api.updateCube(options, function (err, cubeJSON) {
             if (err) return console.error('Error updating Cube Style:', err, cubeJSON);
 
@@ -932,8 +936,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // TODO: add to queue etc. with websocket implementation
     },
-
-  
 });
 
 
@@ -990,11 +992,14 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         callback && callback();
     },
 
-    setStyle : function (postgis) {
-        if (!postgis) return console.error('no styloe to set!');
-        
-        this.store.data.postgis = postgis;
+    setData : function (data) {
+        if (!data) return console.error('no styloe to set!');
+        this.store.data.postgis = data;
         this.save('data');
+    },
+    setStyle : function (data) {
+        console.error('deprecated??');
+        return this.setData(data);
     },
 
     // on change in style editor, etc.
@@ -1004,7 +1009,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         var postgisOptions = style.options;
 
         // save 
-        this.setStyle(postgisOptions);
+        this.setData(postgisOptions);
 
         // update layer option
         this._refreshLayer(layerUuid);
@@ -1045,7 +1050,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     },
 
     _prepareRaster : function () {
-
         var fileUuid = this._fileUuid;
         var subdomains = app.options.servers.tiles.subdomains;
         var access_token = '?access_token=' + app.tokens.access_token;
@@ -1118,9 +1122,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         app.api.dbFetch(options, callback.bind(this));
     },
 
-    _gridOnMousedown : function(e) {
-        
-    },
+    _gridOnMousedown : function(e) {},
 
     _gridOnMouseup : function (e) {
         if (!e.data) return;
@@ -1305,6 +1307,10 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
         return meta;
     },
 
+    getData : function () {
+        return this.store.data.postgis;
+    },
+
     getFileMeta : function () {
         var file = app.Account.getFile(this.store.file);
         var metajson = file.store.data.raster.metadata;
@@ -1374,6 +1380,38 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 
     isRaster : function () {
         return true;
+    },
+
+    setData : function (data) {
+        if (!data) return console.error('no styloe to set!');
+        this.store.data.postgis = data;
+        this.save('data');
+    },
+    setStyle : function (data) {
+        console.error('deprecated??');
+        return this.setData(data);
+    },
+
+    // on change in style editor, etc.
+    updateStyle : function (style) {
+
+        var layerUuid = style.layerUuid;
+        var postgisOptions = style.options;
+
+        // save 
+        this.setData(postgisOptions);
+
+        // update layer option
+        this._refreshLayer(layerUuid);
+    },
+
+    _refreshLayer : function (layerUuid) {
+
+        this.layer.setOptions({
+            layerUuid : layerUuid
+        });
+
+        this.layer.redraw();
     },
 
 });

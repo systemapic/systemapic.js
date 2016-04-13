@@ -229,7 +229,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-
 	// Save template error message
 	_templateSaveError : function (message) {
 		this._templateSaverError.innerHTML = message;
@@ -245,14 +244,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.saveStyleTemplate(name);
 	},
 
-	// *************************************************************** //
-	// * TEMPLATES TEMPLATES TEMPLATES TEMPLATES TEMPLATES TEMPLATES * // 
-	// *************************************************************** //
-
 	_initTemplates : function () {	
 
+		// refresh
 		this._refreshTemplates();
 
+		// if no templates, return
 		if ( this.templates.length < 1 ) return;
 
 		// create dropdown
@@ -268,6 +265,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// fill select options
 		this.templates.forEach(function (template) {
 
+			// create option
 			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
 			option.value = template.uuid;
 			option.innerHTML = template.name;
@@ -359,22 +357,56 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// Update style
 	_updateStyle : function (newLegend) {
 		if (this._layer.isCube()) return this._updateCube();
-		if (this._layer.isVector()) return this._updateVector();
+		if (this._layer.isVector()) return this._updateVector(newLegend);
 		if (this._layer.isRaster()) return this._updateRaster();
 		console.error('invalid data type');
 	},
 
 	_updateRaster : function () {
-		console.log('TODO!');
 
-		// create cartocss
-		// get styleJSON
+		// get vars
+		var layer = this._layer;
+		var file_id = layer.getFileUuid();
+		var sql = '(SELECT * FROM ' + file_id + ') as sub';	
 
-		// save to pile layer (ie. create new pile layer and update wu layer with it)
-		// save styleJSON to wu layer
+		// get stops
+		var stops = this._rasterStyler.stops;
+
+		// convert stops to css
+		var styleCSS = this._stops2cartocss(stops);
+
+		// get layer.store.data
+		var layerData = layer.getData();
+		
+		// set new cartocss
+		layerData.cartocss = styleCSS;
+
+		// remove old layer_id
+		delete layerData.layer_id; 
+
+		// create layer on server
+		app.api.createTileLayer(layerData, function (err, newLayerJSON) {
+			if (err) return app.feedback.setError({
+				title : 'Something went wrong',
+				description : err
+			});
+
+			// new layer
+			var newLayerStyle = Wu.parse(newLayerJSON);
+
+			// catch errors
+			if (newLayerStyle.error) return console.error(newLayerStyle.error);
+
+			// update layer with new store.data
+			layer.updateStyle(newLayerStyle);
+
+			// save styleJSON to layer.style
+			layer.setStyling(stops);
+
+		}.bind(this));
 	},
 
-	_updateVector : function () {
+	_updateVector : function (newLegend) {
 
 		// Update point
 		this._pointStyler.setCarto(this._carto.point);
@@ -399,10 +431,23 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// todo: is this needed?
 		this.type = 'cube';
+		// todo: is this needed?
 		this._rasterStyler.setCarto(this._rasterStyler.stops);
 
 		// get stops
 		var stops = this._rasterStyler.stops;
+
+		// convert stops to css
+		var styleCSS = this._stops2cartocss(stops);
+
+		// update pile layer
+		this._layer.updateStyle(styleCSS);
+
+		// save styleJSON to wu layer
+		this._layer.setStyling(stops); // will be stringified in setStyling fn, 
+	},
+
+	_stops2cartocss : function (stops) {
 
 		// ensure opacity is a number between 0 and 1 (todo: rewrite)
 		if ( !stops[0].opacity && _.isNaN(stops[0].opacity)) stops[0].opacity = 1;
@@ -421,18 +466,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			'raster-colorizer-default-color: transparent;' +
 			'raster-comp-op: color-dodge;' +
 			'raster-colorizer-stops:' +
-			'stop(' + (stops[0].val-1) + ', rgba(0,0,0,0))' + 
+			'stop(' + (parseInt(stops[0].val)-1) + ', rgba(0,0,0,0))' + 
 			'stop(' + stops[0].val + ', ' + RGBA_one + ')' + 
 			'stop(' + stops[1].val + ', ' + RGBA_two + ')' +
+			'stop(' + (parseInt(stops[1].val)+1) + ', rgba(0,0,0,0))' + 
 			'stop(255, rgba(0,0,0,0), exact);' +
 			'}';
 
-		// update pile layer
-		this._layer.updateStyle(styleCSS);
-
-		// save styleJSON to wu layer
-		this._layer.setStyling(stops); // will be stringified in setStyling fn, 
-
+		return styleCSS;
 	},
 
 	_refresh : function () {
