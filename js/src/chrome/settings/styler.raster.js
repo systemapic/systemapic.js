@@ -1,8 +1,9 @@
 Wu.RasterStyler = Wu.Class.extend({
 
-	type : 'cube',
-	rangeMin : 0,
-	rangeMax : 255,
+	type       : 'cube',
+	rangeMin   : 0,
+	rangeMax   : 255,
+	pixelWidth : 369,
 
 	initialize : function (options) {
 
@@ -11,7 +12,7 @@ Wu.RasterStyler = Wu.Class.extend({
 		var defaultStops = [
 			{ 	val : 80,  
 				col : {
-					r : 255,
+					r : 0,
 					g : 0,
 					b : 255,
 					a : 1
@@ -100,7 +101,9 @@ Wu.RasterStyler = Wu.Class.extend({
 		Wu.DomEvent.on(this.slider.target, 'dblclick', this.rangeClick, this);
 
 
-		// Color selectors, etc
+		// EACH COLOR
+		// EACH COLOR
+		// EACH COLOR
 
 		this.stops.forEach(function (stop, i) { 
 
@@ -164,9 +167,6 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		}.bind(this));
 
-		// Store width of slider
-		this.pixelWidth = this._rangeMarks.offsetWidth;
-
 		// Set poision of color selectors, ranges, etc
 		this.setSliderPosition();
 
@@ -177,27 +177,184 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	_renderStopList : function () {
 
-		console.log('_renderStopList');
-		console.log('this._stopListContainer', this._stopListContainer);
+		// return;
 
 		this._stopListContainer.innerHTML = '';
+		var tabIndex = 1;
 
-		this.stops.forEach(function (stop) {
+		// CREATE DESCRIPTION LINE
 
-			console.log('stop', stop);
+		// LINE
+		var line = Wu.DomUtil.create('div', 'stop-list-each', this._stopListContainer);
 
+		// NUMBER
+		var noWrap  = Wu.DomUtil.create('div', 'stop-list-no stop-list-item', line);
+		var noTitle = Wu.DomUtil.create('div', 'stop-list-no-title', noWrap, '#');
+
+		// VALUE
+		var valWrap  = Wu.DomUtil.create('div',   'stop-list-val stop-list-item', line);
+		var valInput = Wu.DomUtil.create('div', 'stop-list-title', valWrap, 'Value');
+
+		// COLORS
+		var colWrap = Wu.DomUtil.create('div', 'stop-list-color-wrapper stop-list-item', line);
+		
+		var rInput  = Wu.DomUtil.create('div', 'stop-color', colWrap, 'Red');						
+		var gInput  = Wu.DomUtil.create('div', 'stop-color', colWrap, 'Green');
+		var bInput  = Wu.DomUtil.create('div', 'stop-color', colWrap, 'Blue');
+
+		// ALPHA
+		var alphaWrap = Wu.DomUtil.create('div', 'stop-list-alpha-wrapper stop-list-item', line);			
+		var aInput  = Wu.DomUtil.create('div', 'stop-color', alphaWrap, 'Opacity');
+
+		// COLOR
+		var colorWrap = Wu.DomUtil.create('div', 'stop-list-color-ball-wrapper', line);
+		var color = Wu.DomUtil.create('div', 'stop-list-color-ball', colorWrap);
+		    // color.setAttribute('style', 'background:' + Wu.Tools.rgbaStyleStr(stop.col));
+
+
+
+		// Allow user to remove color if it's more than three...
+		if ( this.stops.length >= 3 ) var allowKilling = true;
+
+		// POPULATE
+		this.stops.forEach(function (stop, i) {
+		
+			var v = stop.val ? stop.val : '0';
+			var r = stop.col.r ? stop.col.r : '0';
+			var g = stop.col.g ? stop.col.g : '0';
+			var b = stop.col.b ? stop.col.b : '0';
+			var a = stop.col.a ? stop.col.a : '0';
+
+			// LINE
 			var line = Wu.DomUtil.create('div', 'stop-list-each', this._stopListContainer);
-			var val  = Wu.DomUtil.create('div', 'stop-list-val stop-list-item', line, stop.val);
-			var colWrap = Wu.DomUtil.create('div', 'stop-list-color-wrapper', line);
-			var r = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.r);
-			var g = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.g);
-			var b = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.b);
-			var a = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.a);
+
+			// NUMBER
+			var noWrap  = Wu.DomUtil.create('div', 'stop-list-no stop-list-item', line);
+			var noTitle = Wu.DomUtil.create('div', 'stop-list-no-title', noWrap, '<b>' + (i+1) + '</b>');
+
+			// VALUE
+			var valWrap  = Wu.DomUtil.create('div',   'stop-list-val stop-list-item', line);
+			var valInput = Wu.DomUtil.create('input', 'stop-list-title', valWrap, v);
+			valInput.value = v;
+			valInput.setAttribute('no', i);
+			valInput.setAttribute('type', 'v');
+			valInput.setAttribute('tabindex', tabIndex++);
+
+			// COLORS
+			var colWrap = Wu.DomUtil.create('div', 'stop-list-color-wrapper stop-list-item', line);
 			
+			var rInput  = Wu.DomUtil.create('input', 'stop-color', colWrap, r);
+			rInput.value = r;
+			rInput.setAttribute('no', i);
+			rInput.setAttribute('type', 'r');
+			rInput.setAttribute('tabindex', tabIndex++);
+						
+			var gInput  = Wu.DomUtil.create('input', 'stop-color', colWrap, g);
+			gInput.value = g;
+			gInput.setAttribute('no', i);
+			gInput.setAttribute('type', 'g');
+			gInput.setAttribute('tabindex', tabIndex++);
+
+			var bInput  = Wu.DomUtil.create('input', 'stop-color', colWrap, b);
+			bInput.value = b;
+			bInput.setAttribute('no', i);
+			bInput.setAttribute('type', 'b');
+			bInput.setAttribute('tabindex', tabIndex++);
+			
+			// ALPHA
+			var alphaWrap = Wu.DomUtil.create('div', 'stop-list-alpha-wrapper stop-list-item', line);			
+			var aInput  = Wu.DomUtil.create('input', 'stop-color', alphaWrap, a);
+			aInput.value = a;
+			aInput.setAttribute('no', i);
+			aInput.setAttribute('type', 'a');
+			aInput.setAttribute('tabindex', tabIndex++);
+
+
+			// COLOR
+			var colorWrap = Wu.DomUtil.create('div', 'stop-list-color-ball-wrapper', line);
+			var color = Wu.DomUtil.create('div', 'stop-list-color-ball', colorWrap);
+			    color.setAttribute('style', 'background:' + Wu.Tools.rgbaStyleStr(stop.col));
+			
+
+			// Validate (force numerice)
+			valInput.onkeypress = Wu.Tools.forceNumeric;
+			rInput.onkeypress = Wu.Tools.forceNumeric;
+			gInput.onkeypress = Wu.Tools.forceNumeric;
+			bInput.onkeypress = Wu.Tools.forceNumeric;
+			aInput.onkeypress = Wu.Tools.forceNumeric;
+
+			// Update
+			Wu.DomEvent.on(valInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(rInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(gInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(bInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(aInput, 'blur', this.rasterInputChange, this);
+
+
+			if ( allowKilling ) {
+				
+				var icon = '<i class="fa fa-minus-circle" no="' + i + '"></i>';
+				var killButton = Wu.DomUtil.create('div', 'stop-list-kill-color target-remove', line, icon);
+				    killButton.setAttribute('no', i);
+				
+				Wu.DomEvent.on(killButton, 'click', this.killStop, this);
+
+			}
+
 		}.bind(this));
 
 	},
 
+	killStop : function (e) {
+
+		var no = e.target.getAttribute('no');
+		this.removeStop(no);
+
+	},
+
+	rasterInputChange : function (e) {
+
+		var no = e.target.getAttribute('no');
+		var type = e.target.getAttribute('type');
+		var val  = e.target.value;
+
+		// Make sure value is not more or less than maximum allowed
+		if ( type == 'v' ) {
+			if ( val < this.rangeMin ) val = this.rangeMin;
+			if ( val > this.rangeMax ) val = this.rangeMax;
+
+			// Update Object
+			this.stops[no].val = val;
+		}
+
+		// Force RGB values to be between 255 and 0
+		if ( type == 'r' || type == 'g' || type == 'b' ) {
+			if ( val < 0 )   val = 0;
+			if ( val > 255 ) val = 255;
+
+			// Update Object
+			this.stops[no].col[type] = val;
+
+		}
+
+		// Force ALPHA to be between 0 and 1
+		if ( type == 'a' ) {
+			if ( val < 0 ) val = 0;
+			if ( val > 1 ) val = 1;
+
+			// Update Object
+			this.stops[no].col[type] = val;			
+		}		
+
+		// Rewrite input with new value
+		e.target.value = val;
+
+
+		this._renderSlider();
+			
+
+
+	},
 
 	_updateColor : function (col, key, wrapper) {
 
@@ -218,11 +375,11 @@ Wu.RasterStyler = Wu.Class.extend({
 		var handleClick = false;
 		target.classList.forEach(function (c) { if ( c == 'noUi-handle' ) handleClick = true; });
 
-		handleClick ? this.removeStop(e) : this.addStop(e);
+		handleClick ? this.removeStopClick(e) : this.addStop(e);
 
 	},
 
-	removeStop : function (e) {
+	removeStopClick : function (e) {
 
 		// This is a bit hacky, but what we're doing is to fetch
 		// the latest "hoverValue", which is the position of the mouse.
@@ -238,26 +395,35 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		if ( stop === false ) return;
 
+		this.removeStop(stop);
+
+
+	},
+
+	removeStop : function (no) {
+
+		// Do not allow less than two stops
+		if ( this.stops.length <= 2 ) return;
 
 		// REMOVE FROM DOM
-		this.stops[stop].DOM.wrapper.remove();
-		this.stops[stop].DOM.wrapper = null;
+		this.stops[no].DOM.wrapper.remove();
+		this.stops[no].DOM.wrapper = null;
 		
-		this.stops[stop].DOM.container.remove();
-		this.stops[stop].DOM.container = null;	
+		this.stops[no].DOM.container.remove();
+		this.stops[no].DOM.container = null;	
 		
-		this.stops[stop].DOM.range.remove();
-		this.stops[stop].DOM.range = null;
+		this.stops[no].DOM.range.remove();
+		this.stops[no].DOM.range = null;
 		
-		this.stops[stop].DOM.colorBall.color.remove();
-		this.stops[stop].DOM.colorBall.color = null;
+		this.stops[no].DOM.colorBall.color.remove();
+		this.stops[no].DOM.colorBall.color = null;
 		
-		this.stops[stop].DOM.colorBall = null;
+		this.stops[no].DOM.colorBall = null;
 
-		this.stops[stop].DOM = null;
+		this.stops[no].DOM = null;
 
 		// Remove from Array
-		this.stops.splice(stop, 1);
+		this.stops.splice(no, 1);
 
 		// Redraw slider
 		this._renderSlider();
@@ -345,7 +511,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		}.bind(this));
 
-		this.setSliderColor();
+		this.setSliderColor();		
 
 	},
 
@@ -391,6 +557,9 @@ Wu.RasterStyler = Wu.Class.extend({
 			stop.DOM.number.innerHTML = stop.val;
 
 		}.bind(this));
+
+
+		this._renderStopList();
 		
 	},
 

@@ -2378,6 +2378,7 @@ input.chrome-field-input {
     position: relative;
 
     margin-top: 20px;
+    margin-bottom: 100px;
 }
 
 .raster-range-marks {
@@ -2589,5 +2590,85 @@ input.chrome-field-input {
 
 .raster-stop-list-container {
     position: relative;
-    top: 60px;    
+    margin-top: 60px;
+    text-align: center;
+}
+
+
+.stop-list-each {
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.stop-list-item,
+.stop-list-color-ball-wrapper {
+    display: inline-block;
+    vertical-align: top;
+}
+
+
+.stop-list-no {
+    width: 26px;
+    border-right: 1px solid #c8c8c8;
+    margin-right: 6px;
+    text-align: center;
+    padding-right: 6px;
+}
+
+.stop-list-no-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.stop-list-val,
+.stop-list-color-wrapper,
+.stop-list-alpha-wrapper {
+    padding-right: 6px;
+    margin-right: 6px;
+    border-right: 1px solid #c8c8c8;
+}
+
+
+.stop-list-title,
+.stop-color {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    /*width: 50px;*/
+    width: 45px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.stop-list-kill-color {
+    left: auto;
+    right: -22px;
+    top: 0px;
+    font-size: 14px; 
+    opacity: 0;   
+}
+
+.stop-list-each:hover > .stop-list-kill-color {
+    opacity: 1;
+}
+
+input.stop-list-title,
+input.stop-color {
+    background: #EEE;
+}
+
+
+
+.stop-list-color-ball {
+    width: 22px;
+    height: 19px;
+    left: 4px;
+    position: relative;
+    border-radius: 2px;
 }

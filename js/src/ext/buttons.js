@@ -55,7 +55,7 @@ Wu.button = Wu.Class.extend({
 		}.bind(this), this);
 
 		// Force numeric
-		miniInputMax.onkeypress = this.forceNumeric;
+		miniInputMax.onkeypress = Wu.Tools.forceNumeric;
 		
 		// remember
 		this.max = miniInputMax;
@@ -76,7 +76,7 @@ Wu.button = Wu.Class.extend({
 		}.bind(this), this);
 
 		// Force numeric
-		miniInputMin.onkeypress = this.forceNumeric;
+		miniInputMin.onkeypress = Wu.Tools.forceNumeric;
 
 		// remember
 		this.min = miniInputMin;
@@ -478,7 +478,7 @@ Wu.button = Wu.Class.extend({
 		// Wu.DomEvent.on(input, 'blur', fn);
 
 		// Force numeric
-		if ( !allowText ) input.onkeypress = this.forceNumeric;
+		if ( !allowText ) input.onkeypress = Wu.Tools.forceNumeric;
 
 		Wu.DomEvent.on(input, 'blur', this.blurInput, this);
 
@@ -534,7 +534,7 @@ Wu.button = Wu.Class.extend({
 		Wu.DomEvent.on(miniInput, 'blur', fn);
 
 		// Force numeric
-		if ( !allowText ) miniInput.onkeypress = this.forceNumeric;		    
+		if ( !allowText ) miniInput.onkeypress = Wu.Tools.forceNumeric;		    
 
 	},
 

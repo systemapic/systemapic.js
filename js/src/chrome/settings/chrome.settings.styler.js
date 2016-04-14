@@ -471,9 +471,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		}.bind(this));
 
-		styleCSS += 'stop(' + parseInt(stops[stops.length-1].val) + ', rgba(0,0,0,0))' + 
-			    'stop(255, rgba(0,0,0,0), exact);' +
-			    '}';
+		var lastStop = (parseInt(stops[stops.length-1].val)+1);
+		if ( lastStop < 255 ) styleCSS += 'stop(' + lastStop + ', rgba(0,0,0,0))';
+		styleCSS += 'stop(255, rgba(0,0,0,0), exact);}';
+
+
+		console.log(styleCSS);
 
 		return styleCSS;
 	},

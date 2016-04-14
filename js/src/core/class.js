@@ -2430,6 +2430,9 @@ Wu.Tools = {
 			var a_range = Math.abs(RGB1.a - RGB2.a);
 			var a_diff = a_range * percent;
 			var a_new = RGB1.a < RGB2.a ? RGB1.a + a_diff : RGB1.a - a_diff;
+
+			a_new = Math.ceil(a_new * 100)/100;
+
 		} else {
 			var a_new = 1
 		}
@@ -2494,6 +2497,10 @@ Wu.Tools = {
 		}
 	},
 
+	forceNumeric : function (e) {		
+		// only allow '0-9' + '.' and '-'
+		return e.charCode >= 45 && e.charCode <= 57 && e.charCode != 47;
+	},	
 
 };
 
