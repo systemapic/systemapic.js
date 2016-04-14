@@ -1908,7 +1908,9 @@ input.target-input.polygon {
     margin-top: 10px;
 }
 
-
+.data-list-line:hover {
+    background: rgba(220, 220, 220, 0.33);
+}
 
 
 

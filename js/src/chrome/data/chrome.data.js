@@ -1375,12 +1375,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var removeBtn = Wu.DomUtil.create('div', 'cubeset-remove-btn', wrap, '<i class="fa fa-trash-o"></i>');
 
         // remove click
-        Wu.DomEvent.on(removeBtn, 'click', function () {
+        Wu.DomEvent.on(removeBtn, 'click', function () {        // todo: mem leaks if not removed
             this._removeCubesetItem(dataset);
         }, this);
 
         // change date click
-        Wu.DomEvent.on(dataset_time, 'dblclick', function () {
+        Wu.DomEvent.on(dataset_time, 'dblclick', function () {  // todo: mem leaks if not removed
 
             this._addDatePicker({
                 dataset : dataset,
