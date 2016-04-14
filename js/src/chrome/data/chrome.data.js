@@ -1013,7 +1013,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         .classed('file-popup-trigger add-layer', true)
         .html('<i class="fa fa-plus-square add-trigger"></i>Add layer');
 
-
         // Update
         addTrigger
         .classed('active', function (d) {
@@ -1024,7 +1023,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         .on('click', function (file) {
             file._createLayer(app.activeProject);
         }.bind(this));
-
 
         // Exit
         addTrigger
@@ -1401,8 +1399,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var div = options.div;
         var container = options.container;
         var layer = options.layer;
-
-        console.log('currentDate', currentDate);
 
         // clear old
         if (this._datePicker) {
@@ -3116,34 +3112,35 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         if ( type != 'postgis' && type != 'cube') return;
 
         // Bind
-        var popupTrigger =
-                parent
-                .selectAll('.file-popup-trigger')
-                .data(function(d) { return [d] });
+        var popupTrigger = parent
+        .selectAll('.file-popup-trigger')
+        .data(function(d) { 
+            return [d]; 
+        });
 
         // Enter
         popupTrigger
-                .enter()
-                .append('div')
-                .classed('file-popup-trigger', true);
+        .enter()
+        .append('div')
+        .classed('file-popup-trigger fa fa-caret-down', true);
 
         // Update
         popupTrigger
-                .classed('active', function (d) {
-                    var uuid = d.getUuid();
-                    if ( uuid == this.showLayerActionFor ) return true;
-                    return false;
-                }.bind(this))
-                .on('click', function (d) {
-                    var uuid = d.getUuid();
-                    this.enableLayerPopup(uuid)
-                }.bind(this));
+        .classed('active', function (d) {
+            var uuid = d.getUuid();
+            if ( uuid == this.showLayerActionFor ) return true;
+            return false;
+        }.bind(this))
+        .on('click', function (d) {
+            var uuid = d.getUuid();
+            this.enableLayerPopup(uuid)
+        }.bind(this));
 
 
         // Exit
         popupTrigger
-                .exit()
-                .remove();
+        .exit()
+        .remove();
 
 
     },
@@ -3158,30 +3155,29 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     createLayerActionPopUp : function (parent, library) {
 
         // Bind
-        var dataListLineAction =
-                parent
-                        .selectAll('.file-popup')
-                        .data(function(d) { return [d] });
+        var dataListLineAction = parent
+        .selectAll('.file-popup')
+        .data(function(d) { return [d] });
 
         // Enter
         dataListLineAction
-                .enter()
-                .append('div')
-                .classed('file-popup', true);
+        .enter()
+        .append('div')
+        .classed('file-popup', true);
 
 
         // Update
         dataListLineAction
-                .classed('displayNone', function (d) {
-                    var uuid = d.getUuid();
-                    if ( uuid == this.showLayerActionFor ) return false;
-                    return true;
-                }.bind(this));
+        .classed('displayNone', function (d) {
+            var uuid = d.getUuid();
+            if ( uuid == this.showLayerActionFor ) return false;
+            return true;
+        }.bind(this));
 
         // Exit
         dataListLineAction
-                .exit()
-                .remove();
+        .exit()
+        .remove();
 
 
         this.initLayerActions(dataListLineAction, library);
