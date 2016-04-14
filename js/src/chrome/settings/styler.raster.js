@@ -8,8 +8,27 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		this.options = options;
 
+		var defaultStops = [
+			{ 	val : 80,  
+				col : {
+					r : 255,
+					g : 0,
+					b : 255,
+					a : 1
+				}
+			},
+			{ 	val : 180,
+				col : {
+					r : 255,
+					g : 0,
+					b : 0,
+					a : 1
+				}
+			},
+		]
+
 		// get stops
-		this.stops = _.isObject(options.carto) ? options.carto : [{ val : 80,  col : '#FF0000', opacity : 1 },{ val : 180, col : '#00FF00', opacity : 1 }];
+		this.stops = _.isObject(options.carto) ? options.carto : defaultStops;
 
 		// create dom
 		this._initContainer();
@@ -29,9 +48,11 @@ Wu.RasterStyler = Wu.Class.extend({
 		this._rangeMarks = Wu.DomUtil.create('div', 'raster-range-marks', this._wrapper);
 		this._maxMark = Wu.DomUtil.create('div', 'raster-range-max-mark', this._rangeMarks, this.rangeMin.toString());
 		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, this.rangeMax.toString()); // todo: shouldn't be hardcoded
-		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);
-
+		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);		
 		this._rangeWrapper = Wu.DomUtil.create('div', 'raster-color-range-wrapper', this._wrapper);
+
+		this._stopListContainer = Wu.DomUtil.create('div', 'raster-stop-list-container', this._wrapper);
+
 
 		this._renderSlider();
 
@@ -133,26 +154,13 @@ Wu.RasterStyler = Wu.Class.extend({
 				id        : i,
 				fn 	  : this._updateColor.bind(this),
 				right     : false,
-				value     : this.stops[i].col,
+				value     : Wu.Tools.rgbaStyleStr(this.stops[i].col),
 				className : 'raster-color',
-				on        : true
+				on        : true,
+				showAlpha : true,
+				format    : 'rgba'
+
 			});
-
-
-			// console.log('stop.DOM.colorBall',stop.DOM.colorBall);
-
-			// stop.DOM.miniInput = new Wu.button({
-			// 	appendTo    : stop.DOM.container,
-			// 	type        : 'miniInput',
-			// 	id          : 'cube-input-' + i,
-			// 	right 	    : true,
-			// 	isOn        : true,
-			// 	value       : this.stops[i].opacity,
-			// 	className   : 'raster-color-input',
-			// 	placeholder : 1,
-			// 	fn 	    : this._updateOpacity.bind(this)
-			// });
-
 
 		}.bind(this));
 
@@ -163,12 +171,37 @@ Wu.RasterStyler = Wu.Class.extend({
 		this.setSliderPosition();
 
 
-
+		this._renderStopList();
 
 	},
 
-	_updateColor : function (hex, key, wrapper) {
-		this.stops[key].col = hex;
+	_renderStopList : function () {
+
+		console.log('_renderStopList');
+		console.log('this._stopListContainer', this._stopListContainer);
+
+		this._stopListContainer.innerHTML = '';
+
+		this.stops.forEach(function (stop) {
+
+			console.log('stop', stop);
+
+			var line = Wu.DomUtil.create('div', 'stop-list-each', this._stopListContainer);
+			var val  = Wu.DomUtil.create('div', 'stop-list-val stop-list-item', line, stop.val);
+			var colWrap = Wu.DomUtil.create('div', 'stop-list-color-wrapper', line);
+			var r = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.r);
+			var g = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.g);
+			var b = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.b);
+			var a = Wu.DomUtil.create('div', 'stop-list-color-each', colWrap, stop.col.a);
+			
+		}.bind(this));
+
+	},
+
+
+	_updateColor : function (col, key, wrapper) {
+
+		this.stops[key].col = col;
 		this.setSliderColor();
 	},
 
@@ -260,11 +293,11 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		// First stop values
 		var val1 = stop1.val;
-		var col1 = stop1.col;
+		var rgba1 = stop1.col;
 
 		// Second stop values
 		var val2 = stop2.val;
-		var col2 = stop2.col;
+		var rgba2 = stop2.col;
 
 
 		// CALCULATIONS
@@ -282,21 +315,13 @@ Wu.RasterStyler = Wu.Class.extend({
 		// stops are we located at ... [*][.*..][*] = 25%
 		var percent = newValRange/valRange;
 
-		// Get color value for new stop (RGB)
-		var RGB1 = Wu.Tools.hex2RGB(col1);
-		var RGB2 = Wu.Tools.hex2RGB(col2);
-
 		// Mix colors
-		var newRGB = Wu.Tools.mixColors(RGB1, RGB2, percent);
-
-		// Hex value for new stop
-		var newHEX = Wu.Tools.rgb2HEX(newRGB);		
+		var newRGB = Wu.Tools.mixColors(rgba1, rgba2, percent);
 
 		// Data for new stop
 		var newStop = {
 			val : newVal,
-			col : newHEX,
-			opacity : 1
+			col : newRGB
 		}
 
 		// Inject new stop
@@ -315,7 +340,7 @@ Wu.RasterStyler = Wu.Class.extend({
 		this.stops.forEach(function (stop, i) {
 
 			var pixelsFromLeft = Math.round((stop.val / span) * this.pixelWidth);			
-			var style = 'transform: translate(' + pixelsFromLeft + 'px, 0px)'; // TODO: Write more cross browser friendly
+			var style = Wu.Tools.transformTranslate(pixelsFromLeft, 0);			
 			stop.DOM.wrapper.setAttribute('style', style);
 
 		}.bind(this));
@@ -372,12 +397,10 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	getGradient : function (c1, c2) {
 
-		var style = 'background: -webkit-linear-gradient(left, ' + c1 + ' , ' + c2 + ');';
-		style += 'background: -o-linear-gradient(right, ' + c1 + ' , ' + c2 + ');';
-		style += 'background: -moz-linear-gradient(right, ' + c1 + ' , ' + c2 + ');';
-		style += 'background: linear-gradient(to right, ' + c1 + ' , ' + c2 + ');';
-
-		return style;
+		var _c1 = Wu.Tools.rgbaStyleStr(c1);
+		var _c2 = Wu.Tools.rgbaStyleStr(c2);
+		var gradient = Wu.Tools.createGradient(_c1, _c2);
+		return gradient;
 	},
 
 	setCarto : function (carto) {
@@ -385,26 +408,6 @@ Wu.RasterStyler = Wu.Class.extend({
 		console.log('carto', carto);
 		this.options.carto = carto;
 	},	
-
-
-
-
-
-	// _updateOpacity : function (e) {
-	// 	var box = e.target;
-
-	// 	if (box == this.leftMiniInput.input) {
-	// 		this.stops[0].opacity = parseFloat(box.value)
-	// 	}
-		
-	// 	if (box == this.rightMiniInput.input) {
-	// 		this.stops[1].opacity = parseFloat(box.value);
-	// 	}
-
-	// 	// update
-	// 	this.setSliderColor();
-	// },
-
 
 
 

@@ -2376,6 +2376,8 @@ input.chrome-field-input {
     padding-right: 24px;
 
     position: relative;
+
+    margin-top: 20px;
 }
 
 .raster-range-marks {
@@ -2490,7 +2492,12 @@ input.chrome-field-input {
     width: 21px;
     height: 18px;
     left: -10px;
-    top: -6px;    
+    top: -6px;
+}
+
+.raster-styler .noUi-handle{
+    width: 18px;
+    left: -9px;
 }
 
 
@@ -2579,3 +2586,8 @@ input.chrome-field-input {
     cursor: pointer;
 }
 
+
+.raster-stop-list-container {
+    position: relative;
+    top: 60px;    
+}

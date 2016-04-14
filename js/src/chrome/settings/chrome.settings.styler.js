@@ -462,9 +462,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			if ( !stop.opacity && _.isNaN(stop.opacity)) stop.opacity = 1;
 
 			var val = stop.val;
-			var RGB = Wu.Tools.color2RGB(stop.col);
+			var _RGBA = stop.col;
 
-			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + stop.opacity + ')';
+			var rgba = 'rgba(' + _RGBA.r + ',' + _RGBA.g + ',' + _RGBA.b + ',' + _RGBA.a + ')';
 
 			styleCSS += 'stop(' + val + ', ' + rgba + ')';
 

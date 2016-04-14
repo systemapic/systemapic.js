@@ -897,7 +897,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     updateStyle : function (style) {
 
-        console.log('udpateStyle', style);
+        // console.log('udpateStyle', style);
 
         var options = {
             cube_id : this.getCubeId(),

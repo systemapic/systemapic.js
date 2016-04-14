@@ -2445,9 +2445,35 @@ Wu.Tools = {
 
 		return { r : r_new, g : g_new, b : b_new, a : a_new };
 
-	},	
+	},
 
+	rgbStyleStr : function (rgb) {
+		return 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')';
+	},
 
+	rgbaStyleStr : function (rgba) {
+		return 'rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + rgba.a + ')';
+	},
+
+	createGradient : function (c1, c2) {
+		
+		var style = 'background: -webkit-linear-gradient(left, ' + c1 + ' , ' + c2 + ');';
+		style += 'background: -o-linear-gradient(right, ' + c1 + ' , ' + c2 + ');';
+		style += 'background: -moz-linear-gradient(right, ' + c1 + ' , ' + c2 + ');';
+		style += 'background: linear-gradient(to right, ' + c1 + ' , ' + c2 + ');';
+
+		return style;
+	},
+
+	transformTranslate : function (x, y) {
+
+		var str  = '-ms-transform: translate(' + x + 'px,' + y + 'px);';
+		    str += '-webkit-transform: translate(' + x + 'px,' + y + 'px);';
+   		    str += 'transform: translate(' + x + 'px,' + y + 'px);';
+    		
+    		return str;
+
+	},
 
 
 	isElement : function (obj) {

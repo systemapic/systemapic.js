@@ -291,12 +291,28 @@ Wu.button = Wu.Class.extend({
 
 		
 		// var that = this;
-		this.initSpectrum(value, color, key, fn, showAlpha, showInput, format)
+		this.initSpectrum({
+			value     : value, 
+			color     : color, 
+			key       : key, 
+			fn        : fn, 
+			showAlpha : showAlpha, 
+			showInput : showInput, 
+			format    : format
+		})
 
 	},
 
 
-	initSpectrum : function (col, wrapper, key, fn, showAlpha, showInput, format) {
+	initSpectrum : function (options) {
+
+		var col = options.value;
+		var wrapper = options.color;
+		var key = options.key;
+		var fn = options.fn;
+		var showAlpha = options.showAlpha;
+		var showInput = options.showInput;
+		var format = options.format;
 
 		if ( !format ) var format = 'hex';
 
@@ -311,20 +327,17 @@ Wu.button = Wu.Class.extend({
 			containerClassName: 'dark clip',
 			change: function(col) {
 
-				// console.log('hex', hex);
-
 				if ( showAlpha ) {
 
-					var RGBA = {
+					var color = {
 						r : Math.round(col._r),
 						g : Math.round(col._g),
 						b : Math.round(col._b),
 						a : col._a
 					}
 
-					wrapper.style.background = col;
-					fn(RGBA, key, wrapper);
-					// return;
+					var bg = Wu.Tools.rgbaStyleStr(color);
+
 
 				} else {
 
@@ -336,12 +349,13 @@ Wu.button = Wu.Class.extend({
 					if ( g.length == 1 ) g += '0';
 					if ( b.length == 1 ) b += '0';
 
-					hex = '#' + r + g + b;
-
-					wrapper.style.background = col;
-					fn(col, key, wrapper);
+					var color = '#' + r + g + b;
+					var bg = color;
 
 				}
+
+				wrapper.style.background = bg;
+				fn(color, key, wrapper);
 
 			}
 		});
