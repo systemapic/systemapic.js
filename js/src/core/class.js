@@ -2413,7 +2413,61 @@ Wu.Tools = {
 		// Return black if there are no matches
 		// (could return false, but will have to catch that error later)
 		return '#000000';				
+	},
+
+	mixColors : function (RGB1, RGB2, percent) {
+
+		if ( !RGB1 || !RGB2 ) return;
+		if ( !percent ) var percent = 50;
+
+		// Get each color range
+		var r_range = Math.abs(RGB1.r - RGB2.r);
+		var g_range = Math.abs(RGB1.g - RGB2.g);
+		var b_range = Math.abs(RGB1.b - RGB2.b);
+
+		// Calculate alpha
+		if ( RGB1.a && RGB2.a ) {
+			var a_range = Math.abs(RGB1.a - RGB2.a);
+			var a_diff = a_range * percent;
+			var a_new = RGB1.a < RGB2.a ? RGB1.a + a_diff : RGB1.a - a_diff;
+		} else {
+			var a_new = 1
+		}
+
+		// Figure out new color value
+		var r_diff = Math.round(r_range * percent);
+		var g_diff = Math.round(g_range * percent);
+		var b_diff = Math.round(b_range * percent);
+
+		var r_new = RGB1.r < RGB2.r ? RGB1.r + r_diff : RGB1.r - r_diff;
+		var g_new = RGB1.g < RGB2.g ? RGB1.g + g_diff : RGB1.g - g_diff;
+		var b_new = RGB1.b < RGB2.b ? RGB1.b + b_diff : RGB1.b - b_diff;
+
+		return { r : r_new, g : g_new, b : b_new, a : a_new };
+
 	},	
+
+
+
+
+	isElement : function (obj) {
+
+		try {
+			//Using W3 DOM2 (works for FF, Opera and Chrom)
+			return obj instanceof HTMLElement;
+
+		} catch(e) {
+
+			//Browsers not supporting W3 DOM2 don't have HTMLElement and
+			//an exception is thrown and we end up here. Testing some
+			//properties that all elements have. (works on IE7)
+			return (typeof obj==="object") &&
+			(obj.nodeType===1) && (typeof obj.style === "object") &&
+			(typeof obj.ownerDocument ==="object");
+
+		}
+	},
+
 
 };
 

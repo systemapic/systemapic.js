@@ -2379,15 +2379,20 @@ input.chrome-field-input {
 
 .raster-range-marks {
     position: relative;
-    bottom: 6px;
+    bottom: 9px;
     font-size: 12px;
     color: #999;
 }
 
 .raster-range-min-mark {
     position: absolute;
-    right: 0;
+    right: -10px;
     top: 0;
+}
+
+.raster-range-max-mark {
+    position: relative;
+    left: -3px;    
 }
 
 .raster-color-range-wrapper {    
@@ -2395,96 +2400,58 @@ input.chrome-field-input {
     position: relative;
     padding-right: 16px;
     top: -12px;
-    /*z-index: 99;*/
-}
+    }
 
 .raster-color-range {
     position: absolute;
-    height: 100%;
+    height: 11px;
     background-color: red;
-}
+    width: 10px;
+    top: -19px;
+    left: 15px;
+    }
 
 .raster-range-slider .noUi-connect {
     background-color: transparent !important;
-}
+    }
 
-.raster-color-selector {
+.raster-color-selector-wrapper {
     position: absolute;
     bottom: -28px;
-/*    
-    border-radius: 25px;
-    background: red;
-    bottom: -31px;
-    width: 18px;
-    height: 18px;
-    box-shadow: 0 0 0px 2px white inset, 0 0 0px 1px #c8c8c8;*/
-}
-
-.raster-color-selector.left {
-    left: -9px;
-}
-
-.raster-color-selector.right {
-    right: -9px;
-}
+    width: 20px;
+    height: 20px;
+    padding: 0px;
+    text-align: center;
+    width: 30px;
+    left: -15px;
+    }
 
 .raster-color {
     border-radius: 25px;
-    background: red;
     bottom: -31px;
     width: 18px;
     height: 18px;
     box-shadow: 0 0 0px 2px white inset, 0 0 0px 1px #c8c8c8;    
-    }
-
-.raster-color {
     display: block;
     float: none;
     margin: 0;
+    left: auto;
+    right: auto;
+    position: relative !important;
+    margin: auto;
+    top: 5px !important;
     }
-
-.raster-color-selector.left .raster-color {
-    position: absolute;
-    left: 2px;
-    top: -16px;    
-    }
-
-.raster-color-selector.right .raster-color {
-    position: absolute;
-    left: -18px;
-    top: -16px;    
-    }    
-
-
 
 .raster-color-number {
     position: absolute;
-    top: -62px;
+    top: -45px;
     font-size: 12px;
     text-align: center; 
+    width: 100%;
     }
-
-.right .raster-color-number {
-    width: 100px;
-    left: -60px;
-    }
-
-.left .raster-color-number {
-    width: 100px;
-    left: -40px;   
-    }    
-
-
-
-
-
-
 
 .big-graph-outer-container {
     right: 0;
-    /*bottom: 100px*/
-    /*bottom: 65px;*/
-    /*bottom: 52px;*/
     bottom: 35px;
     }
 
@@ -2501,28 +2468,8 @@ input.chrome-field-input {
     padding-left: 50px;
     padding-right: 50px;
     padding-top: 10px;
-    z-index: 10;    
-
-    /*border-top: 1px solid #CFCFCF;*/
+    z-index: 10;
     border-radius: 0px 0px 5px 5px;    
-    }
-
-.big-slider-play-button {
-    /*font-size: 21px;*/
-    /*top: 23px;*/
-    /*left: 17px;*/
-    }
-
-.big-slider-step-forward {
-    /*right: 13px;*/
-    /*font-size: 21px;*/
-    /*top: 23px;    */
-    }
-
-.big-slider-step-backward {
-    /*font-size: 21px;*/
-    /*top: 23px;*/
-    /*right: 30px;*/
     }
 
 .big-slider-outer-container .noUi-horizontal {
@@ -2562,7 +2509,7 @@ input.chrome-field-input {
     margin-left: 10px;
     margin-right: 10px;
     cursor: pointer;
-}
+    }
 
 
 .big-slider-button-container {
@@ -2602,7 +2549,32 @@ input.chrome-field-input {
 
 
 
-.raster-color-selector {
+/*.raster-color-selector {
     padding: 3px;
     background: red;    
+}*/
+
+.add-stop-yo {
+    position: absolute;
+    bottom: -120px;
+    background: #C9C9C9;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;    
+    }
+
+.add-stop-yo:hover {
+    background: #C6C6C6;
 }
+
+
+.add-stop-yo:active {
+    background: #C3C3C3;
+}
+
+.noUi-origin {
+    cursor: pointer;
+}
+

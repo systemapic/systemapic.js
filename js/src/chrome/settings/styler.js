@@ -1138,13 +1138,7 @@ Wu.Styler = Wu.Class.extend({
 		var file_id = layer.getFileUuid();
 		var sql = options.sql;
 		var project = this.options.project;
-		    // layerOptions = layer.store.data.postgis;
 
-		// layerOptions.sql = sql;
-		// layerOptions.css = css;
-		// layerOptions.file_id = file_id;
-
-		// var sql = 'SELECT * FROM ' + file_id;	
 		var sql = '(SELECT * FROM ' + file_id + ') as sub';	
 
 		var layerJSON = {
@@ -1166,12 +1160,11 @@ Wu.Styler = Wu.Class.extend({
 
 		// create layer on server
 		app.api.createTileLayer(layerJSON, function (err, newLayerJSON) {
-			if (err) {
-				return app.feedback.setError({
-					title : 'Something went wrong',
-					description : err
-				});
-			}
+			if (err) return app.feedback.setError({
+				title : 'Something went wrong',
+				description : err
+			});
+			
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 

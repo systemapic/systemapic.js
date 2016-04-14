@@ -273,6 +273,9 @@ Wu.button = Wu.Class.extend({
 		var on          = this.options.isOn;
 		var className   = this.options.className;
 		var value       = this.options.value;
+		var showAlpha   = this.options.showAlpha;
+		var showInput   = this.options.showInput;
+		var format      = this.options.format;
 		var _class 	= 'chrome-color-ball ';
 
 		if ( className ) _class += className;
@@ -288,35 +291,58 @@ Wu.button = Wu.Class.extend({
 
 		
 		// var that = this;
-		this.initSpectrum(value, color, key, fn)
+		this.initSpectrum(value, color, key, fn, showAlpha, showInput, format)
 
 	},
 
 
-	initSpectrum : function (hex, wrapper, key, fn) {
+	initSpectrum : function (col, wrapper, key, fn, showAlpha, showInput, format) {
+
+		if ( !format ) var format = 'hex';
+
 		$(wrapper).spectrum({
-			color: hex,
-			preferredFormat: 'hex',
+			color: col,
+			preferredFormat: format,
 			showInitial: true,
-			showAlpha: false,
+			showInput: showInput,
+			showAlpha: showAlpha,
 			chooseText: 'Choose',
 			cancelText: 'Cancel',
 			containerClassName: 'dark clip',
-			change: function(hex) {
+			change: function(col) {
 
-				var r = Math.round(hex._r).toString(16);
-				var g = Math.round(hex._g).toString(16);
-				var b = Math.round(hex._b).toString(16);
+				// console.log('hex', hex);
 
-				if ( r.length == 1 ) r += '0';
-				if ( g.length == 1 ) g += '0';
-				if ( b.length == 1 ) b += '0';
+				if ( showAlpha ) {
 
-				hex = '#' + r + g + b;
+					var RGBA = {
+						r : Math.round(col._r),
+						g : Math.round(col._g),
+						b : Math.round(col._b),
+						a : col._a
+					}
 
-				wrapper.style.background = hex;
+					wrapper.style.background = col;
+					fn(RGBA, key, wrapper);
+					// return;
 
-				fn(hex, key, wrapper);
+				} else {
+
+					var r = Math.round(col._r).toString(16);
+					var g = Math.round(col._g).toString(16);
+					var b = Math.round(col._b).toString(16);
+
+					if ( r.length == 1 ) r += '0';
+					if ( g.length == 1 ) g += '0';
+					if ( b.length == 1 ) b += '0';
+
+					hex = '#' + r + g + b;
+
+					wrapper.style.background = col;
+					fn(col, key, wrapper);
+
+				}
+
 			}
 		});
 

@@ -1,4 +1,5 @@
-Wu.BigSliderGraph = Wu.Evented.extend({
+Wu.Graph = Wu.Graph || {};
+Wu.Graph.Year = Wu.Evented.extend({
 
 	// ██╗███╗   ██╗██╗████████╗
 	// ██║████╗  ██║██║╚══██╔══╝
