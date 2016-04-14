@@ -1783,7 +1783,7 @@ Wu.ErrorLayer = Wu.Model.Layer.extend({
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
     if (!layer.data) {
-        console.error('ErrorLayer (1):', layer);
+        // console.log('ErrorLayer');
         return new Wu.ErrorLayer();
     }
     // postgis vector
@@ -1817,7 +1817,7 @@ Wu.createLayer = function (layer) {
     // google
     if (layer.data.google) return new Wu.GoogleLayer(layer);
 
-    console.error('ErrorLayer (2):', layer);
+    console.log('ErrorLayer');
     return new Wu.ErrorLayer();
 };
 
