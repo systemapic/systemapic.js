@@ -55,6 +55,7 @@
     padding-bottom: 5px;    
     padding-left: 0;
     width: 443px;
+    border-radius: 4px;
     }
 
 .chrome-data-top-title {
@@ -931,10 +932,10 @@ input.chrome-field-input {
     padding: 10px;
     }
 
-.file-popup-trigger:hover {
+/*.file-popup-trigger:hover {
     text-decoration: underline;    
     }
-
+*/
 .slim-font {
     font-weight: 200;
     }

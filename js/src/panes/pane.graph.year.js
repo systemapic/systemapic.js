@@ -1,13 +1,6 @@
 Wu.Graph = Wu.Graph || {};
 Wu.Graph.Year = Wu.Evented.extend({
 
-	// ██╗███╗   ██╗██╗████████╗
-	// ██║████╗  ██║██║╚══██╔══╝
-	// ██║██╔██╗ ██║██║   ██║   
-	// ██║██║╚██╗██║██║   ██║   
-	// ██║██║ ╚████║██║   ██║   
-	// ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝   
-
 	_initialize : function (options) {
 
 		// Tis is for enabling different kinds of graphs
@@ -39,16 +32,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 		Wu.Mixin.Events.on('setSliderTitle', this.setTitle, this)
 
 	},
-
-
-
-
-	// ██╗     ██╗███████╗████████╗███████╗███╗   ██╗██╗███╗   ██╗ ██████╗ 
-	// ██║     ██║██╔════╝╚══██╔══╝██╔════╝████╗  ██║██║████╗  ██║██╔════╝ 
-	// ██║     ██║███████╗   ██║   █████╗  ██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
-	// ██║     ██║╚════██║   ██║   ██╔══╝  ██║╚██╗██║██║██║╚██╗██║██║   ██║
-	// ███████╗██║███████║   ██║   ███████╗██║ ╚████║██║██║ ╚████║╚██████╔╝
-	// ╚══════╝╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
 	// When slider is sliding
 	sliding : function (e) {
@@ -126,16 +109,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	},
 
-
-
-	// ██████╗ ██████╗ ███████╗██████╗  █████╗ ██████╗ ███████╗    ██████╗  █████╗ ████████╗ █████╗ 
-	// ██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔══██╗██╔════╝    ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗
-	// ██████╔╝██████╔╝█████╗  ██████╔╝███████║██████╔╝█████╗      ██║  ██║███████║   ██║   ███████║
-	// ██╔═══╝ ██╔══██╗██╔══╝  ██╔═══╝ ██╔══██║██╔══██╗██╔══╝      ██║  ██║██╔══██║   ██║   ██╔══██║
-	// ██║     ██║  ██║███████╗██║     ██║  ██║██║  ██║███████╗    ██████╔╝██║  ██║   ██║   ██║  ██║
-	// ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝    ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
-
-
 	renderData : function (allYears) {
 
 		// Array of JSON with all days with every year, one by one
@@ -207,11 +180,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		this.currentYear = this.yearNames[this.yearNames.length-1];
 
-
 		// SAVE THE LAST DAY IN THE TIME LINE
-		// SAVE THE LAST DAY IN THE TIME LINE
-		// SAVE THE LAST DAY IN THE TIME LINE
-		
 		// Get object
 		var lastDay = this.allYears[this.allYears.length-1];
 
@@ -245,10 +214,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 
 		// SAVE THE FIRST DAY IN THE TIME LINE
-		// SAVE THE FIRST DAY IN THE TIME LINE
-		// SAVE THE FIRST DAY IN THE TIME LINE
-
-
 		// Get object
 		var firstDay = this.allYears[0];
 
@@ -291,20 +256,9 @@ Wu.Graph.Year = Wu.Evented.extend({
 	},
 
 
-
-
-	// ██╗███╗   ██╗██╗████████╗     ██████╗ ██████╗  █████╗ ██████╗ ██╗  ██╗
-	// ██║████╗  ██║██║╚══██╔══╝    ██╔════╝ ██╔══██╗██╔══██╗██╔══██╗██║  ██║
-	// ██║██╔██╗ ██║██║   ██║       ██║  ███╗██████╔╝███████║██████╔╝███████║
-	// ██║██║╚██╗██║██║   ██║       ██║   ██║██╔══██╗██╔══██║██╔═══╝ ██╔══██║
-	// ██║██║ ╚████║██║   ██║       ╚██████╔╝██║  ██║██║  ██║██║     ██║  ██║
-	// ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝        ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝
-
 	initGraph : function () {
 
 
-		// AVERAGE DATA FOR ALL YEARS
-		// AVERAGE DATA FOR ALL YEARS
 		// AVERAGE DATA FOR ALL YEARS
 
 		// Prepare DC dimensions
@@ -318,8 +272,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 		var maxDate = xDim.top(1)[0].date;
 
 		// DATA FOR CURRENT YEAR
-		// DATA FOR CURRENT YEAR
-		// DATA FOR CURRENT YEAR
 
 		// Data will get populated in updateGraph()
 		this.graphData = [];
@@ -328,14 +280,10 @@ Wu.Graph.Year = Wu.Evented.extend({
 		this.ndx = crossfilter(this.graphData);
 
 		// LINE DIMENSION
-		// LINE DIMENSION
-
 		// THIS PART CHANGES FOR EVERY MOVE
-
 		var thisXdim = this.ndx.dimension(function(d) { return d.date });
 		var yThisDim = thisXdim.group().reduceSum(function(d) { return d.SCF; });
 
-		// SCATTER DIMENSION
 		// SCATTER DIMENSION
 		var scatterDim = thisXdim.group().reduceSum(function(d) { 
 			return d.SCF
@@ -431,14 +379,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 	},
 
 
-
-	// ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗     ██████╗ ██████╗  █████╗ ██████╗ ██╗  ██╗
-	// ██║   ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝    ██╔════╝ ██╔══██╗██╔══██╗██╔══██╗██║  ██║
-	// ██║   ██║██████╔╝██║  ██║███████║   ██║   █████╗      ██║  ███╗██████╔╝███████║██████╔╝███████║
-	// ██║   ██║██╔═══╝ ██║  ██║██╔══██║   ██║   ██╔══╝      ██║   ██║██╔══██╗██╔══██║██╔═══╝ ██╔══██║
-	// ╚██████╔╝██║     ██████╔╝██║  ██║   ██║   ███████╗    ╚██████╔╝██║  ██║██║  ██║██║     ██║  ██║
-	//  ╚═════╝ ╚═╝     ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝     ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝
-
 	updateGraph : function () {
 
 		// Current year
@@ -478,15 +418,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 		this.currentSCF.innerHTML = 'SCF: ' + scf + '%';
 
 	},
-
-
-	// ██████╗  █████╗ ████████╗ █████╗     ████████╗ ██████╗  ██████╗ ██╗     ███████╗
-	// ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔════╝
-	// ██║  ██║███████║   ██║   ███████║       ██║   ██║   ██║██║   ██║██║     ███████╗
-	// ██║  ██║██╔══██║   ██║   ██╔══██║       ██║   ██║   ██║██║   ██║██║     ╚════██║
-	// ██████╔╝██║  ██║   ██║   ██║  ██║       ██║   ╚██████╔╝╚██████╔╝███████╗███████║
-	// ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝
-
 
 	getMaxSCF : function (days) { 
 

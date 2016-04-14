@@ -1013,7 +1013,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         .classed('file-popup-trigger add-layer', true)
         .html('<i class="fa fa-plus-square add-trigger"></i>Add layer');
 
-
         // Update
         addTrigger
         .classed('active', function (d) {
@@ -1024,7 +1023,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         .on('click', function (file) {
             file._createLayer(app.activeProject);
         }.bind(this));
-
 
         // Exit
         addTrigger
@@ -1305,8 +1303,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             // parse
             var cube = Wu.parse(updatedCube);
 
-
-
             // update Wu.CubeLayer
             var updatedLayer = layer._saveCube(cube);
 
@@ -1359,10 +1355,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var dataset = options.dataset;
         var appendTo = options.appendTo;
         var index = (options.index + 1).toString();
+        var layer = this._fullscreen._layer;
 
         // get meta
         var name = dataset.meta ? dataset.meta.text : 'error';
-        var timestamp = dataset.meta ? dataset.meta.date : 'error';
+        var timestamp = dataset.meta ? moment(dataset.meta.date).format("MMMM Do YYYY") : 'error';
         var uuid = dataset.uuid;
 
         // wrapper
@@ -1377,10 +1374,71 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // buttons
         var removeBtn = Wu.DomUtil.create('div', 'cubeset-remove-btn', wrap, '<i class="fa fa-trash-o"></i>');
 
-        // btn click
-        Wu.DomEvent.on(removeBtn, 'click', function () {
+        // remove click
+        Wu.DomEvent.on(removeBtn, 'click', function () {        // todo: mem leaks if not removed
             this._removeCubesetItem(dataset);
         }, this);
+
+        // change date click
+        Wu.DomEvent.on(dataset_time, 'dblclick', function () {  // todo: mem leaks if not removed
+
+            this._addDatePicker({
+                dataset : dataset,
+                div : dataset_time,
+                layer : layer,
+                container : wrap
+            });
+
+        }, this);
+
+    },
+
+    _addDatePicker : function (options) {
+        var dataset = options.dataset;
+        var currentDate = dataset.meta ? dataset.meta.date : new Date();
+        var div = options.div;
+        var container = options.container;
+        var layer = options.layer;
+
+        // clear old
+        if (this._datePicker) {
+            this._datePicker.destroy();
+            delete this._datePicker;
+        }
+
+        // create date picker
+        var picker = this._datePicker = new Pikaday({
+            firstDay : 1,
+            defaultDate : moment(currentDate).toDate(),
+            setDefaultDate : true,
+            yearRange : 3,
+            onSelect: function(date) {
+
+                // set date to dataset in cube
+                layer.setDatasetDate({
+                    dataset : dataset,
+                    date : date
+                }, function (err, updatedCube) {
+                    if (err) return console.error('Could not set date for dataset!');
+
+                    // update list
+                    var timestamp = moment(date).format("MMMM Do YYYY");
+                    div.innerHTML = timestamp;
+                });
+
+                // destroy
+                picker.destroy();
+
+                // remove close event
+                Wu.DomEvent.off(container, 'click', picker.destroy, picker);
+            }
+        });
+
+        // add to DOM
+        div.parentNode.insertBefore(this._datePicker.el, div.nextSibling);
+
+        // add close event
+        Wu.DomEvent.on(container, 'click', picker.destroy, picker);
 
     },
 
@@ -1401,15 +1459,31 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         }.bind(this), 100);
     },
 
+    parse_date_YYYY_DDD : function (f) {
+        // f is eg. "SCF_MOD_2014_002.tif"
+        var a = f.split('.');
+        var b = a[0].split('_');
+        var year = b[2];
+        var day = b[3];
+        var yd = year + '-' + day;
+        var date = moment(yd, "YYYY-DDDD");
+        var dateString = date.format();
+        if (date.isValid()) return dateString;
+        return false;
+    },
+
     _addCubesetItemByUuid : function (fileUuid) {
 
         var file = app.Account.getFile(fileUuid);
 
+        // get date from filename (todo: make more flexible, with option to choose)
+        var date = this.parse_date_YYYY_DDD(file.getTitle());
+
         var dataset = {
             uuid : file.getUuid(),
             meta : {
-                text : 'Filename : ' + file.getTitle(),
-                date : file.getCreated()
+                text : file.getTitle(),
+                date : date || file.getCreated()
             }
         }
 
@@ -3038,34 +3112,35 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         if ( type != 'postgis' && type != 'cube') return;
 
         // Bind
-        var popupTrigger =
-                parent
-                .selectAll('.file-popup-trigger')
-                .data(function(d) { return [d] });
+        var popupTrigger = parent
+        .selectAll('.file-popup-trigger')
+        .data(function(d) { 
+            return [d]; 
+        });
 
         // Enter
         popupTrigger
-                .enter()
-                .append('div')
-                .classed('file-popup-trigger', true);
+        .enter()
+        .append('div')
+        .classed('file-popup-trigger fa fa-caret-down', true);
 
         // Update
         popupTrigger
-                .classed('active', function (d) {
-                    var uuid = d.getUuid();
-                    if ( uuid == this.showLayerActionFor ) return true;
-                    return false;
-                }.bind(this))
-                .on('click', function (d) {
-                    var uuid = d.getUuid();
-                    this.enableLayerPopup(uuid)
-                }.bind(this));
+        .classed('active', function (d) {
+            var uuid = d.getUuid();
+            if ( uuid == this.showLayerActionFor ) return true;
+            return false;
+        }.bind(this))
+        .on('click', function (d) {
+            var uuid = d.getUuid();
+            this.enableLayerPopup(uuid)
+        }.bind(this));
 
 
         // Exit
         popupTrigger
-                .exit()
-                .remove();
+        .exit()
+        .remove();
 
 
     },
@@ -3080,30 +3155,29 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     createLayerActionPopUp : function (parent, library) {
 
         // Bind
-        var dataListLineAction =
-                parent
-                        .selectAll('.file-popup')
-                        .data(function(d) { return [d] });
+        var dataListLineAction = parent
+        .selectAll('.file-popup')
+        .data(function(d) { return [d] });
 
         // Enter
         dataListLineAction
-                .enter()
-                .append('div')
-                .classed('file-popup', true);
+        .enter()
+        .append('div')
+        .classed('file-popup', true);
 
 
         // Update
         dataListLineAction
-                .classed('displayNone', function (d) {
-                    var uuid = d.getUuid();
-                    if ( uuid == this.showLayerActionFor ) return false;
-                    return true;
-                }.bind(this));
+        .classed('displayNone', function (d) {
+            var uuid = d.getUuid();
+            if ( uuid == this.showLayerActionFor ) return false;
+            return true;
+        }.bind(this));
 
         // Exit
         dataListLineAction
-                .exit()
-                .remove();
+        .exit()
+        .remove();
 
 
         this.initLayerActions(dataListLineAction, library);

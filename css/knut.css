@@ -1796,6 +1796,12 @@ input.target-input.polygon {
 .cubeset-time {
     position: relative;
     left: 20px;
+    cursor: context-menu;
+    max-width: 150px;
+}
+
+.cubeset-time:hover {
+    color: black;
 }
 
 .cubeset-remove-btn {
@@ -1897,9 +1903,14 @@ input.target-input.polygon {
 
 
 
+.pika-single {
+    width: 260px;
+    margin-top: 10px;
+}
 
-
-
+.data-list-line:hover {
+    background: rgba(220, 220, 220, 0.33);
+}
 
 
 
