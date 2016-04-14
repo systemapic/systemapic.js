@@ -1050,7 +1050,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	// turn off a layer from options
-	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
+	_removeItem : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
 		
 		// get layermenuItem
 		var layermenuItem = this.layers[uuid];
@@ -1086,7 +1086,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	_remove : function (uuid) {
 		// find layermenuItem uuid
 		var layermenuItem = this._getLayermenuItem(uuid); // uuid: layer-q2e321-qweeqw-dasdas
-		this.remove(layermenuItem.item.uuid);
+		this._removeItem(layermenuItem.item.uuid);
 	},
 
 	// add from sidepane
@@ -1366,8 +1366,9 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	deleteMenuFolder : function (uuid) {
+		
 		// remove
-		this.remove(uuid); // layerMenuItem-32132-123123-adsdsa-sda
+		this._removeItem(uuid); // layerMenuItem-32132-123123-adsdsa-sda
 
 		// Hides layer button if there are no layers to show
 		app.Chrome.Top._showHideLayerButton();
