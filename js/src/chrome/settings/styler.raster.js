@@ -135,9 +135,23 @@ Wu.RasterStyler = Wu.Class.extend({
 				right     : false,
 				value     : this.stops[i].col,
 				className : 'raster-color',
-				on        : true,
-				showAlpha : false
+				on        : true
 			});
+
+
+			// console.log('stop.DOM.colorBall',stop.DOM.colorBall);
+
+			// stop.DOM.miniInput = new Wu.button({
+			// 	appendTo    : stop.DOM.container,
+			// 	type        : 'miniInput',
+			// 	id          : 'cube-input-' + i,
+			// 	right 	    : true,
+			// 	isOn        : true,
+			// 	value       : this.stops[i].opacity,
+			// 	className   : 'raster-color-input',
+			// 	placeholder : 1,
+			// 	fn 	    : this._updateOpacity.bind(this)
+			// });
 
 
 		}.bind(this));
