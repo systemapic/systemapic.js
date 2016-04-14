@@ -1213,8 +1213,10 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
 
             var data = JSON.parse(json);
 
+            console.log('e:', e);
+
             e.data = data;
-            var event = e.e.originalEvent;
+            var event = e.originalEvent;
             this._event = {
                 x : event.x,
                 y : event.y
