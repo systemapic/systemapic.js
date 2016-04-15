@@ -891,6 +891,29 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         app._map.removeLayer(this.layer);
     },
 
+    remove : function (map) {
+        console.log('cubelayer remove');
+        var map = map || app._map;
+
+        this._layers.forEach(function (layer) {
+            // leaflet fn
+            if (map.hasLayer(layer)) map.removeLayer(layer);
+        });
+
+        // remove from active layers
+        app.MapPane.removeActiveLayer(this);    
+
+        // remove from zIndex
+        this._removeFromZIndex();
+
+        // remove from descriptionControl if avaialbe
+        var descriptionControl = app.MapPane.getControls().description;
+        if ( descriptionControl ) descriptionControl._removeLayer(this);
+
+        this._added = false;
+    },
+
+
     isCube : function () {
         return true;
     },
