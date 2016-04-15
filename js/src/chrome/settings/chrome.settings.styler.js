@@ -447,36 +447,42 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		if ( !stops ) return;
 
-		// set css
-		var styleCSS = 	'#layer {' +
+		var minVal = 0;
+		var maxVal = 255;
+
+		var fistStop = parseInt(stops[0].val);
+		var lastStop = parseInt(stops[stops.length-1].val);
+
+		// Default CSS
+		var styleCSS = '#layer {' +
 			'raster-opacity: 1;' + 
 			'raster-colorizer-default-mode: linear;' + 
 			'raster-colorizer-default-color: transparent;' +
 			'raster-comp-op: color-dodge;' +
-			'raster-colorizer-stops:' +
-			'stop(' + parseInt(stops[0].val) + ', rgba(0,0,0,0))';
+			'raster-colorizer-stops:';
 
+		// If the first stop is not equal to minVal,
+		// create a stop for minVal
+		if ( fistStop != minVal ) {
+			styleCSS += 'stop(' + minVal + ', rgba(0,0,0,0))';
+			styleCSS += 'stop(' + (fistStop-1) + ', rgba(0,0,0,0))';
+		}
 
+		// Create all the stops
 		stops.forEach(function (stop, i) {
-
-			if ( !stop.opacity && _.isNaN(stop.opacity)) stop.opacity = 1;
-
 			var val = stop.val;
 			var _RGBA = stop.col;
-
 			var rgba = 'rgba(' + _RGBA.r + ',' + _RGBA.g + ',' + _RGBA.b + ',' + _RGBA.a + ')';
-
 			styleCSS += 'stop(' + val + ', ' + rgba + ')';
+		}.bind(this));		
 
-
-		}.bind(this));
-
-		var lastStop = (parseInt(stops[stops.length-1].val)+1);
-		if ( lastStop < 255 ) styleCSS += 'stop(' + lastStop + ', rgba(0,0,0,0))';
-		styleCSS += 'stop(255, rgba(0,0,0,0), exact);}';
-
-
-		console.log(styleCSS);
+		// If the last stop is not equal to maxVal,
+		// create a stop for 
+		if ( lastStop != maxVal ) {
+			styleCSS += 'stop(' + (lastStop+1) + ', rgba(0,0,0,0))';
+			styleCSS += 'stop(' + maxVal + ', rgba(0,0,0,0), exact)';
+		}
+		styleCSS += ';}';
 
 		return styleCSS;
 	},
