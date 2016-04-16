@@ -273,6 +273,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
 
+    // need to rewrite this function.
+    //
+    // it's too expensive to rewrite everything for every _refresh(), and _refresh() is being called a LOT.
+    // when changing project, the uploadButton needs to be aware of new project_id, but this can be solved with _onProjectSelected event instead
+    // so no need to recreate upload button
+    // also, no need to flush all files if only a small layer update (like rename)
+    // also, no need to flush all files if only an update on single file
+    // 
+    // basically, the idea of recreating everythign on every change doesn't work when there's a lot of files, it's just too slow
+    // currently every action takes > 2000ms if filelist is >1000 files.
+    //
+    // perhaps better to remove d3 completely, and just create divs normally, then update store the divs in an object on file_id keys
     _refresh : function () {
 
         if (!this._project) return;
