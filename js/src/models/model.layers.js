@@ -294,10 +294,10 @@ Wu.Model.Layer = Wu.Model.extend({
         // set on legend
         this.setLegendsTitle(title);
 
-        // fire layer edited
-        Wu.Mixin.Events.fire('layerEdited', {detail : {
-                layer: this
-        }});
+        // // fire layer edited
+        // Wu.Mixin.Events.fire('layerEdited', {detail : {
+        //         layer: this
+        // }});
 
         return this;
     },
@@ -892,7 +892,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     remove : function (map) {
-        console.log('cubelayer remove');
         var map = map || app._map;
 
         this._layers.forEach(function (layer) {

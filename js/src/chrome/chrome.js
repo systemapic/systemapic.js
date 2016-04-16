@@ -49,6 +49,8 @@ Wu.Chrome = Wu.Class.extend({
 
 	updateMapSize : function () {
 
+		return;
+		
 		var rightChrome = app.Chrome.Right;
 		var leftChrome = app.Chrome.Left;
 		var left = 0;

@@ -65,11 +65,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
     _onLayerDeleted : function () {
-        this._refresh();
+        // this._refresh();
+        this._refreshLayers();
     },
 
     _onLayerEdited : function () {
-        this._refresh();
+        // this._refresh();
+        this._refreshLayers();
     },
 
     _initContainer : function () {
@@ -573,7 +575,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         this.showLayerActionFor = false;
         this.selectedLayers = [];
 
-        this._refreshFiles();
+        // this._refreshFiles(); // see https://github.com/systemapic/systemapic.js/issues/203
         this._refreshLayers();
     },
 
@@ -2511,13 +2513,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     _refreshLayers : function () {
 
-        // FILES
+        // layers
         for (var p in this.layerProviders) {
             var provider = this.layerProviders[p];
             var layers = provider.layers;
             provider.data = _.toArray(layers);
             var D3container = this.layerListContainers[p].D3container;
             var data = this.layerProviders[p].data;
+
+            // redraw layer list
             this.initLayerList(D3container, data, p);
         }
 
@@ -2740,56 +2744,52 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     initLayerList : function (D3container, data, library) {
 
         // BIND
-        var dataListLine =
-                D3container
-                        .selectAll('.data-list-line')
-                        .data(data);
+        var dataListLine = D3container
+        .selectAll('.data-list-line')
+        .data(data);
 
         // ENTER
         dataListLine
-                .enter()
-                .append('div')
-                .classed('data-list-line', true);
+        .enter()
+        .append('div')
+        .classed('data-list-line', true);
 
         // UPDATE
         dataListLine
-                .classed('file-selected', function(d) {
+        .classed('file-selected', function(d) {
 
-                    var uuid = d.getUuid();
+            var uuid = d.getUuid();
 
-                    // If selected with CMD or SHIFT
-                    var index = this.selectedLayers.indexOf(uuid);
-                    if (index > -1) return true;
+            // If selected with CMD or SHIFT
+            var index = this.selectedLayers.indexOf(uuid);
+            if (index > -1) return true;
 
-                    // If selected by single click
-                    if ( uuid == this.showLayerActionFor ) return true;
+            // If selected by single click
+            if ( uuid == this.showLayerActionFor ) return true;
 
-                    // Else no selection
-                    return false;
+            // Else no selection
+            return false;
 
-                }.bind(this))
+        }.bind(this))
 
-                // Add flash to new layer
-                .classed('new-layer-list-item', function (d) {
-                    var uuid = d.getUuid();
-                    if ( this.newLayer == uuid ) {
-                        return true;
-                        this.newLayer = false;
-                    }
-                    return false;
-                }.bind(this))
+        // Add flash to new layer
+        .classed('new-layer-list-item', function (d) {
+            if (this.newLayer ==  d.getUuid()) {
+                return true;
+                this.newLayer = false;
+            }
+            return false;
+        }.bind(this))
 
-                .classed('editingName', function (d) {
-                    var uuid = d.getUuid();
-
-                    return this.editingLayerName == uuid;
-                }.bind(this));
+        .classed('editingName', function (d) {
+            return this.editingLayerName == d.getUuid();
+        }.bind(this));
 
 
         // EXIT
         dataListLine
-                .exit()
-                .remove();
+        .exit()
+        .remove();
 
         // create layermenu toggle 
         this.createLayerToggleSwitch(dataListLine, library);
@@ -3037,65 +3037,59 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var that = this;
 
         // Bind
-        var nameInput =
-                parent
-                        .selectAll('.layer-name-input')
-                        .data(function (d) {
-                            var uuid = d.getUuid();
-                            if ( this.editingLayerName == uuid ) return [d];
-                            return false;
-                        }.bind(this))
+        var nameInput = parent
+        .selectAll('.layer-name-input')
+        .data(function (layer) {
+            if (this.editingLayerName == layer.getUuid()) return [layer];
+            return false;
+        }.bind(this))
 
         // Enter
         nameInput
-                .enter()
-                // .append('textarea')
-                .append('input')
-                .attr('type', 'text')
-                .classed('layer-name-input', true);
+        .enter()
+        .append('input')
+        .attr('type', 'text')
+        .classed('layer-name-input', true);
 
 
         // Update
         nameInput
-                .attr('placeholder', function (d) {
-                    return d.getTitle();
-                })
-                .attr('name', function (d) {
-                    return d.getUuid()
-                })
-                .html(function (d) {
-                    return d.getTitle();
-                })
-                .classed('displayNone', function (d) {
-                    var uuid = d.getUuid();
-                    if ( that.editingLayerName == uuid ) return false;
-                    return true;
-                })
-                .on('blur', function (d) {
-                    var newName = this.value;
-                    that.saveLayerName(newName, d, library);
-                })
-                .on('keydown', function (d) {
-                    var keyPressed = window.event.keyCode;
-                    var newName = this.value;
-                    if ( keyPressed == 13 ) this.blur(); // Save on enter
-                });
+        .attr('placeholder', function (layer) {
+            return layer.getTitle();
+        })
+        .attr('name', function (layer) {
+            return layer.getUuid()
+        })
+        .html(function (layer) {
+            return layer.getTitle();
+        })
+        .classed('displayNone', function (layer) {
+            if (that.editingLayerName == layer.getUuid()) return false;
+            return true;
+        })
+        .on('blur', function (layer) {
+            that.saveLayerTitle(this.value, layer, library);
+        })
+        .on('keydown', function (d) {
+            var keyPressed = window.event.keyCode;
+            if (keyPressed == 13) this.blur(); // blur on enter
+        });
 
-
+        // remove
         nameInput
-                .exit()
-                .remove();
+        .exit()
+        .remove();
 
 
         // Hacky, but works...
         // Select text in input field...
-        if ( nameInput ) {
+        if (nameInput) {
             nameInput.forEach(function(ni) {
-                if ( ni[0] ) {
+                if (ni[0]) {
                     ni[0].select();
                     return;
                 }
-            })
+            });
         }
 
     },
@@ -3342,17 +3336,21 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         this._refreshLayers();
     },
 
-    // Save layer name
-    saveLayerName : function (newName, d, library) {
+    // save layer title
+    saveLayerTitle : function (title, layer, library) {
 
-        if ( !newName || newName == '' ) newName = d.getTitle();
-        d.setTitle(newName);
+        // ensure title
+        title = title || layer.getTitle();
 
+        // set layer title
+        layer.setTitle(title);
+
+        // mark not editing
         this.editingLayerName = false;
 
         // fire layer edited
         Wu.Mixin.Events.fire('layerEdited', {detail : {
-            layer: d
+            layer: layer
         }});
 
     }
