@@ -1,277 +1,295 @@
 Wu.Animator = Wu.Evented.extend({
 
-	options : {
+    options : {
 
-		// Animation frames per second
-		fps : 4,
+        // Animation frames per second
+        fps : 1,
 
-		// Max value for steps on slider
-		maxLength : 365,
+        // Max value for steps on slider
+        maxLength : 365,
 
-		// Defines what kind of graph we want
-		graphType : 'annualCycles'
+        // Defines what kind of graph we want
+        graphType : 'annualCycles'
 
-	},
+    },
 
-	// Set Frames Per Second
-	setFPS : function (fps) {
-		this.options.fps = fps;
-		Wu.Mixin.Events.fire('setFPS', {detail : {
-			fps : fps
-		}});
-	},	
+    _initialize : function (options) {
 
-	// Basic initializer
-	_initialize : function (options) {
-
-		// fetching data is async, so must wait for callback
-		this.initData(function (err) {
-			if (err) return console.error('Wu.Animator init err:', err);
-
-			// hide by default if option set
-			if (this.options.hide) this.hide();
+        // fetching data is async, so must wait for callback
+        this._fetchData(this._renderData.bind(this));
 
-		}.bind(this));
-		
-	},
+        // todo: fetching data should query raster itself. in other words, must be connected to cube layer directly, 
+        //  and fetch data thru it.
 
-	// Initialize data
-	initData : function (done) {
+    },
 
-		// get data from server
-		app.api.getCustomData({
-			name : this.options.data
-		}, function (err, d) {
-			if (err) return done(err);
+    // fetch data from server
+    _fetchData : function (done) { // todo: query raster instead
 
-			// parse
-			var data = Wu.parse(d);
+        // get data from server
+        app.api.getCustomData({
+            name : this.options.data
+        }, done);
 
-			// render
-			this.dataReady(data);
+    },
 
-			// continue initialize
-			done(err);
+    // Callback for when data is ready
+    _renderData : function (err, data) {
+        if (err) return console.error(err);
 
-		}.bind(this));
+        // set data
+        this._data = Wu.parse(data);
 
-	},
+        // create slider
+        this._createSlider();
 
-	// Callback for when data is ready
-	dataReady : function (data) {
+        // add hooks
+        this._addHooks();       
 
-		// Set slider steps
-		this.dataLength = data.length;
-		if ( this.dataLength > this.options.maxLength ) {
-			this.dataLength = this.options.maxLength;
-		}
-
-		// Initialize slider
-		this.initSlider();
+        // create graph
+        this._createGraph();
+     
+    },
 
-		// Set sliding event
-		this.slideEvent();
-
-		// Add hooks
-		this.addHooks();		
+    // Set Frames Per Second
+    setFPS : function (fps) {
 
-		// Create graph
-		this.graph = new Wu.Graph.Year({
-			data     : data,
-			appendTo : this.sliderOuterContainer,
-			type     : this.options.graphType
-		});
-	},
-
+        // set locally
+        this.options.fps = fps;
 
-	initSlider : function () {
-
-		this.sliderOuterContainer = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
-		var sliderInnerContainer = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
-		var slider = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
-		this.sliderButtonsContainer = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
-		this.stepBackward = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
-		this.tapBackward = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
-		this.playButton = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');		
-		this.tapForward = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
-		this.stepForward = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');
-		this.tickContainer = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
-
-		this.slider = noUiSlider.create(slider, {
-			start: [this.currentSliderValue],
-			// limit: this.dataLength,
-			range: {
-				'min': 1,
-				'max': this.dataLength
-			}
-		});
-	},
-
-
-	// Overlaps a tad with "ACTIONS" underneath
-	addHooks : function () {
+        // propagate
+        Wu.Mixin.Events.fire('setFPS', {detail : {
+            fps : fps
+        }});
+    },  
 
-		// dom events
-		Wu.DomEvent.on(this.stepBackward, 'click', this.moveBackward, this);
-		Wu.DomEvent.on(this.tapBackward,  'click', this.stepOneBackward, this);
-		Wu.DomEvent.on(this.stepForward,  'click', this.moveForward, this);
-		Wu.DomEvent.on(this.tapForward,   'click', this.stepOneForward, this);
-		Wu.DomEvent.on(this.playButton,   'click', this.play, this);
-
-		// slider event
-		this.slider.on('slide', _.throttle(function( values, handle ) {
-			this.currentSliderValue = Math.round(values);
-			this.slideEvent();
-		}.bind(this), 100));
-
-		// listen for events
-		Wu.Mixin.Events.on('setSlider', this.setSlider, this);
-		Wu.Mixin.Events.on('updateSliderButtons', this.updateButtons, this);
-	},
+    _createSlider : function () {
 
+        // create divs
+        this.sliderOuterContainer = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
+        var sliderInnerContainer = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
+        var slider = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
+        this.sliderButtonsContainer = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
+        this.stepBackward = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
+        this.tapBackward = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
+        this.playButton = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');        
+        this.tapForward = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
+        this.stepForward = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');
+        this.tickContainer = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
 
-	// When sliding (dragging or clicking)
-	slideEvent : function () {
+        // Set number of slider steps
+        var dataLength = (_.size(this._data) > this.options.maxLength) ? this.options.maxLength : _.size(this._data);
 
-		if ( !this.currentSliderValue ) this.currentSliderValue = 0;
+        // create slider
+        this.slider = noUiSlider.create(slider, {
+            start: [this._sliderValue],
+            range: {
+                'min': 1,
+                'max': dataLength
+            }
+        });
 
-		// fire sliding event
-		Wu.Mixin.Events.fire('animationSlide', { detail : {
-				layer : this._currentLayer,
-				value : this.currentSliderValue
-		}});
-	},	
+        // hide by default if option set
+        if (this.options.hide) this.hide();
+    },
 
+    _createGraph : function () { // todo: should separate these more
 
-	// Enable layer
-	_layerEnabled : function (e) {
-		var layer = e.detail.layer;
-		this._currentLayer = layer;
-		var show = e.detail.showSlider;
+        // create graph
+        this.graph = new Wu.Graph.Year({
+            data     : this._data,
+            appendTo : this.sliderOuterContainer,
+            type     : this.options.graphType
+        });
+    },
 
-		// set title 
-		this.setTitle(layer.getTitle());
 
-		// show
-		if (show) this.show();
-	},
+    _addHooks : function () {
 
+        // dom events
+        Wu.DomEvent.on(this.stepBackward, 'click', this.moveBackward, this);
+        Wu.DomEvent.on(this.tapBackward,  'click', this.stepOneBackward, this);
+        Wu.DomEvent.on(this.stepForward,  'click', this.moveForward, this);
+        Wu.DomEvent.on(this.tapForward,   'click', this.stepOneForward, this);
+        Wu.DomEvent.on(this.playButton,   'click', this.play, this);
 
-	// Disable layer
-	_layerDisabled : function (e) {
-		var layer = e.detail.layer;
-		if (layer.getUuid() == this._currentLayer.getUuid()) {
-				var show = e.detail.showSlider;
-				this.hide();
-		}
-	},
+        // slider event
+        this.slider.on('slide', _.throttle(function(value) {
 
-	// Set slider value
-	setSlider : function (e) {
-		this.currentSliderValue = e.detail.value;
-		this.slider.set([this.currentSliderValue]);
-	},
+            // set current value
+            this._sliderValue = Math.round(value);
 
-	updateButtons : function (e) {
+            // fire slide event
+            this.slideEvent();
 
-		var disableForward  = e.detail.diableForward;
-		var disableBackward = e.detail.diableBackward
+        }.bind(this), 100));
 
-		if ( disableForward ) { 
-			Wu.DomUtil.addClass(this.stepForward, 'disable-button');
-		} else { 
-			Wu.DomUtil.removeClass(this.stepForward, 'disable-button'); 
-		}
+        // listen for events
+        Wu.Mixin.Events.on('setSlider', this.setSlider, this);
+        Wu.Mixin.Events.on('updateSliderButtons', this.updateButtons, this);
+    },
 
-		if ( disableBackward ) { 
-			Wu.DomUtil.addClass(this.stepBackward, 'disable-button');
-		} else { 
-			Wu.DomUtil.removeClass(this.stepBackward, 'disable-button'); 
-		}
 
-	},
+    // When sliding (dragging or clicking)
+    slideEvent : function () {
 
-	// Set title
-	setTitle : function (title) {
-		if (!this._currentLayer) return;
-		Wu.Mixin.Events.fire('setSliderTitle', {detail : {
-			title : title
-		}});
-	},
+    	// ensure slider value
+        if (!this._sliderValue) this._sliderValue = 0;
 
+        // get current date
+        var timestamp = this._getCurrentDate();
 
-	// These are the actions for the play, pause, step forward and backward buttons
-	play : function () {		
-		this.playing ? this.stopPlaying() : this.startPlaying();
-	},
+        // fire sliding event
+        Wu.Mixin.Events.fire('animationSlide', { detail : {
+            layer : this._currentLayer,
+            value : this._sliderValue,
+            timestamp : timestamp
+        }});
+    },  
 
+    // todo: slider should know which date it is without asking graph
+    _getCurrentDate : function () {
+    	var date = this.graph.getCurrentDate();
+    	return date;
+    },
 
-	startPlaying : function () {
+    // Enable layer
+    _layerEnabled : function (e) {
 
-		this.playButton.innerHTML = '<i class="fa fa-pause"></i>';
+    	// get event payload
+        var layer = e.detail.layer;
+        var show = e.detail.showSlider;
 
-		this.playing = true;
+        // set current layer
+        this._currentLayer = layer;
 
-		this.playInterval = setInterval(function() {
-			if ( this.currentSliderValue == 365 ) {
-				clearInterval(this.playInterval);
-				return;
-			} else {
-				this.slider.set(this.currentSliderValue++);
-				this.slideEvent();
-			}			
-		}.bind(this), (1000/this.options.fps)) 
+        // set title 
+        this.setTitle(layer.getTitle());
 
-		// fire animation play
-		Wu.Mixin.Events.fire('animationPlay');
+        // show
+        if (show) this.show();
+    },
 
-	},
 
-	stopPlaying : function () {
+    // Disable layer
+    _layerDisabled : function (e) {
+        var layer = e.detail.layer;
 
-		this.playButton.innerHTML = '<i class="fa fa-play"></i>';
+        // hide if current layer
+        if (layer.getUuid() == this._currentLayer.getUuid()) {
+                this.hide();
+        }
+    },
 
-		clearInterval(this.playInterval);
-		this.playing = false;
+    // Set slider value
+    setSlider : function (e) {
+        this._sliderValue = e.detail.value;
+        this.slider.set([this._sliderValue]);
+    },
 
-		// fire animation stop
-		Wu.Mixin.Events.fire('animationStop');
-	},
+    updateButtons : function (e) {
 
-	stepOneForward : function () {		
-		this.currentSliderValue++;
-		this.slideEvent();
-		this.slider.set([this.currentSliderValue]);
-	},
+        var disableForward  = e.detail.diableForward;
+        var disableBackward = e.detail.diableBackward
 
-	stepOneBackward : function () {
-		this.currentSliderValue--;
-		this.slideEvent();
-		this.slider.set([this.currentSliderValue]);
-	},
+        if (disableForward) { 
+            Wu.DomUtil.addClass(this.stepForward, 'disable-button');
+        } else { 
+            Wu.DomUtil.removeClass(this.stepForward, 'disable-button'); 
+        }
 
-	moveBackward : function () {
-		Wu.Mixin.Events.fire('sliderMoveBackward');
-	},
+        if (disableBackward) { 
+            Wu.DomUtil.addClass(this.stepBackward, 'disable-button');
+        } else { 
+            Wu.DomUtil.removeClass(this.stepBackward, 'disable-button'); 
+        }
 
-	moveForward : function () {
-		Wu.Mixin.Events.fire('sliderMoveForward');
-	},	
+    },
 
-	// Update message box, if it exists before
-	update : function (message, severity) {
-	},
+    // Set title
+    setTitle : function (title) {
 
-	remove : function (id) {
-	},
+    	// return if no layer
+        if (!this._currentLayer) return;
 
-	hide : function () {
-		this.sliderOuterContainer.style.display = 'none';
-	},
+        // fire event
+        Wu.Mixin.Events.fire('setSliderTitle', {detail : {
+            title : title
+        }});
+    },
 
-	show : function () {
-		this.sliderOuterContainer.style.display = 'block';
-	},	
+
+    // These are the actions for the play, pause, step forward and backward buttons
+    play : function () {        
+        this.playing ? this.stopPlaying() : this.startPlaying();
+    },
+
+
+    startPlaying : function () {
+
+        this.playButton.innerHTML = '<i class="fa fa-pause"></i>';
+
+        this.playing = true;
+
+        this.playInterval = setInterval(function() {
+            if ( this._sliderValue == 365 ) {
+                clearInterval(this.playInterval);
+                return;
+            } else {
+                this.slider.set(this._sliderValue++);
+                this.slideEvent();
+            }           
+        }.bind(this), (1000/this.options.fps)) 
+
+        // fire animation play
+        Wu.Mixin.Events.fire('animationPlay');
+    },
+
+    stopPlaying : function () {
+
+        this.playButton.innerHTML = '<i class="fa fa-play"></i>';
+
+        clearInterval(this.playInterval);
+        this.playing = false;
+
+        // fire animation stop
+        Wu.Mixin.Events.fire('animationStop');
+    },
+
+    stepOneForward : function () {      
+        this._sliderValue++;
+        this.slideEvent();
+        this.slider.set([this._sliderValue]);
+    },
+
+    stepOneBackward : function () {
+        this._sliderValue--;
+        this.slideEvent();
+        this.slider.set([this._sliderValue]);
+    },
+
+    moveBackward : function () {
+        Wu.Mixin.Events.fire('sliderMoveBackward');
+    },
+
+    moveForward : function () {
+        Wu.Mixin.Events.fire('sliderMoveForward');
+    },  
+
+    // Update message box, if it exists before
+    update : function (message, severity) {
+    },
+
+    remove : function (id) {
+    },
+
+    hide : function () {
+        this.sliderOuterContainer.style.display = 'none';
+    },
+
+    show : function () {
+        this.sliderOuterContainer.style.display = 'block';
+    },  
 
 });
 

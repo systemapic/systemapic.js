@@ -22,6 +22,7 @@
 //  - findDate(), find index of array corresponding to date.
 //  - dates must be moment.js compatible
 //  - problem of missing days in a raster set... could be solved with a simple check-and-skip i guess
+//  - if cacheSize=3, then this._cache[] will always just contain three frames: 0, 1, 2
 //
 // websocket loading of tiles
 //  - as an add-on later, in order to request tiles faster
@@ -36,8 +37,9 @@
 Wu.CubeLayer = Wu.Model.Layer.extend({
 
     options : {
-        fps : 4,
+        fps : 1,
         cacheSize : 3, // frames to cache ahead
+        timestampResolution : 'YYYY-DDDD' // moment format at which to compare dates (year/day only here)
     },
 
     _cache : [],
@@ -61,7 +63,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     initLayer : function () {
-        // this.update();
 
         // init cursor
         this._initCursor();
@@ -88,10 +89,11 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // get datasets
         var datasets = this.getDatasets();
 
+        // no cache if empty datasets
+        if (!_.size(datasets)) return;
+
         // cache is current cursor index and cacheSize long
         var cache = _.slice(datasets, this._cursor.idx, this._cursor.idx + this.options.cacheSize);
-
-        console.log('cached: ', cache);
 
         // load cache
         cache.forEach(this._cacheDataset, this);
@@ -181,7 +183,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     playAnimation : function () {
 
         // debug: start on layer 0
-        this._currentFrame = this._layers[0];
+        this._currentFrame = this._cache[0].layer;
 
         // show one layer after the other (in loop)
         this._player = setInterval(function () {
@@ -210,9 +212,22 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _onAnimationSlide : function (e) {
         if (!this._added) return;
 
+        // get event payload
         var value = e.detail.value;
+        var timestamp = e.detail.timestamp; // moment
 
-        console.log('_onAnimationSlide', value);
+        console.log('_onAnimationSlide', value, timestamp);
+
+        // find dataset corresponding to current date
+        var dataset = _.find(this.getDatasets(), function (d) { 
+            var a = moment(d.timestamp).format(this.options.timestampResolution); // YYYY-DDDD of dataset
+            var b = moment(timestamp).format(this.options.timestampResolution);   // YYYY-DDDD of animation
+            return a == b;
+        });
+
+        console.log('found dataset of the day!', dataset);
+
+        // todo: move cursor to dataset of the day!
     },
 
     _onAnimationPlay : function () {

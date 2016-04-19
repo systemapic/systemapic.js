@@ -25,12 +25,10 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	// Listen to events
 	addHooks : function () {
-
 		Wu.Mixin.Events.on('animationSlide', this.sliding, this);
 		Wu.Mixin.Events.on('sliderMoveBackward', this.moveBackward, this);
-		Wu.Mixin.Events.on('sliderMoveForward',  this.moveForward, this);
+		Wu.Mixin.Events.on('sliderMoveForward', this.moveForward, this);
 		Wu.Mixin.Events.on('setSliderTitle', this.setTitle, this)
-
 	},
 
 	// When slider is sliding
@@ -80,6 +78,20 @@ Wu.Graph.Year = Wu.Evented.extend({
 		this.updateDayOfYear();
 
 		this.checkEnds();
+	},
+
+	// returns moment.js object
+	getCurrentDate : function () {
+
+		// get day/year
+		var day = this.currentDay;
+		var year = this.currentYear;
+
+		// create moment date from year/day
+		var date = moment().dayOfYear(day).year(year);
+
+		// return moment.js object
+		return date;
 	},
 
 
@@ -268,7 +280,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 		var yMinDim = xDim.group().reduceSum(function(d) { return d.min });
 		var yAvgDim = xDim.group().reduceSum(function(d) { return d.avg });
 
-    		var minDate = xDim.bottom(1)[0].date;
+    	var minDate = xDim.bottom(1)[0].date;
 		var maxDate = xDim.top(1)[0].date;
 
 		// DATA FOR CURRENT YEAR
@@ -450,7 +462,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 			var minD = false;
 
-			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
+			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) { // _.isArray() ?
 				if ( !minD ) minD = days[day][1].SCF;
 				days[day].forEach(function (d) { if ( d.SCF < minD ) minD = d.SCF });
 				eachDay[day] = Math.round(minD);
