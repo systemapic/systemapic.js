@@ -48,7 +48,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 	// Skipping one year back in time
 	moveBackward : function () {
 
-		if ( this.diableBackward ) return;
+		if ( this.disableBackward ) return;
 
 		this.currentYear--;
 
@@ -67,7 +67,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 	// Skipping one year ahead in time
 	moveForward : function () {
 		
-		if ( this.diableForward ) return;
+		if ( this.disableForward ) return;
 		
 		this.currentYear++;
 
@@ -88,22 +88,22 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// FORWARD BUTTON
 		if ( this.currentYear == this.yearNames[this.yearNames.length-1] ) {
-			this.diableForward = true;
+			this.disableForward = true;
 		} else {
-			this.diableForward = false;
+			this.disableForward = false;
 		}
 
 		// BACKWARD BUTTON
 		if ( this.currentYear == this.yearNames[0] ) {
-			this.diableBackward = true;
+			this.disableBackward = true;
 		} else {
-			this.diableBackward = false;
+			this.disableBackward = false;
 		}
 
 		// Fire event, so that slider can disable buttons
 		Wu.Mixin.Events.fire('updateSliderButtons', { detail : {
-			diableForward  : this.diableForward,
-			diableBackward : this.diableBackward
+			disableForward  : this.disableForward,
+			disableBackward : this.disableBackward
 
 		}});				
 
