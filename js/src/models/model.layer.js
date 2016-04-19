@@ -665,15 +665,18 @@ Wu.Model.Layer = Wu.Model.extend({
 
 
 Wu.ErrorLayer = Wu.Model.Layer.extend({
-    _listen : function () {}
+    initialize : function () {
+        console.log('Errorlayer');
+    }
 });
 
-// shorthand for creating all kinds of layers
+// shorthand for creating all types of layers
 Wu.createLayer = function (layer) {
-    if (!layer.data) {
-        return new Wu.ErrorLayer();
-    }
 
+    // error layer
+    if (!layer.data) return new Wu.ErrorLayer();
+
+    // check if vector/raster
     var isVector = (layer.data.postgis && layer.data.postgis.geom_type == 'geometry');
     var isRaster = (layer.data.postgis && layer.data.postgis.geom_type == 'raster');
 
@@ -689,22 +692,13 @@ Wu.createLayer = function (layer) {
     // mapbox
     if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
-    // systemapic vector tiles todo: store not as geojson, but as vector tiles in project db model?
-    if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
-    
-    // osm
-    if (layer.data.osm) return new Wu.OSMLayer(layer);
-
-    // topojson
-    if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
-
     // norkart
     if (layer.data.norkart) return new Wu.NorkartLayer(layer);
 
     // google
     if (layer.data.google) return new Wu.GoogleLayer(layer);
 
-    console.log('ErrorLayer');
+    // catch-all error layer
     return new Wu.ErrorLayer();
 };
 
@@ -715,7 +709,6 @@ L.TileLayer.include({
         this.redraw();
     }
 });
-
 L.UtfGrid.include({
     setOptions : function (options) {
         L.setOptions(this, options);

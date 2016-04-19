@@ -28,7 +28,7 @@ Wu.Animator = Wu.Evented.extend({
 		this.initData(function (err) {
 			if (err) return console.error('Wu.Animator init err:', err);
 
-			// hide by default is option set
+			// hide by default if option set
 			if (this.options.hide) this.hide();
 
 		}.bind(this));

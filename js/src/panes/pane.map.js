@@ -115,7 +115,7 @@ Wu.MapPane = Wu.Pane.extend({
 			zoomControl : false,
 			inertia : false,
 			// loadingControl : true,
-			// zoomAnimationThreshold : 2
+			// zoomAnimationThreshold : 2,
 		});
 
 		// add attribution

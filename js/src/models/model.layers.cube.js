@@ -12,17 +12,13 @@
 //  - when playing, cursor position updates, and another frame must be preloaded, and another frame destroyed
 //  - when sliding, or moving cursor position a lot, all frames more than x away from cursor must be destroyed, 
 //      and ten new frames preloaded
-//  - preloading means creating a Leaflet layer and adding it to the map (display:none)
-//  - destroying means removing Leaflet layer from map, and purging all refs, incl. images
 //  - moveCursor(), which controls all of this
 //  - how to id the cursor? how to get correct layer in cube based on id? simplest is order in array, first layer being 0. this 
 //      needs to play well with dates in chart, etc, however. chart can perhaps accept a date, and when slider is moved, it can
 //      emit a slider-moved event, which contains the date. cursor can then be updated by search&replace in cube array for correct date?
 //      just gonna assume this will work, and do the work on graph afterwards.
-//  - findDate(), find index of array corresponding to date.
-//  - dates must be moment.js compatible
-//  - problem of missing days in a raster set... could be solved with a simple check-and-skip i guess
-//
+//  - need an array of datasets in cube, which contains at least 1) dataset_id, 2) date/timestamp. can also contain other metadata.
+// 
 // websocket loading of tiles
 //  - as an add-on later, in order to request tiles faster
 //  - until then, try to separate request logic as much as possible, so that Wu.CubeLayer.Websockets can easily override Wu.CubeLayer
@@ -37,10 +33,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     options : {
         fps : 4,
-        cacheSize : 3, // frames to cache ahead
     },
 
-    _cache : [],
+    _layers : [],
 
     initialize : function (store) {
 
@@ -57,121 +52,83 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this.store = store;
 
         // parse cube json
-        this._cube = Wu.parse(this.store.data.cube);
+        this.store.data.cube = Wu.parse(this.store.data.cube);
     },
 
     initLayer : function () {
-        // this.update();
-
-        // init cursor
-        this._initCursor();
-
-        // init cache
-        this._initCache();
-
-        // mark inited
+        this.update();
         this._inited = true;
     },
 
-    _initCursor : function () {
-
-        // set cursor to 0
-        this._setCursor({
-            idx : 0,
-            layer : null,
-            dataset : null
-        });
-    },
-
-    _initCache : function () {
-
-        // get datasets
-        var datasets = this.getDatasets();
-
-        // cache is current cursor index and cacheSize long
-        var cache = _.slice(datasets, this._cursor.idx, this._cursor.idx + this.options.cacheSize);
-
-        console.log('cached: ', cache);
-
-        // load cache
-        cache.forEach(this._cacheDataset, this);
-
-        // set cursor to first in cache
-        this._setCursor(this._cache[0]);
-    },
-
-    _setCursor : function (cursor) {
-        var layer = cursor.layer;
-
-        // set cursor
-        this._cursor = cursor;
-
-        // set layer 
-        if (layer) {
-
-            // this.layer needed for model.layers.js fn's
-            this.layer = layer;
-
-            // show layer
-            this._showLayer(layer);
-        }
-    },
-
-    _cacheDataset : function (dataset, idx) {
-
-        console.log('_cacheDataset', idx);
-
-        // url template
-        var access_token = '?access_token=' + app.tokens.access_token;
-        var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}';
-
-        // create leaflet layer
-        var layer = L.tileLayer(url, {
-            cube_id : this.getCubeId(),
-            dataset_id : dataset.id,
-            subdomains : app.options.servers.cubes.subdomains,
-            maxRequests : 0,
-            cache : Wu.Util.getRandomChars(6)
-        });
-
-        // add to map
-        app._map.addLayer(layer);
-
-        // hide by default
-        this._hideLayer(layer);
-
-        // cache frame
-        this._cache[idx] = {
-            idx : idx,
-            dataset : dataset,
-            layer : layer
-        }
-
-    },
-
     update : function () {
-        console.error('update');
         var map = app._map;
 
         // prepare raster
-        // this._prepareRaster();
+        this._prepareRaster();
     },
 
     getDatasets : function () {
-        return this._cube.datasets;
+        return this.store.data.cube.datasets;
     },
 
     getCubeId : function () {
-        return this._cube.cube_id;
+        return this.store.data.cube.cube_id;
     },  
 
     _refreshCube : function () {
-        console.error('_refreshCube');
-        // this._prepareRaster();
+        this._prepareRaster();
+    },
+
+    _prepareRaster : function () {
+
+        // cube has array of layers
+        this._layers = [];
+
+        // get vars
+        var datasets = this.getDatasets();
+        var cube_id = this.getCubeId();
+        var subdomains  = app.options.servers.cubes.subdomains;
+        var access_token = '?access_token=' + app.tokens.access_token;
+
+        console.log('datasets:', datasets);
+
+        // add each dataset as layer
+        datasets.forEach(function (d) {
+
+            // url template
+            var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}';
+            
+            // create leaflet layer
+            var cubeLayer = L.tileLayer(url, {
+                cube_id : cube_id,
+                dataset_id : d.uuid,
+                subdomains : subdomains,
+                maxRequests : 0,
+                cache : Wu.Util.getRandomChars(6)
+            });
+
+            // add layer to cube array
+            this._layers.push(cubeLayer);
+
+            // add to map
+            app._map.addLayer(cubeLayer);
+
+            // hide by default
+            cubeLayer.getContainer().style.display = 'none';
+
+        }, this);
+
+        // set first layer as default
+        this._showLayer(this._layers[0]);
     },
 
     _showLayer : function (layer) {
+        
+        // show layer
         layer.getContainer().style.display = 'block';
+
+        // mark current layer (needed?)
+        this.layer = layer;
     },
 
     _hideLayer : function (layer) {
@@ -195,7 +152,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // show next frame
             this._showFrame && this._showLayer(this._showFrame);
 
-        }.bind(this), (1000 / this.options.fps));
+        }.bind(this), 1000 / this.options.fps);
     },
 
     stopAnimation : function () {
@@ -261,22 +218,23 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // add to map
         this._addTo();
+        
     },
 
     _addTo : function (type) {
+
         if (!this._inited) this.initLayer();
 
         var map = app._map;
-        var layer = this._cursor.layer;
 
         // leaflet fn
-        map.addLayer(layer);
+        map.addLayer(this.layer);
 
         // add to active layers
-        app.MapPane.addActiveLayer(this);   // includes baselayers, todo: evented
+        app.MapPane.addActiveLayer(this);   // includes baselayers
 
         // update zindex
-        this._addToZIndex(type); // todo: evented
+        this._addToZIndex(type);
 
         this._added = true;
 
@@ -305,9 +263,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     remove : function (map) {
         var map = map || app._map;
 
-        this._cache.forEach(function (cache) {
-            var layer = cache.layer;
-
+        this._layers.forEach(function (layer) {
             // leaflet fn
             if (map.hasLayer(layer)) map.removeLayer(layer);
         });
@@ -318,18 +274,21 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // remove from zIndex
         this._removeFromZIndex();
 
-        // remove from descriptionControl if avaialbe.. TODO: make this evented instead
+        // remove from descriptionControl if avaialbe
         var descriptionControl = app.MapPane.getControls().description;
         if (descriptionControl) descriptionControl._removeLayer(this);
 
         this._added = false;
     },
 
+
     isCube : function () {
         return true;
     },
 
     updateStyle : function (style) {
+
+        // console.log('udpateStyle', style);
 
         var options = {
             cube_id : this.getCubeId(),
@@ -354,8 +313,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this.store.data.cube = JSON.stringify(cube);
         this.save('data');
 
-        // set updated cube
-        this._cube = cube;
+        // hack: must parse again, cause cube is currently stored as JSON
+        this.store.data.cube = cube;
 
         return this;
     },
@@ -363,14 +322,14 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _refreshLayer : function () {
 
         // refresh all layers
-        this._cache.forEach(function (cache) {
-            var layer = cache.layer;
+        this._layers.forEach(function (layer) {
             layer.setOptions({
                 cache : Wu.Util.getRandomChars(6) // change url to skip browser cache
             });
             layer.redraw();
         });
 
+        // TODO: add to queue etc. with websocket implementation
     },
 
     setDatasetDate : function (options, done) {
@@ -380,14 +339,14 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var dataset = options.dataset;
 
         // set new date (format: "2016-04-01T00:00:00+02:00")
-        dataset.timestamp = moment(date).format();
+        dataset.meta.date = moment(date).format();
 
         // get all datasets
         var datasets = this.getDatasets();
 
         // find index 
         var idx = _.findIndex(datasets, function (d) {
-            return d.id == dataset.id;
+            return d.uuid == dataset.uuid;
         });
 
         // update dataset
