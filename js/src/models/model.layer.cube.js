@@ -215,13 +215,14 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // get event payload
         var value = e.detail.value;
         var timestamp = e.detail.timestamp; // moment
+        var format = this.options.timestampResolution;
 
         console.log('_onAnimationSlide', value, timestamp);
 
         // find dataset corresponding to current date
         var dataset = _.find(this.getDatasets(), function (d) { 
-            var a = moment(d.timestamp).format(this.options.timestampResolution); // YYYY-DDDD of dataset
-            var b = moment(timestamp).format(this.options.timestampResolution);   // YYYY-DDDD of animation
+            var a = moment(d.timestamp).format(format); // YYYY-DDDD of dataset
+            var b = moment(timestamp).format(format);   // YYYY-DDDD of animation
             return a == b;
         });
 
