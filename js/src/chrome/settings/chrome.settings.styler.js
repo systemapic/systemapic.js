@@ -443,6 +443,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._layer.setStyling(stops); // will be stringified in setStyling fn, 
 	},
 
+	// todo: move to styler.raster.js
 	_stops2cartocss : function (stops) {
 
 		if ( !stops ) return;
@@ -450,22 +451,27 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var minVal = 0;
 		var maxVal = 255;
 
-		var fistStop = parseInt(stops[0].val);
+		var firstStop = parseInt(stops[0].val);
 		var lastStop = parseInt(stops[stops.length-1].val);
 
+		// todo: add blur to stops
+		var blur = true;
+		var blurType = 'gaussian';
+
 		// Default CSS
-		var styleCSS = '#layer {' +
-			'raster-opacity: 1;' + 
-			'raster-colorizer-default-mode: linear;' + 
-			'raster-colorizer-default-color: transparent;' +
-			'raster-comp-op: color-dodge;' +
-			'raster-colorizer-stops:';
+		var styleCSS = '#layer { ';
+		styleCSS += 'raster-opacity: 1; ';
+		styleCSS += 'raster-colorizer-default-mode: linear; ';
+		styleCSS += 'raster-colorizer-default-color: transparent; ';
+		styleCSS += 'raster-comp-op: color-dodge; ';
+		if (blur) styleCSS += 'raster-scaling: ' + blurType || 'gaussian' + '; ';
+		styleCSS += 'raster-colorizer-stops: ';
 
 		// If the first stop is not equal to minVal,
 		// create a stop for minVal
-		if ( fistStop != minVal ) {
-			styleCSS += 'stop(' + minVal + ', rgba(0,0,0,0))';
-			styleCSS += 'stop(' + (fistStop-1) + ', rgba(0,0,0,0))';
+		if ( firstStop != minVal ) {
+			styleCSS += ' stop(' + minVal + ', rgba(0,0,0,0))';
+			styleCSS += ' stop(' + (firstStop-1) + ', rgba(0,0,0,0))';
 		}
 
 		// Create all the stops
@@ -473,14 +479,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			var val = stop.val;
 			var _RGBA = stop.col;
 			var rgba = 'rgba(' + _RGBA.r + ',' + _RGBA.g + ',' + _RGBA.b + ',' + _RGBA.a + ')';
-			styleCSS += 'stop(' + val + ', ' + rgba + ')';
+			styleCSS += ' stop(' + val + ', ' + rgba + ')';
 		}.bind(this));		
 
 		// If the last stop is not equal to maxVal,
 		// create a stop for 
 		if ( lastStop != maxVal ) {
-			styleCSS += 'stop(' + (lastStop+1) + ', rgba(0,0,0,0))';
-			styleCSS += 'stop(' + maxVal + ', rgba(0,0,0,0), exact)';
+			styleCSS += ' stop(' + (lastStop+1) + ', rgba(0,0,0,0))';
+			styleCSS += ' stop(' + maxVal + ', rgba(0,0,0,0), exact)';
 		}
 		styleCSS += ';}';
 
