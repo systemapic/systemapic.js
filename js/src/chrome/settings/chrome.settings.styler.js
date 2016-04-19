@@ -464,7 +464,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		styleCSS += 'raster-colorizer-default-mode: linear; ';
 		styleCSS += 'raster-colorizer-default-color: transparent; ';
 		styleCSS += 'raster-comp-op: color-dodge; ';
-		if (blur) styleCSS += 'raster-scaling: ' + blurType || 'gaussian' + '; ';
+		if (blur) styleCSS += 'raster-scaling: ' + blurType + '; ';
 		styleCSS += 'raster-colorizer-stops: ';
 
 		// If the first stop is not equal to minVal,
