@@ -30,6 +30,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		app.Tools.Styler = this;
 	},
 
+
+
 	_initContainer : function () {
 
 		// Create container
@@ -67,7 +69,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Mark inited
 		this._inited = true;
 
+
 	},
+
+
 
 	_initVectorStyler : function () {
 
@@ -95,7 +100,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			styler 	  : this,
 			meta 	  : this._meta,
 			columns   : this._columns,
-			container : this._fieldsWrapper
+			container : this._fieldsWrapper,
+			rangeMin  : 0,
+			rangeMax  : 255
 		};
 
 		this._rasterStyler = new Wu.RasterStyler(options);
@@ -112,7 +119,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			styler 	  : this,
 			meta 	  : this._meta,
 			columns   : this._columns,
-			container : this._fieldsWrapper
+			container : this._fieldsWrapper,
+			rangeMin  : 0,
+			rangeMax  : 255
 		};
 
 		this._rasterStyler = new Wu.RasterStyler(options);
@@ -122,24 +131,28 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	_initStylingOptions : function () {
 
 		var options = {
-			carto 	: this._carto,
-			layer 	: this._layer,
-			project : this._project,
-			styler 	: this,
-			meta 	: this._meta,
-			columns : this._columns,
-			container : this._fieldsWrapper
+			carto 	  : this._carto,
+			layer 	  : this._layer,
+			project   : this._project,
+			styler 	  : this,
+			meta 	  : this._meta,
+			columns   : this._columns,
+			container : this._fieldsWrapper,
+			// type      : this._layer.getMeta().geometry_type
 		};
 
 
+		var type = this._layer.getMeta().geometry_type;
+
+
 		// create point styler
-		this._pointStyler = new Wu.Styler.Point(options);
+		if ( type == 'ST_Point' ) this._pointStyler = new Wu.Styler.Point(options);
 
 		// create polygon styler
-		this._polygonStyler = new Wu.Styler.Polygon(options);
+		if ( type == 'ST_MultiPolygon' ) this._polygonStyler = new Wu.Styler.Polygon(options);
 
 		// create line styler
-		this._lineStyler = new Wu.Styler.Line(options);
+		if ( type == 'ST_MultiLineString' ) this._lineStyler = new Wu.Styler.Line(options);
 
 	},
 
@@ -448,8 +461,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		if ( !stops ) return;
 
-		var minVal = 0;
-		var maxVal = 255;
+		var minVal = this._rasterStyler.options.rangeMin;
+		var maxVal = this._rasterStyler.options.rangeMax;	
 
 		var firstStop = parseInt(stops[0].val);
 		var lastStop = parseInt(stops[stops.length-1].val);
@@ -503,6 +516,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 	show : function () {
+
 		if (!this._inited) this._initLayout();
 
 		// hide others
@@ -520,11 +534,24 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var layerUuid = this._getActiveLayerUuid();
 		if (layerUuid) this._selectedActiveLayer(false, layerUuid);		
 
-		// Select layer we're working on
-		var options = this.layerSelector.childNodes;
-		for (var k in options) {
-			if (options[k].value == layerUuid) options[k].selected = true;
-		}
+
+		// // Select layer we're working on
+		// var options = this.layerSelector.options.options;
+
+		// for (var k in options) {
+
+		// 	var isElem = Wu.Tools.isElement(options[k]);
+		// 	if ( !isElem ) return;
+			
+		// 	var uuid = options[k].getAttribute('data-value');
+
+		// 	if ( uuid == layerUuid ) {
+		// 		console.log('options[k]', options[k]);
+		// 	}
+		// }
+
+
+
 	},
 
 	closed : function () {
@@ -535,6 +562,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// event run when layer selected 
 	_selectedActiveLayer : function (value, uuid) {
+
 
 		Wu.DomUtil.removeClass(this._buttonWrapper, 'displayNone');
 
@@ -589,6 +617,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Add temp layer
 		this._tempaddLayer();
+
+		// Set active layer in dropdown
+		this.layerSelector.setFromUuid(uuid);
 
 	},
 

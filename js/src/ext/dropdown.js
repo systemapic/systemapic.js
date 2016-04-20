@@ -25,9 +25,12 @@ Wu.Dropdown = Wu.Class.extend({
 		this._form_combobox__options_wrapper = Wu.DomUtil.create('div', 'form-combobox_options_wrapper', this._select);
 		this._form_combobox__options = Wu.DomUtil.create('ul', 'form-combobox_options', this._form_combobox__options_wrapper);
 
+
+		this.options.options = [];
+
 		// Create select options
-		this.options.content.forEach(function(selectOption) {
-			var option = Wu.DomUtil.create('li', 'form-combobox_option item', this._form_combobox__options, selectOption.title);
+		this.options.content.forEach(function(selectOption, i) {
+			var option = this.options.options[i] = Wu.DomUtil.create('li', 'form-combobox_option item', this._form_combobox__options, selectOption.title);
 
 			if (selectOption.disabled) {
 				Wu.DomUtil.addClass(option, "disabled-option");
@@ -63,6 +66,35 @@ Wu.Dropdown = Wu.Class.extend({
 		Wu.DomEvent.on(this._form_combobox_input, 'keydown', this._onKeydown, this);
 		
 	},
+
+
+
+	setFromUuid : function (layerUuid) {
+	
+		// Select layer we're working on
+		// var options = this.layerSelector.options.options;
+		var options = this.options.options;
+
+		for (var k in options) {
+
+			var isElem = Wu.Tools.isElement(options[k]);
+			if ( !isElem ) return;
+
+			var uuid = options[k].getAttribute('data-value');
+			if ( uuid == layerUuid ) {
+				var title = options[k].innerHTML;
+				this.setValue({
+					value: uuid,
+					title: title
+				});
+			}
+		}
+
+	},
+
+
+
+
 
 	_initEventsListners : function () {
 		Wu.DomEvent.on(this._select, 'click', this._toggleListItems, this);
@@ -155,7 +187,11 @@ Wu.Dropdown = Wu.Class.extend({
 	},
 
 	_onKeydown: function (e) {
+
+		console.error('_onKeydown');
+
 		var key = event.which ? event.which : event.keyCode;
+
 
 		if (key === 32) {
 			this._showListItems();
@@ -183,6 +219,12 @@ Wu.Dropdown = Wu.Class.extend({
 		if (key === 38 || key === 40 || key === 27 || key === 32 || key === 13) {
 			Wu.DomEvent.stop(e);	
 		}
+
+
+		var _char = String.fromCharCode(key);
+		console.log(key);
+		// console.log('Wu.Tools.keyMap(key)', Wu.Tools.keyMap(key));
+		// console.log('_char', _char);
 		
 	}
 

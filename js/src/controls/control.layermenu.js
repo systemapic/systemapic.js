@@ -914,8 +914,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayer : function (item) {
 
-		// console.log('%c toggleLayer', 'background: red; color: white;');
-
 		if (this.editMode) return;
 
 		var layer = item.layer;
@@ -984,7 +982,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// fire event
 		Wu.Mixin.Events.fire('layerEnabled', { detail : {
 			layer : layer
-		}}); 
+		}});
 
 	},
 

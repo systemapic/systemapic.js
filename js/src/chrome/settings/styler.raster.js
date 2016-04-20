@@ -1,8 +1,6 @@
 Wu.RasterStyler = Wu.Class.extend({
 
 	type       : 'cube',
-	rangeMin   : 0,
-	rangeMax   : 255,
 	pixelWidth : 369,
 
 	initialize : function (options) {
@@ -28,8 +26,8 @@ Wu.RasterStyler = Wu.Class.extend({
 		// Create divs
 		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper raster-styler', this.options.container);
 		this._rangeMarks = Wu.DomUtil.create('div', 'raster-range-marks', this._wrapper);
-		this._maxMark = Wu.DomUtil.create('div', 'raster-range-max-mark', this._rangeMarks, this.rangeMin.toString());
-		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, this.rangeMax.toString()); // todo: shouldn't be hardcoded
+		this._maxMark = Wu.DomUtil.create('div', 'raster-range-max-mark', this._rangeMarks, this.options.rangeMin.toString());
+		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, this.options.rangeMax.toString()); // todo: shouldn't be hardcoded
 		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);		
 		this._rangeWrapper = Wu.DomUtil.create('div', 'raster-color-range-wrapper', this._wrapper);
 
@@ -81,8 +79,8 @@ Wu.RasterStyler = Wu.Class.extend({
 			animate: false,
 			behaviour: 'hover',
 			range: {
-				'min': this.rangeMin,
-				'max': this.rangeMax
+				'min': this.options.rangeMin,
+				'max': this.options.rangeMax
 			}
 		});
 
@@ -221,7 +219,7 @@ Wu.RasterStyler = Wu.Class.extend({
 	// No width, nor color updates happens here...
 	setSliderPosition : function () {
 
-		var span = this.rangeMax - this.rangeMin;	
+		var span = this.options.rangeMax - this.options.rangeMin;	
 
 		this.stops.forEach(function (stop, i) {
 
@@ -238,7 +236,7 @@ Wu.RasterStyler = Wu.Class.extend({
 	// Sets slider color + width + updates number above line
 	setSliderColor : function () {
 
-		var span = this.rangeMax - this.rangeMin;
+		var span = this.options.rangeMax - this.options.rangeMin;
 
 		this.stops.forEach(function (stop, i) {
 
@@ -662,8 +660,8 @@ Wu.RasterStyler = Wu.Class.extend({
 		// Make sure value is not more or less than maximum allowed
 		if ( type == 'v' ) {
 
-			if ( val < this.rangeMin ) val = this.rangeMin;
-			if ( val > this.rangeMax ) val = this.rangeMax;
+			if ( val < this.options.rangeMin ) val = this.options.rangeMin;
+			if ( val > this.options.rangeMax ) val = this.options.rangeMax;
 
 			// If val is less than stop before, force it to previous stop + 1
 			if ( this.stops[no-1] && this.stops[no-1].val >= val ) {
