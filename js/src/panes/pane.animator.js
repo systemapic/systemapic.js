@@ -3,13 +3,15 @@ Wu.Animator = Wu.Evented.extend({
     options : {
 
         // Animation frames per second
-        fps : 2,
+        fps : 1,
 
         // Max value for steps on slider
         maxLength : 365,
 
         // Defines what kind of graph we want
-        graphType : 'annualCycles'
+        graphType : 'annualCycles',
+
+        sliderThrottle : 500
 
     },
 
@@ -122,7 +124,7 @@ Wu.Animator = Wu.Evented.extend({
             // fire slide event
             this.slideEvent();
 
-        }.bind(this), 100));
+        }.bind(this), this.options.sliderThrottle));
 
         // listen for events
         Wu.Mixin.Events.on('setSlider', this.setSlider, this);
