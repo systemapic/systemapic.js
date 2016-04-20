@@ -163,10 +163,11 @@
 
 .layer-name-input {
     left: 38px;
-    padding-top: 2px;
+    padding-top: 0px;
     width: 280px;
     background: transparent;
     font-weight: 600;
+    top: -1px;
     }
 
 .file-name-input {
@@ -175,9 +176,12 @@
     padding-top: 5px;
     height: 27px;
     width: 315;
-    left: -5px;
     left: 25px;
-    top: 5px;
+    position: absolute;
+    top: 3px !important;
+    visibility: visible;
+    color: #3C4759 !important;
+
     }
 
 .chrome-content-header {
@@ -1079,15 +1083,6 @@ input.chrome-field-input {
 
 .data-list-line.editingFileName:hover .file-name-content {
     visibility: hidden;
-    }
-
-.file-name-input {
-    visibility: visible;
-    color: #3C4759;
-    }
-
-.data-list-line.editingFileName:hover .file-name-input {
-    color: white;
     }
 
 .chrome-switch-container.switch-on {

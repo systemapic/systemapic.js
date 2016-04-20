@@ -922,6 +922,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // Update
         nameInput
+        .attr('value', function (d) {
+            if ( library == 'layers' ) return d.getTitle();
+            return d.getName();
+        })
         .attr('placeholder', function (d) {
             if ( library == 'layers' ) return d.getTitle();
             return d.getName();
@@ -3003,8 +3007,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // Bind
         var nameContent =
                 parent
-                        .selectAll('.layer-name-content')
-                        .data(function(d) { return [d] });
+                    .selectAll('.layer-name-content')
+                    .data(function(d) { return [d] });
 
         // Enter
         nameContent
@@ -3061,6 +3065,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // Update
         nameInput
+        .attr('value', function (layer) {
+            return layer.getTitle();
+        })
         .attr('placeholder', function (layer) {
             return layer.getTitle();
         })
