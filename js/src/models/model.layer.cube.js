@@ -107,7 +107,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._updateCache();
 
         // set cursor to first in cache
-        this._setCursor(0);
+        this._setCursor(0);  // 
     },
 
     // this is where layers are shown on map
@@ -122,17 +122,28 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._cursor = datasetIndex;
 
         // get cache at cursor
-        var cache = this._cache[this._cursor];
+        // var cache = this._cache[this._cursor]; // <- this is wrong.. cache sequence is arbitrary
 
-        console.log('_setCursor cache:', cache);
-        if (!cache) return console.error('no cache @ cursor:', this._cursor)
+        var cache = _.find(this._cache, function (c) {
+            console.log('____searching cache, c,', c.idx, datasetIndex);
+            return c.idx == datasetIndex;
+        });
 
-        var layer = cache.layer;
+        console.log('_setCursor cache, this._cache, this._cursor:', cache, this._cache, this._cursor);
+      
+        if (!cache) console.error('no cache @ cursor:', this._cursor)
 
-        if (!layer) return console.error('no layer @ cursor:', this._cursor)
+        var layer = cache ? cache.layer : false;
 
-        console.log('_setCursor layer:', layer);
+        if (!layer) console.error('no layer @ cursor:', this._cursor)
 
+        // console.log('_setCursor layer:', layer.options.dataset_id);
+
+        // hide old layer
+        if (this.layer) {
+            this._hideLayer(this.layer); // todo: unload, destroy
+        }
+        
         // set layer 
         if (layer) {
 
@@ -146,11 +157,25 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     _updateCache : function () {
 
+        console.log('---------- _updateCache -----------');
+
         // cache is current cursor index and cacheSize long
-        var datasetsToCache = _.slice(this._datasets, this._cursor, this._cursor + this.options.cacheSize);
+        var datasets = _.slice(this._datasets, this._cursor, this._cursor + this.options.cacheSize);
+
+        console.log('datasets.length', datasets.length);
+
+        var cache = this._cache;
 
         // check which are already cached
-        
+        var datasetsToCache = _.filter(datasets, function (d) {
+            var notFound = true;
+            cache.forEach(function (c){
+                if (d.id == c.dataset.id) notFound = false;
+            });
+            return notFound;
+        })
+
+        console.log('datasetsToCache.length', datasetsToCache.length);
 
         // load cache
         datasetsToCache.forEach(this._cacheFrame, this);
@@ -235,10 +260,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             return a == b;
         });
 
-        // return if no frame for this date
-        if (datasetIndex < 0) return console.log('no dataset on this date');
-
-        console.log('found dataset of the day!', datasetIndex);
+        // // return if no frame for this date
+        // if (datasetIndex < 0) {
+        //     this._setCursor(datasetIndex);
+        //     return console.log('no dataset on this date');
+        // }
+        // console.log('found dataset of the day!', datasetIndex);
 
         // move cursor to frame of the day
         this._moveCursor(datasetIndex);
