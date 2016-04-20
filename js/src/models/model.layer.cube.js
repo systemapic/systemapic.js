@@ -48,11 +48,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     options : {
         
-        // frames per second
-        fps : 5,
-
         // frames to cache [before, after]
-        cacheSize : [2, 10], 
+        cacheSize : [2, 20], 
         
         // moment format at which to compare dates (year/day only here)
         timeFormat : 'YYYY-DDDD', 
@@ -144,7 +141,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this.layer = this._cache[0].layer;
 
     },
-
 
     _moveCursor : function (options) {
 
@@ -258,14 +254,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         });
     },
 
-   
-
     update : function () {
         console.error('update');
         var map = app._map;
 
-        // prepare raster
-        // this._prepareRaster();
     },
 
     getDatasets : function () {
@@ -304,7 +296,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         return didx;
     },
 
-   
     _showLayer : function (layer) {
         layer.getContainer().style.display = 'block';
     },
@@ -312,74 +303,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _hideLayer : function (layer) {
         layer.getContainer().style.display = 'none';
     },
-
-    playAnimation : function () {
-        
-        return;
-
-        // // debug: start on layer 0
-        // this._currentFrame = this._cache[0].layer;
-
-        // // show one layer after the other (in loop)
-        // this._player = setInterval(function () {
-
-        //     // figure out which frame is current and next
-        //     this._setFrames();
-
-        //     // hide current frame
-        //     this._hideFrame && this._hideLayer(this._hideFrame);
-
-        //     // show next frame
-        //     this._showFrame && this._showLayer(this._showFrame);
-
-        // }.bind(this), (1000 / this.options.fps));
-    },
-
-    stopAnimation : function () {
-        this._player && clearInterval(this._player);
-    },
-
-    _onSetFPS : function (e) {
-        var fps = e.detail.fps;
-        this.options.fps = fps;
-    },
-
-    // _onAnimationPlay : function () {
-    //     if (!this._added) return;
-
-    //     // play
-    //     this.playAnimation();
-    // },
-
-    // _onAnimationStop : function () {
-    //     if (!this._added) return;
-        
-    //     // stop
-    //     this.stopAnimation();
-    // },
-
-    // _setFrames : function () {
-        
-    //     // find current index
-    //     var curIdx = _.findIndex(this._layers, this._currentFrame);
-
-    //     console.log('curIdx = ', curIdx);
-
-    //     // find next index
-    //     var nextIdx = curIdx + 1;
-    //     if (nextIdx > this._layers.length -1) {
-    //         nextIdx = 0;
-    //     }
-
-    //     // set frames
-    //     this._showFrame = this._layers[nextIdx];
-    //     this._hideFrame = this._layers[curIdx];
-    //     this._currentFrame = this._showFrame;
-    // },
-
-
-
-
 
     add : function (type) {
         this.addTo();
