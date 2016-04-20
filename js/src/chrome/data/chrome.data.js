@@ -1296,15 +1296,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // iterate and update
         for (var i=0; i < list.length; i++) {
-            var uuid = list[i].getAttribute('dataset-uuid');
-            var meta = _.find(datasets, function (d) {
-                return d.uuid == uuid;
-            }).meta;
-
-            order.push({
-                uuid : uuid,
-                meta : meta
+            var id = list[i].getAttribute('dataset-uuid');
+            var dataset = _.find(datasets, function (d) {
+                return d.id == id;
             });
+
+            order.push(dataset);
         }
 
         // save to server
@@ -1372,9 +1369,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var layer = this._fullscreen._layer;
 
         // get meta
-        var name = dataset.meta ? dataset.meta.text : 'error';
-        var timestamp = dataset.meta ? moment(dataset.meta.date).format("MMMM Do YYYY") : 'error';
-        var uuid = dataset.uuid;
+        var name = dataset.description || '';
+        var timestamp = moment(dataset.timestamp).format("MMMM Do YYYY") || 'error';
+        var uuid = dataset.id;
 
         // wrapper
         var wrap = Wu.DomUtil.create('div', 'cubeset-wrapper', appendTo);
@@ -1494,11 +1491,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var date = this.parse_date_YYYY_DDD(file.getTitle());
 
         var dataset = {
-            uuid : file.getUuid(),
-            meta : {
-                text : file.getTitle(),
-                date : date || file.getCreated()
-            }
+            id : file.getUuid(),
+            description : file.getTitle(),
+            timestamp : date || file.getCreated()
         }
 
         // create list item
@@ -1558,7 +1553,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var options = {
             cube_id : layer.getCubeId(),
             datasets : [{
-            uuid : dataset.uuid
+            id : dataset.id
             }]
         }
 
