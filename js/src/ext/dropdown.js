@@ -188,10 +188,7 @@ Wu.Dropdown = Wu.Class.extend({
 
 	_onKeydown: function (e) {
 
-		console.error('_onKeydown');
-
 		var key = event.which ? event.which : event.keyCode;
-
 
 		if (key === 32) {
 			this._showListItems();
@@ -221,11 +218,44 @@ Wu.Dropdown = Wu.Class.extend({
 		}
 
 
-		var _char = String.fromCharCode(key);
-		console.log(key);
-		// console.log('Wu.Tools.keyMap(key)', Wu.Tools.keyMap(key));
-		// console.log('_char', _char);
+		if ( key > 48 && key < 90 ) {
+			this._setKey(key);
+		}
+
+		
+	},
+
+	_setKey : function (key) {
+
+		// Get character
+		var _char = Wu.Tools.keyMap(key).toUpperCase();
+
+		// Go through list of options, jump to first hit
+	 	for ( var k in this.options.content ) {
+
+	 		var c = this.options.content[k];
+
+	 		// Stop if list item is not an object for some reason
+	 		if ( typeof c !== 'object' ) return;
+
+	 		// Get first character in option
+	 		var _firstChar = c.title.charAt(0).toUpperCase();
+
+	 		// If it's a match
+			if ( _char == _firstChar ) {
+
+				// Set value on list
+				this.setValue({
+					value: c.value,
+					title: c.title
+				});
+
+				// Stop
+				return;
+			}		
+	 	}
 		
 	}
+
 
 });
