@@ -1913,7 +1913,9 @@ input.target-input.polygon {
 }
 
 
-
+.big-slider .noUi-base {
+    cursor: pointer;
+}
 
 
 

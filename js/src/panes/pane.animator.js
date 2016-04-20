@@ -11,6 +11,7 @@ Wu.Animator = Wu.Evented.extend({
         // Defines what kind of graph we want
         graphType : 'annualCycles',
 
+        // how often to register updates when sliding
         sliderThrottle : 500
 
     },
@@ -151,7 +152,7 @@ Wu.Animator = Wu.Evented.extend({
 
     // todo: slider should know which date it is without asking graph
     _getCurrentDate : function () {
-    	var date = this.graph.getCurrentDate();
+    	var date = this.graph.getCurrentDate(this._sliderValue);
     	return date;
     },
 

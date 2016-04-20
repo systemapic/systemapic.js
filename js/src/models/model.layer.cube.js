@@ -31,6 +31,8 @@
 //  - a frame => dataset + layer + dataset-index. this._cache stores frames. frames are ready to be displayed (ie. contains layer)
 //  - a dataset = dataset
 //  - a layer = Leaflet layer, already added to map
+//  
+//  - create all Leaflet layers in cache at init, then re-use the layers
 //
 // websocket loading of tiles
 //  - as an add-on later, in order to request tiles faster
@@ -45,9 +47,18 @@
 Wu.CubeLayer = Wu.Model.Layer.extend({
 
     options : {
+        
+        // frames per second
         fps : 5,
-        cacheSize : 20, // frames to cache ahead
-        timeResolution : 'YYYY-DDDD' // moment format at which to compare dates (year/day only here)
+
+        // frames to cache [before, after]
+        cacheSize : [2, 10], 
+        
+        // moment format at which to compare dates (year/day only here)
+        timeFormat : 'YYYY-DDDD', 
+        
+        // empty, transparent png
+        emptyTile : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAB9JREFUaIHtwQENAAAAwqD3T20ON6AAAAAAAAAAAL4NIQAAAZpg4dUAAAAASUVORK5CYII=',
     },
 
     _cache : [],
@@ -80,154 +91,174 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // mark inited
         this._inited = true;
+
+        // debug
+        app._cubeDebug = this;
+
     },
 
     _initCursor : function () {
 
         // set cursor to 0
-        this._setCursor(0);
-
-        // set cursor to 0 (number is index of this._datasets)
-        // this._cursor = 0;
+        this._cursor = 0;
     },
 
     _initCache : function () {
 
-        // get datasets
+        // set datasets
         this._datasets = this.getDatasets();
 
-        // no cache if empty datasets
-        if (!_.size(this._datasets)) return;
+        // total num of cached frames
+        var cacheSize = this.options.cacheSize[0] + this.options.cacheSize[1];
 
-        // update cache based on current cursor
+        // create cache
+        _.times(cacheSize, function (n) {
+
+            // create empty Leaflet layer
+            var layer = L.tileLayer(this._getTileUrl(), {
+                errorTileUrl : this.options.emptyTile,
+                cube_id : this.getCubeId(),
+                subdomains : app.options.servers.cubes.subdomains,
+                maxRequests : 0,
+                dataset_id : null,
+                cache : null
+            });
+
+            // add layer to map
+            app._map.addLayer(layer);
+
+            // hide by default
+            this._hideLayer(layer);
+
+            // add to cache
+            this._cache.push({
+                layer : layer,
+                dataset_id : null,
+                age : Date.now(),
+                idx : null
+            });
+
+        }, this);
+
+        // set default layer
+        this.layer = this._cache[0].layer;
+
+    },
+
+
+    _moveCursor : function (options) {
+
+        // get options
+        var timestamp = options.timestamp;
+
+        // find index of dataset corresponding to current date
+        var didx = this._findDatasetByTimestamp(timestamp);
+
+        if (!didx) {
+            console.error('no dataset corresponding to timestamp');
+            this._hideLayer(this.layer);
+            return;
+        }
+
+        // console.log('setting cursor --> ', didx);
+
+        // set
+        this._cursor = didx;
+       
+        // make sure cache is updated; got all correct layers loaded
         this._updateCache();
 
-        // set cursor to first in cache
-        this._setCursor(0);  // 
+        // sets cursor at current frame (ie. show layer on map)
+        this._updateCursor();
+
     },
 
-    // this is where layers are shown on map
-    // sets this._cursor = datasetIndex
-    // displays layer
-    // nothing else...
-    _setCursor : function (datasetIndex) {
 
-        // console.error('_setCursor datasetIndex:', datasetIndex);
+    // this is where layers are shown on map 
+    // hides, displays layers, nothing else...
+    _updateCursor : function () {
 
-        // set cursor
-        this._cursor = datasetIndex;
+        // hide current layer
+        if (this.layer) {
+            this._hideLayer(this.layer);
+        }
+
+        // find dataset
+        var dataset = this._datasets[this._cursor];
 
         // find cached frame
-        console.time('searching cache');
-        var frame = _.find(this._cache, function (c) {
-            return c.idx == datasetIndex;
+        var cache = _.find(this._cache, function (c) {
+            return c.dataset_id == dataset.id;
         });
-        console.timeEnd('searching cache');
 
-      
-        if (!frame) console.error('no frame @ cursor:', this._cursor)
+        // get layer
+        var layer = cache ? cache.layer : false;
 
-        var layer = frame ? frame.layer : false;
+        // should never happen, ideally
+        if (!layer) return console.error('no layer @ cursor??');
 
-        if (!layer) console.error('no layer @ cursor:', this._cursor)
+        // show layer
+        this._showLayer(layer);
 
-        // hide old layer
-        if (this.layer) {
-            // console.log('hiding layer');
-            this._hideLayer(this.layer); // todo: unload, destroy
-        }
-        
-        // set layer 
-        if (layer) {
-
-            // this.layer needed for model.layers.js fn's
-            this.layer = layer;
-
-            // show layer
-            this._showLayer(layer);
-        }
+        // set layer
+        this.layer = layer;
     },
 
+    // update cache
     _updateCache : function () {
 
-        // console.log('---------- _updateCache -----------');
+        // determine which datasets should be in cache
+        var a = _.slice(this._datasets, this._cursor, this._cursor + this.options.cacheSize[1]);
+        var b = _.slice(this._datasets, this._cursor - this.options.cacheSize[0], this._cursor);
 
-        // cache is current cursor index and cacheSize long
-        var datasets = _.slice(this._datasets, this._cursor, this._cursor + this.options.cacheSize);
+        // sort datasets
+        var datasets = _.sortBy(_.unique(a.concat(b)), function (d) {
+            return _.findIndex(this._datasets, function (dd) {return d.id == dd.id});
+        }, this);
 
-        // console.log('datasets.length', datasets.length);
 
-        var cache = this._cache;
+        // cache datasets
+        datasets.forEach(function (dataset) {
 
-        // check which are already cached
-        console.time('filter datasets');
-        var datasetsToCache = _.filter(datasets, function (d) {
-            var notFound = true;
-            cache.forEach(function (c){
-                if (d.id == c.dataset.id) notFound = false;
+            // check if dataset already cached
+            var cached = _.find(this._cache, function (c) {
+                return c.dataset_id == dataset.id;
             });
-            return notFound;
-        });
-        console.timeEnd('filter datasets');
 
-        // load cache
-        console.time('cache datasets');
-        datasetsToCache.forEach(this._cacheFrame, this);
-        console.timeEnd('cache datasets');
+            // if already in cache, all good
+            if (cached) return;// console.log('already cached :)', cached.idx);
+            var didx = _.findIndex(this._datasets, function (d) {return d.id == dataset.id});
+            // console.log('caching#', didx)
+            
+            // set layer options
+            var layerOptions = {
+                dataset_id : dataset.id,
+                cache : Wu.Util.getRandomChars(6)
+            }
 
-        // todo: destroy old
+            // get available cache
+            var cache = this._getAvailableCache();
+
+            // update layer
+            cache.layer.setOptions(layerOptions);
+
+            // update cache
+            cache.dataset_id = dataset.id;
+            cache.age = Date.now();
+            cache.idx = didx;
+
+        }, this);
+     
     },
 
-    _cacheFrame : function (dataset) {
-
-        // console.log('_cacheFrame');
-
-        // url template
-        var access_token = '?access_token=' + app.tokens.access_token; // todo: add hash for styling to url
-        var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}';
-
-        // create leaflet layer
-        console.time('create leaflet layer');
-        var layer = L.tileLayer(url, {
-            cube_id : this.getCubeId(),
-            dataset_id : dataset.id,
-            subdomains : app.options.servers.cubes.subdomains,
-            maxRequests : 0,
-            cache : Wu.Util.getRandomChars(6)
+    _getAvailableCache : function () {
+        // return oldest cache
+        return _.min(this._cache, function (c) {
+            return c.age;
         });
-        console.timeEnd('create leaflet layer');
-
-        // add to map
-        console.time('add layer to map');
-        app._map.addLayer(layer);
-        console.timeEnd('add layer to map');
-
-        // hide by default
-        console.time('hide layer');
-        this._hideLayer(layer);
-        console.timeEnd('hide layer');
-
-        // get frame index by dataset
-        console.time('find index');
-        var datasetIndex = _.findIndex(this._datasets, function (d) { 
-            return d.id == dataset.id;
-        });
-        console.timeEnd('find index');
-
-        // console.log('_cacheFrame datasetIndex:', datasetIndex);
-
-        // cache frame
-        console.time('push frame to cache');
-        this._cache.push({
-            idx : datasetIndex, // dataset index
-            dataset : dataset,
-            layer : layer
-        });
-        console.timeEnd('push frame to cache');
-
-        // console.log('_cacheFrame cache.length', this._cache.length);
-
     },
+
+   
 
     update : function () {
         console.error('update');
@@ -253,56 +284,27 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _onAnimationSlide : function (e) {
         if (!this._added) return;
 
-        // get event payload
-        var value = e.detail.value;
+        // get timestamp
         var timestamp = e.detail.timestamp; // moment
-        var format = this.options.timeResolution;
 
-        // find index of dataset corresponding to current date
-        console.time('--anim findIndex');
-        var datasetIndex = _.findIndex(this._datasets, function (d) { 
-            var a = moment(d.timestamp).format(format); // YYYY-DDDD of dataset
-            var b = moment(timestamp).format(format);   // YYYY-DDDD of animation
+        // move cursor
+        this._moveCursor({
+            timestamp : timestamp
+        });
+
+    },
+
+    _findDatasetByTimestamp : function (t) {
+        var f = this.options.timeFormat;
+        var didx = _.findIndex(this._datasets, function (d) { 
+            var a = moment(d.timestamp).format(f); // YYYY-DDDD of dataset
+            var b = moment(t).format(f); // YYYY-DDDD of animation
             return a == b;
         });
-        console.timeEnd('--anim findIndex');
-
-        // // return if no frame for this date
-        // if (datasetIndex < 0) {
-        //     this._setCursor(datasetIndex);
-        //     return console.log('no dataset on this date');
-        // }
-        // console.log('found dataset of the day!', datasetIndex);
-
-        // move cursor to frame of the day
-        this._moveCursor(datasetIndex);
+        return didx;
     },
 
-    _moveCursor : function (datasetIndex) {
-
-        // console.log('_moveCursor', datasetIndex);
-
-        // set
-        this._cursor = datasetIndex;
-
-        // find frame
-        var dataset = this._datasets[datasetIndex];
-
-        var index = datasetIndex + 1; // real count, not array count (which starts at 0)
-        var total = _.size(this._datasets);
-        var still = total - index;
-
-        // console.log('Current dataset:', index);
-        // console.log('Total datasets:', total);
-        // console.log('Datasets right:', still);
-
-        // update cache to current frame + 3
-        this._updateCache();
-
-        // set cursor (and layer) to current frame
-        this._setCursor(datasetIndex);
-    },
-
+   
     _showLayer : function (layer) {
         layer.getContainer().style.display = 'block';
     },
@@ -502,8 +504,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     _refreshLayer : function () {
 
-        console.error('_refreshLayer!');
-
         // refresh all Leaflet layers
         this._cache.forEach(function (cache) {
             var layer = cache.layer;
@@ -564,5 +564,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             
         }.bind(this));
     },
+
+    _getTileUrl : function () {
+        var access_token = '?access_token=' + app.tokens.access_token;
+        var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}';
+        return url;
+    },
+
 
 });

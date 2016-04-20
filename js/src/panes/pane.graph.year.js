@@ -81,10 +81,10 @@ Wu.Graph.Year = Wu.Evented.extend({
 	},
 
 	// returns moment.js object
-	getCurrentDate : function () {
+	getCurrentDate : function (day) {
 
 		// get day/year
-		var day = this.currentDay;
+		var day = day;
 		var year = this.currentYear;
 
 		// create moment date from year/day
@@ -555,6 +555,9 @@ Wu.Graph.Year = Wu.Evented.extend({
 		var day = date.getDate();
 		var monthIndex = date.getMonth();
 		var year = date.getFullYear();
+
+		// todo: fix -- this.dayName is off by one day (sometimes...)
+		// rewrite with moment.js (takes into account leap years, etc... :)
 		this.dayName = day + ' ' + monthNames[monthIndex] + ' ' + year;
 
 		this.updateGraph();
