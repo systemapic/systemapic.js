@@ -100,10 +100,20 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._cursor = 0;
     },
 
+    _initDatasets : function () {
+        var datasets = this.getDatasets();
+        var f = this.options.timeFormat;
+        datasets.forEach(function (d) {
+            // prepare format for quicker search later
+            d.formattedTime = moment(d.timestamp).format(f);
+        });
+        return datasets;
+    },
+
     _initCache : function () {
 
         // set datasets
-        this._datasets = this.getDatasets();
+        this._datasets = this._initDatasets();
 
         // total num of cached frames
         var cacheSize = this.options.cacheSize[0] + this.options.cacheSize[1];
@@ -243,6 +253,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             cache.age = Date.now();
             cache.idx = didx;
 
+            console.log('setOptions', didx);
+
+
         }, this);
      
     },
@@ -288,10 +301,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     _findDatasetByTimestamp : function (t) {
         var f = this.options.timeFormat;
+        var b = moment(t).format(f); // YYYY-DDDD of animation
         var didx = _.findIndex(this._datasets, function (d) { 
-            var a = moment(d.timestamp).format(f); // YYYY-DDDD of dataset
-            var b = moment(t).format(f); // YYYY-DDDD of animation
-            return a == b;
+            return d.formattedTime == b;
         });
         return didx;
     },
