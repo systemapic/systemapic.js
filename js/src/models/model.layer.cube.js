@@ -255,7 +255,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             cache.age = Date.now();
             cache.idx = dataset.idx;
 
-            console.log('setOptions', dataset.idx);
+            // console.log('setOptions', dataset.idx);
 
         }, this);
      
@@ -287,7 +287,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // this._prepareRaster();
     },
 
-    _onAnimationSlide : function (e) {
+    // _onAnimationSlide : function (e) {
+    _onSliderSet : function (e) {
         if (!this._added) return;
 
         // get timestamp

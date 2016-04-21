@@ -29,6 +29,9 @@ Wu.Model = Wu.Class.extend({
 		Wu.Mixin.Events.on('animationSlide',  this._onAnimationSlide, this);
 		Wu.Mixin.Events.on('setFPS',   		  this._onSetFPS, this);
 
+		Wu.Mixin.Events.on('sliderSet',  this._onSliderSet, this);
+		Wu.Mixin.Events.on('sliderUpdate',  this._onSliderUpdate, this);
+
 		// file events
 		var event_id = 'downloadReady-' + this.getUuid();
 		Wu.Mixin.Events.on(event_id, this._onDownloadReady, this);
@@ -70,5 +73,7 @@ Wu.Model = Wu.Class.extend({
 	_onAnimationSlide: function () {},
 	_onSetFPS 		 : function () {},
 	_onCubeEdited	 : function () {},
+	_onSliderSet	 : function () {},
+	_onSliderUpdate	 : function () {},
 
 });

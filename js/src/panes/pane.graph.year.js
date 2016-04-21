@@ -25,7 +25,8 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	// Listen to events
 	addHooks : function () {
-		Wu.Mixin.Events.on('animationSlide', this.sliding, this);
+		// Wu.Mixin.Events.on('animationSlide', this.sliding, this);
+		Wu.Mixin.Events.on('sliderUpdate', this.sliding, this);
 		Wu.Mixin.Events.on('sliderMoveBackward', this.moveBackward, this);
 		Wu.Mixin.Events.on('sliderMoveForward', this.moveForward, this);
 		Wu.Mixin.Events.on('setSliderTitle', this.setTitle, this)
@@ -117,7 +118,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 			disableForward  : this.disableForward,
 			disableBackward : this.disableBackward
 
-		}});				
+		}});			
 
 	},
 
@@ -301,6 +302,12 @@ Wu.Graph.Year = Wu.Evented.extend({
 			return d.SCF
 		}.bind(this));
 
+		// debug save
+		this._dcCache = {
+			scatterDim : scatterDim,
+			yThisDim : yThisDim
+		}
+
 		var graphOuterContainer = Wu.DomUtil.create('div', 'big-graph-outer-container', this.options.appendTo);
 
 		var graphInfoContainer = Wu.DomUtil.create('div', 'big-graph-info-container', graphOuterContainer);
@@ -421,7 +428,13 @@ Wu.Graph.Year = Wu.Evented.extend({
 		this.ndx.add(this.graphData);
 
 		// Redraw graph
-		dc.redrawAll()
+		dc.redrawAll();
+		// dc.redrawAll(this._dcCache.yThisDim);
+		// dc.redraw()
+		// this.ndx.redraw();
+
+		// console.log('this.ndx', this.ndx);
+		// console.log('dc:', dc);
 
 		var scf = Math.round(this.years[year][day-1].SCF * 100) / 100;
 

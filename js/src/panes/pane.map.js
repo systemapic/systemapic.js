@@ -111,9 +111,13 @@ Wu.MapPane = Wu.Pane.extend({
 			attributionControl : false,
 			maxZoom : 19,
 			minZoom : 0,
-			// zoomAnimation : false
 			zoomControl : false,
 			inertia : false,
+
+			// js optimizing attempt
+			fadeAnimation : false,
+			zoomAnimation : false
+
 			// loadingControl : true,
 			// zoomAnimationThreshold : 2,
 		});

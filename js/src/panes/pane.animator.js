@@ -52,6 +52,8 @@ Wu.Animator = Wu.Evented.extend({
         // create graph
         this._createGraph();
      
+        // mark inited
+        this._inited = true;
     },
 
     // Set Frames Per Second
@@ -89,7 +91,8 @@ Wu.Animator = Wu.Evented.extend({
             range: {
                 'min': 1,
                 'max': dataLength
-            }
+            },
+            step : 1
         });
 
         // hide by default if option set
@@ -116,16 +119,9 @@ Wu.Animator = Wu.Evented.extend({
         Wu.DomEvent.on(this.tapForward,   'click', this.stepOneForward, this);
         Wu.DomEvent.on(this.playButton,   'click', this.play, this);
 
-        // slider event
-        this.slider.on('slide', _.throttle(function(value) {
-
-            // set current value
-            this._sliderValue = Math.round(value);
-
-            // fire slide event
-            this.slideEvent();
-
-        }.bind(this), this.options.sliderThrottle));
+        // slider events
+        this.slider.on('update', this._sliderUpdateEvent.bind(this));
+        this.slider.on('set', this._sliderSetEvent.bind(this));
 
         // listen for events
         Wu.Mixin.Events.on('setSlider', this.setSlider, this);
@@ -133,22 +129,44 @@ Wu.Animator = Wu.Evented.extend({
     },
 
 
-    // When sliding (dragging or clicking)
-    slideEvent : function () {
+    // @ only update graph
+    // event that runs when sliding (ie. a lot!)
+    // see http://refreshless.com/nouislider/events-callbacks/
+    _sliderUpdateEvent : function (value) {
+        if (!this._inited) return;
 
-    	// ensure slider value
-        if (!this._sliderValue) this._sliderValue = 0;
+        // set slider value
+        this._sliderValue = value ? Math.round(value) : 0;
+
+        // fire slider update event (for graph)
+        Wu.Mixin.Events.fire('sliderUpdate', { detail : {
+            value : this._sliderValue,
+        }});
+    },
+
+    // @ event: update layers
+    // event that runs when new value is set (either after slide, or with .set())
+    _sliderSetEvent : function (value, handle, unencoded, tap) {
+        if (!this._inited) return;
+
+        // set slider value
+        this._sliderValue = value ? Math.round(value) : 0;
 
         // get current date
         var timestamp = this._getCurrentDate();
 
-        // fire sliding event
-        Wu.Mixin.Events.fire('animationSlide', { detail : {
-            layer : this._currentLayer,
-            value : this._sliderValue,
-            timestamp : timestamp
-        }});
-    },  
+        // add delay if tap (to )
+        setTimeout(function () {
+
+             // fire slider set event
+            Wu.Mixin.Events.fire('sliderSet', { detail : {
+                value : this._sliderValue,
+                timestamp : timestamp
+            }});
+
+        }.bind(this), tap ? 300 : 0);
+       
+    },
 
     // todo: slider should know which date it is without asking graph
     _getCurrentDate : function () {
@@ -187,7 +205,7 @@ Wu.Animator = Wu.Evented.extend({
     // Set slider value
     setSlider : function (e) {
         this._sliderValue = e.detail.value;
-        this.slider.set([this._sliderValue]);
+        this.slider.set(this._sliderValue);
     },
 
     updateButtons : function (e) {
@@ -206,7 +224,6 @@ Wu.Animator = Wu.Evented.extend({
         } else { 
             Wu.DomUtil.removeClass(this.stepBackward, 'disable-button'); 
         }
-
     },
 
     // Set title
@@ -230,18 +247,27 @@ Wu.Animator = Wu.Evented.extend({
 
     startPlaying : function () {
 
+        // set pause icon
         this.playButton.innerHTML = '<i class="fa fa-pause"></i>';
 
+        // mark as playing
         this.playing = true;
 
+        // move frame @ fps
         this.playInterval = setInterval(function() {
-            if ( this._sliderValue == 365 ) {
-                clearInterval(this.playInterval);
-                return;
-            } else {
-                this.slider.set(this._sliderValue++);
-                this.slideEvent();
+
+            // check if last day of year
+            if (this._sliderValue == 365) {     // todo: move to next year...?
+
+                // stop playing
+                return clearInterval(this.playInterval);
+
+            } else {                
+
+                // move cursor forward
+                this.stepOneForward();
             }           
+
         }.bind(this), (1000/this.options.fps)) 
 
         // fire animation play
@@ -250,8 +276,10 @@ Wu.Animator = Wu.Evented.extend({
 
     stopPlaying : function () {
 
+        // set play icon
         this.playButton.innerHTML = '<i class="fa fa-play"></i>';
 
+        // stop playing
         clearInterval(this.playInterval);
         this.playing = false;
 
@@ -260,15 +288,13 @@ Wu.Animator = Wu.Evented.extend({
     },
 
     stepOneForward : function () {      
-        this._sliderValue++;
-        this.slideEvent();
-        this.slider.set([this._sliderValue]);
+        var value = this._sliderValue + 1;
+        this.slider.set(value);
     },
 
     stepOneBackward : function () {
-        this._sliderValue--;
-        this.slideEvent();
-        this.slider.set([this._sliderValue]);
+        var value = this._sliderValue - 1;
+        this.slider.set(value);
     },
 
     moveBackward : function () {
@@ -280,11 +306,9 @@ Wu.Animator = Wu.Evented.extend({
     },  
 
     // Update message box, if it exists before
-    update : function (message, severity) {
-    },
+    update : function (message, severity) {},
 
-    remove : function (id) {
-    },
+    remove : function (id) {},
 
     hide : function () {
         this.sliderOuterContainer.style.display = 'none';
