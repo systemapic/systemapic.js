@@ -103,9 +103,11 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _initDatasets : function () {
         var datasets = this.getDatasets();
         var f = this.options.timeFormat;
-        datasets.forEach(function (d) {
-            // prepare format for quicker search later
+        datasets.forEach(function (d, n) {
+            // prepare format for quicker search 
             d.formattedTime = moment(d.timestamp).format(f);
+            // prepare index for quicker search
+            d.idx = n;
         });
         return datasets;
     },
@@ -233,7 +235,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             // if already in cache, all good
             if (cached) return;// console.log('already cached :)', cached.idx);
-            var didx = _.findIndex(this._datasets, function (d) {return d.id == dataset.id});
+
             // console.log('caching#', didx)
             
             // set layer options
@@ -251,10 +253,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // update cache
             cache.dataset_id = dataset.id;
             cache.age = Date.now();
-            cache.idx = didx;
+            cache.idx = dataset.idx;
 
-            console.log('setOptions', didx);
-
+            console.log('setOptions', dataset.idx);
 
         }, this);
      
