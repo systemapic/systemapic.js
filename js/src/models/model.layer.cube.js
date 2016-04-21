@@ -64,9 +64,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // set store
         this._setStore(store);
-
-        // listen up
-        this._listen();
     },
 
     _setStore : function (store) {
@@ -79,6 +76,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     initLayer : function () {
+
+        // listen up
+        this._listen();
 
         // init cursor
         this._initCursor();
@@ -96,16 +96,19 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     _initCursor : function () {
 
-        // set cursor to 0
+        // init cursor
         this._cursor = 0;
+        
     },
 
     _initDatasets : function () {
         var datasets = this.getDatasets();
         var f = this.options.timeFormat;
         datasets.forEach(function (d, n) {
+
             // prepare format for quicker search 
             d.formattedTime = moment(d.timestamp).format(f);
+            
             // prepare index for quicker search
             d.idx = n;
         });
@@ -133,6 +136,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 cache : null
             });
 
+            // add load event
+            layer.on('load', this._layerLoaded, this);
+
             // add layer to map
             app._map.addLayer(layer);
 
@@ -154,6 +160,13 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
+    _layerLoaded : function (e) {
+        var layer = e.target;
+        var dataset = _.find(this._datasets, {id : layer.options.dataset_id});
+
+        dataset && console.log('loaded:', dataset.idx);
+    },
+
     _moveCursor : function (options) {
 
         // get options
@@ -167,8 +180,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             this._hideLayer(this.layer);
             return;
         }
-
-        // console.log('setting cursor --> ', didx);
 
         // set
         this._cursor = didx;
@@ -234,10 +245,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             });
 
             // if already in cache, all good
-            if (cached) return;// console.log('already cached :)', cached.idx);
+            if (cached) return;
 
-            // console.log('caching#', didx)
-            
             // set layer options
             var layerOptions = {
                 dataset_id : dataset.id,
@@ -254,8 +263,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             cache.dataset_id = dataset.id;
             cache.age = Date.now();
             cache.idx = dataset.idx;
-
-            // console.log('setOptions', dataset.idx);
 
         }, this);
      
