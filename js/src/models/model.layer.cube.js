@@ -98,7 +98,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // init cursor
         this._cursor = 0;
-        
+
     },
 
     _initDatasets : function () {
@@ -139,6 +139,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // add load event
             layer.on('load', this._layerLoaded, this);
 
+            // add click event
+            // layer.on('click', this._layerClick, this); // no effect?
+
             // add layer to map
             app._map.addLayer(layer);
 
@@ -158,6 +161,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // set default layer
         this.layer = this._cache[0].layer;
 
+    },
+
+    _layerClick : function (e) {
+        console.log('_layerClick', e);
     },
 
     _layerLoaded : function (e) {
@@ -221,6 +228,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // set layer
         this.layer = layer;
+
+        console.log('_updateCursor', this._cursor);
     },
 
     // update cache

@@ -116,10 +116,16 @@ Wu.MapPane = Wu.Pane.extend({
 
 			// js optimizing attempt
 			fadeAnimation : false,
-			zoomAnimation : false
+			zoomAnimation : false,
 
+			// exp
+			// zoomSnap : 0,
+			// zoomDelta : 2,
+			// wheelPxPerZoomLevel : 10,
+			// wheelDebounceTime : 5,
 			// loadingControl : true,
 			// zoomAnimationThreshold : 2,
+
 		});
 
 		// add attribution
