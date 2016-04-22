@@ -226,11 +226,13 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	// fired on window resize
+	// THIS FUNCTION IS NEVER FIRED, IS IT???
 	resizeEvent : function (d) {
 
 		this._updateWidth(d);
 	},
     
+    	// THIS FUNCTION IS NEVER FIRED, IS IT???
 	_updateWidth : function (d) {
 		var map = this._map;
 		if (!map || !d) return;

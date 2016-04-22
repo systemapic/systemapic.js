@@ -25,6 +25,8 @@ Wu.App = Wu.Class.extend({
 
 		// auth
 		app.api.auth(app.authed);
+
+
 	},
 
 	authed : function (err, access_token) {
@@ -410,15 +412,31 @@ Wu.App = Wu.Class.extend({
 		app.isMobile = Wu.Util.isMobile();
 
 		if (app.isMobile) {
-			var device = app.isMobile.mobile ? 'mobile' : 'tablet';
 
-			// load stylesheet
-			app.Controller.loadjscssfile('/css/' + device + '.css', 'css');
+			Wu.DomEvent.on(window, 'resize', this.setMobileSize, this);
+			this.setMobileSize();
 
-			// set width of map
-			var width = app.isMobile.width;
-			app._map._container.style.width = width + 'px';
 		}
+
+	},
+
+
+	setMobileSize : function () {
+
+		// Check landscape or portrait format
+		if(window.innerHeight > window.innerWidth) var portrait = true;
+
+		// Get width
+		var width = portrait ? app.isMobile.width : app.isMobile.height;
+
+		// Check device type
+		var device = app.isMobile.mobile ? 'mobile' : 'tablet';
+
+		// load stylesheet
+		app.Controller.loadjscssfile('/css/' + device + '.css', 'css');
+
+		// set width of map
+		app._map._container.style.width = width + 'px';
 
 	},
 
