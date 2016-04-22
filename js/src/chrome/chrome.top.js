@@ -13,8 +13,18 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	initContainer : function () {
 
+		var isPublic = app.Account.isPublic();
+
+		var cName = 'chrome chrome-container chrome-top';
+		if ( isPublic ) {
+			cName += ' public'; 
+		} else {
+			cName += ' logged-in';
+		}
+
+
 		// container to hold errything
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
+		this._container = Wu.DomUtil.create('div', cName, app._appPane);
 
 		// Menu Button
 		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);
@@ -163,6 +173,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Toggle left pane
 		Wu.DomEvent[onoff](this._menuButton, 'click', this._toggleLeftPane, this);
 
+		Wu.Mixin.Events[onoff]('_openLayerMenu', this._onLayMenuOpen, this);
+
+	},
+
+	_onLayMenuOpen : function () {
+
+		if ( !app.isMobile || !app.isMobile.mobile ) return;
+
+		this.closeLeftPane();
+
 	},
 
 	addHooks : function () {
@@ -249,10 +269,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 	_toggleLeftPane : function (e) {
+		
 		this._leftPaneisOpen ? this.closeLeftPane() : this.openLeftPane();
+		Wu.Mixin.Events.fire('toggleLeftChrome', {detail : {leftPaneisOpen : this._leftPaneisOpen }}); 
+
+
 	},
 
 	openLeftPane : function () {
+
+
 
 		// close other tabs
 		Wu.Mixin.Events.fire('closeMenuTabs');
@@ -319,15 +345,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 	_openLayerMenu : function () {
+	
 
 		// use a variable to mark editor as open
 		this._layerMenuOpen = true;
 
-		// Add "active" class from button
-		// Wu.DomUtil.addClass(this._layersBtn, 'active');
-
 		// TODO: Open Layer Menu
 		this.__layerMenu.openLayerPane();
+
+		if ( !app.isMobile || !app.isMobile.mobile ) return;
+		this.closeLeftPane();
 	},
 
 	_closeLayerMenu : function () {
@@ -335,15 +362,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// mark not open
 		this._layerMenuOpen = false;
 
-		// Remove "active" class from button
-		// Wu.DomUtil.removeClass(this._layersBtn, 'active');
-
 		// TODO: Close Layer Menu
 		this.__layerMenu.closeLayerPane();
 	},	
 
-	_onCloseMenuTabs : function () {
-		
+	_onCloseMenuTabs : function () {	
+
 		// app.Chrome();
 		this.closeLeftPane();
 	}

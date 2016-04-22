@@ -406,6 +406,17 @@ Wu.App = Wu.Class.extend({
 	},
 
 
+
+
+
+	// ███╗   ███╗ ██████╗ ██████╗ ██╗██╗     ███████╗
+	// ████╗ ████║██╔═══██╗██╔══██╗██║██║     ██╔════╝
+	// ██╔████╔██║██║   ██║██████╔╝██║██║     █████╗  
+	// ██║╚██╔╝██║██║   ██║██╔══██╗██║██║     ██╔══╝  
+	// ██║ ╚═╝ ██║╚██████╔╝██████╔╝██║███████╗███████╗
+	// ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚══════╝╚══════╝
+
+
 	// todo: move to own script
 	detectMobile : function() {
 		
@@ -413,10 +424,18 @@ Wu.App = Wu.Class.extend({
 
 		if (app.isMobile) {
 
-			Wu.DomEvent.on(window, 'resize', this.setMobileSize, this);
+			// Set size	
 			this.setMobileSize();
 
+			// Listen to the wind blow
+			this.mobileListners();
 		}
+
+	},
+
+	mobileListners : function () {
+
+		Wu.DomEvent.on(window, 'resize', this.setMobileSize, this);
 
 	},
 
@@ -427,7 +446,8 @@ Wu.App = Wu.Class.extend({
 		if(window.innerHeight > window.innerWidth) var portrait = true;
 
 		// Get width
-		var width = portrait ? app.isMobile.width : app.isMobile.height;
+		var width  = portrait ? app.isMobile.width : app.isMobile.height;
+		var height = portrait ? app.isMobile.height : app.isMobile.width;
 
 		// Check device type
 		var device = app.isMobile.mobile ? 'mobile' : 'tablet';
@@ -437,8 +457,21 @@ Wu.App = Wu.Class.extend({
 
 		// set width of map
 		app._map._container.style.width = width + 'px';
+		// app._map._container.style.height = height + 'px';
 
 	},
+
+
+	// ███████╗███╗   ██╗██████╗     ███╗   ███╗ ██████╗ ██████╗ ██╗██╗     ███████╗
+	// ██╔════╝████╗  ██║██╔══██╗    ████╗ ████║██╔═══██╗██╔══██╗██║██║     ██╔════╝
+	// █████╗  ██╔██╗ ██║██║  ██║    ██╔████╔██║██║   ██║██████╔╝██║██║     █████╗  
+	// ██╔══╝  ██║╚██╗██║██║  ██║    ██║╚██╔╝██║██║   ██║██╔══██╗██║██║     ██╔══╝  
+	// ███████╗██║ ╚████║██████╔╝    ██║ ╚═╝ ██║╚██████╔╝██████╔╝██║███████╗███████╗
+	// ╚══════╝╚═╝  ╚═══╝╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚══════╝╚══════╝
+
+
+
+
 
 	debug : function () {
 

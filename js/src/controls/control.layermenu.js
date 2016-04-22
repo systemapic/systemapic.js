@@ -50,7 +50,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	            project_dependent : false
 	        });
 
-	        // this._layerButton.innerHTML = '<i class="top-button fa fa-bars"></i> <span class="layer-button-text">Layers</div>';
 	        this._layerButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-layers"></i> <span class="layer-button-text">Layers</div>';
 	        
 	        
@@ -58,11 +57,13 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	toggleLayerMenu : function () {
-
 		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function  () {
+
+		Wu.Mixin.Events.fire('_openLayerMenu', {}); 		
+
 		this._isOpen = true;
 		Wu.DomUtil.removeClass(this._innerContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._layerButton, 'rounded-layer-button');
@@ -71,6 +72,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	}, 
 
 	close : function () {
+
 		this._isOpen = false;
 		Wu.DomUtil.addClass(this._innerContainer, 'displayNone');
 		Wu.DomUtil.addClass(this._layerButton, 'rounded-layer-button');
@@ -178,10 +180,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
 
-		if (app.mobile) {
-			// Mobile arrow	
-		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
-		}
+		// if (app.mobile) {
+		// 	// Mobile arrow	
+		//     	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
+		// }
 
 	},
 
@@ -193,6 +195,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomEvent.on(this._container, 'mouseleave', function () {
 			app._map.scrollWheelZoom.enable();
 		}, this);
+
+
+		Wu.Mixin.Events.on('toggleLeftChrome', this._toggleLeftChrome, this);
+
+
 	},
 
 	_initContent : function () {
@@ -1416,7 +1423,18 @@ L.Control.Layermenu = Wu.Control.extend({
 			console.log('set max height of layer menu!');
 		}
 
-	}
+	},
+
+
+	// EVENT fired in chrome.top.js
+	_toggleLeftChrome : function (e) {
+
+		if ( !app.isMobile || !app.isMobile.mobile ) return;		
+
+		var isOpen = e.detail.leftPaneisOpen;
+		isOpen ? this.close() : this.open();
+
+	},
 
 
 });

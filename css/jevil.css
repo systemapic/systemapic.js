@@ -2720,3 +2720,12 @@ input.stop-color {
 .raster-stops-button-container {
     text-align: center;
 }
+
+
+.close-smooth-fullscreen {
+    background: white;
+}
+
+.smooth-fullscreen {
+    padding-bottom: 200px !important;
+}
