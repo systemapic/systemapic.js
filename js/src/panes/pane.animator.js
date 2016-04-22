@@ -3,7 +3,7 @@ Wu.Animator = Wu.Evented.extend({
     options : {
 
         // Animation frames per second
-        fps : 5,
+        fps : 3,
 
         // Max value for steps on slider
         maxLength : 365,
