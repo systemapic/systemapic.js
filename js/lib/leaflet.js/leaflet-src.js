@@ -4497,7 +4497,8 @@ L.GridLayer = L.Layer.extend({
 		this._tiles[key] = {
 			el: tile,
 			coords: coords,
-			current: true
+			current: true,
+			loaded : false
 		};
 
 		container.appendChild(tile);
