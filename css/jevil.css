@@ -29,7 +29,14 @@
     margin-right: 0px;
     opacity: 0.0;
     cursor: pointer;
+
+    top: 28px;
+
     }
+
+.file-popup-trigger.add-layer {
+    top: 10px !important;
+}
 
 .file-list-container-file-list .data-list-line:hover .file-popup-trigger,
 .file-list-container-file-list .data-list-line.file-selected .file-popup-trigger,
@@ -2039,6 +2046,7 @@ input.chrome-field-input {
 
 .file-name-content {
     padding-right: 62px;    
+    word-break: break-all;    
 }
 
 .chrome-upload-button {
@@ -2163,6 +2171,9 @@ input.chrome-field-input {
     padding: 5px 10px;
     color: #000;
     cursor: pointer;
+    overflow: hidden;
+    line-height: 2;
+    padding-top: 1px;    
 }
 
 .chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper {
@@ -2719,4 +2730,57 @@ input.stop-color {
 
 .raster-stops-button-container {
     text-align: center;
+}
+
+
+
+.scroll-cathcer {
+    background: red;
+    position: relative;
+    width: 400px;
+    height: 40px;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    }
+
+
+.files-page-counter-container {
+    text-align: center;
+}
+
+.files-page-counter-container div {
+    cursor: pointer;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.paginator-button {
+    border: 1px solid;
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    padding: 5px;
+}
+
+.files-pages-dots-countainer {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.pages-dott {
+    display: inline-block;
+    height: 31px;
+    border: 1px solid;
+    padding: 5px;
+}
+
+.pages-dott.active-dott {
+    background: cyan;
+}
+
+
+.data-list-line .file-name-content {
+    height: 16px;
+    overflow: hidden;    
 }

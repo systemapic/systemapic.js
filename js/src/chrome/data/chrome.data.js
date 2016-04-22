@@ -3,7 +3,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     _ : 'data',
 
     options : {
-        defaultWidth : 400
+        defaultWidth : 400,     
+        start : 0,              // What index array should start at
+        count : 10,             // How many items in list (per "page")
     },
 
     // When a new layer is created, we make a background fade on it
@@ -140,6 +142,31 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // Containers
         this._filesContainerHeader = Wu.DomUtil.create('div', 'files-container-header', this._listContainer);
         this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._listContainer);
+
+        // File list container content (this is where the items go)
+        this._filesContainerContent = Wu.DomUtil.create('div', 'files-container-content', this._filesContainer);
+
+        this.initPageCounter();
+
+    },
+
+    initPageCounter : function () {
+        this._pageCounterContainer = Wu.DomUtil.create('div', 'files-page-counter-container', this._filesContainer);
+        this._pageCounterDotsContainer = Wu.DomUtil.create('div', 'files-pages-dots-countainer', this._pageCounterContainer);
+    },
+
+    updatePageCounter : function (D3container, p, data, page) {
+            
+        page ? page : 1
+
+        this.paginator = $(this._pageCounterDotsContainer).pagination({
+            dataSource : data,
+            pageNumber : page, 
+            pageSize : 8,
+            callback: function(d, pagination){
+                this.initFileList(D3container, d, p);
+            }.bind(this)
+        })
     },
 
     _initContent : function () {
@@ -222,6 +249,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     onOpened : function () {},
     onClosed : function () {},
     _addEvents : function () {},
+
     _removeEvents : function () {},
     _onWindowResize : function () {},
 
@@ -285,7 +313,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // currently every action takes > 2000ms if filelist is >1000 files.
     //
     // perhaps better to remove d3 completely, and just create divs normally, then update store the divs in an object on file_id keys
+
+
+    // KO: We can remove D3, but that does not change the problem. It's in general much easier working with data driven docuemnts
+    // with D3 than it is without it. That's what it's fore. And it makes need of much less code.
+    // but, yeah, I'll work on it.
+
+    // Also, I cannot see that the _refresh() function runs as often as you claim to. For what I see, it's the _refreshFiles(), 
+    // not the _refresh() function that runs too often.
+
     _refresh : function () {
+
+        console.error('_refresh');
 
         if (!this._project) return;
 
@@ -297,7 +336,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // Empty containers
         if ( this._layersContainer ) this._layersContainer.innerHTML = 'Currently no layers. Add data below.';
-        if ( this._filesContainer )  this._filesContainer.innerHTML = '';
+        if ( this._filesContainerContent )  this._filesContainerContent.innerHTML = '';
 
         // only update list if project is editable
         if (this._project.isEditable()) {
@@ -620,7 +659,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             this.fileListContainers[f] = {};
 
             // Create wrapper
-            this.fileListContainers[f].wrapper = Wu.DomUtil.create('div', 'file-list-container', this._filesContainer);
+            this.fileListContainers[f].wrapper = Wu.DomUtil.create('div', 'file-list-container', this._filesContainerContent);
 
             // D3 Container
             this.fileListContainers[f].fileList = Wu.DomUtil.create('div', 'file-list-container-file-list', this.fileListContainers[f].wrapper);
@@ -631,26 +670,42 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
     _refreshFiles : function (options) {
+
+        console.error('_refreshFiles');
+        console.log('this.paginator', this.paginator);
+        console.log('');
+
+        // console.log('this.paginator.getSelectedPageNum()', this.paginator.getSelectedPageNum());
+
+
         options = options || {};
 
         // FILES
-        for (var p in this.fileProviders) {
+        for (var p in this.fileProviders) { // Det er bare én liste
+
             var provider = this.fileProviders[p];
             var files = provider.getFiles();
             var sortBy = options.sortBy || this.currentSort || 'lastUpdated'
             var reverse = options.reverse || this.reverse || false;
             var filter = options.filter || this.searchInput && this.searchInput.value && this.searchInput.value.toLowerCase() || '';
 
-            if (filter) {
+
+            // IF FILTERING DATA
+            if ( filter ) {
                 provider.data = _.filter(_.toArray(files), function (file) {
                     return file.store.name.toLowerCase().indexOf(filter) !== -1 || app.Users[file.store.createdBy].getFullName().toLowerCase().indexOf(filter) !== -1;
                 });
                 files = provider.data;
             }
 
-            // get file list, sorted by last updated
-            provider.data = _.sortBy(_.toArray(files), function (f) {
-                if (sortBy === 'dataSize') {
+            // Get list as array
+            var dataArr = _.toArray(files);
+
+
+
+            // Get file list, sorted by last updated
+            provider.data = _.sortBy(dataArr, function (f) {
+                if (sortBy === 'dataSize') { // Default filter
                     return parseInt(f.store[sortBy]);
                 }
 
@@ -661,10 +716,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 provider.data = provider.data.reverse();
             }
 
+
             // containers
             var D3container = this.fileListContainers[p].D3container;
             var data = this.fileProviders[p].data;
+
+            this.updatePageCounter(D3container, p, data);
+
+            return;
+
             this.initFileList(D3container, data, p);
+
+
         }
 
     },
@@ -741,7 +804,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // ├┤ ├─┤│  ├─┤  ├┤ ││  ├┤   │││├┬┘├─┤├─┘├─┘├┤ ├┬┘
     // └─┘┴ ┴└─┘┴ ┴  └  ┴┴─┘└─┘  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─
     initFileList : function (D3container, data, library) {
-
 
         // BIND
         var dataListLine = D3container

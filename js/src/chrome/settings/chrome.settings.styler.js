@@ -130,6 +130,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_initStylingOptions : function () {
 
+		this.type = this._layer.getMeta().geometry_type;
+
+		// Possible types:
+		// ST_Point
+		// ST_MultiPolygon
+		// ST_MultiLineString
+
 		var options = {
 			carto 	  : this._carto,
 			layer 	  : this._layer,
@@ -138,21 +145,20 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			meta 	  : this._meta,
 			columns   : this._columns,
 			container : this._fieldsWrapper,
-			// type      : this._layer.getMeta().geometry_type
+			type      : this.type
 		};
-
-
-		var type = this._layer.getMeta().geometry_type;
-
-
+		
 		// create point styler
-		if ( type == 'ST_Point' ) this._pointStyler = new Wu.Styler.Point(options);
+		// if ( this.type == 'ST_Point' ) 
+		this._pointStyler = new Wu.Styler.Point(options);
 
 		// create polygon styler
-		if ( type == 'ST_MultiPolygon' ) this._polygonStyler = new Wu.Styler.Polygon(options);
+		// if ( this.type == 'ST_MultiPolygon' ) 
+		this._polygonStyler = new Wu.Styler.Polygon(options);
 
 		// create line styler
-		if ( type == 'ST_MultiLineString' ) this._lineStyler = new Wu.Styler.Line(options);
+		// if ( this.type == 'ST_MultiLineString' ) 
+		this._lineStyler = new Wu.Styler.Line(options);
 
 	},
 
