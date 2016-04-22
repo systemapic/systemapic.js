@@ -49,7 +49,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     options : {
         
         // frames to cache [before, after]
-        cacheSize : [2, 20], 
+        cacheSize : [3, 15], 
         
         // moment format at which to compare dates (year/day only here)
         timeFormat : 'YYYY-DDDD', 
@@ -152,7 +152,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             this._cache.push({
                 layer : layer,
                 dataset_id : null,
-                age : Date.now(),
                 idx : null
             });
 
@@ -188,6 +187,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             return;
         }
 
+        // set direction (for cache algorithm)
+        this._cursorDirection = (didx > this._cursor) ? 1 : -1;
+
         // set
         this._cursor = didx;
        
@@ -198,7 +200,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._updateCursor();
 
     },
-
 
     // this is where layers are shown on map 
     // hides, displays layers, nothing else...
@@ -229,7 +230,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // set layer
         this.layer = layer;
 
-        console.log('_updateCursor', this._cursor);
+        console.log('cursor @', this._cursor);
     },
 
     // update cache
@@ -243,7 +244,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var datasets = _.sortBy(_.unique(a.concat(b)), function (d) {
             return _.findIndex(this._datasets, function (dd) {return d.id == dd.id});
         }, this);
-
 
         // cache datasets
         datasets.forEach(function (dataset) {
@@ -278,10 +278,24 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _getAvailableCache : function () {
-        // return oldest cache
-        return _.min(this._cache, function (c) {
-            return c.age;
-        });
+
+        // if going forward in time
+        if (this._cursorDirection > 0) {
+            
+            // return lowest cached dataet index
+            return _.min(this._cache, function (c) {
+                return c.idx;
+            }); 
+
+        // if going backwards in time
+        } else {
+            
+            // return highest cached dataset index
+            return _.max(this._cache, function (c) {
+                return c.idx;
+            });
+        }
+       
     },
 
     update : function () {
@@ -303,7 +317,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // this._prepareRaster();
     },
 
-    // _onAnimationSlide : function (e) {
+    // event when slider is set
     _onSliderSet : function (e) {
         if (!this._added) return;
 
