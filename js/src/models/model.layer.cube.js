@@ -49,7 +49,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     options : {
         
         // frames to cache [before, after]
-        cacheSize : [3, 15], 
+        cacheSize : [5, 25], 
         
         // moment format at which to compare dates (year/day only here)
         timeFormat : 'YYYY-DDDD', 
@@ -137,10 +137,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             });
 
             // add load event
-            layer.on('load', this._layerLoaded, this);
+            layer.on('load', this._onLayerLoaded, this);
 
             // add click event
-            // layer.on('click', this._layerClick, this); // no effect?
+            // layer.on('click', this._onLayerClick, this); // no effect?
+            // layer.on('tileunload', this._onTileUnload, this); // no effect?
+            // layer.on('tileload', this._onTileLoad, this); // no effect?
 
             // add layer to map
             app._map.addLayer(layer);
@@ -162,15 +164,33 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
-    _layerClick : function (e) {
+    _onTileUnload : function (e) {
+        var layer = e.target;
+        console.log('_onTileUnload', layer.options.dataset_id);
+    },
+
+    _onTileLoad : function (e) {
+         var layer = e.target;
+        console.log('_onTileLoad', layer.options.dataset_id);
+    },
+
+    _onLayerClick : function (e) {
         console.log('_layerClick', e);
     },
 
-    _layerLoaded : function (e) {
+    _onLayerLoaded : function (e) {
         var layer = e.target;
         var dataset = _.find(this._datasets, {id : layer.options.dataset_id});
 
-        dataset && console.log('loaded:', dataset.idx);
+        if (!dataset) return;
+
+        console.log('loaded:', dataset.idx);
+
+        // mark cache loaded
+        var cache = _.find(this._cache, {idx : dataset.idx});
+        if (cache) {
+            cache.loaded = true;
+        }
     },
 
     _moveCursor : function (options) {
@@ -181,7 +201,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // find index of dataset corresponding to current date
         var didx = this._findDatasetByTimestamp(timestamp);
 
-        if (!didx) {
+        if (didx < 0) {
             console.error('no dataset corresponding to timestamp');
             this._hideLayer(this.layer);
             return;
@@ -237,6 +257,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _updateCache : function () {
 
         // determine which datasets should be in cache
+        // todo: this is only true for the current year... what when changing years? 
         var a = _.slice(this._datasets, this._cursor, this._cursor + this.options.cacheSize[1]);
         var b = _.slice(this._datasets, this._cursor - this.options.cacheSize[0], this._cursor);
 
@@ -262,16 +283,26 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 cache : Wu.Util.getRandomChars(6)
             }
 
+            // (20) loaded: 107 -- bug
+            // -----------------------
+            // clues:
+            // - has to do with cache that is not yet completely loaded
+            // - when thus reused, shit happens
+            // - seems if layer is overwritten, then as soon as first 20 tiles are loaded, 
+            //  the next 20 tiles all fire "loaded" event.
+            // - fix with https://github.com/systemapic/systemapic.js/issues/210
+
             // get available cache
             var cache = this._getAvailableCache();
-
-            // update layer
-            cache.layer.setOptions(layerOptions);
 
             // update cache
             cache.dataset_id = dataset.id;
             cache.age = Date.now();
             cache.idx = dataset.idx;
+            cache.loaded = false;
+
+            // update layer
+            cache.layer.setOptions(layerOptions);
 
         }, this);
      
