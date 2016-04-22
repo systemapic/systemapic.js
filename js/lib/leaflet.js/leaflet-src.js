@@ -4497,7 +4497,7 @@ L.GridLayer = L.Layer.extend({
 		this._tiles[key] = {
 			el: tile,
 			coords: coords,
-			current: true
+			current: true,
 		};
 
 		container.appendChild(tile);
@@ -4526,7 +4526,7 @@ L.GridLayer = L.Layer.extend({
 
 		tile = this._tiles[key];
 		if (!tile) { return; }
-
+		
 		tile.loaded = +new Date();
 		if (this._map._fadeAnimated) {
 			L.DomUtil.setOpacity(tile.el, 0);
@@ -4824,7 +4824,7 @@ L.TileLayer = L.GridLayer.extend({
 
 				tile.onload = L.Util.falseFn;
 				tile.onerror = L.Util.falseFn;
-
+				
 				if (!tile.complete) {
 					tile.src = L.Util.emptyImageUrl;
 					L.DomUtil.remove(tile);

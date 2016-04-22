@@ -34,7 +34,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	// When slider is sliding
 	sliding : function (e) {
-		this.currentSliderValue = e.detail.value;
+		this._sliderValue = e.detail.value;
 		this.updateDayOfYear();
 	},
 
@@ -51,10 +51,12 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		this.currentYear--;
 
+		console.log('moveBackward', this.slider);
+
 		var currentDay = this.years[this.currentYear][this.currentDay-1];
 		if ( !currentDay ) {
-			this.currentSliderValue = this.finalDay.Doy;
-			this.slider.set([this.currentSliderValue]);
+			this._sliderValue = this.finalDay.Doy;
+			this.slider.set([this._sliderValue]);
 		}
 
 		this.updateDayOfYear();
@@ -72,8 +74,8 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		var currentDay = this.years[this.currentYear][this.currentDay-1];
 		if ( !currentDay ) {
-			this.currentSliderValue = this.finalDay.Doy;
-			this.slider.set([this.currentSliderValue]);
+			this._sliderValue = this.finalDay.Doy;
+			this.slider.set([this._sliderValue]);
 		}
 	
 		this.updateDayOfYear();
@@ -258,12 +260,12 @@ Wu.Graph.Year = Wu.Evented.extend({
 			MonthNo : firstMonthNo
 		}
 	
-		this.currentSliderValue = this.finalDay.Doy;
+		this._sliderValue = this.finalDay.Doy;
 
 
 		// Set slider to current day
 		Wu.Mixin.Events.fire('setSlider', { detail : {
-			value : this.currentSliderValue
+			value : this._sliderValue
 		}});
 
 	},
@@ -475,7 +477,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 			var minD = false;
 
-			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) { // _.isArray() ?
+			if (_.isArray(days[day])) { 
 				if ( !minD ) minD = days[day][1].SCF;
 				days[day].forEach(function (d) { if ( d.SCF < minD ) minD = d.SCF });
 				eachDay[day] = Math.round(minD);
@@ -491,7 +493,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 		var eachDay = [];
 
 		for ( var day in days ) {		
-			if ( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
+			if (_.isArray(days[day])) {
 				var avg = 0;
 				days[day].forEach(function(d) { avg += d.SCF; });
 				eachDay[day] = Math.round(avg / days[day].length);
@@ -556,7 +558,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// Start figuring out what day we are showing
 		var year = this.currentYear;
-		var day  = this.currentDay  = this.currentSliderValue;
+		var day  = this.currentDay  = this._sliderValue;
 
 		// Check how many days it's in the current year
 		var daysInYear = this.years[this.currentYear].length-1;		
