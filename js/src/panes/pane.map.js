@@ -116,7 +116,9 @@ Wu.MapPane = Wu.Pane.extend({
 
 			// js optimizing attempt
 			fadeAnimation : false,
-			zoomAnimation : false,
+			// zoomAnimation : false,
+
+			
 
 			// exp
 			// zoomSnap : 0,

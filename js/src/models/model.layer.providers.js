@@ -8,7 +8,10 @@ Wu.MapboxLayer = Wu.Model.Layer.extend({
 
         this.layer = L.tileLayer(url, {
             accessToken : this.store.accessToken,
-            mapboxUri : this.store.data.mapbox
+            mapboxUri : this.store.data.mapbox,
+
+            // edge buffer plugin
+            // edgeBufferTiles : 2,
         });
 
         // add hooks
