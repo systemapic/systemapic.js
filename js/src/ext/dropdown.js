@@ -141,6 +141,7 @@ Wu.Dropdown = Wu.Class.extend({
 	},
 
 	setValue: function (selectOption) {
+
 		this._form_combobox_input.setAttribute('data-value', selectOption.value);
 		this._form_combobox_input.innerHTML = selectOption.title;
 

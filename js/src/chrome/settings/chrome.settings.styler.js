@@ -369,7 +369,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// Update style
 	_updateStyle : function (newLegend) {
-		if (this._layer.isCube()) return this._updateCube();
+		if (this._layer.isCube())   return this._updateCube();
 		if (this._layer.isVector()) return this._updateVector(newLegend);
 		if (this._layer.isRaster()) return this._updateRaster();
 		console.error('invalid data type');
@@ -441,7 +441,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_updateCube : function () {
-
 
 		// get stops
 		var stops = this._rasterStyler.stops;
@@ -532,23 +531,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		
 		// Enable settings from layer we're working with
 		var layerUuid = this._getActiveLayerUuid();
-		if (layerUuid) this._selectedActiveLayer(false, layerUuid);		
-
-
-		// // Select layer we're working on
-		// var options = this.layerSelector.options.options;
-
-		// for (var k in options) {
-
-		// 	var isElem = Wu.Tools.isElement(options[k]);
-		// 	if ( !isElem ) return;
-			
-		// 	var uuid = options[k].getAttribute('data-value');
-
-		// 	if ( uuid == layerUuid ) {
-		// 		console.log('options[k]', options[k]);
-		// 	}
-		// }
+		if (layerUuid) this._selectedActiveLayer(false, layerUuid);
 
 
 
@@ -562,7 +545,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// event run when layer selected 
 	_selectedActiveLayer : function (value, uuid) {
-
 
 		Wu.DomUtil.removeClass(this._buttonWrapper, 'displayNone');
 
@@ -632,6 +614,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		
 		// Get layermeta
 		var layerMeta = layer.getMeta();
+
+		// // Perhaps not the right place to set this...
+		// for ( var k in layerMeta.columns ) {
+		// 	var min = layerMeta.columns[k].min;
+		// 	var max = layerMeta.columns[k].max;
+		// 	if ( min != max ) layerMeta.columns[k].int = true;
+		// }
 
 		// Get columns
 		this._columns = layerMeta.columns;

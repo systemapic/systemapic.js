@@ -181,7 +181,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// dropdown
 		var dropdown = new Wu.button({
-			id 	 	 : 'color',
+			id 	 : 'color',
 			type 	 : 'dropdown',
 			isOn 	 : isOn,
 			right 	 : true,

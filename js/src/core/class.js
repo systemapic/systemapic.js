@@ -2425,17 +2425,15 @@ Wu.Tools = {
 		var g_range = Math.abs(RGB1.g - RGB2.g);
 		var b_range = Math.abs(RGB1.b - RGB2.b);
 
-		// Calculate alpha
-		if ( RGB1.a && RGB2.a ) {
-			var a_range = Math.abs(RGB1.a - RGB2.a);
-			var a_diff = a_range * percent;
-			var a_new = RGB1.a < RGB2.a ? RGB1.a + a_diff : RGB1.a - a_diff;
+		// Avoid false on zero
+		var a1 = RGB1.a ? RGB1.a : 0;
+		var a2 = RGB2.a ? RGB2.a : 0;
 
-			a_new = Math.ceil(a_new * 100)/100;
-
-		} else {
-			var a_new = 1
-		}
+		// Get new alpha
+		var a_range = Math.abs(a1 - a2);
+		var a_diff = a_range * percent;
+		var a_new = a1 < a2 ? a1 + a_diff : a1 - a_diff;
+		a_new = Math.ceil(a_new * 100)/100;
 
 		// Figure out new color value
 		var r_diff = Math.round(r_range * percent);
@@ -2458,35 +2456,30 @@ Wu.Tools = {
 		return 'rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + rgba.a + ')';
 	},
 
-	createGradient : function (c1, c2) {
-		
-		var style = 'background: -webkit-linear-gradient(left, ' + c1 + ' , ' + c2 + ');';
-		style += 'background: -o-linear-gradient(right, ' + c1 + ' , ' + c2 + ');';
-		style += 'background: -moz-linear-gradient(right, ' + c1 + ' , ' + c2 + ');';
-		style += 'background: linear-gradient(to right, ' + c1 + ' , ' + c2 + ');';
+	createGradient : function (colors) {
 
+		var c = colors.join(',');
+
+		var style = 'background: -webkit-linear-gradient(left, ' + c + ');';
+		style += 'background: -o-linear-gradient(right, ' + c + ');';
+		style += 'background: -moz-linear-gradient(right, ' + c + ');';
+		style += 'background: linear-gradient(to right, ' + c + ');';
 		return style;
 	},
 
 	transformTranslate : function (x, y) {
-
 		var str  = '-ms-transform: translate(' + x + 'px,' + y + 'px);';
 		    str += '-webkit-transform: translate(' + x + 'px,' + y + 'px);';
    		    str += 'transform: translate(' + x + 'px,' + y + 'px);';
-    		
     		return str;
-
 	},
 
 
 	isElement : function (obj) {
-
 		try {
-			//Using W3 DOM2 (works for FF, Opera and Chrom)
+			//Using W3 DOM2 (works for FF, Opera and Chrome)
 			return obj instanceof HTMLElement;
-
 		} catch(e) {
-
 			//Browsers not supporting W3 DOM2 don't have HTMLElement and
 			//an exception is thrown and we end up here. Testing some
 			//properties that all elements have. (works on IE7)
@@ -2761,7 +2754,6 @@ Wu.Tools = {
 			"WIN_OEM_CLEAR", // [254]
 			"" // [255]
 		];
-
 		return keyboardMap[key];
 	}
 

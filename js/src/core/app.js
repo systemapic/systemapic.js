@@ -4,9 +4,7 @@ Wu.App = Wu.Class.extend({
 
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
-
 	language : language,
-
 	_ready : false,
 
 	initialize : function (options) {
@@ -110,8 +108,13 @@ Wu.App = Wu.Class.extend({
 		// data for server
 		var data = JSON.stringify(app.options);
 
+		console.log('');
+		console.log('app.options', app.options);
+		
+
 		// get portal
 		app.api.getPortal(function (err, response) {
+
 			if (err) return console.error('Something went wrong.');
 
 			// parse
@@ -443,7 +446,7 @@ Wu.App = Wu.Class.extend({
 	setMobileSize : function () {
 
 		// Check landscape or portrait format
-		if(window.innerHeight > window.innerWidth) var portrait = true;
+		var portrait = window.innerHeight > window.innerWidth;
 
 		// Get width
 		var width  = portrait ? app.isMobile.width : app.isMobile.height;

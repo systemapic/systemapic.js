@@ -1,6 +1,6 @@
 Wu.Chrome.Top = Wu.Chrome.extend({
 
-	_ : 'topchrome', 
+	_ : 'topchrome',
 
 	_initialize : function (options) {
 
@@ -16,11 +16,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var isPublic = app.Account.isPublic();
 
 		var cName = 'chrome chrome-container chrome-top';
-		if ( isPublic ) {
-			cName += ' public'; 
-		} else {
-			cName += ' logged-in';
-		}
+		isPublic ? cName += ' public' : cName += ' logged-in';
 
 
 		// container to hold errything

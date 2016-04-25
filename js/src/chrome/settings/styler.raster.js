@@ -23,6 +23,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	_initContainer : function () {
 
+
 		// Create divs
 		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper raster-styler', this.options.container);
 		this._rangeMarks = Wu.DomUtil.create('div', 'raster-range-marks', this._wrapper);
@@ -38,7 +39,6 @@ Wu.RasterStyler = Wu.Class.extend({
 		
 		// Render slider
 		this._renderSlider();
-
 
 		// Description
 		this._descriptions = Wu.DomUtil.create('div', 'raster-styler-description', this.options.container);
@@ -203,6 +203,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	// Update color
 	_updateColor : function (col, key, wrapper) {
+
 		this.stops[key].col = col;
 		this.setSliderColor();
 	},
@@ -479,7 +480,6 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		// COLORS
 		var colWrap = Wu.DomUtil.create('div', 'stop-list-color-wrapper stop-list-item', line);
-		
 		var rInput  = Wu.DomUtil.create('div', 'stop-color', colWrap, 'Red');						
 		var gInput  = Wu.DomUtil.create('div', 'stop-color', colWrap, 'Green');
 		var bInput  = Wu.DomUtil.create('div', 'stop-color', colWrap, 'Blue');
@@ -716,9 +716,13 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	getGradient : function (c1, c2) {
 
+		var inBetween = Wu.Tools.mixColors(c1, c2, 0.5);
+
 		var _c1 = Wu.Tools.rgbaStyleStr(c1);
-		var _c2 = Wu.Tools.rgbaStyleStr(c2);
-		var gradient = Wu.Tools.createGradient(_c1, _c2);
+		var _c2 = Wu.Tools.rgbaStyleStr(inBetween);
+		var _c3 = Wu.Tools.rgbaStyleStr(c2);
+
+		var gradient = Wu.Tools.createGradient([_c1,_c2,_c3]);
 		return gradient;
 	},
 
