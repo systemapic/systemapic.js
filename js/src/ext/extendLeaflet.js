@@ -123,7 +123,7 @@ L.Control.Attribution.include({
         // Default is to not buffer edge tiles (edgeBufferTiles = 0).
         var edgeBufferTiles = this.options.edgeBufferTiles || 0;
 
-        console.log('edgeBufferTiles', edgeBufferTiles);
+        // console.log('edgeBufferTiles', edgeBufferTiles);
 
         return new L.Bounds(
           tileRange.min.subtract([edgeBufferTiles, edgeBufferTiles]),

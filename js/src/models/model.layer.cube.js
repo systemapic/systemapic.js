@@ -202,7 +202,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var didx = this._findDatasetByTimestamp(timestamp);
 
         if (didx < 0) {
-            console.error('no dataset corresponding to timestamp');
+            // console.error('no dataset corresponding to timestamp');
             this._hideLayer(this.layer);
             return;
         }

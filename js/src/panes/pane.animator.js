@@ -289,13 +289,37 @@ Wu.Animator = Wu.Evented.extend({
 
     stepOneForward : function () {      
         var value = this._sliderValue + 1;
+
+        if ( value > this.options.maxLength ) {
+                this.stepAfterEnd()
+                value = 1;
+
+        }
+
         this.slider.set(value);
+
     },
 
     stepOneBackward : function () {
         var value = this._sliderValue - 1;
+        
+        if ( value <= 0 ) {
+                this.stepBeforeBeginning();
+                value = this.options.maxLength;
+        }
+
         this.slider.set(value);
+
     },
+
+    stepBeforeBeginning : function () {
+        Wu.Mixin.Events.fire('stepBeforeBeginning');
+    },
+
+    stepAfterEnd : function () {
+        Wu.Mixin.Events.fire('stepAfterEnd');
+    },    
+
 
     moveBackward : function () {
         Wu.Mixin.Events.fire('sliderMoveBackward');

@@ -29,12 +29,16 @@ Wu.Graph.Year = Wu.Evented.extend({
 		Wu.Mixin.Events.on('sliderUpdate', this.sliding, this);
 		Wu.Mixin.Events.on('sliderMoveBackward', this.moveBackward, this);
 		Wu.Mixin.Events.on('sliderMoveForward', this.moveForward, this);
-		Wu.Mixin.Events.on('setSliderTitle', this.setTitle, this)
+		Wu.Mixin.Events.on('setSliderTitle', this.setTitle, this);
+
+		Wu.Mixin.Events.on('stepBeforeBeginning', this.firstToLastDay, this);
+		Wu.Mixin.Events.on('stepAfterEnd', this.lastToFirstDay, this);
 	},
 
 	// When slider is sliding
 	sliding : function (e) {
-		this._sliderValue = e.detail.value;
+
+		var val = this._sliderValue = e.detail.value;
 		this.updateDayOfYear();
 	},
 
@@ -51,36 +55,47 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		this.currentYear--;
 
-		console.log('moveBackward', this.slider);
-
 		var currentDay = this.years[this.currentYear][this.currentDay-1];
 		if ( !currentDay ) {
 			this._sliderValue = this.finalDay.Doy;
-			this.slider.set([this._sliderValue]);
+			Wu.Mixin.Events.fire('setSlider', { detail : {value : this._sliderValue}});
 		}
 
 		this.updateDayOfYear();
-
-		this.checkEnds();		
-
+		this.checkEnds();
 	},
+
 
 	// Skipping one year ahead in time
 	moveForward : function () {
 		
 		if ( this.disableForward ) return;
-		
-		this.currentYear++;
+		if ( !this.years[this.currentYear + 1] ) return;
 
+		this.currentYear++;
 		var currentDay = this.years[this.currentYear][this.currentDay-1];
+
 		if ( !currentDay ) {
 			this._sliderValue = this.finalDay.Doy;
-			this.slider.set([this._sliderValue]);
+			Wu.Mixin.Events.fire('setSlider', { detail : {value : this._sliderValue}});
 		}
 	
 		this.updateDayOfYear();
 
 		this.checkEnds();
+	},
+
+	// Fittepølse
+	lastToFirstDay : function () { // I.e. skipping one step from December 31st to January 1st
+		this.moveForward();
+		this._sliderValue = 1;
+		this.updateDayOfYear();
+	},
+
+	firstToLastDay : function () { // I.e. skipping one step from January 1st to December 31st
+		this.moveBackward();
+		this._sliderValue = this.years[this.currentYear].length;
+		this.updateDayOfYear();
 	},
 
 	// returns moment.js object
@@ -413,15 +428,11 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// Rebuild graph data
 		this.years[year].forEach(function (d, i) {
-			var doy = i+1;
-			if ( doy < day ) this.graphData.push(d);
+			if ( i < day ) this.graphData.push(d);
 		}.bind(this));
 
 		// If we're at the end of the road
-		if ( !this.years[year][day-1] ) {
-			// this.stopPlaying();
-			return;
-		}
+		if ( !this.years[year][day-1] ) return;
 
 		// Clear old data
 		this.ndx.remove();
@@ -431,12 +442,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// Redraw graph
 		dc.redrawAll();
-		// dc.redrawAll(this._dcCache.yThisDim);
-		// dc.redraw()
-		// this.ndx.redraw();
-
-		// console.log('this.ndx', this.ndx);
-		// console.log('dc:', dc);
 
 		var scf = Math.round(this.years[year][day-1].SCF * 100) / 100;
 
@@ -561,9 +566,13 @@ Wu.Graph.Year = Wu.Evented.extend({
 		var day  = this.currentDay  = this._sliderValue;
 
 		// Check how many days it's in the current year
-		var daysInYear = this.years[this.currentYear].length-1;		
+		var daysInYear = this.years[this.currentYear].length;		
 
-		if ( day > daysInYear || !day ) day = this.currentDay = daysInYear;	
+		if ( day > daysInYear || !day ) {
+			day = this.currentDay = daysInYear;
+			// Prevent slider from going into "non-data"
+			Wu.Mixin.Events.fire('setSlider', { detail : {value : day}});
+		}
 	
 	  	var blankDate = new Date(year, 0);
   		var date = new Date(blankDate.setDate(day));
