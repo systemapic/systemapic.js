@@ -288,7 +288,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	initGraph : function () {
 
-
 		// AVERAGE DATA FOR ALL YEARS
 
 		// Prepare DC dimensions
@@ -298,7 +297,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 		var yMinDim = xDim.group().reduceSum(function(d) { return d.min });
 		var yAvgDim = xDim.group().reduceSum(function(d) { return d.avg });
 
-    	var minDate = xDim.bottom(1)[0].date;
+    		var minDate = xDim.bottom(1)[0].date;
 		var maxDate = xDim.top(1)[0].date;
 
 		// DATA FOR CURRENT YEAR
@@ -312,12 +311,10 @@ Wu.Graph.Year = Wu.Evented.extend({
 		// LINE DIMENSION
 		// THIS PART CHANGES FOR EVERY MOVE
 		var thisXdim = this.ndx.dimension(function(d) { return d.date });
-		var yThisDim = thisXdim.group().reduceSum(function(d) { return d.SCF; });
+		var yThisDim = thisXdim.group().reduceSum(function(d) { return d.SCF });
 
 		// SCATTER DIMENSION
-		var scatterDim = thisXdim.group().reduceSum(function(d) { 
-			return d.SCF
-		}.bind(this));
+		var scatterDim = thisXdim.group().reduceSum(function(d) { return d.SCF }.bind(this));
 
 		// debug save
 		this._dcCache = {
@@ -340,75 +337,76 @@ Wu.Graph.Year = Wu.Evented.extend({
 		// Get HTML element, and define it as graph container
 		var hitslineChart = dc.compositeChart(graphInnerContainer)
 
-
 		// Run graph
 		hitslineChart
-		.width(500).height(220)
-		.dimension(xDim)
+			.width(500).height(220)
+			.dimension(xDim)
+		
+			.x(d3.time.scale().domain([minDate,maxDate]))
+		 	.y(d3.scale.linear().domain([0, 100]))
+
+			.clipPadding(10)   	
+			.elasticY(false)
+			.elasticX(false)
+			.brushOn(false)
+			.transitionDuration(0)			
+
+			// Each of these will be a new graph
+			.compose([
+
+				// MAX value
+				dc.lineChart(hitslineChart)
+					.group(yMaxDim)
+					.colors('#DDDDDD')
+					.renderArea(true)   	
+					.renderDataPoints(false)
+					.xyTipsOn(false),
+
+				// MIN value
+				dc.lineChart(hitslineChart)
+					.group(yMinDim)
+					.colors('#ffffff')
+					.renderArea(true)   	
+					.renderDataPoints(false)
+					.xyTipsOn(false),
+
+				// AVERAGE value
+				dc.lineChart(hitslineChart)
+					.group(yAvgDim)
+					.colors('#999999')
+					.renderDataPoints(false)
+					.xyTipsOn(false),
+
+				// THIS YEAR value – LINE
+				dc.lineChart(hitslineChart)
+					.group(yThisDim)
+					.colors('#ff6666')
+					.renderDataPoints(false)
+					.xyTipsOn(false),
+
+				// THIS YEAR value – LAST DATE (DOT)
+				dc.scatterPlot(hitslineChart)
+					.group(scatterDim)
+					.symbolSize(8)
+					.excludedOpacity(0)
+					.colors('#ff0000')
+					.symbol('triangle-up')
+					.keyAccessor(function(d) {
+						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
+						return false;
+					}.bind(this))
+					.valueAccessor(function(d) {
+						if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
+						return false;
+					}.bind(this))
+			]);
 	
-		.x(d3.time.scale().domain([minDate,maxDate]))
-	 	.y(d3.scale.linear().domain([0, 100]))
 
-		.clipPadding(10)   	
-		.elasticY(false)
-		.elasticX(false)
-		.brushOn(false)
-		.transitionDuration(0)			
-
-		// Each of these will be a new graph
-		.compose([
-
-			// MAX value
-			dc.lineChart(hitslineChart)
-				.group(yMaxDim)
-				.colors('#DDDDDD')
-				.renderArea(true)   	
-				.renderDataPoints(false)
-				.xyTipsOn(false),
-
-			// MIN value
-			dc.lineChart(hitslineChart)
-				.group(yMinDim)
-				.colors('#ffffff')
-				.renderArea(true)   	
-				.renderDataPoints(false)
-				.xyTipsOn(false),
-
-			// AVERAGE value
-			dc.lineChart(hitslineChart)
-				.group(yAvgDim)
-				.colors('#999999')
-				.renderDataPoints(false)
-				.xyTipsOn(false),
-
-			// THIS YEAR value – LINE
-			dc.lineChart(hitslineChart)
-				.group(yThisDim)
-				.colors('#ff6666')
-				.renderDataPoints(false)
-				.xyTipsOn(false),
-
-			// THIS YEAR value – LAST DATE (DOT)
-			dc.scatterPlot(hitslineChart)
-				.group(scatterDim)
-				.symbolSize(8)
-				.excludedOpacity(0)
-				.colors('#ff0000')
-				.symbol('triangle-up')
-				.keyAccessor(function(d) {
-					if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
-					return false;
-				}.bind(this))
-				.valueAccessor(function(d) {
-					if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
-					return false;
-				}.bind(this))
-		]);
-	
 		hitslineChart
-		.xUnits(d3.time.months)
-		.xAxis()
-		.tickFormat(d3.time. format('%b'))
+			.xUnits(d3.time.months)
+			.xAxis()
+			.tickFormat(d3.time. format('%b'))
+
 
 		dc.renderAll(); 
 
