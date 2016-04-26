@@ -85,7 +85,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 		this.checkEnds();
 	},
 
-	// Fittepølse
 	lastToFirstDay : function () { // I.e. skipping one step from December 31st to January 1st
 		this.moveForward();
 		this._sliderValue = 1;
