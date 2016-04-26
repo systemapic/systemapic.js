@@ -108,13 +108,8 @@ Wu.App = Wu.Class.extend({
 		// data for server
 		var data = JSON.stringify(app.options);
 
-		console.log('');
-		console.log('app.options', app.options);
-		
-
 		// get portal
 		app.api.getPortal(function (err, response) {
-
 			if (err) return console.error('Something went wrong.');
 
 			// parse
@@ -270,7 +265,9 @@ Wu.App = Wu.Class.extend({
 	_initView : function () {
 			
 		// runs hotlink
-		if (app._initHotlink()) return;
+		if (app._initHotlink()) {
+			return;
+		} 
 
 		// open first project (ordered by lastUpdated)
 		app.Controller.openDefaultProject();
@@ -307,6 +304,7 @@ Wu.App = Wu.Class.extend({
 			app._setProject(project);
 			return true;
 		}
+
 		// request project from server
 		app.api.getProject({
 			username : app.hotlink.username,
@@ -409,17 +407,6 @@ Wu.App = Wu.Class.extend({
 	},
 
 
-
-
-
-	// ███╗   ███╗ ██████╗ ██████╗ ██╗██╗     ███████╗
-	// ████╗ ████║██╔═══██╗██╔══██╗██║██║     ██╔════╝
-	// ██╔████╔██║██║   ██║██████╔╝██║██║     █████╗  
-	// ██║╚██╔╝██║██║   ██║██╔══██╗██║██║     ██╔══╝  
-	// ██║ ╚═╝ ██║╚██████╔╝██████╔╝██║███████╗███████╗
-	// ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚══════╝╚══════╝
-
-
 	// todo: move to own script
 	detectMobile : function() {
 		
@@ -463,17 +450,6 @@ Wu.App = Wu.Class.extend({
 		// app._map._container.style.height = height + 'px';
 
 	},
-
-
-	// ███████╗███╗   ██╗██████╗     ███╗   ███╗ ██████╗ ██████╗ ██╗██╗     ███████╗
-	// ██╔════╝████╗  ██║██╔══██╗    ████╗ ████║██╔═══██╗██╔══██╗██║██║     ██╔════╝
-	// █████╗  ██╔██╗ ██║██║  ██║    ██╔████╔██║██║   ██║██████╔╝██║██║     █████╗  
-	// ██╔══╝  ██║╚██╗██║██║  ██║    ██║╚██╔╝██║██║   ██║██╔══██╗██║██║     ██╔══╝  
-	// ███████╗██║ ╚████║██████╔╝    ██║ ╚═╝ ██║╚██████╔╝██████╔╝██║███████╗███████╗
-	// ╚══════╝╚═╝  ╚═══╝╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚══════╝╚══════╝
-
-
-
 
 
 	debug : function () {

@@ -168,6 +168,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
     _togglePane : function () {
+        if (!this._inited) this._refresh();
 
         // right chrome
         var chrome = this.options.chrome;
@@ -195,6 +196,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // mark button active
         Wu.DomUtil.addClass(this._topButton, 'active');
         this._container.style.display = 'block';
+
         this._isOpen = true;
 
         // enable edit of layer menu...
@@ -285,8 +287,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // currently every action takes > 2000ms if filelist is >1000 files.
     //
     // perhaps better to remove d3 completely, and just create divs normally, then update store the divs in an object on file_id keys
-    _refresh : function () {
+    _refresh : function (options) {
 
+        // debug: don't refresh from projectSelected event
+        if (options && options.event && options.event == 'projectSelected') return;
+
+        // if no project, return
         if (!this._project) return;
 
         // remove temp files
@@ -337,6 +343,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         } else {
             Wu.DomUtil.removeClass(this._layerListWrapper, 'displayNone');
         }
+
+        // mark inited
+        this._inited = true;
 
     },
 

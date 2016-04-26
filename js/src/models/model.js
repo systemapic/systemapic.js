@@ -28,6 +28,7 @@ Wu.Model = Wu.Class.extend({
 		Wu.Mixin.Events.on('animationStop',   this._onAnimationStop, this);
 		Wu.Mixin.Events.on('animationSlide',  this._onAnimationSlide, this);
 		Wu.Mixin.Events.on('setFPS',   		  this._onSetFPS, this);
+		Wu.Mixin.Events.on('mapClick',   	  this._onMapClick, this);
 
 		Wu.Mixin.Events.on('sliderSet',  this._onSliderSet, this);
 		Wu.Mixin.Events.on('sliderUpdate',  this._onSliderUpdate, this);
@@ -75,5 +76,6 @@ Wu.Model = Wu.Class.extend({
 	_onCubeEdited	 : function () {},
 	_onSliderSet	 : function () {},
 	_onSliderUpdate	 : function () {},
+	_onMapClick		 : function () {},
 
 });

@@ -1214,6 +1214,7 @@ input.chrome-field-input {
     width: 246px;
     /*box-shadow: 0 0 0px 1px red inset;*/
     right: 6px;
+    z-index: 1001;
     }
 
 .leaflet-control-layermenu .scroller-frame {
@@ -2460,7 +2461,7 @@ input.chrome-field-input {
     padding-right: 0;
     padding-left: 0;
     right: 50px;
-    z-index: 5;  
+    z-index: 1000;  
     }
 
 .big-slider-inner-container {
