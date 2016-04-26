@@ -2755,7 +2755,21 @@ Wu.Tools = {
 			"" // [255]
 		];
 		return keyboardMap[key];
-	}
+	},
+
+	getCursorPos : function (input) {
+	    // Internet Explorer Caret Position (TextArea)
+	    if (document.selection && document.selection.createRange) {
+	        var range = document.selection.createRange();
+	        var bookmark = range.getBookmark();
+	        var caret_pos = bookmark.charCodeAt(2) - 2;
+	    } else {
+	        // Firefox Caret Position (TextArea)
+	        if (input.setSelectionRange)
+	            var caret_pos = input.selectionStart;
+	    }
+	    return caret_pos;
+	},	
 
 
 };

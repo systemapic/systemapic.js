@@ -266,6 +266,7 @@ Wu.button = Wu.Class.extend({
 	// └─┘└─┘┴─┘└─┘┴└─  └─┘┴ ┴┴─┘┴─┘
 
 	initColorBall : function () {
+
 		var appendTo    = this.options.appendTo;
 		var key         = this.options.id;
 		var fn          = this.options.fn;
@@ -280,26 +281,27 @@ Wu.button = Wu.Class.extend({
 
 		if ( className ) _class += className;
 
-		var color = Wu.DomUtil.create('div', _class, appendTo);
-		color.id = 'color_ball_' + key;
-		color.style.background = value;
+		this.color = Wu.DomUtil.create('div', _class, appendTo);
+		this.color.id = 'color_ball_' + key;
+		this.color.style.background = value;
 
-		this.color = color;
-
-		if ( !on ) Wu.DomUtil.addClass(color, 'disable-color-ball');
-		if ( !right ) Wu.DomUtil.addClass(color, 'left-ball');
+		if ( !on ) Wu.DomUtil.addClass(this.color, 'disable-color-ball');
+		if ( !right ) Wu.DomUtil.addClass(this.color, 'left-ball');
 
 		
 		// var that = this;
 		this.initSpectrum({
 			value     : value, 
-			color     : color, 
+			color     : this.color, 
 			key       : key, 
 			fn        : fn, 
 			showAlpha : showAlpha, 
 			showInput : showInput, 
 			format    : format
 		})
+
+
+		// $(this.color).spectrum('set', '#660000');
 
 	},
 
@@ -357,7 +359,8 @@ Wu.button = Wu.Class.extend({
 				wrapper.style.background = bg;
 				fn(color, key, wrapper);
 
-			}
+			}		
+
 		});
 
 	},	

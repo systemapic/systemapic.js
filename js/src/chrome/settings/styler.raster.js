@@ -108,13 +108,12 @@ Wu.RasterStyler = Wu.Class.extend({
 			}
 
 			// Update current stop with adjusted values
-			this.stops[handle].val = val;	
-
-			// Mark slider as changed
-			app.Tools.Styler.markChanged();
+			this.stops[handle].val = val;
+			
 
 			// Set slider position
-			this.setSliderPosition();
+			this._setSliderPosition();
+			this._renderStopList();
 
 
 		}.bind(this));
@@ -192,7 +191,11 @@ Wu.RasterStyler = Wu.Class.extend({
 		}.bind(this));
 
 		// Set poision of color selectors, ranges, etc
-		this.setSliderPosition();
+		this._setSliderPosition();
+
+		// this._renderStopList();
+		app.Tools.Styler.markChanged();
+
 
 	},
 
@@ -203,9 +206,8 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	// Update color
 	_updateColor : function (col, key, wrapper) {
-
 		this.stops[key].col = col;
-		this.setSliderColor();
+		this._setSliderColor();
 	},
 
 	// Update color, and redraw slider
@@ -218,7 +220,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	// ONLY sets color elements position from left!
 	// No width, nor color updates happens here...
-	setSliderPosition : function () {
+	_setSliderPosition : function () {
 
 		var span = this.options.rangeMax - this.options.rangeMin;	
 
@@ -230,12 +232,12 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		}.bind(this));
 
-		this.setSliderColor();		
+		this._setSliderColor();
 
 	},
 
 	// Sets slider color + width + updates number above line
-	setSliderColor : function () {
+	_setSliderColor : function () {
 
 		var span = this.options.rangeMax - this.options.rangeMin;
 
@@ -278,8 +280,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		}.bind(this));
 
-
-		this._renderStopList();
+		// this._renderStopList();
 		
 	},
 
@@ -311,6 +312,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		// Redraw slider
 		this._renderSlider();
+		this._renderStopList();
 
 	},
 
@@ -363,6 +365,38 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		// Render da sheeet
 		this._renderSlider();
+		this._renderStopList();
+
+	},
+
+	addStopBefore : function (val) {
+
+		var nextStop = this.stops[0];
+		var newStop = {
+			val : val,
+			col : nextStop.col
+		}
+
+		this.stops.splice(0,0,newStop);
+
+		this._renderSlider();
+		this._renderStopList();
+
+	},
+
+	addStopAfter : function (val) {
+
+		var prevStop = this.stops[this.stops.length-1];
+		var newStop = {
+			val : val,
+			col : prevStop.col
+		}
+
+		this.stops.push(newStop);
+
+		this._renderSlider();
+		this._renderStopList();
+
 
 	},
 
@@ -409,6 +443,18 @@ Wu.RasterStyler = Wu.Class.extend({
 		var index = -1;
 		var tooClose = false;
 		var buffer = 15;
+
+		// Add stop before
+		if ( val < ( this.stops[0].val - buffer) ) {
+			this.addStopBefore(val);
+			return;
+		}
+
+		// Add stop after
+		if ( val > ( this.stops[this.stops.length-1].val + buffer ) ) {
+			this.addStopAfter(val);
+			return;
+		}
 
 		// Find out between which stops to place this stop...
 		this.stops.forEach(function (stop, i) {
@@ -460,10 +506,9 @@ Wu.RasterStyler = Wu.Class.extend({
 	_renderStopList : function () {
 
 		if ( !this.viewStoplist ) return;
-
-
+		
 		this._stopListContainer.innerHTML = '';
-		var tabIndex = 1;
+		var tabIndex = 100;
 
 		// CREATE DESCRIPTION LINE
 
@@ -502,6 +547,8 @@ Wu.RasterStyler = Wu.Class.extend({
 		// POPULATE
 		this.stops.forEach(function (stop, i) {
 		
+			var _h = stop.list = {};
+
 			var v = stop.val ? stop.val : '0';
 			var r = stop.col.r ? stop.col.r : '0';
 			var g = stop.col.g ? stop.col.g : '0';
@@ -509,7 +556,7 @@ Wu.RasterStyler = Wu.Class.extend({
 			var a = stop.col.a ? stop.col.a : '0';
 
 			// LINE
-			var line = Wu.DomUtil.create('div', 'stop-list-each', this._stopListContainer);
+			_h.line = Wu.DomUtil.create('div', 'stop-list-each', this._stopListContainer);
 
 			// ADD NEW STOP
 			if ( this.stops[i+1] ) {
@@ -518,64 +565,61 @@ Wu.RasterStyler = Wu.Class.extend({
 				// and after is greater than two.
 				if ( diff >= 2 ) {
 					var icon = '<i class="fa fa-plus-circle" no="' + i + '"></i>';
-					var addButton = Wu.DomUtil.create('div', 'stop-list-add-color target-add', line, icon);				
-					Wu.DomEvent.on(addButton, 'click', this.addButtonClick, this);					
+					_h.addButton = Wu.DomUtil.create('div', 'stop-list-add-color target-add', _h.line, icon);				
+					Wu.DomEvent.on(_h.addButton, 'click', this.addButtonClick, this);					
 				}
 			}
 
 			// NUMBER
-			var noWrap  = Wu.DomUtil.create('div', 'stop-list-no stop-list-item', line);
-			var noTitle = Wu.DomUtil.create('div', 'stop-list-no-title', noWrap, '<b>' + (i+1) + '</b>');
+			_h.noWrap  = Wu.DomUtil.create('div', 'stop-list-no stop-list-item', _h.line);
+			_h.noTitle = Wu.DomUtil.create('div', 'stop-list-no-title', _h.noWrap, '<b>' + (i+1) + '</b>');
 
 			// VALUE
-			var valWrap  = Wu.DomUtil.create('div',   'stop-list-val stop-list-item', line);
-			var valInput = Wu.DomUtil.create('input', 'stop-list-title', valWrap, v);
-			valInput.value = v;
-			valInput.setAttribute('no', i);
-			valInput.setAttribute('type', 'v');
-			valInput.setAttribute('tabindex', tabIndex++);
+			_h.valWrap  = Wu.DomUtil.create('div',   'stop-list-val stop-list-item', _h.line);
+			_h.valInput = Wu.DomUtil.create('input', 'stop-list-title', _h.valWrap, v);
+			_h.valInput.value = v;
+			_h.valInput.setAttribute('no', i);
+			_h.valInput.setAttribute('type', 'v');
+			_h.valInput.setAttribute('tabindex', tabIndex++);
 
 			// COLORS
-			var colWrap = Wu.DomUtil.create('div', 'stop-list-color-wrapper stop-list-item', line);
+			_h.colWrap = Wu.DomUtil.create('div', 'stop-list-color-wrapper stop-list-item', _h.line);
 			
 			// RED
-			var rInput  = Wu.DomUtil.create('input', 'stop-color', colWrap, r);
-			rInput.value = r;
-			rInput.setAttribute('no', i);
-			rInput.setAttribute('type', 'r');
-			rInput.setAttribute('tabindex', tabIndex++);
+			_h.rInput  = Wu.DomUtil.create('input', 'stop-color', _h.colWrap, r);
+			_h.rInput.value = r;
+			_h.rInput.setAttribute('no', i);
+			_h.rInput.setAttribute('type', 'r');
+			_h.rInput.setAttribute('tabindex', tabIndex++);
 				
 			// GREEN		
-			var gInput  = Wu.DomUtil.create('input', 'stop-color', colWrap, g);
-			gInput.value = g;
-			gInput.setAttribute('no', i);
-			gInput.setAttribute('type', 'g');
-			gInput.setAttribute('tabindex', tabIndex++);
+			_h.gInput  = Wu.DomUtil.create('input', 'stop-color', _h.colWrap, g);
+			_h.gInput.value = g;
+			_h.gInput.setAttribute('no', i);
+			_h.gInput.setAttribute('type', 'g');
+			_h.gInput.setAttribute('tabindex', tabIndex++);
 
 			// BLUE
-			var bInput  = Wu.DomUtil.create('input', 'stop-color', colWrap, b);
-			bInput.value = b;
-			bInput.setAttribute('no', i);
-			bInput.setAttribute('type', 'b');
-			bInput.setAttribute('tabindex', tabIndex++);
+			_h.bInput  = Wu.DomUtil.create('input', 'stop-color', _h.colWrap, b);
+			_h.bInput.value = b;
+			_h.bInput.setAttribute('no', i);
+			_h.bInput.setAttribute('type', 'b');
+			_h.bInput.setAttribute('tabindex', tabIndex++);
 			
 			// ALPHA
-			var alphaWrap = Wu.DomUtil.create('div', 'stop-list-alpha-wrapper stop-list-item', line);			
-			var aInput  = Wu.DomUtil.create('input', 'stop-color', alphaWrap, a);
-			aInput.value = a;
-			aInput.setAttribute('no', i);
-			aInput.setAttribute('type', 'a');
-			aInput.setAttribute('tabindex', tabIndex++);
-
+			_h.alphaWrap = Wu.DomUtil.create('div', 'stop-list-alpha-wrapper stop-list-item', _h.line);			
+			_h.aInput  = Wu.DomUtil.create('input', 'stop-color', _h.alphaWrap, a);
+			_h.aInput.value = a;
+			_h.aInput.setAttribute('no', i);
+			_h.aInput.setAttribute('type', 'a');
+			_h.aInput.setAttribute('tabindex', tabIndex++);
 
 			// COLOR
-			var colorWrap = Wu.DomUtil.create('div', 'stop-list-color-ball-wrapper', line);
-			// var color = Wu.DomUtil.create('div', 'stop-list-color-ball', colorWrap);
-			    // color.setAttribute('style', 'background:' + Wu.Tools.rgbaStyleStr(stop.col));
+			_h.colorWrap = Wu.DomUtil.create('div', 'stop-list-color-ball-wrapper', _h.line);
 
 			// Color selector
-			var color = new Wu.button({
-				appendTo  : colorWrap,
+			_h.color = new Wu.button({
+				appendTo  : _h.colorWrap,
 				type      : 'colorball',
 				id        : i,
 				fn 	  : this._forceUpdateColor.bind(this),
@@ -587,34 +631,130 @@ Wu.RasterStyler = Wu.Class.extend({
 				format    : 'rgba'
 			});
 
-			
 
-			// Validate (force numerice)
-			valInput.onkeypress = Wu.Tools.forceNumeric;
-			rInput.onkeypress = Wu.Tools.forceNumeric;
-			gInput.onkeypress = Wu.Tools.forceNumeric;
-			bInput.onkeypress = Wu.Tools.forceNumeric;
-			aInput.onkeypress = Wu.Tools.forceNumeric;
+			// Catch arrow movements			
+			Wu.DomEvent.on(_h.valInput, 'keydown', this.routKey, this);
+			Wu.DomEvent.on(_h.rInput,   'keydown', this.routKey, this);
+			Wu.DomEvent.on(_h.gInput,   'keydown', this.routKey, this);
+			Wu.DomEvent.on(_h.bInput,   'keydown', this.routKey, this);
+			Wu.DomEvent.on(_h.aInput,   'keydown', this.routKey, this);
+
+			// Force numeric value
+			_h.valInput.onkeypress = Wu.Tools.forceNumeric;
+			_h.rInput.onkeypress   = Wu.Tools.forceNumeric;
+			_h.gInput.onkeypress   = Wu.Tools.forceNumeric;
+			_h.bInput.onkeypress   = Wu.Tools.forceNumeric;
+			_h.aInput.onkeypress   = Wu.Tools.forceNumeric;
 
 			// Update
-			Wu.DomEvent.on(valInput, 'blur', this.rasterInputChange, this);
-			Wu.DomEvent.on(rInput, 'blur', this.rasterInputChange, this);
-			Wu.DomEvent.on(gInput, 'blur', this.rasterInputChange, this);
-			Wu.DomEvent.on(bInput, 'blur', this.rasterInputChange, this);
-			Wu.DomEvent.on(aInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(_h.valInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(_h.rInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(_h.gInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(_h.bInput, 'blur', this.rasterInputChange, this);
+			Wu.DomEvent.on(_h.aInput, 'blur', this.rasterInputChange, this);
 
 
 			if ( allowKilling ) {
 				
 				var icon = '<i class="fa fa-minus-circle" no="' + i + '"></i>';
-				var killButton = Wu.DomUtil.create('div', 'stop-list-kill-color target-remove', line, icon);
-				Wu.DomEvent.on(killButton, 'click', this.killStopClick, this);
+				_h.killButton = Wu.DomUtil.create('div', 'stop-list-kill-color target-remove', _h.line, icon);
+				Wu.DomEvent.on(_h.killButton, 'click', this.killStopClick, this);
 
 			}
 
 		}.bind(this));
 
 	},
+
+	routKey : function (e) {
+
+		var key = e.keyCode;
+
+		// UP
+		if ( key == 38 ) this.tab(e, 'up');
+
+		// DOWN
+		if ( key == 40 ) this.tab(e, 'down');
+
+		// LEFT
+		if ( key == 37 ) {
+			var input = e.target;
+			var cPos = Wu.Tools.getCursorPos(input);
+			if ( cPos <= 0 ) this.tab(e, 'left');
+		}		
+
+		// RIGHT
+		if ( key == 39 ) {	
+			var input = e.target;
+			var length = input.value.length;
+			var cPos = Wu.Tools.getCursorPos(input);
+			if ( cPos >= length ) this.tab(e, 'right')
+		}
+
+		// Blur on enter
+		if ( key == 13 ) e.target.blur();		
+		
+
+	},
+
+	// "Circular" tabbing in list
+	tab : function (e, direction) {
+
+		var no = parseInt(e.target.getAttribute('no'));
+		var type = e.target.getAttribute('type');
+		
+		// TABBING UP OR DOWN
+		// TABBING UP OR DOWN
+		// TABBING UP OR DOWN
+
+		if ( direction == 'up' || direction == 'down' ) {
+
+			if ( direction == 'up' )    var _num = this.stops[no-1] ? no-1 : this.stops.length-1;
+			if ( direction == 'down' )  var _num = this.stops[no+1] ? no+1 : 0;
+
+			if ( type == 'v' ) this.stops[_num].list.valInput.focus();
+			if ( type == 'r' ) this.stops[_num].list.rInput.focus();
+			if ( type == 'g' ) this.stops[_num].list.gInput.focus();
+			if ( type == 'b' ) this.stops[_num].list.bInput.focus();
+			if ( type == 'a' ) this.stops[_num].list.aInput.focus();
+
+			return;
+
+		}
+
+		// TABBING LEFT OR RIGHT
+		// TABBING LEFT OR RIGHT
+		// TABBING LEFT OR RIGHT
+
+		if ( direction == 'left' || direction == 'right' ) {
+
+			// Create an array of input fields
+			var inputs = [
+				{ type : 'v', input :  this.stops[no].list.valInput },
+				{ type : 'r', input :  this.stops[no].list.rInput },
+				{ type : 'g', input :  this.stops[no].list.gInput },
+				{ type : 'b', input :  this.stops[no].list.bInput },
+				{ type : 'a', input :  this.stops[no].list.aInput },
+			]
+
+			// Tab left or right
+			inputs.forEach(function (input, i) {	
+				if ( input.type == type ) {
+					if ( direction == 'right' ) var _no = i == inputs.length-1 ? 0 : i+1;					
+					if ( direction == 'left' )  var _no = i == 0 ? inputs.length-1 : i-1;
+					inputs[_no].input.focus();
+					return;					
+				}
+			}.bind(this));
+
+			return;
+		}
+
+	},
+
+
+
+
 
 	// Remove Stop
 	killStopClick : function (e) {
@@ -699,10 +839,50 @@ Wu.RasterStyler = Wu.Class.extend({
 		// Rewrite input with new value
 		e.target.value = val;
 
+
+		// ****************************
+
+		
+		// If updating value
+
+		if ( type == 'v' ) {
+
+			// Set value
+			this.stops[no].val = val;
+
+			// Render slider
+			this._renderSlider();
+
+			// Stop
+			return;			
+
+		}
+
+
+
+		// UPDATING COLOR
+
+		// RGBA object
+		var RGBA = this.stops[no].col;
+
+		// Set value
+		RGBA[type] = val;
+
+		// get RGBA color
+		var bgColor = Wu.Tools.rgbaStyleStr(RGBA)
+
+		// Set spectrum
+		var stop  = this.stops[no];
+		var list  = this.stops[no].list;
+		var color = list.color.color;
+
+		color.style.background = bgColor;
+		$(color).spectrum("set", bgColor);
+
 		// Render slider
 		this._renderSlider();
 			
-	},
+	},	
 
 
 
@@ -726,16 +906,54 @@ Wu.RasterStyler = Wu.Class.extend({
 		return gradient;
 	},
 
+	stops2cartocss : function (stops) {
 
+		if ( !stops ) return;
 
-	// setCarto : function (carto) {
-	// 	console.log('%c setCarto ', 'background: hotpink; color: white;');
-	// 	console.log('carto', carto);
-	// 	this.options.carto = carto;
-	// },	
+		var minVal = this.options.rangeMin;
+		var maxVal = this.options.rangeMax;	
 
+		var firstStop = parseInt(stops[0].val);
+		var lastStop = parseInt(stops[stops.length-1].val);
 
+		// todo: add blur to stops
+		var blur = true;
+		var blurType = 'gaussian';
 
+		// Default CSS
+		var styleCSS = '#layer { ';
+		styleCSS += 'raster-opacity: 1; ';
+		styleCSS += 'raster-colorizer-default-mode: linear; ';
+		styleCSS += 'raster-colorizer-default-color: transparent; ';
+		styleCSS += 'raster-comp-op: color-dodge; ';
+		if (blur) styleCSS += 'raster-scaling: ' + blurType + '; ';
+		styleCSS += 'raster-colorizer-stops: ';
+
+		// If the first stop is not equal to minVal,
+		// create a stop for minVal
+		if ( firstStop != minVal ) {
+			styleCSS += ' stop(' + minVal + ', rgba(0,0,0,0))';
+			styleCSS += ' stop(' + (firstStop-1) + ', rgba(0,0,0,0))';
+		}
+
+		// Create all the stops
+		stops.forEach(function (stop, i) {
+			var val = stop.val;
+			var _RGBA = stop.col;
+			var rgba = 'rgba(' + _RGBA.r + ',' + _RGBA.g + ',' + _RGBA.b + ',' + _RGBA.a + ')';
+			styleCSS += ' stop(' + val + ', ' + rgba + ')';
+		}.bind(this));		
+
+		// If the last stop is not equal to maxVal,
+		// create a stop for 
+		if ( lastStop != maxVal ) {
+			styleCSS += ' stop(' + (lastStop+1) + ', rgba(0,0,0,0))';
+			styleCSS += ' stop(' + maxVal + ', rgba(0,0,0,0), exact)';
+		}
+		styleCSS += ';}';
+
+		return styleCSS;
+	},
 
 });
 
