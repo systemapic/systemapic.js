@@ -113,14 +113,16 @@ Wu.App = Wu.Class.extend({
 		
 
 		// get portal
+		console.time('get portal');
 		app.api.getPortal(function (err, response) {
-
+			console.timeEnd('get portal');
 			if (err) return console.error('Something went wrong.');
 
 			// parse
 			var store = Wu.parse(response);
 
 			// build app
+			console.log('Building...');
 			app.build(store)
 		});
 	},
@@ -131,24 +133,30 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		app.options.json = portalStore;
 
+		console.log('...objects');
 		// load json model
 		app._initObjects();
 
+		console.log('...containers');
 		// create app container
 		app._initContainer();
 
+		console.log('...chrome');
 		// init chrome
 		app._initChrome();
 
+		console.log('...panes');
 		// create panes
 		app._initPanes();
 
+		console.log('...view');
 		// init pane view
 		app._initView();
 
 		// ready
 		app._ready = true; // todo: fire app ready event
 
+		console.log('Ready!');
 		// select project
 		Wu.Mixin.Events.fire('appReady');
 
@@ -180,10 +188,14 @@ Wu.App = Wu.Class.extend({
 	_initObjects : function () {
 
 		// data controller
+		console.time('new Wu.Data()');
 		app.Data = new Wu.Data();
+		console.timeEnd('new Wu.Data()');
 
 		// controller .. todo: refactor what's in controller.. or expand..
+		console.time('new Wu.Controller()');
 		app.Controller = new Wu.Controller();
+		console.timeEnd('new Wu.Controller()');
 
 		// main user account
 		app.Account = new Wu.User(app.options.json.account);

@@ -99,6 +99,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // init cursor
         this._cursor = 0;
 
+        // init feature group
+        this._group = L.featureGroup([]).addTo(app._map);
+
     },
 
     _initDatasets : function () {
@@ -139,13 +142,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // add load event
             layer.on('load', this._onLayerLoaded, this);
 
-            // add click event
-            // layer.on('click', this._onLayerClick, this); // no effect?
-            // layer.on('tileunload', this._onTileUnload, this); // no effect?
-            // layer.on('tileload', this._onTileLoad, this); // no effect?
-
-            // add layer to map
-            app._map.addLayer(layer);
+            // add layer to feature group
+            this._group.addLayer(layer);
 
             // hide by default
             this._hideLayer(layer);
@@ -159,10 +157,17 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         }, this);
 
+
         // set default layer
         this.layer = this._cache[0].layer;
 
     },
+
+    _onMapClick : function (event) {
+        console.log('_onMapClick', event);
+        var latlng = event.details.e.latlng;
+        console.log('latlng', latlng);
+    },  
 
     _onTileUnload : function (e) {
         var layer = e.target;
@@ -170,7 +175,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _onTileLoad : function (e) {
-         var layer = e.target;
+        var layer = e.target;
         console.log('_onTileLoad', layer.options.dataset_id);
     },
 

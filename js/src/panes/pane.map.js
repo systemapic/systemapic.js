@@ -130,10 +130,17 @@ Wu.MapPane = Wu.Pane.extend({
 
 		});
 
+		map.on('click', function (e) {
+			Wu.Mixin.Events.fire('mapClick', {details : {
+				e : e
+			}});
+		}, this);
+
 		// add attribution
 		this._addAttribution(map);
 
 
+		// todo: remove this?
 		// global map events
 		map.on('zoomstart', function (e) {
 
@@ -158,7 +165,8 @@ Wu.MapPane = Wu.Pane.extend({
 		}, this);
 
 
-		// // on map load
+		// todo: remove, refactor this?
+		// on map load
 		map.on('projectSelected', function (e) {
 			// hack due to race conditions
 			setTimeout(function () { 
