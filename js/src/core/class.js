@@ -2757,6 +2757,7 @@ Wu.Tools = {
 		return keyboardMap[key];
 	},
 
+	// Get cursor position in input field
 	getCursorPos : function (input) {
 	    // Internet Explorer Caret Position (TextArea)
 	    if (document.selection && document.selection.createRange) {
@@ -2769,7 +2770,9 @@ Wu.Tools = {
 	            var caret_pos = input.selectionStart;
 	    }
 	    return caret_pos;
-	},	
+	},
+
+	
 
 
 };

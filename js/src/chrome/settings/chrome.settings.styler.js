@@ -382,8 +382,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var file_id = layer.getFileUuid();
 		var sql = '(SELECT * FROM ' + file_id + ') as sub';	
 
+		// Get styleJSON
+		var styleJSON = this._rasterStyler.styleJSON;
+
 		// get stops
-		var stops = this._rasterStyler.stops;
+		var stops = styleJSON.stops;
 
 		// convert stops to css
 		var styleCSS = this._rasterStyler.stops2cartocss(stops);
@@ -414,7 +417,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			layer.updateStyle(newLayerStyle);
 
 			// save styleJSON to layer.style
-			layer.setStyling(stops);
+			layer.setStyling(styleJSON);
 
 		}.bind(this));
 	},
@@ -442,8 +445,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateCube : function () {
 
+		// Get style JSON
+		var styleJSON = this._rasterStyler.styleJSON;
+
 		// get stops
-		var stops = this._rasterStyler.stops;
+		var stops = styleJSON.stops;
 
 		// convert stops to css
 		var styleCSS = this._rasterStyler.stops2cartocss(stops);
@@ -452,7 +458,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._layer.updateStyle(styleCSS);
 
 		// save styleJSON to wu layer
-		this._layer.setStyling(stops); // will be stringified in setStyling fn, 
+		this._layer.setStyling(styleJSON); // will be stringified in setStyling fn, 
 	},
 
 	_refresh : function () {

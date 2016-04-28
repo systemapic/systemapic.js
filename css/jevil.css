@@ -2705,6 +2705,7 @@ input.stop-color {
     color: rgba(251, 22, 50, 0.58);
 }
 
+.raster-options-button,
 .raster-stops-view-as-list-button {
     color: white;
     font-family: 'Open Sans', sans-serif, "Helvetica Neue", Helvetica, Arial;
@@ -2718,6 +2719,15 @@ input.stop-color {
     color: #616161;
 }
 
+.raster-options-button  {
+    margin: 2px;
+    font-size: 10px;
+}
+
+
+
+
+
 .raster-stops-button-container {
     text-align: center;
 }
@@ -2729,4 +2739,59 @@ input.stop-color {
 
 .smooth-fullscreen {
     padding-bottom: 200px !important;
+}
+
+
+.chrome-pane.styler .chrome-color-ball {
+    overflow: hidden;
+}
+
+.raster-color-range:after,
+.chrome-pane.styler .chrome-color-ball:after {
+    content: '';
+    background-image: url('/images/noPxl-micro.png');
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: -1;    
+}
+
+
+
+.range-button-container {
+    text-align: center;
+    top: 50px;
+    position: relative;
+}
+
+.raster-styler-range-wrapper {
+    border-top: 1px solid #C8C8C8;
+    border-bottom: 1px solid #C8c8c8;
+    padding-bottom: 13px;
+    padding-top: 4px;
+    position: relative;
+    top: 6px;
+}
+
+.raster-styler-range-wrapper .stop-color {
+    display: block;
+}
+
+.raster-styler-range-wrapper .stop-color {
+    width: 70px;   
+}
+
+.raster-styler-range-min-wrapper,
+.raster-styler-range-max-wrapper {
+    display: inline-block;
+}
+
+.raster-styler-range-title {
+    float: left;
+    font-weight: 600;
+    top: 13px;
+    position: relative;    
 }

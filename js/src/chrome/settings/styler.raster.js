@@ -9,9 +9,26 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		// Default styling
 		var defaultStops = [{val : 80, col : { r : 0, g : 0, b : 255, a : 1 } }, { val : 180, col : { r : 255, g : 0, b : 0, a : 1 } }];
+		var defaultRange = { min : this.options.rangeMin, max : this.options.rangeMax };
 
 		// Get stops
-		this.stops = _.isObject(options.carto) ? options.carto : defaultStops;
+		this.styleJSON = _.isObject(options.carto) ? options.carto : defaultStops;
+
+		// **************************************************************** //
+		// **************************************************************** //
+		// Fallback for earlier saved files. Can be deleted after debugging
+		if ( !this.styleJSON.stops || !this.styleJSON.range ) {
+			var temp = {};
+			if ( !this.styleJSON.stops ) temp.stops = defaultStops;
+			if ( !this.styleJSON.range ) temp.range = defaultRange;
+			this.styleJSON = temp;
+		}
+		// **************************************************************** //
+		// **************************************************************** //
+
+		// Shorten
+		this.stops = this.styleJSON.stops;
+		this.range = this.styleJSON.range;
 
 		// Create dom
 		this._initContainer();
@@ -27,15 +44,13 @@ Wu.RasterStyler = Wu.Class.extend({
 		// Create divs
 		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper raster-styler', this.options.container);
 		this._rangeMarks = Wu.DomUtil.create('div', 'raster-range-marks', this._wrapper);
-		this._maxMark = Wu.DomUtil.create('div', 'raster-range-max-mark', this._rangeMarks, this.options.rangeMin.toString());
-		this._minMark = Wu.DomUtil.create('div', 'raster-range-min-mark', this._rangeMarks, this.options.rangeMax.toString()); // todo: shouldn't be hardcoded
 		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);		
 		this._rangeWrapper = Wu.DomUtil.create('div', 'raster-color-range-wrapper', this._wrapper);
 
 		// For list
 		this._stopListContainer = Wu.DomUtil.create('div', 'raster-stop-list-container', this._wrapper);	
 		this._stopListButtonContainer = Wu.DomUtil.create('div', 'raster-stops-button-container', this._wrapper);
-		this._stopListButton = Wu.DomUtil.create('div', 'raster-stops-view-as-list-button', this._stopListButtonContainer, 'View as list');
+		this._stopListButton = Wu.DomUtil.create('div', 'raster-stops-view-as-list-button', this._stopListButtonContainer, 'View details');
 		
 		// Render slider
 		this._renderSlider();
@@ -45,12 +60,83 @@ Wu.RasterStyler = Wu.Class.extend({
 		this._descriptions.innerHTML = 'Double click on colored line to create a new handle.<br>Double click on handle to remove it.'
 
 
+		console.log('this', this);
+		// this.predefinedRange(1);
+
 	},
 
 	addHooks : function () {
 		Wu.DomEvent.on(this._stopListButton, 'click', this.toggleStoplist, this);
 	},	
 
+	predefinedRange : function (no) {
+
+		var palette   = this.palettes[no];
+		if ( !palette ) return;
+
+		var minVal    = this.range.min;
+		var maxVal    = this.range.max;
+		var range     = maxVal-minVal;
+		var noStops   = palette.length;
+		var intervals = Math.floor(range/(noStops-1));
+
+		this._clearErryzing();
+
+		this.stops = [];
+
+		palette.forEach(function (p, i) {
+			
+			// if ( i == 0 )		var val = minVal;
+			// else if ( i == noStops-1 )	var val = maxVal;
+			// else 			var val = i*intervals;
+
+			var val = i*intervals;		
+
+			var newStop = { val : val, col : p }
+			this.stops[i] = newStop;
+		}.bind(this));		
+		
+		this._renderSlider();
+		this._renderStopList();
+
+	
+	},
+
+
+	_clearErryzing : function () {
+
+		this.stops.forEach( function (stop) {
+			if ( stop.DOM ) this._clearStop(stop);
+		}.bind(this));
+
+	},
+
+	_clearStop : function (stop) {
+
+		var wrapperElement = Wu.Tools.isElement(stop.DOM.wrapper);
+		if ( wrapperElement ) stop.DOM.wrapper.remove();
+		stop.DOM.wrapper = null;
+
+		var containerElement = Wu.Tools.isElement(stop.DOM.container);
+		if ( containerElement ) stop.DOM.container.remove();
+		stop.DOM.container = null;	
+
+		var rangeElement = Wu.Tools.isElement(stop.DOM.range);
+		if ( rangeElement ) stop.DOM.range.remove();
+		stop.DOM.range = null;
+
+		if ( stop.DOM.colorBall && stop.DOM.colorBall.color ) {
+			var colorElement = Wu.Tools.isElement(stop.DOM.colorBall.color);
+			if ( colorElement ) {
+				stop.DOM.colorBall.color.remove();
+				stop.DOM.colorBall.color = null;
+			}
+		} 
+		stop.DOM.colorBall = null;
+
+		stop.DOM = null;
+
+	},
 
 
 
@@ -71,16 +157,17 @@ Wu.RasterStyler = Wu.Class.extend({
 		// SLIDER				
 
 		var sliderStops = [];
-		this.stops.forEach(function (stop) { sliderStops.push(stop.val) });
+		this.stops.forEach(function (stop) { sliderStops.push(stop.val+this.range.min) }.bind(this));
 
 		// Create slider
 		this.slider = noUiSlider.create(this._sliderContainer, {
 			start: sliderStops,
 			animate: false,
+			step : 1,
 			behaviour: 'hover',
 			range: {
-				'min': this.options.rangeMin,
-				'max': this.options.rangeMax
+				'min': this.range.min,
+				'max': this.range.max
 			}
 		});
 
@@ -107,10 +194,10 @@ Wu.RasterStyler = Wu.Class.extend({
 				if ( diffAfter == 0 ) val --;
 			}
 
-			// Update current stop with adjusted values
-			this.stops[handle].val = val;
-			
 
+			// Update current stop with adjusted values
+			this.stops[handle].val = val - this.range.min;
+			
 			// Set slider position
 			this._setSliderPosition();
 			this._renderStopList();
@@ -132,33 +219,7 @@ Wu.RasterStyler = Wu.Class.extend({
 		this.stops.forEach(function (stop, i) { 
 
 			// If DOM for this stop already exists, remove it
-			if ( stop.DOM ) {
-
-				var wrapperElement = Wu.Tools.isElement(stop.DOM.wrapper);
-				if ( wrapperElement ) stop.DOM.wrapper.remove();
-				stop.DOM.wrapper = null;
-
-				var containerElement = Wu.Tools.isElement(stop.DOM.container);
-				if ( containerElement ) stop.DOM.container.remove();
-				stop.DOM.container = null;	
-
-				var rangeElement = Wu.Tools.isElement(stop.DOM.range);
-				if ( rangeElement ) stop.DOM.range.remove();
-				stop.DOM.range = null;
-
-				if ( stop.DOM.colorBall && stop.DOM.colorBall.color ) {
-					var colorElement = Wu.Tools.isElement(stop.DOM.colorBall.color);
-					if ( colorElement ) {
-						stop.DOM.colorBall.color.remove();
-						stop.DOM.colorBall.color = null;
-					}
-				} 
-				stop.DOM.colorBall = null;
-
-				stop.DOM = null;
-
-			}
-
+			if ( stop.DOM ) this._clearStop(stop);
 
 			stop.DOM = {}
 
@@ -172,7 +233,7 @@ Wu.RasterStyler = Wu.Class.extend({
 			stop.DOM.range     = Wu.DomUtil.create('div', 'raster-color-range', stop.DOM.wrapper);
 
 			// Number
-			stop.DOM.number    = Wu.DomUtil.create('div', 'raster-color-number', stop.DOM.container, stop.val);
+			stop.DOM.number    = Wu.DomUtil.create('div', 'raster-color-number', stop.DOM.container, stop.val+this.range.min);
 
 			// Color selector
 			stop.DOM.colorBall = new Wu.button({
@@ -213,8 +274,24 @@ Wu.RasterStyler = Wu.Class.extend({
 	// Update color, and redraw slider
 	// (Gets used when color from list is changed by spectrum)
 	_forceUpdateColor : function (col, key, wrapper) {
+		// Store color
 		this.stops[key].col = col;
+		// Update one line only
+		this._updateListLine(key);
+		// Redraw slider
 		this._renderSlider();
+	},
+
+	// Updates values in one line of the list,
+	// without redrawing the whole list
+	_updateListLine : function (key) {
+
+		var stop = this.stops[key];
+		var v = stop.list.valInput.value = stop.val;
+		var r = stop.list.rInput.value = stop.col.r;
+		var g = stop.list.gInput.value = stop.col.g;
+		var b = stop.list.bInput.value = stop.col.b;
+		var a = stop.list.aInput.value = stop.col.a;	
 	},
 
 
@@ -222,11 +299,11 @@ Wu.RasterStyler = Wu.Class.extend({
 	// No width, nor color updates happens here...
 	_setSliderPosition : function () {
 
-		var span = this.options.rangeMax - this.options.rangeMin;	
+		var span = this.range.max - this.range.min;
 
 		this.stops.forEach(function (stop, i) {
 
-			var pixelsFromLeft = Math.round((stop.val / span) * this.pixelWidth);			
+			var pixelsFromLeft = Math.round((stop.val / span) * this.pixelWidth);
 			var style = Wu.Tools.transformTranslate(pixelsFromLeft, 0);			
 			stop.DOM.wrapper.setAttribute('style', style);
 
@@ -239,7 +316,7 @@ Wu.RasterStyler = Wu.Class.extend({
 	// Sets slider color + width + updates number above line
 	_setSliderColor : function () {
 
-		var span = this.options.rangeMax - this.options.rangeMin;
+		var span = this.range.max - this.range.min;
 
 		this.stops.forEach(function (stop, i) {
 
@@ -250,8 +327,8 @@ Wu.RasterStyler = Wu.Class.extend({
 				var nextStop = this.stops[i+1];
 
 				// Calculate				
-				var thisPercentFromLeft = Math.round(thisStop.val/span * 100);
-				var nextPercentFromLeft = Math.round(nextStop.val/span * 100);
+				var thisPercentFromLeft = Math.round((thisStop.val+this.range.min)/span * 100);
+				var nextPercentFromLeft = Math.round((nextStop.val+this.range.min)/span * 100);
 
 				// Values
 				// var left  = thisPercentFromLeft;
@@ -276,7 +353,7 @@ Wu.RasterStyler = Wu.Class.extend({
 			stop.DOM.range.style.width = width + 'px';
 
 			// Write value
-			stop.DOM.number.innerHTML = stop.val;
+			stop.DOM.number.innerHTML = stop.val + this.range.min;
 
 		}.bind(this));
 
@@ -284,8 +361,11 @@ Wu.RasterStyler = Wu.Class.extend({
 		
 	},
 
+
+
 	// Remove stop (by index)
 	removeStop : function (no) {
+
 
 		// Do not allow less than two stops
 		if ( this.stops.length <= 2 ) return;
@@ -408,10 +488,7 @@ Wu.RasterStyler = Wu.Class.extend({
 	rangeClick : function (e) {
 
 		var target = e.target;
-		var handleClick = false;
-
-		// Check if we've clicked on a handle...
-		target.classList.forEach(function (c) { if ( c == 'noUi-handle' ) handleClick = true; });
+		var handleClick = Wu.DomUtil.hasClass(target, 'noUi-handle');
 
 		// If we've clicked on a handle, remove stop
 		// If we've clicked on the color strip, add stop
@@ -425,11 +502,13 @@ Wu.RasterStyler = Wu.Class.extend({
 		// Then we add a buffer, and figure out which stop we're closest to.
 		var stop = false;
 
-		var buffer = 12;
+		var buffer = 0;
 		this.stops.forEach(function (_stop, i) {
-			if ( _stop.val > (this.hoverValue-buffer) &&  _stop.val < (this.hoverValue+buffer) ) {
+
+			if ( _stop.val >= (this.hoverValue-buffer) &&  _stop.val <= (this.hoverValue+buffer) ) {
 				stop = i;
 			}
+
 		}.bind(this));
 
 		if ( stop === false ) return;
@@ -439,10 +518,11 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	rangeClickAddStop : function (e) {
 
-		var val = Math.round(this.hoverValue);
+		var val = Math.round(this.hoverValue) - this.range.min;
 		var index = -1;
 		var tooClose = false;
-		var buffer = 15;
+		// var buffer = 15;
+		var buffer = 0;
 
 		// Add stop before
 		if ( val < ( this.stops[0].val - buffer) ) {
@@ -458,16 +538,23 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		// Find out between which stops to place this stop...
 		this.stops.forEach(function (stop, i) {
+
+			// Stop value
+			var stopVal = stop.val;
+
 			// New value is LARGER than stop
-			if ( val > stop.val ) index = i;
-			var diff = Math.abs(stop.val - val);
+			if ( val > stopVal ) index = i;
+			var diff = Math.abs( stopVal - val);
 			if ( diff < buffer ) tooClose = true;
+
 		}.bind(this));
 
 		// Need a buffer, so that we don't create a new handle when pulling a handle :P
 		if ( tooClose ) { console.error('Too close!'); return; }
 
+		// Add stop
 		this.addStop(val, index);
+
 
 	},
 
@@ -493,12 +580,12 @@ Wu.RasterStyler = Wu.Class.extend({
 
 	disableStopList : function () {
 		this._stopListContainer.innerHTML = '';
-		this._stopListButton.innerHTML = 'View as list';
+		this._stopListButton.innerHTML = 'View details';
 		this.viewStoplist = false;
 	}, 
 
 	enableStopList : function () {
-		this._stopListButton.innerHTML = 'Hide list';
+		this._stopListButton.innerHTML = 'Hide details';
 		this.viewStoplist = true;
 		this._renderStopList();
 	},	
@@ -549,7 +636,7 @@ Wu.RasterStyler = Wu.Class.extend({
 		
 			var _h = stop.list = {};
 
-			var v = stop.val ? stop.val : '0';
+			var v = stop.val ? stop.val+this.range.min : this.range.min;
 			var r = stop.col.r ? stop.col.r : '0';
 			var g = stop.col.g ? stop.col.g : '0';
 			var b = stop.col.b ? stop.col.b : '0';
@@ -664,8 +751,97 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		}.bind(this));
 
+
+		// Add line for adjusting range
+		var rangeWrapper = Wu.DomUtil.create('div', 'raster-styler-range-wrapper', this._stopListContainer);
+		
+		var rangeTitle = Wu.DomUtil.create('div', 'raster-styler-range-title', rangeWrapper, 'Range:');
+
+		var rangeMinWrapper = Wu.DomUtil.create('div', 'raster-styler-range-min-wrapper', rangeWrapper);
+		var rangeMinDescr   = Wu.DomUtil.create('div', 'stop-color', rangeMinWrapper, 'min');
+		var rangeMinInput   = Wu.DomUtil.create('input', 'raster-styler-range-min stop-color', rangeMinWrapper);
+
+		var rangeMaxWrapper = Wu.DomUtil.create('div', 'raster-styler-range-max-wrapper', rangeWrapper);
+		var rangeMaxDescr   = Wu.DomUtil.create('div', 'stop-color', rangeMaxWrapper, 'max');
+		var rangeMaxInput   = Wu.DomUtil.create('input', 'raster-styler-range-max stop-color', rangeMaxWrapper);
+
+		rangeMinInput.value = this.range.min;
+		rangeMaxInput.value = this.range.max;
+
+		Wu.DomEvent.on(rangeMinInput, 'blur', this._saveRange, this);
+		Wu.DomEvent.on(rangeMaxInput, 'blur', this._saveRange, this);
+
+		rangeMaxInput.onkeypress = Wu.Tools.forceNumeric;
+		rangeMinInput.onkeypress = Wu.Tools.forceNumeric;
+
+		this.rangeMinInput = rangeMinInput;
+		this.rangeMaxInput = rangeMaxInput;
+
 	},
 
+	_saveRange : function () {
+
+		// Get input values
+		var minInput = parseInt(this.rangeMinInput.value);
+		var maxInput = parseInt(this.rangeMaxInput.value);
+
+		// If no input value, use min/max values
+		var minRange = minInput ? minInput : this.range.min;
+		var maxRange = maxInput ? maxInput : this.range.max;
+		// If min input is zero, use it
+		if ( minInput === 0 ) minRange = 0;
+
+		// If max value is less than min value;
+		if ( minRange >= maxRange ) {	
+			maxRange = minRange+1;
+			this.rangeMaxInput.value = maxRange;
+		}
+
+		// Do not allow range smaller than number of stops;
+		if ( maxRange-minRange < this.stops.length ) {
+			maxRange = minRange + this.stops.length;
+		}
+
+
+		// Store previous slider range
+		var prevRange = this.range.max - this.range.min;
+
+		// Set new slider range
+		this.range.min = minRange;
+		this.range.max = maxRange;
+
+		// Get value from first and last stop
+		var minVal = this.stops[0].val;
+		var maxVal = this.stops[this.stops.length-1].val;
+		
+		// Get range of stops
+		var valRange = maxVal - minVal;
+		// Get range of slider
+		var range = maxRange - minRange;
+
+		// How many percent is range between stops of PREVIOUS slider range?
+		var pp = valRange/prevRange;
+
+		// Recalculate stops
+		this.stops.forEach(function (stop, i) {	
+			
+			// Percent of value range
+			var percent = stop.val/valRange * pp;
+			var newVal  = Math.round(range * percent);
+			
+			// Store calculated value
+			stop.val = newVal;
+
+		}.bind(this));	
+
+		// Update slider
+		this._renderSlider();
+		// Update list
+		this._renderStopList();
+
+	},
+
+	// Rout key movement
 	routKey : function (e) {
 
 		var key = e.keyCode;
@@ -800,8 +976,8 @@ Wu.RasterStyler = Wu.Class.extend({
 		// Make sure value is not more or less than maximum allowed
 		if ( type == 'v' ) {
 
-			if ( val < this.options.rangeMin ) val = this.options.rangeMin;
-			if ( val > this.options.rangeMax ) val = this.options.rangeMax;
+			if ( val < this.range.min ) val = this.range.min;
+			if ( val > this.range.max ) val = this.range.max;
 
 			// If val is less than stop before, force it to previous stop + 1
 			if ( this.stops[no-1] && this.stops[no-1].val >= val ) {
@@ -814,7 +990,7 @@ Wu.RasterStyler = Wu.Class.extend({
 			}
 
 			// Update Object
-			this.stops[no].val = val;
+			this.stops[no].val = val + this.range.min;
 		}
 
 		// Force RGB values to be between 255 and 0
@@ -910,8 +1086,8 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		if ( !stops ) return;
 
-		var minVal = this.options.rangeMin;
-		var maxVal = this.options.rangeMax;	
+		var minVal = this.range.min;
+		var maxVal = this.range.max;	
 
 		var firstStop = parseInt(stops[0].val);
 		var lastStop = parseInt(stops[stops.length-1].val);
@@ -954,6 +1130,165 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		return styleCSS;
 	},
+
+
+
+
+
+	palettes : [
+
+		// 0
+		[
+			{ r : 255, g : 0,   b :  0,   a : 1 },
+			{ r : 255, g : 255, b :  0,   a : 1 },
+			{ r : 0,   g : 255, b :  0,   a : 1 },
+			{ r : 0,   g : 255, b :  255, a : 1 },
+			{ r : 0,   g : 0,   b :  255, a : 1 }
+		],
+
+		// 1
+		[
+			{ r : 0,   g : 0,   b :  255, a : 1 },
+			{ r : 0,   g : 255, b :  255, a : 1 },
+			{ r : 0,   g : 255, b :  0,   a : 1 },
+			{ r : 255, g : 255, b :  0,   a : 1 },
+			{ r : 255, g : 0,   b :  0,   a : 1 }
+		],
+
+		// 2
+		[
+			{ r : 240, g : 249, b :  232, a : 1 },
+			{ r : 123, g : 204, b :  196, a : 1 },
+			{ r : 8,   g : 104, b :  172, a : 1 }
+		],
+
+		// 3
+		[
+			{ r : 8,   g : 104, b :  172, a : 1 },
+			{ r : 123, g : 204, b :  196, a : 1 },
+			{ r : 240, g : 249, b :  232, a : 1 }
+		],
+
+		// 4
+		[
+			{ r : 255, g : 255, b :  178, a : 1 },
+			{ r : 253, g : 141, b :  60,  a : 1 },
+			{ r : 189, g : 0,   b :  38,  a : 1 }
+		],
+
+		// 5
+		[
+			{ r : 189, g : 0,   b :  38,  a : 1 },
+			{ r : 253, g : 141, b :  60,  a : 1 },
+			{ r : 255, g : 255, b :  178, a : 1 }
+		],
+
+		// 6
+		[
+			{ r : 254, g : 235, b :  226, a : 1 },
+			{ r : 122, g : 1,   b :  119, a : 1 }
+		],
+
+		// 7
+		[
+			{ r : 122, g : 1,   b :  119, a : 1 },
+			{ r : 254, g : 235, b :  226, a : 1 }
+		],
+
+		// 8
+		[
+
+			{ r : 215, g : 25,  b :  28,  a : 1 },
+			{ r : 253, g : 174, b :  97,  a : 1 },
+			{ r : 255, g : 255, b :  191, a : 1 },
+			{ r : 171, g : 221, b :  164, a : 1 },
+			{ r : 43,  g : 131, b :  186, a : 1 }
+		],
+
+		// 9
+		[
+			{ r : 43,  g : 131, b :  186, a : 1 },
+			{ r : 171, g : 221, b :  164, a : 1 },
+			{ r : 255, g : 255, b :  191, a : 1 },
+			{ r : 253, g : 174, b :  97,  a : 1 },
+			{ r : 215, g : 25,  b :  28,  a : 1 }
+		],
+
+		// 10 
+		[
+			{ r : 208, g : 28,  b :  139, a : 1 },
+			{ r : 241, g : 182, b :  218, a : 1 },
+			{ r : 247, g : 247, b :  247, a : 1 },
+			{ r : 184, g : 225, b :  134, a : 1 },
+			{ r : 77,  g : 172, b :  38,  a : 1 }
+		],
+
+		// 11
+		[
+			{ r : 77,  g : 172, b :  38,  a : 1 },
+			{ r : 247, g : 247, b :  247, a : 1 },
+			{ r : 208, g : 28,  b :  139, a : 1 }
+		],
+
+		// 12
+		[
+			{ r : 230, g : 97,  b :  1,   a : 1 },
+			{ r : 247, g : 247, b :  247, a : 1 },
+			{ r : 94,  g : 60,  b :  153, a : 1 }
+		],
+
+		// 13
+		[
+			{ r : 94,  g : 60,  b :  153, a : 1 },
+			{ r : 247, g : 247, b :  247, a : 1 },
+			{ r : 230, g :  97, b :   1,  a : 1 }
+		],
+
+		// 14
+		[
+			{ r : 202, g : 0,   b :  32,  a : 1 },
+			{ r : 247, g : 247, b :  247, a : 1 },
+			{ r : 5,   g : 113, b :  176, a : 1 }
+		],
+
+		// 15
+		[
+			{ r : 5,   g : 113, b :  176, a : 1 },
+			{ r : 247, g : 247, b :  247, a : 1 },
+			{ r : 202, g : 0,   b :  32,  a : 1 }
+		],
+
+		// 16
+		[
+			{ r : 255, g : 0,   b :  255, a : 1 },
+			{ r : 255, g : 255, b :  0,   a : 1 },
+			{ r : 0,   g : 255, b :  255, a : 1 }
+		],
+
+		// 17
+		[
+			{ r : 0,   g : 255, b :  255, a : 1 },
+			{ r : 255, g : 255, b :  0,   a : 1 },
+			{ r : 255, g : 0,   b :  255, a : 1 }
+		],
+
+		// 18
+		[
+			{ r : 255, g : 0,   b :  0, a : 1 },
+			{ r : 255, g : 255, b :  0, a : 1 },
+			{ r : 0,   g : 255, b :  0, a : 1 }
+		],
+
+		// 19
+		[
+			{ r : 0,   g : 255, b :  0, a : 1 },
+			{ r : 255, g : 255, b :  0, a : 1 },
+			{ r : 255, g : 0,   b :  0, a : 1 }
+		]
+
+	]
+
+
 
 });
 
