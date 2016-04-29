@@ -141,19 +141,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			// type      : this._layer.getMeta().geometry_type
 		};
 
-
-		var type = this._layer.getMeta().geometry_type;
-
-
-		// create point styler
-		if ( type == 'ST_Point' ) this._pointStyler = new Wu.Styler.Point(options);
-
-		// create polygon styler
-		if ( type == 'ST_MultiPolygon' ) this._polygonStyler = new Wu.Styler.Polygon(options);
-
-		// create line styler
-		if ( type == 'ST_MultiLineString' ) this._lineStyler = new Wu.Styler.Line(options);
-
+		// create stylers
+		this._pointStyler = new Wu.Styler.Point(options);
+		this._polygonStyler = new Wu.Styler.Polygon(options);
+		this._lineStyler = new Wu.Styler.Line(options);
 	},
 
 	_initLegendOptions : function () {
@@ -166,7 +157,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		};
 
 		this._legendStyler = new Wu.Legend(legendOptions);
-
 
 		Wu.DomUtil.removeClass(this._legendStyler._legensOuter, 'displayNone');		
 	},
@@ -326,9 +316,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		this._updateStyle(true);
 
-		this._pointStyler._refresh();
-		this._lineStyler._refresh();
-		this._polygonStyler._refresh();		
+		this._pointStyler && this._pointStyler._refresh();
+		this._lineStyler && this._lineStyler._refresh();
+		this._polygonStyler && this._polygonStyler._refresh();		
 
 	},
 
@@ -425,19 +415,28 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	_updateVector : function (newLegend) {
 
 		// Update point
-		this._pointStyler.setCarto(this._carto.point);
-		this._pointStyler.updateStyle();
+		if (this._pointStyler) {
+			this._pointStyler.setCarto(this._carto.point);
+			this._pointStyler.updateStyle();
+		}
 
 		// Update point
-		this._lineStyler.setCarto(this._carto.line);
-		this._lineStyler.updateStyle();
+		if (this._lineStyler) {
+			this._lineStyler.setCarto(this._carto.line);
+			this._lineStyler.updateStyle();
+		}
 
 		// Update point
-		this._polygonStyler.setCarto(this._carto.polygon);
-		this._polygonStyler.updateStyle();
+		if (this._polygonStyler) {
+			this._polygonStyler.setCarto(this._carto.polygon);
+			this._polygonStyler.updateStyle();
+		}
 
-		var refresh = newLegend ? this._legend : false;
-		this._legendStyler.refreshLegend(refresh);
+		// update legend
+		if (this._legendStyler) {
+			var refresh = newLegend ? this._legend : false;
+			this._legendStyler.refreshLegend(refresh);
+		}
 
 		// Unmark changed
 		this.unmarkChanged();

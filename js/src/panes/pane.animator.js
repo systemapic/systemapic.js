@@ -29,6 +29,11 @@ Wu.Animator = Wu.Evented.extend({
     // fetch data from server
     _fetchData : function (done) { // todo: query raster instead
 
+        // app.api.queryArea({
+        //     name : this.options.data,
+
+        // })
+
         // get data from server
         app.api.getCustomData({
             name : this.options.data

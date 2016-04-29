@@ -130,10 +130,9 @@ Wu.MapPane = Wu.Pane.extend({
 
 		});
 
+		// add map click (bug: layer won't listen to click)
 		map.on('click', function (e) {
-			Wu.Mixin.Events.fire('mapClick', {details : {
-				e : e
-			}});
+			Wu.Mixin.Events.fire('mapClick', {details : {e : e}});
 		}, this);
 
 		// add attribution

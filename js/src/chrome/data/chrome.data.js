@@ -90,10 +90,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         this._listContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._listOuterScroller);
 
         // LAYER LIST
-        this._initLayerListContainer();
+        this._createLayerListContainer();
 
         // FILE LIST
-        this._initFileListContainer();
+        this._createFileListContainer();
 
         // Top container (with upload button)
         this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
@@ -107,7 +107,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
     // Layer list container
-    _initLayerListContainer : function () {
+    _createLayerListContainer : function () {
 
         this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer);
 
@@ -129,7 +129,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
     // File list container
-    _initFileListContainer : function () {
+    _createFileListContainer : function () {
 
         // HEADER
         this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title layer-list', this._listContainer, '<i class="fa fa-database"></i> My Datasets');
@@ -751,6 +751,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // └─┘┴ ┴└─┘┴ ┴  └  ┴┴─┘└─┘  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─
     initFileList : function (D3container, data, library) {
 
+        // debug: only do hundred files
+        var data = _.sample(data, 100);
+
 
         // BIND
         var dataListLine = D3container
@@ -1234,12 +1237,91 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         });
 
         // create cubeset list
+        this._createMaskBox({
+            container : content,
+            layer : layer
+        });
+
+        // create cubeset list
         this._createCubesetBox({
             container : content,
             layer : layer
         });
 
     },
+
+    _abortMaskUpload : function (options) {
+        var input = options.input;
+        var err = options.err;
+
+        console.log('_abortMaskUpload', err);
+    },
+
+    _createMaskBox : function (options) {
+
+        var container = options.container;
+        var layer = options.layer;
+
+        // create divs
+        var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+        var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Add mask');
+
+        // check for html5 file reader compatability
+        if (_.isUndefined(window.FileReader)) return console.error('no filereader available');
+
+        // create input
+        var mask_uploader = Wu.DomUtil.create('input', 'mask-upload-input', toggles_wrapper);
+        mask_uploader.setAttribute('type', 'file');
+        
+        // file input event
+        mask_uploader.onchange = function (e) {
+            e.preventDefault();
+
+            // get file
+            var file = mask_uploader.files[0];
+            
+            console.log('file:', file);
+
+            // only allow .geojson
+            if (!_.contains(file.name, '.geojson')) {
+                return this._abortMaskUpload({
+                    input : mask_uploader,
+                    err : 'Only .geojson format allowed for uploaded mask'
+                });
+            }
+
+            // only allow < 5MB
+            if (file.size > 5000000) {
+                return this._abortMaskUpload({
+                    input : mask_uploader,
+                    err : 'GeoJSON mask larger than 5MB not allowed'
+                });
+            }
+
+            // create file reader
+            var fr = new FileReader();
+
+            // read file
+            fr.readAsText(file);
+
+            // callback for readAsText
+            fr.onload = function (a) {
+                console.log('a', arguments);
+                console.log('fr.results', fr.result);
+                console.log('fr:', fr);
+
+                // todo: 
+                // send geojson to server
+                // add as mask
+            };
+
+            return false;
+        }.bind(this);
+
+
+    },
+
+
 
     _createCubeNameBox : function (options) {
         var container = options.container;
@@ -1317,6 +1399,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             order.push(dataset);
         }
 
+        // due to dataset sample debug below
+        return console.error('debug, not saved!');
+
         // save to server
         app.api.updateCube({
             datasets : order,
@@ -1347,6 +1432,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // get datasets
         var datasets = layer.getDatasets();
+
+
+        // debug: only show first 100
+        var datasets = _.sample(datasets, 100);
 
         // create list
         datasets.forEach(function (dataset, i) {
@@ -2613,6 +2702,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
             // Do not allow postgis layers to be in the baselayer dropdown
             if ( provider.key == "postgis" ) return;
+            if ( provider.key == "cube" ) return;
             if ( provider.key == "raster"  ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
 
             // Get each provider (mapbox, google, etc)
@@ -2668,7 +2758,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         _baselayers.forEach(function (baselayer) {
             var uuid = baselayer.uuid;
             var layer = this._project.getLayer(uuid);
-            layer.disable();
+            layer && layer.disable();
         }.bind(this));
 
         // Add to map
