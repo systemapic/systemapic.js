@@ -25,12 +25,10 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	// Listen to events
 	addHooks : function () {
-		// Wu.Mixin.Events.on('animationSlide', this.sliding, this);
 		Wu.Mixin.Events.on('sliderUpdate', this.sliding, this);
 		Wu.Mixin.Events.on('sliderMoveBackward', this.moveBackward, this);
 		Wu.Mixin.Events.on('sliderMoveForward', this.moveForward, this);
 		Wu.Mixin.Events.on('setSliderTitle', this.setTitle, this);
-
 		Wu.Mixin.Events.on('stepBeforeBeginning', this.firstToLastDay, this);
 		Wu.Mixin.Events.on('stepAfterEnd', this.lastToFirstDay, this);
 	},
@@ -50,8 +48,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	// Skipping one year back in time
 	moveBackward : function () {
-
-		if ( this.disableBackward ) return;
+		if (this.disableBackward) return;
 
 		this.currentYear--;
 
@@ -200,7 +197,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// Year Names
 		this.yearNames = [];
-		for ( var y in this.years ) {
+		for (var y in this.years) {
 			var _y = parseInt(y);
 			if ( !isNaN(_y) ) {
 				this.yearNames.push(_y);
@@ -285,6 +282,11 @@ Wu.Graph.Year = Wu.Evented.extend({
 	},
 
 
+	addData : function (options) {
+		console.log('addData', options);
+	},
+
+
 	initGraph : function () {
 
 		// AVERAGE DATA FOR ALL YEARS
@@ -296,7 +298,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 		var yMinDim = xDim.group().reduceSum(function(d) { return d.min });
 		var yAvgDim = xDim.group().reduceSum(function(d) { return d.avg });
 
-    		var minDate = xDim.bottom(1)[0].date;
+    	var minDate = xDim.bottom(1)[0].date;
 		var maxDate = xDim.top(1)[0].date;
 
 		// DATA FOR CURRENT YEAR

@@ -1306,13 +1306,25 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
             // callback for readAsText
             fr.onload = function (a) {
-                console.log('a', arguments);
-                console.log('fr.results', fr.result);
-                console.log('fr:', fr);
 
-                // todo: 
-                // send geojson to server
-                // add as mask
+                // get mask
+                var geojsonMask = fr.result;
+                var cube_id = layer._cube.cube_id;
+
+                // test data
+                var data = {
+                    cube_id : cube_id,
+                    mask : {
+                        type : 'geojson',
+                        mask : geojsonMask,
+                    }
+                }
+
+                // add mask to layer
+                layer.addMask(data);
+
+               
+
             };
 
             return false;

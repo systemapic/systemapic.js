@@ -323,6 +323,13 @@ Wu.Api = Wu.Class.extend({
 	},
 
 
+	// [pile]
+	addMask : function (options, done) {
+		var path = '/v2/cubes/mask';
+		this.post(path, options, done);
+	},
+
+
 
 
 
@@ -378,6 +385,11 @@ Wu.Api = Wu.Class.extend({
 
 
 	// QUERIES
+
+	queryCube : function (options, done) {
+		var path = '/v2/cubes/query';
+		this.post(path, options, done);
+	},
 
 	
 	dbFetchArea : function (options, done) {

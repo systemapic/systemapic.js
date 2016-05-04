@@ -86,6 +86,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // init cache
         this._initCache();
 
+        // init mask
+        this._initMask();
+
         // mark inited
         this._inited = true;
 
@@ -162,6 +165,90 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this.layer = this._cache[0].layer;
 
     },
+
+    _initMask : function () {
+
+        // get mask
+        var mask = this.getMask();
+
+        console.log('initMask', mask, _.size(mask), _.size(Wu.stringify(mask)));
+
+        console.log('this', this);
+
+
+        if (!mask) return;
+
+        // create mask (topojson) layer
+        this._maskLayer = new L.TopoJSON();
+  
+        // add data to layer
+        this._maskLayer.addData(mask);
+
+        // make sure on top
+        this._maskLayer.bringToFront();
+
+        // click event
+        this._maskLayer.on('click', function(options) { 
+            console.log('Clicked on a group!', options); 
+
+            var layer = options.layer;
+            var geometry = layer.feature.geometry;
+
+            console.log('geometry', geometry);
+
+            var graph = app.Animator.graph;
+
+            console.log('graph', graph);
+
+            // query server for data
+            app.api.queryCube({
+                geometry : geometry,
+                query_type : 'scf',
+                cube_id : this.getCubeId(),
+            }, function (err, data) {
+                console.log('queryerr, data', err, data);
+                if (err) return console.error(err);
+
+                // add data to graph
+                graph.addData(data);
+
+            });
+
+        }.bind(this));
+    },
+
+    query : function (options, done) {
+        console.log('queryByGeometry', options);
+
+        // query server
+
+
+    },
+
+    getMask : function () {
+        var topoMask = this._cube.mask;
+        return topoMask;
+    },
+
+    addMask : function (data) {
+
+        // add mask @ server
+        app.api.addMask(data, function (err, result) {
+            if (err) return console.error(err);
+
+            var masked_cube = Wu.parse(result);
+
+            console.log('masked cube', masked_cube);
+
+            // save updated cube
+            this._saveCube(masked_cube);
+
+            // refresh layers
+            // this._refreshLayer();
+
+        }.bind(this));
+    },
+
 
     _onMapClick : function (event) {
         console.log('_onMapClick', event);
@@ -418,6 +505,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // update zindex
         this._addToZIndex(type); // todo: evented
+
+        // add mask layer
+        if (this._maskLayer) {
+            console.log('adding mask layer');
+            map.addLayer(this._maskLayer);
+        }
 
         this._added = true;
 
