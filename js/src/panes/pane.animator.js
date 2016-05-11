@@ -22,7 +22,7 @@ Wu.Animator = Wu.Evented.extend({
         this._fetchData(this._renderData.bind(this));
 
         // todo: fetching data should query raster itself. in other words, must be connected to cube layer directly, 
-        //  and fetch data thru it.
+        // and fetch data thru it.
 
     },
 

@@ -284,6 +284,9 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	addData : function (options) {
 		console.log('addData', options);
+
+		// update red line
+		this._updateGraph(options.data);
 	},
 
 
@@ -408,11 +411,38 @@ Wu.Graph.Year = Wu.Evented.extend({
 			.xAxis()
 			.tickFormat(d3.time. format('%b'))
 
-
 		dc.renderAll(); 
-
 	},
 
+	// update only red line
+	_updateGraph : function (data) {
+
+		// Clear old data
+		this.ndx.remove();
+
+		// debug: fix date formats
+		data = this._debugFixData(data);
+
+		// set data
+		this.graphData = data;
+
+		// add data
+		this.ndx.add(this.graphData);
+
+		// redraw
+		dc.redrawAll();
+	},
+
+	_debugFixData : function (data) {
+		var fixed = [];
+		data.forEach(function (d) {
+			fixed.push({
+				SCF : d.SCF,
+				date : new Date(d.date)
+			});
+		});
+		return fixed;
+	},
 
 	updateGraph : function () {
 
@@ -427,11 +457,11 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// Rebuild graph data
 		this.years[year].forEach(function (d, i) {
-			if ( i < day ) this.graphData.push(d);
+			if (i < day) this.graphData.push(d);
 		}.bind(this));
 
-		// If we're at the end of the road
-		if ( !this.years[year][day-1] ) return;
+		// If we're at the end of the year
+		if (!this.years[year][day-1]) return;
 
 		// Clear old data
 		this.ndx.remove();
@@ -442,6 +472,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 		// Redraw graph
 		dc.redrawAll();
 
+		// set scf
 		var scf = Math.round(this.years[year][day-1].SCF * 100) / 100;
 
 		// Update HTML
@@ -454,11 +485,11 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		var eachDay = [];
 
-		for ( var day in days ) {
+		for (var day in days) {
 
 			var maxD = false;		
 
-			if( Object.prototype.toString.call( days[day] ) === '[object Array]' ) {
+			if (_.isArray(days[day])) { 
 
 				if ( !maxD ) maxD = days[day][1].SCF;
 				days[day].forEach(function (d) { 
@@ -477,19 +508,20 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		var eachDay = [];
 
-		for ( var day in days ) {	
+		for (var day in days) {	
 
 			var minD = false;
 
 			if (_.isArray(days[day])) { 
-				if ( !minD ) minD = days[day][1].SCF;
-				days[day].forEach(function (d) { if ( d.SCF < minD ) minD = d.SCF });
+				if (!minD) minD = days[day][1].SCF;
+				days[day].forEach(function (d) { 
+					if ( d.SCF < minD ) minD = d.SCF 
+				});
 				eachDay[day] = Math.round(minD);
 			}
 		}
 
 		return eachDay;
-
 	},
 
 	getAvgSCF : function (days) {
@@ -531,7 +563,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 			var thisYear = {
 				SCF : each.SCF,
-				date : this._dateFromNo(each.Doy)
+				date : this._dateFromNo(each.Doy, each.Year)
 			}
 
 			years[currentYear].push(thisYear)
@@ -540,9 +572,11 @@ Wu.Graph.Year = Wu.Evented.extend({
 		return years;
 	},
 
-	_dateFromNo : function (no) {
-	  	var blankDate = new Date(2014, 0);
-  		var date = new Date(blankDate.setDate(no));
+	_dateFromNo : function (doy, year) {
+		year = year || this.currentYear || 2015;
+		console.log('year:', year);
+	  	var blankDate = new Date(year, 0);
+  		var date = new Date(blankDate.setDate(doy));
 		return date;
 	},
 

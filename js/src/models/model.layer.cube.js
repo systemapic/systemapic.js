@@ -171,11 +171,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // get mask
         var mask = this.getMask();
 
-        console.log('initMask', mask, _.size(mask), _.size(Wu.stringify(mask)));
-
-        console.log('this', this);
-
-
+        // return if no mask
         if (!mask) return;
 
         // create mask (topojson) layer
@@ -189,42 +185,44 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // click event
         this._maskLayer.on('click', function(options) { 
-            console.log('Clicked on a group!', options); 
 
+            // get 
             var layer = options.layer;
             var geometry = layer.feature.geometry;
 
-            console.log('geometry', geometry);
-
+            // get graph object
             var graph = app.Animator.graph;
 
-            console.log('graph', graph);
+            // set query options
+            var queryOptions = {
+                geometry : geometry,
+                query_type : 'scf', // snow cover fraction
+                options : {
+                    currentYearOnly : true
+                },
+                cube_id : this.getCubeId(),
+                year : graph.currentYear,
+                day : graph.currentDay
+            };
 
             // query server for data
-            app.api.queryCube({
-                geometry : geometry,
-                query_type : 'scf',
-                cube_id : this.getCubeId(),
-            }, function (err, data) {
-                console.log('queryerr, data', err, data);
+            app.api.queryCube(queryOptions, function (err, data) {
                 if (err) return console.error(err);
 
+                // parse
+                var fractions = Wu.parse(data);
+
                 // add data to graph
-                graph.addData(data);
+                graph.addData({
+                    data : fractions
+                });
 
             });
 
         }.bind(this));
     },
 
-    query : function (options, done) {
-        console.log('queryByGeometry', options);
-
-        // query server
-
-
-    },
-
+  
     getMask : function () {
         var topoMask = this._cube.mask;
         return topoMask;
@@ -236,38 +234,29 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         app.api.addMask(data, function (err, result) {
             if (err) return console.error(err);
 
+            // parse
             var masked_cube = Wu.parse(result);
-
-            console.log('masked cube', masked_cube);
 
             // save updated cube
             this._saveCube(masked_cube);
-
-            // refresh layers
-            // this._refreshLayer();
 
         }.bind(this));
     },
 
 
     _onMapClick : function (event) {
-        console.log('_onMapClick', event);
         var latlng = event.details.e.latlng;
-        console.log('latlng', latlng);
     },  
 
     _onTileUnload : function (e) {
         var layer = e.target;
-        console.log('_onTileUnload', layer.options.dataset_id);
     },
 
     _onTileLoad : function (e) {
         var layer = e.target;
-        console.log('_onTileLoad', layer.options.dataset_id);
     },
 
     _onLayerClick : function (e) {
-        console.log('_layerClick', e);
     },
 
     _onLayerLoaded : function (e) {

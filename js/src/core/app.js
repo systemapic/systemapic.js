@@ -24,7 +24,6 @@ Wu.App = Wu.Class.extend({
 		// auth
 		app.api.auth(app.authed);
 
-
 	},
 
 	authed : function (err, access_token) {
