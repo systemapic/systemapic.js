@@ -1918,3 +1918,74 @@ input.target-input.polygon {
 }
 
 
+
+
+/*DC CHART YEAR GRAPH STYLE EXP*/
+.dc-chart .axis text {
+    font: 13px sans-serif;
+}
+g.axis.x {
+    fill: white;
+}
+g.axis.y {
+    fill: white;
+}
+.big-graph-outer-container {
+    background: #3C4759 !important;
+    padding: 20px;
+    padding-right: 0px;
+    position: absolute;
+    right: 100px;
+    bottom: 45px !important;
+    border-radius: 0;
+    /* opacity: 0; */
+    color: white;
+    opacity: 0.9 !important;
+    /*right: 10px !important;*/
+    /*bottom: 35px !important;*/
+    border-radius: 5px 5px 0 0 !important;
+}
+
+.dc-chart .axis path, .axis line {
+    fill: none;
+    stroke: #FFF;
+    shape-rendering: crispEdges;
+}
+
+.big-slider-inner-container {
+    background: #3C4759 !important;
+    color: white !important;
+    opacity: 0.9 !important;
+    padding-bottom: 24px !important;
+}
+.big-slider-outer-container {
+    right: 10px !important;
+    bottom: 35px !important;  
+}
+
+.dc-chart .sub._3 path.line {
+    stroke-width: 3px !important;
+}
+
+.big-slider-outer-container .noUi-horizontal {
+    top: -26px !important;
+}
+
+
+.big-graph-current-day {
+    font-size: 17px;
+    color: white;
+    font-weight: 600;
+}
+
+.big-graph-current-scf {
+    font-size: 20px;
+    color: white;
+    font-weight: 900;
+}
+
+
+
+
+
+

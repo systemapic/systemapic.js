@@ -53,7 +53,23 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         
         // moment format at which to compare dates (year/day only here)
         timeFormat : 'YYYY-DDDD', 
-        
+
+        // default mask style 
+        mask : {
+
+            style : {
+                fillColor : '#3388ff',
+                fillOpacity : 0.2,
+                color : '#3388ff',
+                opacity : 0.6,
+                weight : 1.5,
+                dashArray : null,
+            },
+
+            // if you want click on separate features of mask
+            separatedFeatures : true,
+        },
+
         // empty, transparent png
         emptyTile : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAB9JREFUaIHtwQENAAAAwqD3T20ON6AAAAAAAAAAAL4NIQAAAZpg4dUAAAAASUVORK5CYII=',
     },
@@ -176,6 +192,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // create mask (topojson) layer
         this._maskLayer = new L.TopoJSON();
+
+        console.log('mask:', mask);
   
         // add data to layer
         this._maskLayer.addData(mask);
@@ -183,12 +201,33 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // make sure on top
         this._maskLayer.bringToFront();
 
+        // set style
+        this._maskLayer.setStyle(this.options.mask.style);
+
         // click event
         this._maskLayer.on('click', function(options) { 
 
-            // get 
+            console.log('maskLayer click', options);
+
             var layer = options.layer;
             var geometry = layer.feature.geometry;
+
+            // reset style for all layers
+            this._maskLayer.eachLayer(function (layer) {
+                layer.setStyle(this.options.mask.style);
+            }.bind(this));
+
+            // set selected layer style
+            layer.setStyle({
+                fillColor : 'white',
+                fillOpacity : 0,
+                color : 'yellow',
+                opacity : 0.8,
+                weight : 2,
+            });
+
+            // make sure selected layer is on top
+            layer.bringToFront();
 
             // get graph object
             var graph = app.Animator.graph;
@@ -197,12 +236,13 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             var queryOptions = {
                 geometry : geometry,
                 query_type : 'scf', // snow cover fraction
+                cube_id : this.getCubeId(),
+                year : graph.currentYear,
+                day : graph.currentDay,
                 options : {
                     currentYearOnly : true
                 },
-                cube_id : this.getCubeId(),
-                year : graph.currentYear,
-                day : graph.currentDay
+                mask_id : layer.feature.id
             };
 
             // query server for data
@@ -221,7 +261,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         }.bind(this));
     },
-
   
     getMask : function () {
         var topoMask = this._cube.mask;
@@ -242,7 +281,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         }.bind(this));
     },
-
 
     _onMapClick : function (event) {
         var latlng = event.details.e.latlng;

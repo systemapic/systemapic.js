@@ -48,6 +48,8 @@ Wu.Animator = Wu.Evented.extend({
         // set data
         this._data = Wu.parse(data);
 
+        console.log('data:', this._data);
+
         // create slider
         this._createSlider();
 

@@ -4,6 +4,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 	_initialize : function (options) {
 
 		// Tis is for enabling different kinds of graphs
+		console.log('INITNITN', this.options.type);
 		if ( this.options.type != 'annualCycles' ) return;
 
 		// Prepares all the data into right format
@@ -294,16 +295,29 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// AVERAGE DATA FOR ALL YEARS
 
+		console.log('this.allData', this.allData);
+
 		// Prepare DC dimensions
 		var ndx     = crossfilter(this.allData);
-		var xDim    = ndx.dimension(function(d) { return d.date });
+		var xDim    = ndx.dimension(function(d) { 
+			console.log('d: ', d);
+			return d.date; 
+		});
 		var yMaxDim = xDim.group().reduceSum(function(d) { return d.max });
 		var yMinDim = xDim.group().reduceSum(function(d) { return d.min });
 		var yAvgDim = xDim.group().reduceSum(function(d) { return d.avg });
 
-    	var minDate = xDim.bottom(1)[0].date;
-		var maxDate = xDim.top(1)[0].date;
 
+		try {
+    		var minDate = xDim.bottom(1)[0].date;
+			var maxDate = xDim.top(1)[0].date;
+		} catch (e) {
+			console.log('xDim', xDim.bottom(1));
+			console.log('xDim', xDim.top(1));
+			console.log('xd', xDim);
+		}
+
+		
 		// DATA FOR CURRENT YEAR
 
 		// Data will get populated in updateGraph()
@@ -345,10 +359,8 @@ Wu.Graph.Year = Wu.Evented.extend({
 		hitslineChart
 			.width(500).height(220)
 			.dimension(xDim)
-		
 			.x(d3.time.scale().domain([minDate,maxDate]))
 		 	.y(d3.scale.linear().domain([0, 100]))
-
 			.clipPadding(10)   	
 			.elasticY(false)
 			.elasticX(false)
@@ -369,7 +381,7 @@ Wu.Graph.Year = Wu.Evented.extend({
 				// MIN value
 				dc.lineChart(hitslineChart)
 					.group(yMinDim)
-					.colors('#ffffff')
+					.colors('#3C4759')
 					.renderArea(true)   	
 					.renderDataPoints(false)
 					.xyTipsOn(false),

@@ -123,8 +123,8 @@ Wu.MapPane = Wu.Pane.extend({
 			// exp
 			// zoomSnap : 0,
 			// zoomDelta : 2,
-			// wheelPxPerZoomLevel : 10,
-			// wheelDebounceTime : 5,
+			wheelPxPerZoomLevel : 100,
+			wheelDebounceTime : 80,
 			// loadingControl : true,
 			// zoomAnimationThreshold : 2,
 
