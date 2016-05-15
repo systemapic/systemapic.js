@@ -202,7 +202,7 @@ Wu.MapPane = Wu.Pane.extend({
 		this._controls = {};
 		_.each(controls, function (control) {
 			this._controls[control] = new L.Control[control.camelize()];
-		}, this);
+		}.bind(this));
 	},
 
 	getControls : function () {

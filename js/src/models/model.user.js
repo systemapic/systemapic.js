@@ -36,7 +36,7 @@ Wu.User = Wu.Class.extend({
 		if (!app.Account) return console.error('too early!');
 		if (this.getUuid() == app.Account.getUuid()) return;
 
-		var isContact = _.contains(app.Account.getContactListUuids(), this.getUuid());
+		var isContact = _.includes(app.Account.getContactListUuids(), this.getUuid());
 
 		return isContact;
 	},

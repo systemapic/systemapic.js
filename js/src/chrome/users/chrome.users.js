@@ -662,7 +662,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				});
 
 			}, this);
-		}, this);
+		}.bind(this));
 
 
 		// input focus, show dropdown

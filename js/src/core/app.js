@@ -245,12 +245,12 @@ Wu.App = Wu.Class.extend({
 		// share pane
 		app.Share = new Wu.Share();
 
-		// big slider
-		app.Animator = new Wu.Animator({ // refactor to project controls
-			// data : 'allYears',
-			data : 'scf.average.2000.2015', // todo: refactor data fetching
-			hide : true
-		});
+		// // big slider
+		// app.Animator = new Wu.Animator({ // refactor to project controls
+		// 	// data : 'allYears',
+		// 	data : 'scf.average.2000.2015', // todo: refactor data fetching
+		// 	hide : true
+		// });
 
 		// add account tab
 		app.AccountPane = new Wu.Pane.Account();

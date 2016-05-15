@@ -1283,7 +1283,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             console.log('file:', file);
 
             // only allow .geojson
-            if (!_.contains(file.name, '.geojson')) {
+            if (!_.includes(file.name, '.geojson')) {
                 return this._abortMaskUpload({
                     input : mask_uploader,
                     err : 'Only .geojson format allowed for uploaded mask'
@@ -2277,7 +2277,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 name: user.getFullName(),
                 container: list_item_container
             });
-        }, this);
+        }.bind(this));
 
 
         // events

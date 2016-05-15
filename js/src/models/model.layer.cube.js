@@ -67,7 +67,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             },
 
             // if you want click on separate features of mask
-            separatedFeatures : true,
+            separatedFeatures : false,
         },
 
         // empty, transparent png
@@ -105,11 +105,28 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // init mask
         this._initMask();
 
+        // init animator control
+        this._initAnimator();
+
         // mark inited
         this._inited = true;
 
         // debug
         app._cubeDebug = this;
+
+    },
+
+    _initAnimator : function () {
+        
+        // only create one instance
+        if (app.Animator) return;
+
+        // animator control
+        app.Animator = new Wu.Animator({ // refactor to project controls
+            data : 'scf.average.2000.2015', // todo: refactor data fetching
+            // hide : true,
+            cube : this
+        });
 
     },
 
@@ -174,8 +191,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 idx : null
             });
 
-        }, this);
-
+        }.bind(this));
 
         // set default layer
         this.layer = this._cache[0].layer;
@@ -205,63 +221,332 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._maskLayer.setStyle(this.options.mask.style);
 
         // click event
-        this._maskLayer.on('click', function(options) { 
+        this._maskLayer.on('click', this._onMaskLayerClick.bind(this)); 
 
-            console.log('maskLayer click', options);
-
-            var layer = options.layer;
-            var geometry = layer.feature.geometry;
-
-            // reset style for all layers
-            this._maskLayer.eachLayer(function (layer) {
-                layer.setStyle(this.options.mask.style);
-            }.bind(this));
-
-            // set selected layer style
-            layer.setStyle({
-                fillColor : 'white',
-                fillOpacity : 0,
-                color : 'yellow',
-                opacity : 0.8,
-                weight : 2,
-            });
-
-            // make sure selected layer is on top
-            layer.bringToFront();
-
-            // get graph object
-            var graph = app.Animator.graph;
-
-            // set query options
-            var queryOptions = {
-                geometry : geometry,
-                query_type : 'scf', // snow cover fraction
-                cube_id : this.getCubeId(),
-                year : graph.currentYear,
-                day : graph.currentDay,
-                options : {
-                    currentYearOnly : true
-                },
-                mask_id : layer.feature.id
-            };
-
-            // query server for data
-            app.api.queryCube(queryOptions, function (err, data) {
-                if (err) return console.error(err);
-
-                // parse
-                var fractions = Wu.parse(data);
-
-                // add data to graph
-                graph.addData({
-                    data : fractions
-                });
-
-            });
-
-        }.bind(this));
     },
-  
+
+
+    _onMaskLayerClick : function (options) {
+
+        console.log('maskLayer click', options);
+
+        if (this.options.mask.separatedFeatures) {
+
+            // query with single feature as mask
+            this._singleFeatureQuery(options);
+
+        } else {
+
+            // query with all features as mask
+            this._multiFeatureQuery(options);
+        }
+
+      
+        // // select one or all features
+        // if (this.options.mask.separatedFeatures) {
+
+        //     // set selected layer style
+        //     layer.setStyle(selectedSingleStyle);
+
+        //     // make sure selected layer is on top
+        //     layer.bringToFront();
+
+        //     // set mask properties
+        //     var mask_id = layer.feature.id;
+        //     var mask_geometry = layer.feature.geometry;
+
+        // } else {
+
+        //     // set mask properties
+        //     var mask_id = 'all';
+        //     var mask_geometry = {
+        //       "type": "FeatureCollection",
+        //       "features": [wholeLayer.toGeoJSON()]
+        //     };
+
+        //     var mask_geometry = wholeLayer.toGeoJSON();
+
+        //     console.log('layer', layer);
+
+        //     // hack: if multipolygon, take largest only
+        //     if (mask_geometry.type == 'MultiPolygon') {
+        //         var largest = _.max(mask_geometry.coordinates, function (m) {
+        //             return _.size(m);
+        //         });
+        //         console.log('largest: ', largest);
+
+        //         mask_geometry.type = 'Polygon';
+        //         mask_geometry.coordinates = largest;
+        //     }
+
+        //     console.log('mask_geometry', mask_geometry);
+
+        //     // set selected layer style to all layers
+        //     this._maskLayer.eachLayer(function (layer) {
+        //         layer.setStyle(selectedWholeStyle);
+        //     }.bind(this));
+        // }
+
+
+        // // set query options
+        // var queryOptions = {
+        //     query_type : 'scf', // snow cover fraction
+        //     cube_id : this.getCubeId(),
+        //     year : graph._current.year,
+        //     day : graph._current.day,
+        //     options : {
+        //         currentYearOnly : true,
+        //         // force_query : true
+        //     },
+        //     mask : {
+        //         geometry : mask_geometry,
+        //         mask_id : mask_id
+        //     }
+        // };
+
+        // // make query
+        // this._queryCube(queryOptions, function (err, data) {
+        //     if (err) return console.error(err, data);
+
+        //     // add data to graph
+        //     graph.addLineData({
+        //         data : fractions
+        //     });
+
+        // });
+
+
+    },
+
+    _singleFeatureQuery : function (options) {
+        // get layer
+        var layer = options.layer;
+
+        var wholeLayer = options.target;
+
+        // get graph object
+        var graph = app.Animator.graph;
+
+        // reset style for all layers
+        this._maskLayer.eachLayer(function (layer) {
+            layer.setStyle(this.options.mask.style);
+        }.bind(this));
+
+        var selectedSingleStyle = {
+            fillColor : 'white',
+            fillOpacity : 0,
+            color : 'yellow',
+            opacity : 0.8,
+            weight : 2,
+        };
+
+        var selectedWholeStyle = {
+            fillColor : 'red',
+            fillOpacity : 0.2,
+            color : 'yellow',
+            opacity : 0,
+        };
+
+        // set selected layer style
+        layer.setStyle(selectedSingleStyle);
+
+        // make sure selected layer is on top
+        layer.bringToFront();
+
+        // set mask properties
+        var mask_id = layer.feature.id;
+        var mask_geometry = layer.feature.geometry;
+
+        // set query options
+        var queryOptions = {
+            query_type : 'scf', // snow cover fraction
+            cube_id : this.getCubeId(),
+            year : graph._current.year,
+            day : graph._current.day,
+            options : {
+                currentYearOnly : true,
+                // force_query : true
+            },
+            mask : {
+                geometry : mask_geometry,
+                mask_id : mask_id
+            }
+        };
+
+        // make query
+        this._queryCube(queryOptions, function (err, data) {
+            if (err) return console.error(err, data);
+
+            // add data to graph
+            graph.addLineData({
+                data : data
+            });
+
+        });
+
+    },
+
+    _multiFeatureQuery : function (options) {
+
+        // get layer
+        var layer = options.layer;
+
+        var wholeLayer = options.target;
+
+        // get graph object
+        var graph = app.Animator.graph;
+
+        // reset style for all layers
+        this._maskLayer.eachLayer(function (layer) {
+            layer.setStyle(this.options.mask.style);
+        }.bind(this));
+
+        var selectedSingleStyle = {
+            fillColor : 'white',
+            fillOpacity : 0,
+            color : 'yellow',
+            opacity : 0.8,
+            weight : 2,
+        };
+
+        var selectedWholeStyle = {
+            fillColor : 'red',
+            fillOpacity : 0.2,
+            color : 'yellow',
+            opacity : 0,
+        };
+
+        // set selected layer style to all layers
+        this._maskLayer.eachLayer(function (layer) {
+            layer.setStyle(selectedWholeStyle);
+        }.bind(this));
+
+       
+        var ops = [];
+        var areas = [];
+
+        // for each layer
+        this._maskLayer.eachLayer(function (layer) {
+            
+            // add async op
+            ops.push(function (callback) {
+
+                var mask_id = layer.feature.id;
+                var mask_geometry = layer.feature.geometry;
+
+                // calc area of geometries
+                areas.push(turf.area(mask_geometry));
+
+                // set query options
+                var queryOptions = {
+                    query_type : 'scf', // snow cover fraction
+                    cube_id : this.getCubeId(),
+                    year : graph._current.year,
+                    day : graph._current.day,
+                    options : {
+                        currentYearOnly : true,
+                        // force_query : true
+                    },
+                    mask : {
+                        geometry : mask_geometry,
+                        mask_id : mask_id
+                    }
+                };
+
+                // make query
+                this._queryCube(queryOptions, callback);
+
+            }.bind(this));
+        }.bind(this));
+
+        // query all areas
+        async.parallel(ops, function (err, polygons) {
+
+            // calulate weighted average of SCF based on ares of polygons
+            var data = this._calculateWeightedAverage({
+                polygons : polygons,
+                areas : areas
+            });
+
+            // add data to graph
+            graph.addLineData({
+                data : data
+            });
+        }.bind(this));
+
+    },
+
+    _calculateWeightedAverage : function (options) {
+
+        // should be added to values from other polygons, 
+        // but weighted based on area of polygon
+        //
+        // (scf_1 * area_a) + (scf_2 * area_b)
+        // ----------------------------------- = weighted scf 
+        //               area_a + area_b 
+
+        var polygons = options.polygons;
+        var areas = options.areas;
+
+        // sum all areas
+        var total_area = _.sum(areas);
+        var sums = []; // 365 days
+        var days = [];
+
+        // each day
+        _.times(365, function (i) {
+
+            // daily avg
+            var avg = [];
+
+            // get results from all polygons
+            polygons.forEach(function (p, n) {
+                if (!p[i]) return; // leap years
+
+                // current day
+                var daily_polygon_scf = p[i].SCF;
+
+                // over the line parts
+                var daily_mean = daily_polygon_scf * areas[n];
+
+                // remember
+                avg.push(daily_mean);
+
+            });
+
+            // calc it out
+            var over_line = _.sum(avg);
+            var under_line = total_area;
+            var weighted_scf = over_line / under_line;
+
+            // create array for line graph
+            var today = polygons[0][i];
+            if (today) days.push({
+                SCF : weighted_scf,
+                date : today.date
+            });
+        });
+
+        return days;
+    },
+
+    _queryCube : function (options, done) {
+
+        // query server for data
+        app.api.queryCube(options, function (err, data) {
+            if (err) return done(err);
+
+            // parse
+            var fractions = Wu.parse(data);
+
+            // catch bad data
+            if (!fractions) return done('Failed to parse data');
+
+            done && done(null, fractions);
+        });
+
+    },
+
     getMask : function () {
         var topoMask = this._cube.mask;
         return topoMask;
@@ -381,7 +666,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var b = _.slice(this._datasets, this._cursor - this.options.cacheSize[0], this._cursor);
 
         // sort datasets
-        var datasets = _.sortBy(_.unique(a.concat(b)), function (d) {
+        var datasets = _.sortBy(_.uniq(a.concat(b)), function (d) {
             return _.findIndex(this._datasets, function (dd) {return d.id == dd.id});
         }, this);
 
@@ -424,22 +709,22 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             cache.layer.setOptions(layerOptions);
 
         }, this);
-     
+
     },
 
     _getAvailableCache : function () {
 
         // if going forward in time
         if (this._cursorDirection > 0) {
-            
-            // return lowest cached dataet index
+
+            // return lowest cached dataset index
             return _.min(this._cache, function (c) {
                 return c.idx;
             }); 
 
         // if going backwards in time
         } else {
-            
+
             // return highest cached dataset index
             return _.max(this._cache, function (c) {
                 return c.idx;
@@ -451,7 +736,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     update : function () {
         console.error('update');
         var map = app._map;
-
     },
 
     getDatasets : function () {
@@ -470,6 +754,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     // event when slider is set
     _onSliderSet : function (e) {
         if (!this._added) return;
+
+        console.log('cube _onSliderSet', e.detail);
 
         // get timestamp
         var timestamp = e.detail.timestamp; // moment
@@ -509,6 +795,13 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // add to map
         this._addTo();
+
+        // // connect to graph
+        // app.Animator.graph.setCube(this);
+
+        // set cube
+        console.log('fire animatorSetCube'); // too early
+        Wu.Mixin.Events.fire('animatorSetCube', { detail : { cube : this }}); 
     },
 
     _getCursorLayer : function () {

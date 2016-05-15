@@ -1985,7 +1985,9 @@ g.axis.y {
 }
 
 
-
+.leaflet-top.leaflet-left {
+    z-index: 1000;
+}
 
 
 

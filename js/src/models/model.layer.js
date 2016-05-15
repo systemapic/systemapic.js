@@ -717,15 +717,21 @@ L.UtfGrid.include({
 });
 
 L.TopoJSON = L.GeoJSON.extend({  
-  addData: function(jsonData) {    
-    if (jsonData.type === "Topology") {
-      for (key in jsonData.objects) {
-        geojson = topojson.feature(jsonData, jsonData.objects[key]);
-        L.GeoJSON.prototype.addData.call(this, geojson);
-      }
-    }    
-    else {
-      L.GeoJSON.prototype.addData.call(this, jsonData);
-    }
-  }  
+    addData: function(jsonData) {    
+        if (!this._topology) this._topology = jsonData;
+
+        if (jsonData.type === "Topology") {
+            for (key in jsonData.objects) {
+                geojson = topojson.feature(jsonData, jsonData.objects[key]);
+                this._geojson = geojson;
+                L.GeoJSON.prototype.addData.call(this, geojson);
+            }
+        }    
+        else {
+            L.GeoJSON.prototype.addData.call(this, jsonData);
+        }
+    },
+    toGeoJSON : function () {
+        return topojson.merge(this._topology, this._topology.objects.collection.geometries);
+    },
 });

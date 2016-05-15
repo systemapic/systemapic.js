@@ -29,11 +29,6 @@ Wu.Animator = Wu.Evented.extend({
     // fetch data from server
     _fetchData : function (done) { // todo: query raster instead
 
-        // app.api.queryArea({
-        //     name : this.options.data,
-
-        // })
-
         // get data from server
         app.api.getCustomData({
             name : this.options.data
@@ -47,8 +42,6 @@ Wu.Animator = Wu.Evented.extend({
 
         // set data
         this._data = Wu.parse(data);
-
-        console.log('data:', this._data);
 
         // create slider
         this._createSlider();
@@ -78,16 +71,16 @@ Wu.Animator = Wu.Evented.extend({
     _createSlider : function () {
 
         // create divs
-        this.sliderOuterContainer = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
-        var sliderInnerContainer = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
-        var slider = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
-        this.sliderButtonsContainer = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
-        this.stepBackward = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
-        this.tapBackward = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
-        this.playButton = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');        
-        this.tapForward = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
-        this.stepForward = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');
-        this.tickContainer = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
+        this.sliderOuterContainer       = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
+        var sliderInnerContainer        = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
+        var slider                      = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
+        this.sliderButtonsContainer     = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
+        this.stepBackward               = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
+        this.tapBackward                = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
+        this.playButton                 = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');        
+        this.tapForward                 = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
+        this.stepForward                = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');
+        this.tickContainer              = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
 
         // Set number of slider steps
         var dataLength = (_.size(this._data) > this.options.maxLength) ? this.options.maxLength : _.size(this._data);
@@ -104,15 +97,18 @@ Wu.Animator = Wu.Evented.extend({
 
         // hide by default if option set
         if (this.options.hide) this.hide();
+
     },
 
     _createGraph : function () { // todo: should separate these more
 
         // create graph
-        this.graph = new Wu.Graph.Year({
+        // this.graph = new Wu.Graph.Year({
+        this.graph = new Wu.Graph.Annual({ // todo: clean the f up
             data     : this._data,
             appendTo : this.sliderOuterContainer,
-            type     : this.options.graphType
+            type     : this.options.graphType,
+            cube     : this.options.cube
         });
     },
 
@@ -245,12 +241,10 @@ Wu.Animator = Wu.Evented.extend({
         }});
     },
 
-
     // These are the actions for the play, pause, step forward and backward buttons
     play : function () {        
         this.playing ? this.stopPlaying() : this.startPlaying();
     },
-
 
     startPlaying : function () {
 
@@ -327,7 +321,6 @@ Wu.Animator = Wu.Evented.extend({
         Wu.Mixin.Events.fire('stepAfterEnd');
     },    
 
-
     moveBackward : function () {
         Wu.Mixin.Events.fire('sliderMoveBackward');
     },
@@ -346,6 +339,7 @@ Wu.Animator = Wu.Evented.extend({
     },
 
     show : function () {
+        if (!this._inited) return;
         this.sliderOuterContainer.style.display = 'block';
     },  
 

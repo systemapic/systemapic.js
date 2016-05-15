@@ -60,7 +60,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		this._projectsWrapper = Wu.DomUtil.create('div', 'chrome-left-project-wrapper', projectsContainer);
 
 		// iterate projects, create item
-		_.each(projects, this._addProject, this);
+		// _.each(projects, this._addProject, this);
+		_.each(projects, this._addProject.bind(this));
 	
 	},
 
@@ -854,7 +855,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			}, this);
 
-		}, this);
+		}.bind(this));
 
 
 		// events

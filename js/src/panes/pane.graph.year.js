@@ -3,10 +3,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	_initialize : function (options) {
 
-		// Tis is for enabling different kinds of graphs
-		console.log('INITNITN', this.options.type);
-		if ( this.options.type != 'annualCycles' ) return;
-
 		// Prepares all the data into right format
 		this.renderData(this.options.data);
 		
@@ -36,7 +32,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	// When slider is sliding
 	sliding : function (e) {
-
 		var val = this._sliderValue = e.detail.value;
 		this.updateDayOfYear();
 	},
@@ -67,11 +62,21 @@ Wu.Graph.Year = Wu.Evented.extend({
 	// Skipping one year ahead in time
 	moveForward : function () {
 		
-		if ( this.disableForward ) return;
-		if ( !this.years[this.currentYear + 1] ) return;
+		if ( this.disableForward ) {
+			console.log('disableForward, refgusing');
+			return;
+		}
+		if ( !this.years[this.currentYear + 1] ) {
+			console.log('refusing!');
+			console.log('this.years', this.years);
+			console.log('this.currentYear', this.currentYear);
+			return;
+		}
 
 		this.currentYear++;
 		var currentDay = this.years[this.currentYear][this.currentDay-1];
+
+		console.log('...currentDa', currentDay)
 
 		if ( !currentDay ) {
 			this._sliderValue = this.finalDay.Doy;
@@ -112,9 +117,15 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	// Check if we are at the beginning or the end of the data
 	checkEnds : function () {
+		// debug
+		// return; // it should be allowed to scroll past the average data set
 
 		// FORWARD BUTTON
 		if ( this.currentYear == this.yearNames[this.yearNames.length-1] ) {
+			console.log('DISABLE FORWARD, because');
+			console.log('this.currentYear', this.currentYear);
+			console.log('yearNames..', this.yearNames[this.yearNames.length-1], this.yearNames);
+
 			this.disableForward = true;
 		} else {
 			this.disableForward = false;
@@ -141,8 +152,12 @@ Wu.Graph.Year = Wu.Evented.extend({
 		// Array of JSON with all days with every year, one by one
 		this.allYears = allYears;
 
+		console.log('allYears', this.allYears); // allYears = orignal data, all of it
+
 		// Array of JSON with all days, categorized by year
 		this.years = this.sanitizeYears(this.allYears);
+
+		console.log('this.years', this.years); // array with keys for each year, with date/SCF only
 
 		// Array of JSON with all days, categorized by year
 		this.days = this.sanitizeDays(this.allYears);
@@ -152,6 +167,11 @@ Wu.Graph.Year = Wu.Evented.extend({
 		this.minSCF = this.getMinSCF(this.days);
 		this.avgSCF = this.getAvgSCF(this.days);
 		
+		console.log('----------');
+		console.log('maxSCF', this.maxSCF);
+		console.log('minSCF', this.minSCF);
+		console.log('avgSCF', this.avgSCF);
+
 		// Create blank array
 		this.allData = [];
 
@@ -295,12 +315,15 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 		// AVERAGE DATA FOR ALL YEARS
 
-		console.log('this.allData', this.allData);
+		console.log('initGraph, allData ->', this.allData);
+
+		// this.allData = array 365 keys, with min/max/avg/date/no (to draw the gray area)
+		// one year's data, created from all data 
+
 
 		// Prepare DC dimensions
 		var ndx     = crossfilter(this.allData);
 		var xDim    = ndx.dimension(function(d) { 
-			console.log('d: ', d);
 			return d.date; 
 		});
 		var yMaxDim = xDim.group().reduceSum(function(d) { return d.max });
@@ -312,6 +335,7 @@ Wu.Graph.Year = Wu.Evented.extend({
     		var minDate = xDim.bottom(1)[0].date;
 			var maxDate = xDim.top(1)[0].date;
 		} catch (e) {
+			console.error(e);
 			console.log('xDim', xDim.bottom(1));
 			console.log('xDim', xDim.top(1));
 			console.log('xd', xDim);
@@ -330,6 +354,8 @@ Wu.Graph.Year = Wu.Evented.extend({
 		// THIS PART CHANGES FOR EVERY MOVE
 		var thisXdim = this.ndx.dimension(function(d) { return d.date });
 		var yThisDim = thisXdim.group().reduceSum(function(d) { return d.SCF });
+
+		console.log('yThisDim', yThisDim);
 
 		// SCATTER DIMENSION
 		var scatterDim = thisXdim.group().reduceSum(function(d) { return d.SCF }.bind(this));
@@ -472,6 +498,13 @@ Wu.Graph.Year = Wu.Evented.extend({
 			if (i < day) this.graphData.push(d);
 		}.bind(this));
 
+		console.log('updateGraph', this.graphData);
+
+		// this.graphData = [{ // array of days to draw with red line
+		// 		SCF : 84.09,
+		// 		date : new Date() // date object, Wed Jan 21 2015 00:00:00 GMT+0100 (CET)
+		// }]
+
 		// If we're at the end of the year
 		if (!this.years[year][day-1]) return;
 
@@ -586,7 +619,6 @@ Wu.Graph.Year = Wu.Evented.extend({
 
 	_dateFromNo : function (doy, year) {
 		year = year || this.currentYear || 2015;
-		console.log('year:', year);
 	  	var blankDate = new Date(year, 0);
   		var date = new Date(blankDate.setDate(doy));
 		return date;

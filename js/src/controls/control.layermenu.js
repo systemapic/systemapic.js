@@ -315,7 +315,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	_getOpenItems : function () {
 		var childNodes = this._content.childNodes;
 		var open = _.filter(childNodes, function (c) {
-			var closed = _.contains(c.classList, 'layeritem-closed');
+			var closed = _.includes(c.classList, 'layeritem-closed');
 			return !closed;
 		});
 		return open.length;
@@ -809,7 +809,7 @@ L.Control.Layermenu = Wu.Control.extend({
 					if (parseInt(item2.pos) == parseInt(pos) && item1.uuid != item2.uuid) return false; 
 				}
 
-			}, this);
+			}.bind(this));
 
 			ready = false;
 			
@@ -828,7 +828,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 				if (item1.uuid == item3.uuid) ready = true; // hit self, start on next iteration
 
-			}, this);
+			}.bind(this));
 
 
 			// keep isOpen value

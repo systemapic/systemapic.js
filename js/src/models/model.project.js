@@ -33,7 +33,7 @@ Wu.Model.Project = Wu.Model.extend({
 				role : role,
 				project : this
 			});
-		}, this);
+		}.bind(this));
 	},
 
 	initFiles : function () {
@@ -1159,7 +1159,7 @@ Wu.Model.Project = Wu.Model.extend({
 		var access = this.getAccess();
 
 		// true: if user is listed as editor
-		if (_.contains(access.read, user.getUuid())) return true;
+		if (_.includes(access.read, user.getUuid())) return true;
 
 		// no access
 		return false;
@@ -1173,7 +1173,7 @@ Wu.Model.Project = Wu.Model.extend({
 		if (user.getUuid() == this.createdBy()) return true;
 
 		// true: if user is listed as editor
-		if (_.contains(access.edit, user.getUuid())) return true;
+		if (_.includes(access.edit, user.getUuid())) return true;
 
 		// true: if user is super
 		if (app.Account.isSuper()) return true; 
