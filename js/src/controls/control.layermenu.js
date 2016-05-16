@@ -50,7 +50,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	            project_dependent : false
 	        });
 
-	        // this._layerButton.innerHTML = '<i class="top-button fa fa-bars"></i> <span class="layer-button-text">Layers</div>';
 	        this._layerButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-layers"></i> <span class="layer-button-text">Layers</div>';
 	        
 	        
@@ -58,11 +57,13 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	toggleLayerMenu : function () {
-
 		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function  () {
+
+		Wu.Mixin.Events.fire('_openLayerMenu', {}); 		
+
 		this._isOpen = true;
 		Wu.DomUtil.removeClass(this._innerContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._layerButton, 'rounded-layer-button');
@@ -71,6 +72,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	}, 
 
 	close : function () {
+
 		this._isOpen = false;
 		Wu.DomUtil.addClass(this._innerContainer, 'displayNone');
 		Wu.DomUtil.addClass(this._layerButton, 'rounded-layer-button');
@@ -178,10 +180,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
 
-		if (app.mobile) {
-			// Mobile arrow	
-		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
-		}
+		// if (app.mobile) {
+		// 	// Mobile arrow	
+		//     	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
+		// }
 
 	},
 
@@ -193,6 +195,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomEvent.on(this._container, 'mouseleave', function () {
 			app._map.scrollWheelZoom.enable();
 		}, this);
+
+
+		Wu.Mixin.Events.on('toggleLeftChrome', this._toggleLeftChrome, this);
+
+
 	},
 
 	_initContent : function () {
@@ -308,7 +315,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	_getOpenItems : function () {
 		var childNodes = this._content.childNodes;
 		var open = _.filter(childNodes, function (c) {
-			var closed = _.contains(c.classList, 'layeritem-closed');
+			var closed = _.includes(c.classList, 'layeritem-closed');
 			return !closed;
 		});
 		return open.length;
@@ -802,7 +809,7 @@ L.Control.Layermenu = Wu.Control.extend({
 					if (parseInt(item2.pos) == parseInt(pos) && item1.uuid != item2.uuid) return false; 
 				}
 
-			}, this);
+			}.bind(this));
 
 			ready = false;
 			
@@ -821,7 +828,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 				if (item1.uuid == item3.uuid) ready = true; // hit self, start on next iteration
 
-			}, this);
+			}.bind(this));
 
 
 			// keep isOpen value
@@ -914,8 +921,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayer : function (item) {
 
-		// console.log('%c toggleLayer', 'background: red; color: white;');
-
 		if (this.editMode) return;
 
 		var layer = item.layer;
@@ -984,7 +989,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// fire event
 		Wu.Mixin.Events.fire('layerEnabled', { detail : {
 			layer : layer
-		}}); 
+		}});
 
 	},
 
@@ -1050,7 +1055,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	// turn off a layer from options
-	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
+	_removeItem : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
 		
 		// get layermenuItem
 		var layermenuItem = this.layers[uuid];
@@ -1086,7 +1091,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	_remove : function (uuid) {
 		// find layermenuItem uuid
 		var layermenuItem = this._getLayermenuItem(uuid); // uuid: layer-q2e321-qweeqw-dasdas
-		this.remove(layermenuItem.item.uuid);
+		this._removeItem(layermenuItem.item.uuid);
 	},
 
 	// add from sidepane
@@ -1366,8 +1371,9 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	deleteMenuFolder : function (uuid) {
+		
 		// remove
-		this.remove(uuid); // layerMenuItem-32132-123123-adsdsa-sda
+		this._removeItem(uuid); // layerMenuItem-32132-123123-adsdsa-sda
 
 		// Hides layer button if there are no layers to show
 		app.Chrome.Top._showHideLayerButton();
@@ -1417,7 +1423,18 @@ L.Control.Layermenu = Wu.Control.extend({
 			console.log('set max height of layer menu!');
 		}
 
-	}
+	},
+
+
+	// EVENT fired in chrome.top.js
+	_toggleLeftChrome : function (e) {
+
+		if ( !app.isMobile || !app.isMobile.mobile ) return;		
+
+		var isOpen = e.detail.leftPaneisOpen;
+		isOpen ? this.close() : this.open();
+
+	},
 
 
 });

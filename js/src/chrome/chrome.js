@@ -44,11 +44,13 @@ Wu.Chrome = Wu.Class.extend({
 		this._project = app.activeProject = app.Projects[e.detail.projectUuid];
 
 		// refresh pane
-		this._refresh();
+		this._refresh({event : 'projectSelected'});
 	},
 
 	updateMapSize : function () {
 
+		return;
+		
 		var rightChrome = app.Chrome.Right;
 		var leftChrome = app.Chrome.Left;
 		var left = 0;

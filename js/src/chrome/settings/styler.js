@@ -49,14 +49,14 @@ Wu.Styler = Wu.Class.extend({
 	_content : {},
 
 	carto : function () {
-		console.log('this.lopitons.carto', this.options.carto, this.type);
 		return this.options.carto[this.type];
 	},
 
+
 	setCarto : function (carto) {
-		console.error('setCarto', carto, this);
 		this.options.carto[this.type] = carto;
 	},
+
 
 	initialize : function (options) {
 
@@ -78,16 +78,12 @@ Wu.Styler = Wu.Class.extend({
 
 	_refresh : function () {
 
-		console.error('_refresh', this);
-
 		this._wrapper.innerHTML = '';
 
 		// create 
 		this.options.carto[this.type] = this.carto() || {};
 
 		this._content[this.type] = {};
-
-		console.log('carto()', this.carto());
 
 		// Get on/off state
 		var isOn = this.carto().enabled;
@@ -185,7 +181,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// dropdown
 		var dropdown = new Wu.button({
-			id 	 	 : 'color',
+			id 	 : 'color',
 			type 	 : 'dropdown',
 			isOn 	 : isOn,
 			right 	 : true,
@@ -453,17 +449,6 @@ Wu.Styler = Wu.Class.extend({
 			staticVal : val
 		};
 	},
-
-    //clearBuggyFiles : function () {
- 	//	// Get file ID
- 	//	var fileId = this._layer.store.file;
-    //
- 	//	// Get file
- 	//	var file = app.Account.getFile(fileId);
-    //
- 	//	file.setStyleTemplates([]);
-    //
- 	//},
 
 	_addColorFields : function (column) {
 
@@ -1135,9 +1120,6 @@ Wu.Styler = Wu.Class.extend({
 		// get sql
 		var sql = layer.getSQL();
 
-		console.error('lyaer.getSQL', sql);
-		console.log('layuer: ', layer);
-
 		// request new layer
 		var layerOptions = {
 			css : carto, 
@@ -1156,13 +1138,7 @@ Wu.Styler = Wu.Class.extend({
 		var file_id = layer.getFileUuid();
 		var sql = options.sql;
 		var project = this.options.project;
-		    // layerOptions = layer.store.data.postgis;
 
-		// layerOptions.sql = sql;
-		// layerOptions.css = css;
-		// layerOptions.file_id = file_id;
-
-		// var sql = 'SELECT * FROM ' + file_id;	
 		var sql = '(SELECT * FROM ' + file_id + ') as sub';	
 
 		var layerJSON = {
@@ -1184,12 +1160,11 @@ Wu.Styler = Wu.Class.extend({
 
 		// create layer on server
 		app.api.createTileLayer(layerJSON, function (err, newLayerJSON) {
-			if (err) {
-				return app.feedback.setError({
-					title : 'Something went wrong',
-					description : err
-				});
-			}
+			if (err) return app.feedback.setError({
+				title : 'Something went wrong',
+				description : err
+			});
+			
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 

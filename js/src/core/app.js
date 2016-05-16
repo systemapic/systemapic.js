@@ -4,9 +4,7 @@ Wu.App = Wu.Class.extend({
 
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
-
 	language : language,
-
 	_ready : false,
 
 	initialize : function (options) {
@@ -25,6 +23,7 @@ Wu.App = Wu.Class.extend({
 
 		// auth
 		app.api.auth(app.authed);
+
 	},
 
 	authed : function (err, access_token) {
@@ -246,10 +245,12 @@ Wu.App = Wu.Class.extend({
 		// share pane
 		app.Share = new Wu.Share();
 
-		// big slider
-		app.BigSlider = new Wu.BigSlider({ // refactor to project controls
-			data : 'allYears'
-		});
+		// // big slider
+		// app.Animator = new Wu.Animator({ // refactor to project controls
+		// 	// data : 'allYears',
+		// 	data : 'scf.average.2000.2015', // todo: refactor data fetching
+		// 	hide : true
+		// });
 
 		// add account tab
 		app.AccountPane = new Wu.Pane.Account();
@@ -264,7 +265,9 @@ Wu.App = Wu.Class.extend({
 	_initView : function () {
 			
 		// runs hotlink
-		if (app._initHotlink()) return;
+		if (app._initHotlink()) {
+			return;
+		} 
 
 		// open first project (ordered by lastUpdated)
 		app.Controller.openDefaultProject();
@@ -301,6 +304,7 @@ Wu.App = Wu.Class.extend({
 			app._setProject(project);
 			return true;
 		}
+
 		// request project from server
 		app.api.getProject({
 			username : app.hotlink.username,
@@ -409,17 +413,44 @@ Wu.App = Wu.Class.extend({
 		app.isMobile = Wu.Util.isMobile();
 
 		if (app.isMobile) {
-			var device = app.isMobile.mobile ? 'mobile' : 'tablet';
 
-			// load stylesheet
-			app.Controller.loadjscssfile('/css/' + device + '.css', 'css');
+			// Set size	
+			this.setMobileSize();
 
-			// set width of map
-			var width = app.isMobile.width;
-			app._map._container.style.width = width + 'px';
+			// Listen to the wind blow
+			this.mobileListners();
 		}
 
 	},
+
+	mobileListners : function () {
+
+		Wu.DomEvent.on(window, 'resize', this.setMobileSize, this);
+
+	},
+
+
+	setMobileSize : function () {
+
+		// Check landscape or portrait format
+		var portrait = window.innerHeight > window.innerWidth;
+
+		// Get width
+		var width  = portrait ? app.isMobile.width : app.isMobile.height;
+		var height = portrait ? app.isMobile.height : app.isMobile.width;
+
+		// Check device type
+		var device = app.isMobile.mobile ? 'mobile' : 'tablet';
+
+		// load stylesheet
+		app.Controller.loadjscssfile('/css/' + device + '.css', 'css');
+
+		// set width of map
+		app._map._container.style.width = width + 'px';
+		// app._map._container.style.height = height + 'px';
+
+	},
+
 
 	debug : function () {
 

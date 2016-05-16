@@ -111,17 +111,35 @@ Wu.MapPane = Wu.Pane.extend({
 			attributionControl : false,
 			maxZoom : 19,
 			minZoom : 0,
-			// zoomAnimation : false
 			zoomControl : false,
 			inertia : false,
+
+			// js optimizing attempt
+			fadeAnimation : false,
+			// zoomAnimation : false,
+
+			
+
+			// exp
+			// zoomSnap : 0,
+			// zoomDelta : 2,
+			wheelPxPerZoomLevel : 100,
+			wheelDebounceTime : 80,
 			// loadingControl : true,
-			// zoomAnimationThreshold : 2
+			// zoomAnimationThreshold : 2,
+
 		});
+
+		// add map click (bug: layer won't listen to click)
+		map.on('click', function (e) {
+			Wu.Mixin.Events.fire('mapClick', {details : {e : e}});
+		}, this);
 
 		// add attribution
 		this._addAttribution(map);
 
 
+		// todo: remove this?
 		// global map events
 		map.on('zoomstart', function (e) {
 
@@ -146,7 +164,8 @@ Wu.MapPane = Wu.Pane.extend({
 		}, this);
 
 
-		// // on map load
+		// todo: remove, refactor this?
+		// on map load
 		map.on('projectSelected', function (e) {
 			// hack due to race conditions
 			setTimeout(function () { 
@@ -183,7 +202,7 @@ Wu.MapPane = Wu.Pane.extend({
 		this._controls = {};
 		_.each(controls, function (control) {
 			this._controls[control] = new L.Control[control.camelize()];
-		}, this);
+		}.bind(this));
 	},
 
 	getControls : function () {
@@ -216,11 +235,13 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	// fired on window resize
+	// THIS FUNCTION IS NEVER FIRED, IS IT???
 	resizeEvent : function (d) {
 
 		this._updateWidth(d);
 	},
     
+    	// THIS FUNCTION IS NEVER FIRED, IS IT???
 	_updateWidth : function (d) {
 		var map = this._map;
 		if (!map || !d) return;

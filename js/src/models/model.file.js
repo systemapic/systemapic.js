@@ -546,24 +546,24 @@ Wu.Model.File = Wu.Model.extend({
 
                 ops.push(function (dataset, callback) {
 
-			var layer = {
-				geom_column: 'the_geom_3857',
-				geom_type: 'geometry',
-				raster_band: '',
-				srid: '',
-				affected_tables: '',
-				interactivity: '',
-				attributes: '',
-				cartocss_version: '2.0.1',
-				cartocss : '#layer { polygon-fill: yellow; polygon-opacity: 0.5; }',
-				sql: '(SELECT * FROM ' + dataset.table_name + ') as sub',
-				file_id: dataset.file_id,
-				return_model: true,
-				debug_1 : 'vectorize_dataset'
-	                };
+					var layer = {
+						geom_column: 'the_geom_3857',
+						geom_type: 'geometry',
+						raster_band: '',
+						srid: '',
+						affected_tables: '',
+						interactivity: '',
+						attributes: '',
+						cartocss_version: '2.0.1',
+						cartocss : '#layer { polygon-fill: yellow; polygon-opacity: 0.5; }',
+						sql: '(SELECT * FROM ' + dataset.table_name + ') as sub',
+						file_id: dataset.file_id,
+						return_model: true,
+						debug_1 : 'vectorize_dataset'
+			                };
 
-			// create postgis layer
-			app.api.createTileLayer(layer, callback);
+					// create postgis layer
+					app.api.createTileLayer(layer, callback);
 
                 });
 
@@ -573,16 +573,16 @@ Wu.Model.File = Wu.Model.extend({
                 	if (!layer) return callback('Error parsing layer: ' + tileLayer);
 
                         var layerModel = {
-				projectUuid : project.getUuid(), // pass to automatically attach to project
-				data : {
-					postgis : layer.options
-				},
-				metadata : layer.options.metadata,
-				title : file.getName() + ' (vectorized)',
-				description : 'Description: Layer created from ' + file.getName(),
-				file : file.getUuid(),
-				// style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
-				style : JSON.stringify(defaultStyle) // save default json style
+							projectUuid : project.getUuid(), // pass to automatically attach to project
+							data : {
+								postgis : layer.options
+							},
+							metadata : layer.options.metadata,
+							title : file.getName() + ' (vectorized)',
+							description : 'Description: Layer created from ' + file.getName(),
+							file : file.getUuid(),
+							// style : JSON.stringify("#layer { polygon-fill: red; polygon-opacity: 1; }") // save default json style
+							style : JSON.stringify(defaultStyle) // save default json style
                         };
 
                         // create new layer model

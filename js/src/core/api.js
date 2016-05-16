@@ -247,7 +247,6 @@ Wu.Api = Wu.Class.extend({
 	updateLayer : function (options, done) {
 		// var path = '/api/layer/update';
 		var path = '/v2/layers/update';
-		console.error('updateLayer', options);
 		this.post(path, options, done);
 	},
 
@@ -300,12 +299,33 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	removeFromCube : function (options, done) {
+		var path = '/v2/cubes/remove';
+		this.post(path, options, done);
+	},
 
+	addToCube : function (options, done) {
+		var path = '/v2/cubes/add';
+		this.post(path, options, done);
+	},
 
+	createCube : function (options, done) {
+		var path = '/v2/cubes/create';
+		this.post(path, options, done);
+	},
+
+	
 	// TILES
 	// [pile]
 	createTileLayer : function (options, done) {
 		var path = '/v2/tiles/create';
+		this.post(path, options, done);
+	},
+
+
+	// [pile]
+	addMask : function (options, done) {
+		var path = '/v2/cubes/mask';
 		this.post(path, options, done);
 	},
 
@@ -365,6 +385,11 @@ Wu.Api = Wu.Class.extend({
 
 
 	// QUERIES
+
+	queryCube : function (options, done) {
+		var path = '/v2/cubes/query';
+		this.post(path, options, done);
+	},
 
 	
 	dbFetchArea : function (options, done) {
@@ -521,7 +546,7 @@ Wu.Api = Wu.Class.extend({
 		if (!_.isEmpty(options)) {
 			_.forOwn(options, function (value, key) {
 				// encode and add
-				url += _.contains(url, '?') ? '&' : '?';
+				url += _.includes(url, '?') ? '&' : '?';
 				url += encodeURIComponent(key) + '=' + encodeURIComponent(value);
 			});
 		}
