@@ -495,7 +495,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         if (!dataset) return;
 
-        console.log('loaded:', dataset.idx);
+        console.log('loaded:', dataset.idx, dataset.timestamp);
 
         // mark cache loaded
         var cache = _.find(this._cache, {idx : dataset.idx});

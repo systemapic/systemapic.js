@@ -37,6 +37,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
     listen : function () {
         Wu.Mixin.Events.on('sliderUpdate', this._onSliderUpdate, this);
+        Wu.Mixin.Events.on('sliderMoveForward', this._onSliderMoveForward, this);
+        Wu.Mixin.Events.on('sliderMoveBackward', this._onSliderMoveBackward, this);
         // Wu.Mixin.Events.on('animatorSetCube', this._setCube, this);
     },
 
@@ -90,7 +92,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
         var minDate = average_dimension.bottom(1)[0].date;  // this is jan 1 2015.. shouldn't be a YEAR per say, since it messes with the line graph (which needs to be in same year to display)
         var maxDate = average_dimension.top(1)[0].date;     
 
-
         // DATA FOR CURRENT YEAR
         // ---------------------
 
@@ -132,7 +133,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // ----------------------
 
         // create composite chart @ container
-        var composite = dc.compositeChart(this._graphContainer)
+        var composite = this._composite = dc.compositeChart(this._graphContainer)
 
         // Run graph
         composite
@@ -221,6 +222,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
     },
 
     _current : {
+        // defaults
         year : 2015,
         day : 1
     },
@@ -241,6 +243,31 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._updateTitles();
     },
 
+    _onSliderMoveBackward : function (e) {
+
+        // set year
+        this._current.year = this._current.year - 1;
+
+        // update line graph
+        this._updateLineGraph();
+
+        // update titles
+        this._updateTitles();
+    },
+
+    _onSliderMoveForward : function (e) {
+
+        // set year
+        this._current.year = this._current.year + 1;
+
+        // update line graph
+        this._updateLineGraph();
+
+        // update titles
+        this._updateTitles();
+
+    },
+
     _updateTitles : function () {
         
         // get titles
@@ -250,12 +277,12 @@ Wu.Graph.Annual = Wu.Evented.extend({
         var scf = _.find(this._cache.line[this._current.year], function (c) {
             return c.date.isSame(date, 'day');
         });
-        var scfTitle = scf ? parseInt(scf.SCF) : '.';
+        var scfTitle = scf ? parseInt(scf.SCF) + '%' : 'na';
 
         // set titles
         this._nameTitle.innerHTML = nameTitle;
         this._dateTitle.innerHTML = dateTitle;
-        this._scfTitle.innerHTML = 'SCF: ' + scfTitle + '%';
+        this._scfTitle.innerHTML = 'SCF: ' + scfTitle;
 
     },
 
@@ -339,6 +366,11 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         // Clear old data
         this.ndx.line_crossfilter.remove();
+
+        // // set date range, doesnt'work....
+        // var minDate = moment().year(this._current.year).day(1);
+        // var maxDate = moment().year(this._current.year).month(12).date(31);
+        // this._composite.x(d3.time.scale().domain([minDate,maxDate]))
 
         // get cached line graph data
         var cache = this._cache.line[this._current.year];
