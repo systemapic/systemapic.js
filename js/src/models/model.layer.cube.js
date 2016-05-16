@@ -209,8 +209,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // create mask (topojson) layer
         this._maskLayer = new L.TopoJSON();
 
-        console.log('mask:', mask);
-  
         // add data to layer
         this._maskLayer.addData(mask);
 
@@ -225,11 +223,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
-
     _onMaskLayerClick : function (options) {
 
-        console.log('maskLayer click', options);
-
+        // query single or all features
         if (this.options.mask.separatedFeatures) {
 
             // query with single feature as mask
@@ -241,88 +237,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             this._multiFeatureQuery(options);
         }
 
-      
-        // // select one or all features
-        // if (this.options.mask.separatedFeatures) {
-
-        //     // set selected layer style
-        //     layer.setStyle(selectedSingleStyle);
-
-        //     // make sure selected layer is on top
-        //     layer.bringToFront();
-
-        //     // set mask properties
-        //     var mask_id = layer.feature.id;
-        //     var mask_geometry = layer.feature.geometry;
-
-        // } else {
-
-        //     // set mask properties
-        //     var mask_id = 'all';
-        //     var mask_geometry = {
-        //       "type": "FeatureCollection",
-        //       "features": [wholeLayer.toGeoJSON()]
-        //     };
-
-        //     var mask_geometry = wholeLayer.toGeoJSON();
-
-        //     console.log('layer', layer);
-
-        //     // hack: if multipolygon, take largest only
-        //     if (mask_geometry.type == 'MultiPolygon') {
-        //         var largest = _.max(mask_geometry.coordinates, function (m) {
-        //             return _.size(m);
-        //         });
-        //         console.log('largest: ', largest);
-
-        //         mask_geometry.type = 'Polygon';
-        //         mask_geometry.coordinates = largest;
-        //     }
-
-        //     console.log('mask_geometry', mask_geometry);
-
-        //     // set selected layer style to all layers
-        //     this._maskLayer.eachLayer(function (layer) {
-        //         layer.setStyle(selectedWholeStyle);
-        //     }.bind(this));
-        // }
-
-
-        // // set query options
-        // var queryOptions = {
-        //     query_type : 'scf', // snow cover fraction
-        //     cube_id : this.getCubeId(),
-        //     year : graph._current.year,
-        //     day : graph._current.day,
-        //     options : {
-        //         currentYearOnly : true,
-        //         // force_query : true
-        //     },
-        //     mask : {
-        //         geometry : mask_geometry,
-        //         mask_id : mask_id
-        //     }
-        // };
-
-        // // make query
-        // this._queryCube(queryOptions, function (err, data) {
-        //     if (err) return console.error(err, data);
-
-        //     // add data to graph
-        //     graph.addLineData({
-        //         data : fractions
-        //     });
-
-        // });
-
-
     },
 
     _singleFeatureQuery : function (options) {
+        
         // get layer
         var layer = options.layer;
-
-        var wholeLayer = options.target;
 
         // get graph object
         var graph = app.Animator.graph;
@@ -332,19 +252,13 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             layer.setStyle(this.options.mask.style);
         }.bind(this));
 
+        // style for single feature
         var selectedSingleStyle = {
             fillColor : 'white',
             fillOpacity : 0,
             color : 'yellow',
             opacity : 0.8,
             weight : 2,
-        };
-
-        var selectedWholeStyle = {
-            fillColor : 'red',
-            fillOpacity : 0.2,
-            color : 'yellow',
-            opacity : 0,
         };
 
         // set selected layer style
@@ -401,14 +315,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             layer.setStyle(this.options.mask.style);
         }.bind(this));
 
-        var selectedSingleStyle = {
-            fillColor : 'white',
-            fillOpacity : 0,
-            color : 'yellow',
-            opacity : 0.8,
-            weight : 2,
-        };
-
+        // style for selected features
         var selectedWholeStyle = {
             fillColor : 'red',
             fillOpacity : 0.2,
