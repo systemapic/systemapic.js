@@ -748,7 +748,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     update : function () {
-        console.error('update');
         var map = app._map;
     },
 
@@ -761,7 +760,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },  
 
     _refreshCube : function () {
-        console.error('_refreshCube');
         // this._prepareRaster();
     },
 
@@ -769,12 +767,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _onSliderSet : function (e) {
         if (!this._added) return;
 
-        console.log('cube _onSliderSet', e.detail);
-
         // get timestamp
         var timestamp = e.detail.timestamp; // moment
-
-        console.log('timestamp', timestamp);
 
         // move cursor
         this._moveCursor({
@@ -799,7 +793,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _showLayer : function (layer) {
-        console.log('layer: ', layer);
         var container = layer.getContainer();
         if (container) container.style.display = 'block';
     },
@@ -832,8 +825,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         });
         if (!cache) cache = this._cache[this._cursor];
        
-        console.log('_getCursorLayer, cache, cursor', this._cache, this._cursor, cache);
-       
         if (!cache) return false;
         return cache.layer;
     },
@@ -856,7 +847,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // add mask layer
         if (this._maskLayer) {
-            console.log('adding mask layer');
             map.addLayer(this._maskLayer);
         }
 

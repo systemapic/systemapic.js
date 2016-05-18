@@ -161,10 +161,7 @@ Wu.Animator = Wu.Evented.extend({
     // event that runs when sliding (ie. a lot!)
     // see http://refreshless.com/nouislider/events-callbacks/
     _sliderUpdateEvent : function (value) {
-        console.log('_sliderUpdateEvent', value);
         if (!this._inited) return;
-
-        console.log('ok');
 
         // set slider value
         this._sliderValue = value ? Math.round(value) : 0;

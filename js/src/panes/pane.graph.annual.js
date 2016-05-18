@@ -97,7 +97,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         var minDate = average_dimension.bottom(1)[0].date;  // this is jan 1 2015.. shouldn't be a YEAR per say, since it messes with the line graph (which needs to be in same year to display)
         var maxDate = average_dimension.top(1)[0].date;     
 
-        console.log('minDate, maxDate', minDate, maxDate);
+        // console.log('minDate, maxDate', minDate, maxDate);
 
         // DATA FOR CURRENT YEAR
         // ---------------------
@@ -487,8 +487,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
         var period = _.find(cache, function (d) {
             return d.date.isSame(today, 'day');
         });
-
-        console.log('_checkEnds', period);
 
         // shade buttons if end of dataset
         period ? this._unshadeButtons() : this._shadeButtons();
