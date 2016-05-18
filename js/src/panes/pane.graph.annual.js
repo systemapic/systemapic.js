@@ -20,7 +20,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
     // annual graph contains average of annual data
 
-
     _initialize : function () {
 
         // listen to events
@@ -32,14 +31,16 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // init graph
         this._initGraph();
 
-        app._debugGraph = this;
     },
 
     listen : function () {
         Wu.Mixin.Events.on('sliderUpdate', this._onSliderUpdate, this);
         Wu.Mixin.Events.on('sliderMoveForward', this._onSliderMoveForward, this);
         Wu.Mixin.Events.on('sliderMoveBackward', this._onSliderMoveBackward, this);
-        // Wu.Mixin.Events.on('animatorSetCube', this._setCube, this);
+        Wu.Mixin.Events.on('loadingGraph', this._onLoadingGraph, this);
+        Wu.Mixin.Events.on('loadedGraph', this._onLoadedGraph, this);
+        Wu.Mixin.Events.on('maskSelected', this._onMaskSelected, this);
+        Wu.Mixin.Events.on('maskUnselected', this._onMaskUnselected, this);
     },
 
     _initContainer : function () {
@@ -47,8 +48,9 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._infoContainer     = Wu.DomUtil.create('div', 'big-graph-info-container',      this._container);
         this._nameTitle         = Wu.DomUtil.create('div', 'big-graph-title',               this._infoContainer, 'title');
         this._dateTitle         = Wu.DomUtil.create('div', 'big-graph-current-day',         this._infoContainer, 'day');
-        this._scfTitle          = Wu.DomUtil.create('div', 'big-graph-current-scf inline',  this._infoContainer, 'scf');
-        this._graphContainer    = Wu.DomUtil.create('div', 'big-graph-inner-container',     this._container)
+        this._graphContainer    = Wu.DomUtil.create('div', 'big-graph-inner-container',     this._container);
+        this._loadingBar        = Wu.DomUtil.create('div', 'graph-loading-bar', this._container);
+        this._legendContainer   = Wu.DomUtil.create('div', 'graph-legend', this._container);
     },
 
     _initGraph : function () {
@@ -56,9 +58,12 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // store crossfilters, dimensions, etc
         this.ndx = {};
 
-        // prepare this._data
-        if (_.isEmpty(this._annualAverageData)) this._prepareAnnualAverageData();
+        // prepare this._data if not already done
+        if (_.isEmpty(this._annualAverageData)) {
 
+            // prepare data
+            this._prepareAnnualAverageData();
+        }
 
 
         // AVERAGE ANNUAL DATA
@@ -91,6 +96,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // get max/min date (?)
         var minDate = average_dimension.bottom(1)[0].date;  // this is jan 1 2015.. shouldn't be a YEAR per say, since it messes with the line graph (which needs to be in same year to display)
         var maxDate = average_dimension.top(1)[0].date;     
+
+        console.log('minDate, maxDate', minDate, maxDate);
 
         // DATA FOR CURRENT YEAR
         // ---------------------
@@ -140,12 +147,12 @@ Wu.Graph.Annual = Wu.Evented.extend({
         .width(500).height(220)
         .dimension(average_dimension)
         .x(d3.time.scale().domain([minDate,maxDate]))
-        // .x(d3.scale.linear().domain([1, 365]))
         .y(d3.scale.linear().domain([0, 100]))
         .clipPadding(10)    
         .elasticY(false)
         .elasticX(false)
         .brushOn(false)
+        .yAxisLabel('SCF (%)')
         .transitionDuration(0)          
         .compose([
 
@@ -168,7 +175,9 @@ Wu.Graph.Annual = Wu.Evented.extend({
             // AVERAGE value
             dc.lineChart(composite)
                 .group(average_avg_group)
-                .colors('#999999')
+                // .colors('#999999')
+                // .colors('rgb(76, 76, 76)')
+                .colors('white')
                 .renderDataPoints(false)
                 .xyTipsOn(false),
 
@@ -179,27 +188,28 @@ Wu.Graph.Annual = Wu.Evented.extend({
                 .renderDataPoints(false)
                 .xyTipsOn(false),
 
-            // THIS YEAR value – LAST DATE (DOT)
-            dc.scatterPlot(composite)
-                .group(point_group)
-                .symbolSize(8)
-                .excludedOpacity(0)
-                // .colors('#ff0000')
-                .colors('#ff6666')
-                .symbol('triangle-up')
-                .keyAccessor(function(d) {
-                    if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.key;
-                    return false;
-                }.bind(this))
-                .valueAccessor(function(d) {
-                    if ( this.graphData && d.key == this.graphData[this.graphData.length-1].date ) return +d.value;
-                    return false;
-                }.bind(this))
+            // // THIS YEAR value – LAST DATE (DOT)
+            // dc.scatterPlot(composite)
+            //     .group(point_group)
+            //     .symbolSize(8)
+            //     .excludedOpacity(0)
+            //     // .colors('#ff0000')
+            //     .colors('#ff6666')
+            //     .symbol('triangle-up')
+            //     .keyAccessor(function(d) {
+            //         var data = this._cache.line[this._current.year];
+            //         if ( data && d.key == data[data.length-1].date ) return +d.key;
+            //         return false;
+            //     }.bind(this))
+            //     .valueAccessor(function(d) {
+            //         var data = this._cache.line[this._current.year];
+            //         if ( data && d.key == data[data.length-1].date ) return +d.value;
+            //         return false;
+            //     }.bind(this))
         ]);
     
 
         composite
-        // .xUnits(d3.time.months)
         .xAxis()
         .tickFormat(d3.time. format('%b'))
 
@@ -209,8 +219,39 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // update titles
         this._updateTitles();
 
+        // update legend
+        this._updateLegend();
+
         // mark inited
         this._graphInited = true;
+
+        // debug: set default date
+        this._setDate(2016, 104);
+
+    },
+
+    _updateLegend : function () {
+
+        var year_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+        var average_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+        var minmax_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+
+        var minmax_color = Wu.DomUtil.create('div', 'graph-legend-color', minmax_container);
+        var average_color = Wu.DomUtil.create('div', 'graph-legend-color', average_container);
+        var year_color = Wu.DomUtil.create('div', 'graph-legend-color', year_container);
+
+        var minmax_text = Wu.DomUtil.create('div', 'graph-legend-text', minmax_container);
+        var average_text = Wu.DomUtil.create('div', 'graph-legend-text', average_container);
+        var year_text = Wu.DomUtil.create('div', 'graph-legend-text', year_container);
+
+        minmax_text.innerHTML = 'Max/min: 2000-2015';
+        average_text.innerHTML = 'Average: 2000-2015';
+        year_text.innerHTML = 'Current year';
+
+        minmax_color.style.background = '#DCDCD7';
+        average_color.style.background = 'white';
+        year_color.style.background = '#F3504A';
+
     },
 
     _setCube : function (e) {
@@ -231,13 +272,35 @@ Wu.Graph.Annual = Wu.Evented.extend({
         line : {}
     },
 
+    _setDate : function (year, day) {
+        
+        // set dates
+        this._current.year = year;
+        this._current.day = day;
+
+        // set slider
+        app.Animator.setSlider(day);
+
+        // set cube cursor
+        var timestamp = moment().year(year).dayOfYear(day);
+        this.getCube().setCursor(timestamp);
+
+        // update line graph
+        this._updateLineGraph();
+
+        // update titles
+        this._updateTitles();
+    },
+
     _onSliderUpdate : function (e) {
 
         // set current day
         this._current.day = e.detail.value;
 
         // update line graph
-        this._updateLineGraph();
+        this._updateLineGraph({
+            evented : true
+        });
 
         // update titles
         this._updateTitles();
@@ -265,28 +328,53 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         // update titles
         this._updateTitles();
+    },
 
+    _onMaskSelected : function (e) {
+        this._maskSelected = true;
+        this._updateTitles();
+    },
+
+    _onMaskUnselected : function () {
+
+        // get default graph
+        this._fetchLineGraph(this._setLineGraph.bind(this));
+
+        // mark
+        this._maskSelected = false;
+
+        // update titles
+        this._updateTitles();
+    },
+
+    _getTitle : function () {
+        var title = this.options.cube.getTitle();
+        if (this._maskSelected) {
+            title += ' (Vassdrag Z 33)';
+        }
+        return title;
     },
 
     _updateTitles : function () {
-        
+
         // get titles
-        var nameTitle = this.options.cube.getTitle();
+        var nameTitle = this._getTitle();
         var date = moment().year(this._current.year).dayOfYear(this._current.day);
         var dateTitle = date.format('MMMM Do YYYY');
-        var scf = _.find(this._cache.line[this._current.year], function (c) {
+        var cache = this._cache.line[this._current.year];
+        var scf = _.find(cache, function (c) {
             return c.date.isSame(date, 'day');
         });
-        var scfTitle = scf ? parseInt(scf.SCF) + '%' : 'na';
+        var scfTitle = scf ? parseInt(scf.SCF) + '%' : '';
+
 
         // set titles
         this._nameTitle.innerHTML = nameTitle;
-        this._dateTitle.innerHTML = dateTitle;
-        this._scfTitle.innerHTML = 'SCF: ' + scfTitle;
-
+        this._dateTitle.innerHTML = dateTitle + ' &nbsp;&nbsp;&nbsp;   <span style="font-weight:900">SCF: ' + scfTitle + '</span>';
+        
     },
 
-    _updateLineGraph : function () {
+    _updateLineGraph : function (options) {
 
         // fetch line graph from server if not done already
         if (!this._cache.line[this._current.year]) {
@@ -294,7 +382,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         }
 
         // set line graph
-        this._setLineGraph();
+        this._setLineGraph(options);
 
     },
 
@@ -362,15 +450,10 @@ Wu.Graph.Annual = Wu.Evented.extend({
         return cache;
     },
 
-    _setLineGraph : function () {
+    _setLineGraph : function (options) {
 
         // Clear old data
         this.ndx.line_crossfilter.remove();
-
-        // // set date range, doesnt'work....
-        // var minDate = moment().year(this._current.year).day(1);
-        // var maxDate = moment().year(this._current.year).month(12).date(31);
-        // this._composite.x(d3.time.scale().domain([minDate,maxDate]))
 
         // get cached line graph data
         var cache = this._cache.line[this._current.year];
@@ -386,6 +469,37 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         // redraw
         dc.redrawAll();
+
+        // update titles
+        this._updateTitles();
+       
+        // check if end of dataset
+        this._checkEnds();
+    },
+
+    _checkEnds : function () {
+
+        // get cached line graph data
+        var cache = this._cache.line[this._current.year];
+
+        // filter out period
+        var today = moment().year(this._current.year).dayOfYear(this._current.day + 1);
+        var period = _.find(cache, function (d) {
+            return d.date.isSame(today, 'day');
+        });
+
+        console.log('_checkEnds', period);
+
+        // shade buttons if end of dataset
+        period ? this._unshadeButtons() : this._shadeButtons();
+    },
+
+    _shadeButtons : function () {
+        Wu.Mixin.Events.fire('shadeButtons');
+    },
+
+    _unshadeButtons : function () {
+        Wu.Mixin.Events.fire('unshadeButtons');
     },
 
     getCurrentDate : function () {
@@ -406,7 +520,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
     _prepareAnnualAverageData : function (year) {
 
         // set year
-        var year = year || 2015;
+        var year = year || 2016;
 
         // passed from constructor
         var data = this.options.data;
@@ -424,22 +538,41 @@ Wu.Graph.Annual = Wu.Evented.extend({
                 return d.Doy == doy;
             });
 
+            // console.log('today:', today);
+
+            // // get this day's max
+            // var max = _.max(today, function (d) {
+            //     return d.SCF;
+            // }).SCF;
+
+            // // get this day's min
+            // var min = _.min(today, function (d) {
+            //     return d.SCF;
+            // }).SCF;
+
+            // // get this day's avg
+            // var sum = 0;
+            // _.times(today.length, function (i) {
+            //     sum += today[i].SCF;
+            // });
+            // var avg = sum/today.length;
+
+            // // get this day's min
+            // var min = _.min(today, function (d) {
+            //     return d.SCF;
+            // }).SCF;
+
+            // // get this day's avg
+            // var sum = 0;
+            // _.times(today.length, function (i) {
+            //     sum += today[i].SCF;
+            // });
+            // var avg = sum/today.length;
+
             // get this day's max
-            var max = _.max(today, function (d) {
-                return d.SCF;
-            }).SCF;
-
-            // get this day's min
-            var min = _.min(today, function (d) {
-                return d.SCF;
-            }).SCF;
-
-            // get this day's avg
-            var sum = 0;
-            _.times(today.length, function (i) {
-                sum += today[i].SCF;
-            });
-            var avg = sum/today.length;
+            var max = today[0].SCFmax; // read from prepared values in json
+            var min = today[0].SCFmin;
+            var avg = today[0].SCFmean;
 
             // add to array
             this._annualAverageData.push({
@@ -454,5 +587,38 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
     },
 
+    _onLoadedGraph : function () {
+        this.hideLoading();
+    },
+
+    _onLoadingGraph : function () {
+        this.showLoading();
+    },
+
+    showLoading : function () {
+
+        var p = 50;
+
+        // show
+        this._loadingBar.style.display = 'block';
+        this._loadingBar.style.width = p + '%';
+
+        // show
+        this._loadingInterval = setInterval(function () {
+            p = p >= 100 ? 0 : p + 10;
+            this._loadingBar.style.width = p + '%';
+        }.bind(this), 100);
+    },
+
+    hideLoading : function () {
+
+        // hide
+        clearInterval(this._loadingInterval);
+
+        // reset
+        this._loadingBar.style.width = '0%';
+    },
+
+  
 
 });

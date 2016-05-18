@@ -49,7 +49,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     options : {
         
         // frames to cache [before, after]
-        cacheSize : [2, 15], 
+        cacheSize : [5, 10], 
         
         // moment format at which to compare dates (year/day only here)
         timeFormat : 'YYYY-DDDD', 
@@ -66,8 +66,27 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 dashArray : null,
             },
 
+            hoverStyle : {
+                fillColor : 'red',
+                fillOpacity : 0.2,
+                color : '#3388ff',
+                opacity : 0.6,
+                weight : 1.5,
+                dashArray : null,
+            },
+
+            selectedStyle : {
+                fillColor : 'yellow',
+                fillOpacity : 0.5,
+                color : '#3388ff',
+                opacity : 0,
+                weight : 1.5,
+                dashArray : null,
+            },
+
             // if you want click on separate features of mask
             separatedFeatures : false,
+            preSelectMask : true,
         },
 
         // empty, transparent png
@@ -108,6 +127,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // init animator control
         this._initAnimator();
 
+        // debug: create legend
+        this._createLegend();
+
         // mark inited
         this._inited = true;
 
@@ -124,6 +146,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // animator control
         app.Animator = new Wu.Animator({ // refactor to project controls
             data : 'scf.average.2000.2015', // todo: refactor data fetching
+            // data : 'allYears', // todo: refactor data fetching
             // hide : true,
             cube : this
         });
@@ -221,9 +244,47 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // click event
         this._maskLayer.on('click', this._onMaskLayerClick.bind(this)); 
 
+        // hover events
+        this._maskLayer.on('mouseover', this._onMaskMouseover.bind(this));
+        this._maskLayer.on('mouseout', this._onMaskMouseout.bind(this));
+
+    },
+
+    _onMaskMouseover : function (options) {
+
+        if (this.options.mask.separatedFeatures) {
+
+            // set style on partial layer only
+            options.layer.setStyle(this.options.mask.hoverStyle);
+
+        } else {
+
+            // reset style for all layers
+            this._maskLayer.eachLayer(function (layer) {
+                layer.setStyle(this.options.mask.hoverStyle);
+            }.bind(this));
+        }
+    },
+
+    _onMaskMouseout : function (options) {
+
+         if (this.options.mask.separatedFeatures) {
+
+            // set style on partial layer only
+            options.layer.setStyle(this.options.mask.style);
+
+        } else {
+
+            // reset style for all layers
+            this._maskLayer.eachLayer(function (layer) {
+                layer.setStyle(this.options.mask.style);
+            }.bind(this));
+        }
     },
 
     _onMaskLayerClick : function (options) {
+
+        this._clickedMasklayer = true;
 
         // query single or all features
         if (this.options.mask.separatedFeatures) {
@@ -300,15 +361,61 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
+    _maskSelected : function (layer) {
+
+        // reset style for all layers
+        this._maskLayer.eachLayer(function (layer) {
+            layer.setStyle(this.options.mask.selectedStyle);
+        }.bind(this));
+
+        // fire mask selected event
+        Wu.Mixin.Events.fire('maskSelected', { detail : { 
+            layer : layer 
+        }}); 
+
+    },
+
+    _maskUnselected : function (layer) {
+
+        // reset style for all layers
+        this._maskLayer.eachLayer(function (layer) {
+            layer.setStyle(this.options.mask.style);
+        }.bind(this));
+
+        // fire mask selected event
+        Wu.Mixin.Events.fire('maskUnselected', { detail : { 
+            layer : layer 
+        }}); 
+
+    },
+
+    _onMapClick : function (event) {
+
+        if (this._clickedMasklayer) {
+            // this click was on mask
+
+        } else {
+
+            // this click was only on map
+            this._maskUnselected();
+        }
+
+        this._clickedMasklayer = false;
+    },  
+
     _multiFeatureQuery : function (options) {
 
         // get layer
         var layer = options.layer;
 
-        var wholeLayer = options.target;
-
         // get graph object
         var graph = app.Animator.graph;
+
+        // set loading
+        graph.showLoading();
+
+        // set mask as active
+        this._maskSelected(layer);
 
         // reset style for all layers
         this._maskLayer.eachLayer(function (layer) {
@@ -328,7 +435,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             layer.setStyle(selectedWholeStyle);
         }.bind(this));
 
-       
         var ops = [];
         var areas = [];
 
@@ -379,6 +485,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             graph.addLineData({
                 data : data
             });
+
+            // hide loading icon
+            graph.hideLoading();
+
         }.bind(this));
 
     },
@@ -390,7 +500,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         //
         // (scf_1 * area_a) + (scf_2 * area_b)
         // ----------------------------------- = weighted scf 
-        //               area_a + area_b 
+        //           area_a + area_b 
 
         var polygons = options.polygons;
         var areas = options.areas;
@@ -474,10 +584,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         }.bind(this));
     },
 
-    _onMapClick : function (event) {
-        var latlng = event.details.e.latlng;
-    },  
-
     _onTileUnload : function (e) {
         var layer = e.target;
     },
@@ -487,6 +593,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _onLayerClick : function (e) {
+
     },
 
     _onLayerLoaded : function (e) {
@@ -667,11 +774,19 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // get timestamp
         var timestamp = e.detail.timestamp; // moment
 
+        console.log('timestamp', timestamp);
+
         // move cursor
         this._moveCursor({
             timestamp : timestamp
         });
 
+    },
+
+    setCursor : function (timestamp) {
+        this._moveCursor({
+            timestamp : timestamp
+        });
     },
 
     _findDatasetByTimestamp : function (t) {
@@ -684,11 +799,14 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _showLayer : function (layer) {
-        layer.getContainer().style.display = 'block';
+        console.log('layer: ', layer);
+        var container = layer.getContainer();
+        if (container) container.style.display = 'block';
     },
 
     _hideLayer : function (layer) {
-        layer.getContainer().style.display = 'none';
+        var container = layer.getContainer();
+        if (container) container.style.display = 'none';
     },
 
     add : function (type) {
@@ -703,16 +821,19 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // add to map
         this._addTo();
 
-        // // connect to graph
-        // app.Animator.graph.setCube(this);
-
         // set cube
-        console.log('fire animatorSetCube'); // too early
         Wu.Mixin.Events.fire('animatorSetCube', { detail : { cube : this }}); 
     },
 
     _getCursorLayer : function () {
-        var cache = this._cache[this._cursor];
+        var cursor = this._cursor;
+        var cache = _.find(this._cache, function (c) {
+            return c.idx == cursor;
+        });
+        if (!cache) cache = this._cache[this._cursor];
+       
+        console.log('_getCursorLayer, cache, cursor', this._cache, this._cursor, cache);
+       
         if (!cache) return false;
         return cache.layer;
     },
@@ -772,6 +893,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // leaflet fn
             if (map.hasLayer(layer)) map.removeLayer(layer);
         });
+
+        // remove mask
+        if (map.hasLayer(this._maskLayer)) map.removeLayer(this._maskLayer);
 
         // remove from active layers
         app.MapPane.removeActiveLayer(this);    
@@ -893,6 +1017,20 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}';
         return url;
     },
+
+
+    // debug: create legend
+    _createLegend : function () {
+
+        // create legend container
+        this._legendContainer = Wu.DomUtil.create('div', 'snow-raster-legend-container', app._map._controlContainer);
+
+        // set legend
+        this._legendContainer.innerHTML = '<div class="info-legend-frame snow-raster"><div class="info-legend-val info-legend-min-val">1%</div><div class="info-legend-header scf">Snow</div><div class="info-legend-val info-legend-max-val">100%</div><div class="info-legend-gradient-container" style="background: -webkit-linear-gradient(0deg, #8C8C8C, white);background: -o-linear-gradient(0deg, #8C8C8C, white);background: -moz-linear-gradient(0deg, #8C8C8C, white);"></div></div>'
+        
+        // this._legendContainer.innerHTML = '<div class="info-legend-frame"><div class="info-legend-val info-legend-min-val">-1</div><div class="info-legend-header">mvel</div><div class="info-legend-val info-legend-max-val">9.8</div><div class="info-legend-gradient-container" style="background: -webkit-linear-gradient(left, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);background: -o-linear-gradient(right, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);background: -moz-linear-gradient(right, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);background: linear-gradient(to right, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);"></div></div>'
+        // this._legendContainer.innerHTML = '<div class="info-legend-frame"><div class="info-legend-val info-legend-min-val">-1</div><div class="info-legend-header">mvel</div><div class="info-legend-val info-legend-max-val">9.8</div><div class="info-legend-gradient-container" style="background: -webkit-linear-gradient(left, #8C8C8C, #ffffff));background: -o-linear-gradient(right, #8C8C8C, #ffffff));background: -moz-linear-gradient(right, #8C8C8C, #ffffff));background: linear-gradient(to right, #8C8C8C, #ffffff));"></div></div>'
+      },
 
 
 });

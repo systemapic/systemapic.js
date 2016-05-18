@@ -93,12 +93,6 @@ L.Control.Legends = Wu.Control.extend({
 		// remove old content
 		this._flush();
 
-		// add new content
-		// this._initContent();
-
-		// add already active layers
-		// this.refreshLegends();
-
 		// show
 		!hide && this._show();
 	},
@@ -235,8 +229,6 @@ L.Control.Legends = Wu.Control.extend({
 			// Open / Close Legends for mobile phones
 			this._isOpen ? this.mobileCloseLegends() : this.mobileOpenLegends();
 		}
-
-
 	},
 
 	mobileCloseLegends : function(e) {
@@ -286,8 +278,6 @@ L.Control.Legends = Wu.Control.extend({
 
 		// Hide the little arrow button         
 		if (!app.mobile) this._legendsOpener.style.opacity = '0';
-
-		// opopopopopopopopopop
 
 		// Set the width of the Legends
 		this._legendsInner.style.width = this.sliderWidth + 'px';
@@ -545,7 +535,6 @@ L.Control.Legends = Wu.Control.extend({
 		this.sliderWidth -= legend.width; 
 
 	},
-
 
 	legendsScrollLeft : function () {
 

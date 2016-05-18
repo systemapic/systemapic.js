@@ -1093,7 +1093,7 @@ Wu.RasterStyler = Wu.Class.extend({
 		var lastStop = parseInt(stops[stops.length-1].val);
 
 		// todo: add blur to stops
-		var blur = true;
+		var blur = false;
 		var blurType = 'gaussian';
 
 		// Default CSS

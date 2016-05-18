@@ -18,12 +18,30 @@ Wu.Animator = Wu.Evented.extend({
 
     _initialize : function (options) {
 
+        // listen to local events
+        this.listen();
+
         // fetching data is async, so must wait for callback
         this._fetchData(this._renderData.bind(this));
 
         // todo: fetching data should query raster itself. in other words, must be connected to cube layer directly, 
         // and fetch data thru it.
 
+    },
+
+    listen : function () {
+        Wu.Mixin.Events.on('shadeButtons', this._onShadeButtons, this);
+        Wu.Mixin.Events.on('unshadeButtons', this._onUnshadeButtons, this);
+    },
+
+    _onShadeButtons : function () {
+        // this.tapBackward.style.color = '#292929';
+        this.tapForward.style.color = '#292929';
+    },
+
+    _onUnshadeButtons : function () {
+        // this.tapBackward.style.color = '#FCFCFC';
+        this.tapForward.style.color = '#FCFCFC';
     },
 
     // fetch data from server
@@ -98,6 +116,11 @@ Wu.Animator = Wu.Evented.extend({
         // hide by default if option set
         if (this.options.hide) this.hide();
 
+        // debug: hide play buttons
+        this.playButton.style.display = 'none';
+        this.stepBackward.style.display = 'none';
+        this.stepForward.style.display = 'none';
+
     },
 
     _createGraph : function () { // todo: should separate these more
@@ -132,11 +155,16 @@ Wu.Animator = Wu.Evented.extend({
     },
 
 
+
+
     // @ only update graph
     // event that runs when sliding (ie. a lot!)
     // see http://refreshless.com/nouislider/events-callbacks/
     _sliderUpdateEvent : function (value) {
+        console.log('_sliderUpdateEvent', value);
         if (!this._inited) return;
+
+        console.log('ok');
 
         // set slider value
         this._sliderValue = value ? Math.round(value) : 0;
@@ -194,7 +222,6 @@ Wu.Animator = Wu.Evented.extend({
         if (show) this.show();
     },
 
-
     // Disable layer
     _layerDisabled : function (e) {
         var layer = e.detail.layer;
@@ -207,7 +234,12 @@ Wu.Animator = Wu.Evented.extend({
 
     // Set slider value
     setSlider : function (e) {
-        this._sliderValue = e.detail.value;
+
+        // get/set value
+        var value = (e && e.detail) ? e.detail.value : e;
+        this._sliderValue = value;
+
+        // set slider
         this.slider.set(this._sliderValue);
     },
 
