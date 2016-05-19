@@ -226,7 +226,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._graphInited = true;
 
         // debug: set default date
-        this._setDate(2016, 104);
+        this._setDate(2016, 103);
 
     },
 
@@ -350,12 +350,12 @@ Wu.Graph.Annual = Wu.Evented.extend({
     _getTitle : function () {
         var title = this.options.cube.getTitle();
         if (this._maskSelected) {
-            title += ' (Vassdrag Z 33)';
+            title += ' - Vassdrag Z 33';
         }
         return title;
     },
 
-    _updateTitles : function () {
+    _updateTitles : function (options) {
 
         // get titles
         var nameTitle = this._getTitle();
@@ -367,22 +367,52 @@ Wu.Graph.Annual = Wu.Evented.extend({
         });
         var scfTitle = scf ? parseInt(scf.SCF) + '%' : '';
 
+        // check limit
+        if (this._current.day >= this._limit) {
+            dateTitle += ' (end of dataset)';
+        }
 
         // set titles
         this._nameTitle.innerHTML = nameTitle;
         this._dateTitle.innerHTML = dateTitle + ' &nbsp;&nbsp;&nbsp;   <span style="font-weight:900">SCF: ' + scfTitle + '</span>';
-        
     },
 
     _updateLineGraph : function (options) {
 
         // fetch line graph from server if not done already
         if (!this._cache.line[this._current.year]) {
-            return this._fetchLineGraph(this._setLineGraph.bind(this));
+            
+            // fetch dataset from server
+            this._fetchLineGraph(function () {
+
+                // calculate limit of dataset
+                var limit = _.size(this._cache.line[this._current.year]) + 1;
+
+                // set limit
+                this._setLimit(limit);
+
+                // set line graph
+                this._setLineGraph();
+
+            }.bind(this))
+
+        } else {
+
+            // set line graph
+            this._setLineGraph(options);
         }
 
-        // set line graph
-        this._setLineGraph(options);
+    },
+
+    _setLimit : function (limit) {
+
+        // set locally
+        this._limit = limit;
+
+        // set limits for slider
+        app.Animator.setSliderLimit({
+            limit : limit
+        });
 
     },
 
@@ -489,7 +519,20 @@ Wu.Graph.Annual = Wu.Evented.extend({
         });
 
         // shade buttons if end of dataset
-        period ? this._unshadeButtons() : this._shadeButtons();
+        if (period) {
+
+            // unshade slider buttons
+            this._unshadeButtons();
+
+        } else {
+
+            // shade slider buttons
+            this._shadeButtons();
+        }
+
+        // update titles
+        this._updateTitles();
+
     },
 
     _shadeButtons : function () {
@@ -594,7 +637,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
     },
 
     showLoading : function () {
-
+        return;
         var p = 50;
 
         // show
@@ -609,7 +652,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
     },
 
     hideLoading : function () {
-
+        return;
         // hide
         clearInterval(this._loadingInterval);
 

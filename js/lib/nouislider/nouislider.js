@@ -1807,7 +1807,9 @@ function closure ( target, options ){
 	}
 
 	// Updateable: margin, limit, step, range, animate, snap
-	function updateOptions ( optionsToUpdate ) {
+	function updateOptions ( optionsToUpdate, dontInvalidate) {
+
+		console.error('updateOptions');
 
 		var v = valueGet(), i, newOptions = testOptions({
 			start: [0, 0],
@@ -1830,13 +1832,19 @@ function closure ( target, options ){
 		newOptions.spectrum.direction = scope_Spectrum.direction;
 		scope_Spectrum = newOptions.spectrum;
 
-		// Invalidate the current positioning so valueSet forces an update.
-		scope_Locations = [];
-		valueSet(v);
+		// don't fire update
+		if (!dontInvalidate) {
 
-		for ( i = 0; i < scope_Handles.length; i++ ) {
-			fireEvent('update', i);
+			// Invalidate the current positioning so valueSet forces an update.
+			scope_Locations = [];
+			valueSet(v);
+
+			for ( i = 0; i < scope_Handles.length; i++ ) {
+				fireEvent('update', i);
+			}
+
 		}
+
 	}
 
 

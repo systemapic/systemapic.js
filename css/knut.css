@@ -2080,7 +2080,14 @@ text.y-axis-label.y-label {
 
 
 
+.noUi-connect {
+    background: #3C4759;
+}
+.noUi-handle {
+    box-shadow: none;
+}
 
-
-
+.big-graph-outer-container {
+    cursor: pointer;
+}
 

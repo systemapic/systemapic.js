@@ -1,3 +1,17 @@
+
+
+
+// slider events
+// 
+// - `set` event is fired AFTER slide is done, 
+// - `update` event is fired for any change/action
+// - `slide` is fired while sliding
+//
+// - currently, CUBE layer is updated on `set`
+//   and GRAPH is updated on `update` 
+
+
+
 Wu.Animator = Wu.Evented.extend({
 
     options : {
@@ -12,14 +26,17 @@ Wu.Animator = Wu.Evented.extend({
         graphType : 'annualCycles',
 
         // how often to register updates when sliding
-        sliderThrottle : 500
+        sliderThrottle : 500,
+
+        buttons : {
+            play : false,
+            yearly : false,
+            daily : true
+        }
 
     },
 
     _initialize : function (options) {
-
-        // listen to local events
-        this.listen();
 
         // fetching data is async, so must wait for callback
         this._fetchData(this._renderData.bind(this));
@@ -28,22 +45,7 @@ Wu.Animator = Wu.Evented.extend({
         // and fetch data thru it.
 
     },
-
-    listen : function () {
-        Wu.Mixin.Events.on('shadeButtons', this._onShadeButtons, this);
-        Wu.Mixin.Events.on('unshadeButtons', this._onUnshadeButtons, this);
-    },
-
-    _onShadeButtons : function () {
-        // this.tapBackward.style.color = '#292929';
-        this.tapForward.style.color = '#292929';
-    },
-
-    _onUnshadeButtons : function () {
-        // this.tapBackward.style.color = '#FCFCFC';
-        this.tapForward.style.color = '#FCFCFC';
-    },
-
+  
     // fetch data from server
     _fetchData : function (done) { // todo: query raster instead
 
@@ -101,26 +103,80 @@ Wu.Animator = Wu.Evented.extend({
         this.tickContainer              = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
 
         // Set number of slider steps
-        var dataLength = (_.size(this._data) > this.options.maxLength) ? this.options.maxLength : _.size(this._data);
+        // var dataLength = (_.size(this._data) > this.options.maxLength) ? this.options.maxLength : _.size(this._data);
 
-        // create slider
-        this.slider = noUiSlider.create(slider, {
+        this._defaultSliderOptions = {
             start: [this._sliderValue],
             range: {
                 'min': 1,
-                'max': dataLength
+                'max': this.options.maxLength
             },
-            step : 1
-        });
+            step : 1,
+            // connect : 'lower'
+        }
+
+        // create slider
+        this.slider = noUiSlider.create(slider, this._defaultSliderOptions);
 
         // hide by default if option set
         if (this.options.hide) this.hide();
 
-        // debug: hide play buttons
-        this.playButton.style.display = 'none';
-        this.stepBackward.style.display = 'none';
-        this.stepForward.style.display = 'none';
+        // hide/show buttons according to options
+        this._displayButtons();
 
+    },
+
+    _addHooks : function () {
+
+        // dom events
+        Wu.DomEvent.on(this.stepBackward, 'click', this.moveBackward, this);
+        Wu.DomEvent.on(this.tapBackward,  'click', this.stepOneBackward, this);
+        Wu.DomEvent.on(this.stepForward,  'click', this.moveForward, this);
+        Wu.DomEvent.on(this.tapForward,   'click', this.stepOneForward, this);
+        Wu.DomEvent.on(this.playButton,   'click', this.play, this);
+
+        // slider events
+        this.slider.on('update', this._sliderUpdateEvent.bind(this));
+        this.slider.on('set', this._sliderSetEvent.bind(this));
+        this.slider.on('slide', this._onSlide.bind(this));
+
+        // listen for events
+        Wu.Mixin.Events.on('setSlider', this.setSlider, this);
+        Wu.Mixin.Events.on('updateSliderButtons', this.updateButtons, this);
+        Wu.Mixin.Events.on('setSliderRange', this._onSetSliderRange, this);
+        Wu.Mixin.Events.on('unsetSliderRange', this._onUnsetSliderRange, this);
+        Wu.Mixin.Events.on('shadeButtons', this._onShadeButtons, this);
+        Wu.Mixin.Events.on('unshadeButtons', this._onUnshadeButtons, this);
+    },
+
+    _onSlide : function (values) {
+        var value = parseInt(values[0]);
+
+        // force limit
+        if (value > this._limit) {
+            // force limit on slider
+            this.slider.set(this._limit);
+
+            // shade buttons
+            this._onShadeButtons();
+        }
+    },
+
+    setSliderLimit : function (limit) {
+        this._limit = limit.limit;
+    },
+
+    getSliderLimit : function () {
+        return this._limit;
+    },  
+
+    _displayButtons : function () {
+        // display buttons based on options
+        this.playButton.style.display   = this.options.buttons.play   ? 'inline-block' : 'none';
+        this.stepBackward.style.display = this.options.buttons.yearly ? 'inline-block' : 'none';
+        this.stepForward.style.display  = this.options.buttons.yearly ? 'inline-block' : 'none';
+        this.tapForward.style.display   = this.options.buttons.daily  ? 'inline-block' : 'none';
+        this.tapBackward.style.display  = this.options.buttons.daily  ? 'inline-block' : 'none';
     },
 
     _createGraph : function () { // todo: should separate these more
@@ -135,27 +191,58 @@ Wu.Animator = Wu.Evented.extend({
         });
     },
 
+    _onShadeButtons : function () {
+       
+        // shade forward button
+        this.tapForward.style.color = '#292929';
 
-    _addHooks : function () {
+        // remove event
+        Wu.DomEvent.off(this.tapForward,  'click', this.stepOneForward, this);
 
-        // dom events
-        Wu.DomEvent.on(this.stepBackward, 'click', this.moveBackward, this);
-        Wu.DomEvent.on(this.tapBackward,  'click', this.stepOneBackward, this);
-        Wu.DomEvent.on(this.stepForward,  'click', this.moveForward, this);
-        Wu.DomEvent.on(this.tapForward,   'click', this.stepOneForward, this);
-        Wu.DomEvent.on(this.playButton,   'click', this.play, this);
+        // shade slider handle
+        this._getSliderHandle().style.background = '#3C4759';
+    },
 
-        // slider events
-        this.slider.on('update', this._sliderUpdateEvent.bind(this));
-        this.slider.on('set', this._sliderSetEvent.bind(this));
+   
+    _onUnshadeButtons : function () {
+       
+        // shade forward button
+        this.tapForward.style.color = '#FCFCFC';
 
-        // listen for events
-        Wu.Mixin.Events.on('setSlider', this.setSlider, this);
-        Wu.Mixin.Events.on('updateSliderButtons', this.updateButtons, this);
+        // reactivate event
+        Wu.DomEvent.on(this.tapForward,  'click', this.stepOneForward, this);
+
+        // shade slider handle
+        this._getSliderHandle().style.background = '#ECEDEF';
+    },
+
+    _getSliderHandle : function () {
+        var handle = this.slider.target.childNodes[0].childNodes[0].childNodes[0];
+        return handle;
     },
 
 
+    _onSetSliderRange : function (e) {
 
+        var range = e.detail.range;
+
+        // update range option
+        this.setSliderOptions({
+            range : range
+        }, true);
+    },
+
+    _onUnsetSliderRange : function () {
+        // set default slider options
+        this.setSliderOptions(this._defaultSliderOptions, true);
+    },
+
+    setSliderOptions : function (options, dontInvalidate) {
+        // set slider options
+        this.slider.updateOptions(options, dontInvalidate);
+    },
+
+   
 
     // @ only update graph
     // event that runs when sliding (ie. a lot!)
@@ -186,7 +273,7 @@ Wu.Animator = Wu.Evented.extend({
         // add delay if tap (to )
         setTimeout(function () {
 
-             // fire slider set event
+            // fire slider set event
             Wu.Mixin.Events.fire('sliderSet', { detail : {
                 value : this._sliderValue,
                 timestamp : timestamp
