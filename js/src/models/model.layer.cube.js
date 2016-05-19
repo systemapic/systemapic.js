@@ -77,9 +77,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             selectedStyle : {
                 fillColor : 'blue',
-                fillOpacity : 0.3,
-                color : '#3388ff',
-                opacity : 0.1,
+                fillOpacity : 0.1,
+                color : 'black',
+                opacity : 0.2,
                 weight : 1.5,
                 dashArray : null,
             },
@@ -219,9 +219,11 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         }.bind(this));
 
         // set default layer
-        this.layer = this._cache[0].layer;
+        this.layer = this._cache[this.options.cacheSize[0]].layer;
 
     },
+
+
 
     _initMask : function () {
 
@@ -375,16 +377,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
 
-    _getGraph : function (done) {
-        var graph = app.Animator.graph;
-        if (!graph) {
-            setTimeout(function() {
-                this._getGraph(done);
-            }.bind(this), 300);
-        } else {
-            return done(null, graph);
-        }
-    },
 
     _multiFeatureQuery : function (options) {
 
@@ -439,7 +431,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                         day : graph._current.day,
                         options : {
                             currentYearOnly : true,
-                            force_query : false
+                            force_query : true
                         },
                         mask : {
                             geometry : mask_geometry,
@@ -455,6 +447,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             // query all areas
             async.parallel(ops, function (err, polygons) {
+
+                console.log('polygons', polygons);
 
                 // calulate weighted average of SCF based on ares of polygons
                 var data = this._calculateWeightedAverage({
@@ -477,6 +471,18 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
+    // async, waiting, to get graph object
+    _getGraph : function (done) {
+
+        // get graph
+        var graph = app.Animator.graph;
+
+        // return graph
+        if (graph) return done(null, graph);
+       
+        // or try again
+        setTimeout(this._getGraph.bind(this, done), 300);
+    },
 
     _maskSelected : function (layer) {
 
@@ -507,6 +513,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _onMapClick : function (event) {
+
+        // not applicable if constantMask is active
         if (this.options.mask.constantMask) return;
 
         if (this._clickedMasklayer) {
@@ -518,6 +526,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             this._maskUnselected();
         }
 
+        // mark last click
         this._clickedMasklayer = false;
     },  
 
@@ -622,24 +631,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _onLayerClick : function (e) {
-
     },
 
-    _onLayerLoaded : function (e) {
-        var layer = e.target;
-        var dataset = _.find(this._datasets, {id : layer.options.dataset_id});
-        if (!dataset) {
-            console.log('not loaded (no dataset)', e);
-            return;
-        }
-        console.log('loaded:', dataset.idx, dataset.timestamp);
-
-        // mark cache loaded
-        var cache = _.find(this._cache, {idx : dataset.idx});
-        if (cache) {
-            cache.loaded = true;
-        }
-    },
 
     _moveCursor : function (options) {
 
@@ -692,6 +685,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // should never happen, ideally
         if (!layer) {
             console.error('no layer @ cursor??');
+            return;
             console.log('--------------------------');
             console.log('dataset:', dataset);
             console.log('cache:', cache);
@@ -732,7 +726,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             });
 
             // if already in cache, all good
-            if (cached) return;
+            if (cached) {
+                return;
+            }
 
             // set layer options
             var layerOptions = {
@@ -765,23 +761,45 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
+    _onLayerLoaded : function (e) {
+
+        // `load` event is fired on a layer that doesn't have dataset_id (ie. hasn't been cached)
+        // how is that possible?
+
+        var layer = e.target;
+        var dataset = _.find(this._datasets, {id : layer.options.dataset_id});
+        if (!dataset) {
+            return;
+        }
+        console.log('loaded:', dataset.idx, dataset.timestamp);
+
+        // mark cache loaded
+        var cache = _.find(this._cache, {idx : dataset.idx});
+        if (cache) {
+            cache.loaded = true;
+        }
+    },
+
+
     _getAvailableCache : function () {
 
         // if going forward in time
         if (this._cursorDirection > 0) {
 
             // return lowest cached dataset index
-            return _.min(this._cache, function (c) {
+            var cache = _.min(this._cache, function (c) {
                 return c.idx;
             }); 
+            return cache;
 
         // if going backwards in time
         } else {
 
             // return highest cached dataset index
-            return _.max(this._cache, function (c) {
+            var cache = _.max(this._cache, function (c) {
                 return c.idx;
             });
+            return cache;
         }
        
     },
@@ -872,7 +890,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         var map = app._map;
         var layer = this._getCursorLayer();
-        if (!layer) return console.error('no layer @ cursor');
+        if (!layer) return console.error('no layer @ cursor.');
 
         // leaflet fn
         map.addLayer(layer);

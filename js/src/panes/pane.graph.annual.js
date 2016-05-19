@@ -365,7 +365,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         var scf = _.find(cache, function (c) {
             return c.date.isSame(date, 'day');
         });
-        var scfTitle = scf ? parseInt(scf.SCF) + '%' : '';
+        var scfTitle = scf ? (Math.round(scf.SCF * 10) / 10) + '%' : '';
 
         // check limit
         if (this._current.day >= this._limit) {
