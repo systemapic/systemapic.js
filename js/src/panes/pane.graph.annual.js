@@ -638,26 +638,26 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
     showLoading : function () {
         return;
-        var p = 50;
+        // var p = 50;
 
-        // show
-        this._loadingBar.style.display = 'block';
-        this._loadingBar.style.width = p + '%';
+        // // show
+        // this._loadingBar.style.display = 'block';
+        // this._loadingBar.style.width = p + '%';
 
-        // show
-        this._loadingInterval = setInterval(function () {
-            p = p >= 100 ? 0 : p + 10;
-            this._loadingBar.style.width = p + '%';
-        }.bind(this), 100);
+        // // show
+        // this._loadingInterval = setInterval(function () {
+        //     p = p >= 100 ? 0 : p + 10;
+        //     this._loadingBar.style.width = p + '%';
+        // }.bind(this), 100);
     },
 
     hideLoading : function () {
         return;
-        // hide
-        clearInterval(this._loadingInterval);
+        // // hide
+        // clearInterval(this._loadingInterval);
 
-        // reset
-        this._loadingBar.style.width = '0%';
+        // // reset
+        // this._loadingBar.style.width = '0%';
     },
 
   

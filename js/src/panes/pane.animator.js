@@ -203,7 +203,6 @@ Wu.Animator = Wu.Evented.extend({
         this._getSliderHandle().style.background = '#3C4759';
     },
 
-   
     _onUnshadeButtons : function () {
        
         // shade forward button
@@ -221,9 +220,7 @@ Wu.Animator = Wu.Evented.extend({
         return handle;
     },
 
-
     _onSetSliderRange : function (e) {
-
         var range = e.detail.range;
 
         // update range option
@@ -241,8 +238,6 @@ Wu.Animator = Wu.Evented.extend({
         // set slider options
         this.slider.updateOptions(options, dontInvalidate);
     },
-
-   
 
     // @ only update graph
     // event that runs when sliding (ie. a lot!)
@@ -420,13 +415,12 @@ Wu.Animator = Wu.Evented.extend({
     stepOneBackward : function () {
         var value = this._sliderValue - 1;
         
-        if ( value <= 0 ) {
-                this.stepBeforeBeginning();
-                value = this.options.maxLength;
+        if (value <= 0) {
+            this.stepBeforeBeginning();
+            value = this.options.maxLength;
         }
 
         this.slider.set(value);
-
     },
 
     stepBeforeBeginning : function () {

@@ -76,17 +76,19 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             },
 
             selectedStyle : {
-                fillColor : 'yellow',
-                fillOpacity : 0.5,
+                fillColor : 'blue',
+                fillOpacity : 0.3,
                 color : '#3388ff',
-                opacity : 0,
+                opacity : 0.1,
                 weight : 1.5,
                 dashArray : null,
             },
 
             // if you want click on separate features of mask
             separatedFeatures : false,
-            preSelectMask : true,
+
+            // to have mask active by default
+            constantMask : true,
         },
 
         // empty, transparent png
@@ -238,15 +240,26 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // make sure on top
         this._maskLayer.bringToFront();
 
-        // set style
-        this._maskLayer.setStyle(this.options.mask.style);
+        // if mask is to be always selected
+        if (this.options.mask.constantMask) {
 
-        // click event
-        this._maskLayer.on('click', this._onMaskLayerClick.bind(this)); 
+            // set style
+            this._maskLayer.setStyle(this.options.mask.selectedStyle);
 
-        // hover events
-        this._maskLayer.on('mouseover', this._onMaskMouseover.bind(this));
-        this._maskLayer.on('mouseout', this._onMaskMouseout.bind(this));
+
+        // if mask should be "clickable"
+        } else {
+
+            // set style
+            this._maskLayer.setStyle(this.options.mask.style);
+
+            // click event
+            this._maskLayer.on('click', this._onMaskLayerClick.bind(this)); 
+
+            // hover events
+            this._maskLayer.on('mouseover', this._onMaskMouseover.bind(this));
+            this._maskLayer.on('mouseout', this._onMaskMouseout.bind(this));
+        }
 
     },
 
@@ -361,6 +374,110 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
+
+    _getGraph : function (done) {
+        var graph = app.Animator.graph;
+        if (!graph) {
+            setTimeout(function() {
+                this._getGraph(done);
+            }.bind(this), 300);
+        } else {
+            return done(null, graph);
+        }
+    },
+
+    _multiFeatureQuery : function (options) {
+
+        // get layer
+        var layer = options.layer;
+
+        // get graph object
+        this._getGraph(function (err, graph) {
+            if (err) return console.error(err);
+
+            // set mask as active
+            this._maskSelected(layer);
+
+            // reset style for all layers
+            this._maskLayer.eachLayer(function (layer) {
+                layer.setStyle(this.options.mask.style);
+            }.bind(this));
+
+            // style for selected features
+            var selectedWholeStyle = {
+                fillColor : 'red',
+                fillOpacity : 0.3,
+                color : 'red',
+                opacity : 0.3,
+            };
+
+            // set selected layer style to all layers
+            this._maskLayer.eachLayer(function (layer) {
+                layer.setStyle(this.options.mask.selectedStyle);
+            }.bind(this));
+
+            var ops = [];
+            var areas = [];
+
+            // for each layer
+            this._maskLayer.eachLayer(function (layer) {
+                
+                // add async op
+                ops.push(function (callback) {
+
+                    var mask_id = layer.feature.id;
+                    var mask_geometry = layer.feature.geometry;
+
+                    // calc area of geometries
+                    areas.push(turf.area(mask_geometry));
+
+                    // set query options
+                    var queryOptions = {
+                        query_type : 'scf', // snow cover fraction
+                        cube_id : this.getCubeId(),
+                        year : graph._current.year,
+                        day : graph._current.day,
+                        options : {
+                            currentYearOnly : true,
+                            force_query : false
+                        },
+                        mask : {
+                            geometry : mask_geometry,
+                            mask_id : mask_id
+                        }
+                    };
+
+                    // make query
+                    this._queryCube(queryOptions, callback);
+
+                }.bind(this));
+            }.bind(this));
+
+            // query all areas
+            async.parallel(ops, function (err, polygons) {
+
+                // calulate weighted average of SCF based on ares of polygons
+                var data = this._calculateWeightedAverage({
+                    polygons : polygons,
+                    areas : areas
+                });
+
+                // add data to graph
+                graph.addLineData({
+                    data : data
+                });
+
+                // hide loading icon
+                graph.hideLoading();
+
+            }.bind(this));
+
+        }.bind(this));
+
+
+    },
+
+
     _maskSelected : function (layer) {
 
         // reset style for all layers
@@ -390,6 +507,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _onMapClick : function (event) {
+        if (this.options.mask.constantMask) return;
 
         if (this._clickedMasklayer) {
             // this click was on mask
@@ -403,95 +521,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._clickedMasklayer = false;
     },  
 
-    _multiFeatureQuery : function (options) {
-
-        // get layer
-        var layer = options.layer;
-
-        // get graph object
-        var graph = app.Animator.graph;
-
-        // set loading
-        graph.showLoading();
-
-        // set mask as active
-        this._maskSelected(layer);
-
-        // reset style for all layers
-        this._maskLayer.eachLayer(function (layer) {
-            layer.setStyle(this.options.mask.style);
-        }.bind(this));
-
-        // style for selected features
-        var selectedWholeStyle = {
-            fillColor : 'red',
-            fillOpacity : 0.2,
-            color : 'yellow',
-            opacity : 0,
-        };
-
-        // set selected layer style to all layers
-        this._maskLayer.eachLayer(function (layer) {
-            layer.setStyle(selectedWholeStyle);
-        }.bind(this));
-
-        var ops = [];
-        var areas = [];
-
-        // for each layer
-        this._maskLayer.eachLayer(function (layer) {
-            
-            // add async op
-            ops.push(function (callback) {
-
-                var mask_id = layer.feature.id;
-                var mask_geometry = layer.feature.geometry;
-
-                // calc area of geometries
-                areas.push(turf.area(mask_geometry));
-
-                // set query options
-                var queryOptions = {
-                    query_type : 'scf', // snow cover fraction
-                    cube_id : this.getCubeId(),
-                    year : graph._current.year,
-                    day : graph._current.day,
-                    options : {
-                        currentYearOnly : true,
-                        // force_query : true
-                    },
-                    mask : {
-                        geometry : mask_geometry,
-                        mask_id : mask_id
-                    }
-                };
-
-                // make query
-                this._queryCube(queryOptions, callback);
-
-            }.bind(this));
-        }.bind(this));
-
-        // query all areas
-        async.parallel(ops, function (err, polygons) {
-
-            // calulate weighted average of SCF based on ares of polygons
-            var data = this._calculateWeightedAverage({
-                polygons : polygons,
-                areas : areas
-            });
-
-            // add data to graph
-            graph.addLineData({
-                data : data
-            });
-
-            // hide loading icon
-            graph.hideLoading();
-
-        }.bind(this));
-
-    },
 
     _calculateWeightedAverage : function (options) {
 
@@ -599,9 +628,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _onLayerLoaded : function (e) {
         var layer = e.target;
         var dataset = _.find(this._datasets, {id : layer.options.dataset_id});
-
-        if (!dataset) return;
-
+        if (!dataset) {
+            console.log('not loaded (no dataset)', e);
+            return;
+        }
         console.log('loaded:', dataset.idx, dataset.timestamp);
 
         // mark cache loaded
@@ -660,7 +690,16 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var layer = cache ? cache.layer : false;
 
         // should never happen, ideally
-        if (!layer) return console.error('no layer @ cursor??');
+        if (!layer) {
+            console.error('no layer @ cursor??');
+            console.log('--------------------------');
+            console.log('dataset:', dataset);
+            console.log('cache:', cache);
+            console.log('this._cache', this._cache);
+            console.log('cursor', this._cursor);
+            console.log('--------------------------');
+            return;
+        }
 
         // show layer
         this._showLayer(layer);
@@ -824,7 +863,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             return c.idx == cursor;
         });
         if (!cache) cache = this._cache[this._cursor];
-       
         if (!cache) return false;
         return cache.layer;
     },
@@ -847,7 +885,23 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // add mask layer
         if (this._maskLayer) {
+
+            // add mask layer
             map.addLayer(this._maskLayer);
+
+            // activate mask
+            if (this.options.mask.constantMask) {
+
+                // get first layer
+                var layers = this._maskLayer.getLayers();
+
+                // click maskLayer
+                this._onMaskLayerClick({
+                    layer : layers[0]
+                });
+
+            }
+
         }
 
         this._added = true;
