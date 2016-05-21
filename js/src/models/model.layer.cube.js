@@ -101,6 +101,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // set store
         this._setStore(store);
+
     },
 
     _setStore : function (store) {
@@ -376,8 +377,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
-
-
     _multiFeatureQuery : function (options) {
 
         // get layer
@@ -410,66 +409,149 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             var ops = [];
             var areas = [];
+            var mask_ids = [];
 
             // for each layer
             this._maskLayer.eachLayer(function (layer) {
                 
-                // add async op
-                ops.push(function (callback) {
+                var mask_id = layer.feature.id;
+                var mask_geometry = layer.feature.geometry;
 
-                    var mask_id = layer.feature.id;
-                    var mask_geometry = layer.feature.geometry;
+                areas.push(mask_geometry);
+                mask_ids.push(mask_id);
 
-                    // calc area of geometries
-                    areas.push(turf.area(mask_geometry));
-
-                    // set query options
-                    var queryOptions = {
-                        query_type : 'scf', // snow cover fraction
-                        cube_id : this.getCubeId(),
-                        year : graph._current.year,
-                        day : graph._current.day,
-                        options : {
-                            currentYearOnly : true,
-                            force_query : true
-                        },
-                        mask : {
-                            geometry : mask_geometry,
-                            mask_id : mask_id
-                        }
-                    };
-
-                    // make query
-                    this._queryCube(queryOptions, callback);
-
-                }.bind(this));
             }.bind(this));
 
-            // query all areas
-            async.parallel(ops, function (err, polygons) {
+            // md5 of all mask_ids
+            var mask_id_md5 = forge.md.md5.create().update(mask_ids.join('')).digest().toHex();
 
-                console.log('polygons', polygons);
+            // set query options
+            var queryOptions = {
+                query_type : 'scf', // snow cover fraction
+                cube_id : this.getCubeId(),
+                year : graph._current.year,
+                day : graph._current.day,
+                options : {
+                    currentYearOnly : true,
+                    force_query : false
+                },
+                mask : {
+                    // geometry : mask_geometry,
+                    // mask_id : mask_id,
+                    multi_mask : true,
+                    geometries : areas,
+                    mask_id : mask_id_md5
+                }
+            };
 
-                // calulate weighted average of SCF based on ares of polygons
-                var data = this._calculateWeightedAverage({
-                    polygons : polygons,
-                    areas : areas
-                });
-
+            // make query
+            this._queryCube(queryOptions, function (err, data) {
+              
                 // add data to graph
                 graph.addLineData({
                     data : data
                 });
 
-                // hide loading icon
-                graph.hideLoading();
+            });
 
-            }.bind(this));
 
         }.bind(this));
 
 
     },
+
+    // _multiFeatureQuery : function (options) {
+
+    //     // get layer
+    //     var layer = options.layer;
+
+    //     // get graph object
+    //     this._getGraph(function (err, graph) {
+    //         if (err) return console.error(err);
+
+    //         // set mask as active
+    //         this._maskSelected(layer);
+
+    //         // reset style for all layers
+    //         this._maskLayer.eachLayer(function (layer) {
+    //             layer.setStyle(this.options.mask.style);
+    //         }.bind(this));
+
+    //         // style for selected features
+    //         var selectedWholeStyle = {
+    //             fillColor : 'red',
+    //             fillOpacity : 0.3,
+    //             color : 'red',
+    //             opacity : 0.3,
+    //         };
+
+    //         // set selected layer style to all layers
+    //         this._maskLayer.eachLayer(function (layer) {
+    //             layer.setStyle(this.options.mask.selectedStyle);
+    //         }.bind(this));
+
+    //         var ops = [];
+    //         var areas = [];
+
+    //         // for each layer
+    //         this._maskLayer.eachLayer(function (layer) {
+                
+    //             // add async op
+    //             ops.push(function (callback) {
+
+    //                 var mask_id = layer.feature.id;
+    //                 var mask_geometry = layer.feature.geometry;
+
+    //                 // calc area of geometries
+    //                 areas.push(turf.area(mask_geometry));
+
+    //                 // set query options
+    //                 var queryOptions = {
+    //                     query_type : 'scf', // snow cover fraction
+    //                     cube_id : this.getCubeId(),
+    //                     year : graph._current.year,
+    //                     day : graph._current.day,
+    //                     options : {
+    //                         currentYearOnly : true,
+    //                         force_query : true
+    //                     },
+    //                     mask : {
+    //                         geometry : mask_geometry,
+    //                         mask_id : mask_id
+    //                     }
+    //                 };
+
+    //                 // make query
+    //                 this._queryCube(queryOptions, callback);
+
+    //             }.bind(this));
+    //         }.bind(this));
+
+    //         // query all areas
+    //         async.parallel(ops, function (err, polygons) {
+
+    //             console.log('polygons', polygons);
+
+    //             // calulate weighted average of SCF based on ares of polygons
+    //             var data = this._calculateWeightedAverage({
+    //                 polygons : polygons,
+    //                 areas : areas
+    //             });
+
+    //             // add data to graph
+    //             graph.addLineData({
+    //                 data : data
+    //             });
+
+    //             // hide loading icon
+    //             graph.hideLoading();
+
+    //         }.bind(this));
+
+    //     }.bind(this));
+
+
+    // },
 
     // async, waiting, to get graph object
     _getGraph : function (done) {
@@ -929,6 +1011,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             layer : this,
             showSlider : true
         }}); 
+
+        console.log('cube_id', this.getCubeId());
+        
     },
 
     _addThin: function () {

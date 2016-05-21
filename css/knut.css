@@ -2060,7 +2060,7 @@ g.axis.y {
     background: rgba(60, 71, 89, 0.61);
     bottom: 30px;
     left: 5px;
-    z-index: 3000;
+    z-index: 1000;
     color: white !important;
     padding: 10px;
     border-radius: 4px;
@@ -2081,7 +2081,7 @@ text.y-axis-label.y-label {
 
 
 .noUi-connect {
-    background: #3C4759;
+    background: #E65959;
 }
 .noUi-handle {
     box-shadow: none;

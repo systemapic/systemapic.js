@@ -112,7 +112,7 @@ Wu.Animator = Wu.Evented.extend({
                 'max': this.options.maxLength
             },
             step : 1,
-            // connect : 'lower'
+            connect : 'lower'
         }
 
         // create slider
@@ -194,13 +194,14 @@ Wu.Animator = Wu.Evented.extend({
     _onShadeButtons : function () {
        
         // shade forward button
-        this.tapForward.style.color = '#292929';
+        this.tapForward.style.color = 'rgb(81, 92, 111)';
 
         // remove event
         Wu.DomEvent.off(this.tapForward,  'click', this.stepOneForward, this);
 
         // shade slider handle
-        this._getSliderHandle().style.background = '#3C4759';
+        this._getSliderHandle().style.background = 'rgb(82, 93, 111)';
+        this._getSliderTail().style.background = 'rgb(82, 93, 111)';
     },
 
     _onUnshadeButtons : function () {
@@ -213,10 +214,16 @@ Wu.Animator = Wu.Evented.extend({
 
         // shade slider handle
         this._getSliderHandle().style.background = '#ECEDEF';
+        this._getSliderTail().style.background = '#ECEDEF';
     },
 
     _getSliderHandle : function () {
         var handle = this.slider.target.childNodes[0].childNodes[0].childNodes[0];
+        return handle;
+    },
+
+    _getSliderTail : function () {
+        var handle = this.slider.target.childNodes[0].childNodes[0];
         return handle;
     },
 

@@ -2489,7 +2489,7 @@ input.chrome-field-input {
 .big-slider-outer-container .noUi-horizontal .noUi-handle {
     width: 21px;
     height: 18px;
-    left: -10px;
+    left: 0px;
     top: -6px;
 }
 
