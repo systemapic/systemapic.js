@@ -31,6 +31,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // init graph
         this._initGraph();
 
+        this._setDate(2016, 103);
+
     },
 
     listen : function () {
@@ -59,11 +61,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this.ndx = {};
 
         // prepare this._data if not already done
-        if (_.isEmpty(this._annualAverageData)) {
-
-            // prepare data
-            this._prepareAnnualAverageData();
-        }
+        if (_.isEmpty(this._annualAverageData)) this._prepareAnnualAverageData();
 
 
         // AVERAGE ANNUAL DATA
@@ -226,7 +224,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._graphInited = true;
 
         // debug: set default date
-        this._setDate(2016, 103);
+        // this._setDate(2015, 103);
 
     },
 
@@ -277,6 +275,19 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // set dates
         this._current.year = year;
         this._current.day = day;
+
+        // set graph dates
+        var minDate = moment().year(this._current.year).dayOfYear(1);
+        var maxDate = moment().year(this._current.year + 1).dayOfYear(-1); // last day of year
+
+        // set date range to graph
+        this._composite.x(d3.time.scale().domain([minDate,maxDate]));
+
+        // todo: make sure average-graph is set to current year
+
+        // this._prepareAnnualAverageData(year);
+        // this.ndx.average_crossfilter = crossfilter(this._annualAverageData); 
+        // this._initGraph();
 
         // set slider
         app.Animator.setSlider(day);
@@ -558,6 +569,48 @@ Wu.Graph.Annual = Wu.Evented.extend({
         return fixed;
     },
 
+    // _prepareAnnualAverageData : function (year) {
+
+    //     // set year
+    //     var year = year || 2016;
+
+    //     // passed from constructor
+    //     var data = this.options.data;
+
+    //     // {
+    //     //  Doy : 326,
+    //     //  SCF : 65.5562,
+    //     //  SCFmax : 85.1759,
+    //     //  SCFmean : 59.9067,
+    //     //  SCFmin : 36.6869,
+    //     //  Year : 2015
+    //     // }
+
+    //     // clear
+    //     this._annualAverageData = [];
+
+
+    //     data.forEach(function (d) {
+
+    //         // get this day's max
+    //         var max = d.SCFmax; // read from prepared values in json
+    //         var min = d.SCFmin;
+    //         var avg = d.SCFmean;
+
+    //         // add to array
+    //         this._annualAverageData.push({
+    //             no   : d.Doy,
+    //             max  : max,
+    //             date : moment().year(d.Year).dayOfYear(d.Doy), // year doesn't matter, as it's avg for all years
+    //             min  : min,
+    //             avg  : avg,
+    //         });
+
+    //     }.bind(this));
+
+
+    // },
+
     _prepareAnnualAverageData : function (year) {
 
         // set year
@@ -579,7 +632,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
                 return d.Doy == doy;
             });
 
-            // console.log('today:', today);
 
             // // get this day's max
             // var max = _.max(today, function (d) {

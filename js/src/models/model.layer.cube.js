@@ -433,7 +433,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 day : graph._current.day,
                 options : {
                     currentYearOnly : true,
-                    force_query : false
+                    // force_query : true
                 },
                 mask : {
                     // geometry : mask_geometry,

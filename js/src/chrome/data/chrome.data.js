@@ -707,6 +707,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
     _onProcessingProgress : function (e) {
+        if (!this._tempFiles) return;
 
         var data = e.detail;
         var percent = data.percent;
@@ -1341,11 +1342,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // create divs
         var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
-        var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Dataset name');
+        var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Cube name');
         var name_input = Wu.DomUtil.create('input', 'smooth-input smaller-input', toggles_wrapper);
         name_input.setAttribute('placeholder', 'Enter name here');
         name_input.value = layer.getName();
         var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
+
+        var cube_id_name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Cube ID');
+        var cube_id_title = Wu.DomUtil.create('input', 'smooth-input smaller-input', toggles_wrapper);
+        cube_id_title.value = layer.getCubeId();
+        cube_id_title.readOnly = true;
+        cube_id_title.style.background = '#F7F7F7';
 
         // event
         Wu.DomEvent.on(name_input, 'keyup', _.throttle(function () {
