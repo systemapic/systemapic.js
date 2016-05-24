@@ -379,7 +379,8 @@ Wu.User = Wu.Class.extend({
 	},
 
 	isSuper : function () {
-		return this.store.access.account_type == 'super';
+		return this.store.access.super;
+		// return this.store.access.account_type == 'super';
 	}
 
 });

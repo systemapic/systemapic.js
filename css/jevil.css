@@ -29,6 +29,8 @@
     margin-right: 0px;
     opacity: 0.0;
     cursor: pointer;
+    background: #C7CACF;
+    padding-left: 5px;
     }
 
 .file-list-container-file-list .data-list-line:hover .file-popup-trigger,
@@ -2164,6 +2166,7 @@ input.chrome-field-input {
     padding: 5px 10px;
     color: #000;
     cursor: pointer;
+    font-size: 16px;
 }
 
 .chrome.chrome-content.active-layer.select-wrap .form-combobox_options_wrapper {
