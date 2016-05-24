@@ -154,6 +154,7 @@ Wu.Animator = Wu.Evented.extend({
 
         // force limit
         if (value > this._limit) {
+
             // force limit on slider
             this.slider.set(this._limit);
 

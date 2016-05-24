@@ -130,9 +130,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // init animator control
         this._initAnimator();
 
-        // debug: create legend
-        this._createLegend();
-
         // mark inited
         this._inited = true;
 
@@ -162,7 +159,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._cursor = 0;
 
         // init feature group
-        this._group = L.featureGroup([]).addTo(app._map);
+        this._group = L.featureGroup([]);//.addTo(app._map);
 
     },
 
@@ -210,10 +207,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             layer.on('load', this._onLayerLoaded, this);
 
             // add layer to feature group
-            this._group.addLayer(layer);
-
-            // hide by default
-            this._hideLayer(layer);
+            this._group.addLayer(layer); // will add layer to map, since group is already added to map
 
             // add to cache
             this._cache.push({
@@ -227,9 +221,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // set default layer
         this.layer = this._cache[this.options.cacheSize[0]].layer;
 
+        // hide by default
+        this._group.eachLayer(this._hideLayer);
+
     },
-
-
 
     _initMask : function () {
 
@@ -422,12 +417,11 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 var mask_id = layer.feature.id;
                 var mask_geometry = layer.feature.geometry;
 
+                // remember
                 areas.push(mask_geometry);
                 mask_ids.push(mask_id);
 
             }.bind(this));
-
-            console.log('areas', areas);
 
             // md5 of all mask_ids
             var mask_id_md5 = forge.md.md5.create().update(mask_ids.join('')).digest().toHex();
@@ -451,8 +445,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 }
             };
 
-            console.log('queryOptions', queryOptions);
-
             // make query
             this._queryCube(queryOptions, function (err, data) {
               
@@ -463,12 +455,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             });
 
-
         }.bind(this));
 
-
     },
-
 
     // async, waiting, to get graph object
     _getGraph : function (done) {
@@ -530,59 +519,59 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },  
 
 
-    _calculateWeightedAverage : function (options) {
+    // _calculateWeightedAverage : function (options) {
 
-        // should be added to values from other polygons, 
-        // but weighted based on area of polygon
-        //
-        // (scf_1 * area_a) + (scf_2 * area_b)
-        // ----------------------------------- = weighted scf 
-        //           area_a + area_b 
+    //     // should be added to values from other polygons, 
+    //     // but weighted based on area of polygon
+    //     //
+    //     // (scf_1 * area_a) + (scf_2 * area_b)
+    //     // ----------------------------------- = weighted scf 
+    //     //           area_a + area_b 
 
-        var polygons = options.polygons;
-        var areas = options.areas;
+    //     var polygons = options.polygons;
+    //     var areas = options.areas;
 
-        // sum all areas
-        var total_area = _.sum(areas);
-        var sums = []; // 365 days
-        var days = [];
+    //     // sum all areas
+    //     var total_area = _.sum(areas);
+    //     var sums = []; // 365 days
+    //     var days = [];
 
-        // each day
-        _.times(365, function (i) {
+    //     // each day
+    //     _.times(365, function (i) {
 
-            // daily avg
-            var avg = [];
+    //         // daily avg
+    //         var avg = [];
 
-            // get results from all polygons
-            polygons.forEach(function (p, n) {
-                if (!p[i]) return; // leap years
+    //         // get results from all polygons
+    //         polygons.forEach(function (p, n) {
+    //             if (!p[i]) return; // leap years
 
-                // current day
-                var daily_polygon_scf = p[i].SCF;
+    //             // current day
+    //             var daily_polygon_scf = p[i].SCF;
 
-                // over the line parts
-                var daily_mean = daily_polygon_scf * areas[n];
+    //             // over the line parts
+    //             var daily_mean = daily_polygon_scf * areas[n];
 
-                // remember
-                avg.push(daily_mean);
+    //             // remember
+    //             avg.push(daily_mean);
 
-            });
+    //         });
 
-            // calc it out
-            var over_line = _.sum(avg);
-            var under_line = total_area;
-            var weighted_scf = over_line / under_line;
+    //         // calc it out
+    //         var over_line = _.sum(avg);
+    //         var under_line = total_area;
+    //         var weighted_scf = over_line / under_line;
 
-            // create array for line graph
-            var today = polygons[0][i];
-            if (today) days.push({
-                SCF : weighted_scf,
-                date : today.date
-            });
-        });
+    //         // create array for line graph
+    //         var today = polygons[0][i];
+    //         if (today) days.push({
+    //             SCF : weighted_scf,
+    //             date : today.date
+    //         });
+    //     });
 
-        return days;
-    },
+    //     return days;
+    // },
 
     _queryCube : function (options, done) {
 
@@ -684,7 +673,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // should never happen, ideally
         if (!layer) {
             console.error('no layer @ cursor??');
-            return;
             console.log('--------------------------');
             console.log('dataset:', dataset);
             console.log('cache:', cache);
@@ -766,6 +754,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var layer = e.target;
         var dataset = _.find(this._datasets, {id : layer.options.dataset_id});
         if (!dataset) {
+            console.log('no dataset');
             return;
         }
         console.log('loaded:', dataset.idx, dataset.timestamp);
@@ -887,11 +876,18 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         if (!this._inited) this.initLayer();
 
         var map = app._map;
-        var layer = this._getCursorLayer();
-        if (!layer) return console.error('no layer @ cursor.');
 
-        // leaflet fn
-        map.addLayer(layer);
+        // add leaflet layer group to map
+        this._group.addTo(map);
+
+        // hide layers
+        this._group.eachLayer(this._hideLayer);
+
+        // make sure cache is updated; got all correct layers loaded
+        this._updateCache();
+
+        // sets cursor at current frame (ie. show layer on map)
+        this._updateCursor();
 
         // add to active layers
         app.MapPane.addActiveLayer(this);   // includes baselayers, todo: evented
@@ -917,8 +913,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 });
 
             }
-
         }
+
+        // show legedn
+        this._showLegend();
 
         // mark added
         this._added = true;
@@ -949,12 +947,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     remove : function (map) {
         var map = map || app._map;
 
-        this._cache.forEach(function (cache) {
-            var layer = cache.layer;
-
-            // leaflet fn
-            if (map.hasLayer(layer)) map.removeLayer(layer);
-        });
+        // remove leaflet layer group from map
+        this._group.removeFrom(map);
 
         // remove mask
         if (map.hasLayer(this._maskLayer)) map.removeLayer(this._maskLayer);
@@ -965,10 +959,14 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // remove from zIndex
         this._removeFromZIndex();
 
+        // hide legend
+        this._hideLegend();
+
         // remove from descriptionControl if avaialbe.. TODO: make this evented instead
         var descriptionControl = app.MapPane.getControls().description;
         if (descriptionControl) descriptionControl._removeLayer(this);
 
+        // mark
         this._added = false;
     },
 
@@ -1083,6 +1081,19 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         return url;
     },
 
+    _showLegend : function () {
+        if (!this._legendContainer) this._createLegend();
+
+        // show
+        this._legendContainer.style.display = 'block';
+    },
+
+    _hideLegend : function () {
+        if (!this._legendContainer) return;
+
+        // hide
+        this._legendContainer.style.display = 'none';
+    },
 
     // debug: create legend. todo: make dynamic
     _createLegend : function () {
@@ -1093,7 +1104,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // set legend
         this._legendContainer.innerHTML = '<div class="info-legend-frame snow-raster"><div class="info-legend-val info-legend-min-val">1%</div><div class="info-legend-header scf">Snow</div><div class="info-legend-val info-legend-max-val">100%</div><div class="info-legend-gradient-container" style="background: -webkit-linear-gradient(0deg, #8C8C8C, white);background: -o-linear-gradient(0deg, #8C8C8C, white);background: -moz-linear-gradient(0deg, #8C8C8C, white);"></div></div>'
         
-      },
+    },
 
 
 });

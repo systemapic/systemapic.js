@@ -274,8 +274,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
     _setDate : function (year, day) {
         
         // set dates
-        this._current.year = year;
-        this._current.day = day;
+        this._current.year = year || this._current.year || 2016;
+        this._current.day = day || this._current.day || 1;
 
         // set graph dates
         var minDate = moment().year(this._current.year).dayOfYear(1);
@@ -397,12 +397,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
             // fetch dataset from server
             this._fetchLineGraph(function () {
 
-                // calculate limit of dataset
-                var limit = _.size(this._cache.line[this._current.year]) + 1;
-
-                // set limit
-                this._setLimit(limit);
-
                 // set line graph
                 this._setLineGraph();
 
@@ -512,6 +506,12 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // redraw
         dc.redrawAll();
 
+        // calculate limit of dataset
+        var limit = _.size(this._cache.line[this._current.year]) + 1;
+
+        // set limit
+        this._setLimit(limit);
+
         // update titles
         this._updateTitles();
        
@@ -570,47 +570,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
         return fixed;
     },
 
-    // _prepareAnnualAverageData : function (year) {
-
-    //     // set year
-    //     var year = year || 2016;
-
-    //     // passed from constructor
-    //     var data = this.options.data;
-
-    //     // {
-    //     //  Doy : 326,
-    //     //  SCF : 65.5562,
-    //     //  SCFmax : 85.1759,
-    //     //  SCFmean : 59.9067,
-    //     //  SCFmin : 36.6869,
-    //     //  Year : 2015
-    //     // }
-
-    //     // clear
-    //     this._annualAverageData = [];
-
-
-    //     data.forEach(function (d) {
-
-    //         // get this day's max
-    //         var max = d.SCFmax; // read from prepared values in json
-    //         var min = d.SCFmin;
-    //         var avg = d.SCFmean;
-
-    //         // add to array
-    //         this._annualAverageData.push({
-    //             no   : d.Doy,
-    //             max  : max,
-    //             date : moment().year(d.Year).dayOfYear(d.Doy), // year doesn't matter, as it's avg for all years
-    //             min  : min,
-    //             avg  : avg,
-    //         });
-
-    //     }.bind(this));
-
-
-    // },
 
     _prepareAnnualAverageData : function (year) {
 
