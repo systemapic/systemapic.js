@@ -177,13 +177,18 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // prepare index for quicker search
             d.idx = n;
         });
+
+        // set
+        this._datasets = datasets;
+
+        // return
         return datasets;
     },
 
     _initCache : function () {
 
         // set datasets
-        this._datasets = this._initDatasets();
+        this._initDatasets();
 
         // total num of cached frames
         var cacheSize = this.options.cacheSize[0] + this.options.cacheSize[1];
@@ -422,6 +427,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             }.bind(this));
 
+            console.log('areas', areas);
+
             // md5 of all mask_ids
             var mask_id_md5 = forge.md.md5.create().update(mask_ids.join('')).digest().toHex();
 
@@ -444,6 +451,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 }
             };
 
+            console.log('queryOptions', queryOptions);
+
             // make query
             this._queryCube(queryOptions, function (err, data) {
               
@@ -460,98 +469,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
-    // _multiFeatureQuery : function (options) {
-
-    //     // get layer
-    //     var layer = options.layer;
-
-    //     // get graph object
-    //     this._getGraph(function (err, graph) {
-    //         if (err) return console.error(err);
-
-    //         // set mask as active
-    //         this._maskSelected(layer);
-
-    //         // reset style for all layers
-    //         this._maskLayer.eachLayer(function (layer) {
-    //             layer.setStyle(this.options.mask.style);
-    //         }.bind(this));
-
-    //         // style for selected features
-    //         var selectedWholeStyle = {
-    //             fillColor : 'red',
-    //             fillOpacity : 0.3,
-    //             color : 'red',
-    //             opacity : 0.3,
-    //         };
-
-    //         // set selected layer style to all layers
-    //         this._maskLayer.eachLayer(function (layer) {
-    //             layer.setStyle(this.options.mask.selectedStyle);
-    //         }.bind(this));
-
-    //         var ops = [];
-    //         var areas = [];
-
-    //         // for each layer
-    //         this._maskLayer.eachLayer(function (layer) {
-                
-    //             // add async op
-    //             ops.push(function (callback) {
-
-    //                 var mask_id = layer.feature.id;
-    //                 var mask_geometry = layer.feature.geometry;
-
-    //                 // calc area of geometries
-    //                 areas.push(turf.area(mask_geometry));
-
-    //                 // set query options
-    //                 var queryOptions = {
-    //                     query_type : 'scf', // snow cover fraction
-    //                     cube_id : this.getCubeId(),
-    //                     year : graph._current.year,
-    //                     day : graph._current.day,
-    //                     options : {
-    //                         currentYearOnly : true,
-    //                         force_query : true
-    //                     },
-    //                     mask : {
-    //                         geometry : mask_geometry,
-    //                         mask_id : mask_id
-    //                     }
-    //                 };
-
-    //                 // make query
-    //                 this._queryCube(queryOptions, callback);
-
-    //             }.bind(this));
-    //         }.bind(this));
-
-    //         // query all areas
-    //         async.parallel(ops, function (err, polygons) {
-
-    //             console.log('polygons', polygons);
-
-    //             // calulate weighted average of SCF based on ares of polygons
-    //             var data = this._calculateWeightedAverage({
-    //                 polygons : polygons,
-    //                 areas : areas
-    //             });
-
-    //             // add data to graph
-    //             graph.addLineData({
-    //                 data : data
-    //             });
-
-    //             // hide loading icon
-    //             graph.hideLoading();
-
-    //         }.bind(this));
-
-    //     }.bind(this));
-
-
-    // },
 
     // async, waiting, to get graph object
     _getGraph : function (done) {
@@ -808,9 +725,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             });
 
             // if already in cache, all good
-            if (cached) {
-                return;
-            }
+            if (cached) return;
 
             // set layer options
             var layerOptions = {
@@ -845,7 +760,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     _onLayerLoaded : function (e) {
 
-        // `load` event is fired on a layer that doesn't have dataset_id (ie. hasn't been cached)
+        // todo: `load` event is fired on a layer that doesn't have dataset_id (ie. hasn't been cached)
         // how is that possible?
 
         var layer = e.target;
@@ -948,6 +863,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     addTo : function () {
         if (!this._inited) this.initLayer();
 
+        // mark added
         this._added = true;
 
         // add to map
@@ -1004,6 +920,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         }
 
+        // mark added
         this._added = true;
 
         // fire event
@@ -1012,8 +929,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             showSlider : true
         }}); 
 
-        console.log('cube_id', this.getCubeId());
-        
     },
 
     _addThin: function () {
@@ -1093,6 +1008,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // set updated cube
         this._cube = cube;
 
+        // refresh datasets
+        this._initDatasets();
+
         return this;
     },
 
@@ -1166,7 +1084,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
 
-    // debug: create legend
+    // debug: create legend. todo: make dynamic
     _createLegend : function () {
 
         // create legend container
@@ -1175,8 +1093,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // set legend
         this._legendContainer.innerHTML = '<div class="info-legend-frame snow-raster"><div class="info-legend-val info-legend-min-val">1%</div><div class="info-legend-header scf">Snow</div><div class="info-legend-val info-legend-max-val">100%</div><div class="info-legend-gradient-container" style="background: -webkit-linear-gradient(0deg, #8C8C8C, white);background: -o-linear-gradient(0deg, #8C8C8C, white);background: -moz-linear-gradient(0deg, #8C8C8C, white);"></div></div>'
         
-        // this._legendContainer.innerHTML = '<div class="info-legend-frame"><div class="info-legend-val info-legend-min-val">-1</div><div class="info-legend-header">mvel</div><div class="info-legend-val info-legend-max-val">9.8</div><div class="info-legend-gradient-container" style="background: -webkit-linear-gradient(left, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);background: -o-linear-gradient(right, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);background: -moz-linear-gradient(right, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);background: linear-gradient(to right, #0000ff,#00ffff,#00ff00,#ffff00,#ff0000);"></div></div>'
-        // this._legendContainer.innerHTML = '<div class="info-legend-frame"><div class="info-legend-val info-legend-min-val">-1</div><div class="info-legend-header">mvel</div><div class="info-legend-val info-legend-max-val">9.8</div><div class="info-legend-gradient-container" style="background: -webkit-linear-gradient(left, #8C8C8C, #ffffff));background: -o-linear-gradient(right, #8C8C8C, #ffffff));background: -moz-linear-gradient(right, #8C8C8C, #ffffff));background: linear-gradient(to right, #8C8C8C, #ffffff));"></div></div>'
       },
 
 

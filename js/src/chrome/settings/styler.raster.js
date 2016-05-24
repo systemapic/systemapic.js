@@ -836,6 +836,7 @@ Wu.RasterStyler = Wu.Class.extend({
 
 		// Update slider
 		this._renderSlider();
+		
 		// Update list
 		this._renderStopList();
 

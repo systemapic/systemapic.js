@@ -31,6 +31,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // init graph
         this._initGraph();
 
+        // set initial date (todo: set to last in series)
         this._setDate(2016, 103);
 
     },
