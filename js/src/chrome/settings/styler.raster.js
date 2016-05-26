@@ -47,6 +47,10 @@ Wu.RasterStyler = Wu.Class.extend({
 		this._sliderContainer = Wu.DomUtil.create('div', 'raster-range-slider', this._wrapper);		
 		this._rangeWrapper = Wu.DomUtil.create('div', 'raster-color-range-wrapper', this._wrapper);
 
+		// Description
+		this._descriptions = Wu.DomUtil.create('div', 'raster-styler-description', this._wrapper);
+		this._descriptions.innerHTML = 'Double click the colored line to create a new handle.<br>Double click the handle to remove it.'
+
 		// For list
 		this._stopListContainer = Wu.DomUtil.create('div', 'raster-stop-list-container', this._wrapper);	
 		this._stopListButtonContainer = Wu.DomUtil.create('div', 'raster-stops-button-container', this._wrapper);
@@ -55,10 +59,7 @@ Wu.RasterStyler = Wu.Class.extend({
 		// Render slider
 		this._renderSlider();
 
-		// Description
-		this._descriptions = Wu.DomUtil.create('div', 'raster-styler-description', this.options.container);
-		this._descriptions.innerHTML = 'Double click on colored line to create a new handle.<br>Double click on handle to remove it.'
-
+		
 
 		console.log('this', this);
 		// this.predefinedRange(1);

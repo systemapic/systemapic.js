@@ -2625,10 +2625,11 @@ input.chrome-field-input {
 }
 
 .raster-styler-description {
-    line-height: 2;
     text-align: center;  
     position: relative;
-    top: -45px;  
+    top: 0;  
+    font-size: 12px;
+    z-index: -1;
     }
 
 .stop-list-no {
