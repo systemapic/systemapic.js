@@ -166,6 +166,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     _initDatasets : function () {
         var datasets = this.getDatasets();
+        console.log('_initDatasets', this);
         var f = this.options.timeFormat;
         datasets.forEach(function (d, n) {
 
