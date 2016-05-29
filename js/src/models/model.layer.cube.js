@@ -505,12 +505,13 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // not applicable if constantMask is active
         if (this.options.mask.constantMask) return;
 
+        // this click was on mask
         if (this._clickedMasklayer) {
-            // this click was on mask
 
+        // this click was only on map
         } else {
 
-            // this click was only on map
+            // fire unselected
             this._maskUnselected();
         }
 
@@ -585,7 +586,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // catch bad data
             if (!fractions) return done('Failed to parse data');
 
+            // callback
             done && done(null, fractions);
+
         });
 
     },
@@ -621,7 +624,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _onLayerClick : function (e) {
     },
 
-
     _moveCursor : function (options) {
 
         // get options
@@ -631,8 +633,12 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var didx = this._findDatasetByTimestamp(timestamp);
 
         if (didx < 0) {
-            // console.error('no dataset corresponding to timestamp');
+            console.error('no dataset corresponding to timestamp');
+
+            // hide
             this._hideLayer(this.layer);
+
+            // done
             return;
         }
 
@@ -688,6 +694,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // set layer
         this.layer = layer;
 
+        // log
         console.log('cursor @', this._cursor);
     },
 
@@ -859,7 +866,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._addTo();
 
         // set cube
-        Wu.Mixin.Events.fire('animatorSetCube', { detail : { cube : this }}); 
+        Wu.Mixin.Events.fire('animatorSetCube', { detail : { 
+            cube : this 
+        }}); 
     },
 
     _getCursorLayer : function () {
@@ -951,7 +960,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._group.removeFrom(map);
 
         // remove mask
-        if (map.hasLayer(this._maskLayer)) map.removeLayer(this._maskLayer);
+        map.hasLayer(this._maskLayer) && map.removeLayer(this._maskLayer);
 
         // remove from active layers
         app.MapPane.removeActiveLayer(this);    
@@ -983,6 +992,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // update cube on server
         app.api.updateCube(options, function (err, cubeJSON) {
+
+            // catch errors
             if (err) return console.error('Error updating Cube Style:', err, cubeJSON);
 
             // parse
@@ -1009,6 +1020,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // refresh datasets
         this._initDatasets();
 
+        // return cube
         return this;
     },
 
@@ -1018,7 +1030,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._cache.forEach(function (cache) {
             var layer = cache.layer;
             layer.setOptions({
-                cache : Wu.Util.getRandomChars(6) // change url to skip browser cache
+                cache : Wu.Util.getRandomChars(6) // change url to avoid browser cache
             });
             layer.redraw();
         });

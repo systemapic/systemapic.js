@@ -14,8 +14,10 @@
 //  + should listen to events for all kinds of actions - ie. be controlled by events, not by fn's
 //  + 
 
-
+// init main object (could be others)
 Wu.Graph = Wu.Graph || {};
+
+// Annual Graph (cyclical)
 Wu.Graph.Annual = Wu.Evented.extend({
 
     // annual graph contains average of annual data
@@ -32,7 +34,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._initGraph();
 
         // set initial date (todo: set to last in series)
-        this._setDate(2016, 103);
+        this._setDate(2015, 103);
 
     },
 

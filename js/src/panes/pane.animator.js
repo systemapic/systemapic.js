@@ -1,6 +1,3 @@
-
-
-
 // slider events
 // 
 // - `set` event is fired AFTER slide is done, 
@@ -9,8 +6,6 @@
 //
 // - currently, CUBE layer is updated on `set`
 //   and GRAPH is updated on `update` 
-
-
 
 Wu.Animator = Wu.Evented.extend({
 
@@ -105,6 +100,7 @@ Wu.Animator = Wu.Evented.extend({
         // Set number of slider steps
         // var dataLength = (_.size(this._data) > this.options.maxLength) ? this.options.maxLength : _.size(this._data);
 
+        // set slider options
         this._defaultSliderOptions = {
             start: [this._sliderValue],
             range: {
@@ -112,7 +108,7 @@ Wu.Animator = Wu.Evented.extend({
                 'max': this.options.maxLength
             },
             step : 1,
-            connect : 'lower'
+            connect : 'lower' // different color on left side of slider
         }
 
         // create slider
@@ -151,12 +147,15 @@ Wu.Animator = Wu.Evented.extend({
 
     _onSlide : function (values) {
         var value = parseInt(values[0]);
+        var limit = this.getSliderLimit();
+
+        console.log('_onSlide; value, limit', value, limit);
 
         // force limit
-        if (value > this._limit) {
+        if (value > limit) {
 
             // force limit on slider
-            this.slider.set(this._limit);
+            this.slider.set(limit);
 
             // shade buttons
             this._onShadeButtons();
@@ -322,8 +321,10 @@ Wu.Animator = Wu.Evented.extend({
     // Set slider value
     setSlider : function (e) {
 
-        // get/set value
+        // get value
         var value = (e && e.detail) ? e.detail.value : e;
+
+        // set value
         this._sliderValue = value;
 
         // set slider
@@ -331,6 +332,8 @@ Wu.Animator = Wu.Evented.extend({
     },
 
     updateButtons : function (e) {
+
+        console.error('updateButtons', e);
 
         var disableForward  = e.detail.diableForward;
         var disableBackward = e.detail.diableBackward
@@ -410,18 +413,21 @@ Wu.Animator = Wu.Evented.extend({
     stepOneForward : function () {      
         var value = this._sliderValue + 1;
 
+        console.log('stepOneForward', value);
+
         if ( value > this.options.maxLength ) {
                 this.stepAfterEnd()
                 value = 1;
-
         }
 
+        // set slider value
         this.slider.set(value);
-
     },
 
     stepOneBackward : function () {
         var value = this._sliderValue - 1;
+
+        console.log('stepOneBackward', value);
         
         if (value <= 0) {
             this.stepBeforeBeginning();
