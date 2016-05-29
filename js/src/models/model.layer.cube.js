@@ -113,6 +113,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._cube = Wu.parse(this.store.data.cube);
     },
 
+    // fired when layer is added to map
     initLayer : function () {
 
         // listen up
@@ -317,6 +318,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _singleFeatureQuery : function (options) {
+        console.error('_singleFeatureQuery', options);
         
         // get layer
         var layer = options.layer;
@@ -378,7 +380,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _multiFeatureQuery : function (options) {
-
+        console.error('_multiFeatureQuery', options);
         // get layer
         var layer = options.layer;
 
@@ -444,6 +446,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                     mask_id : mask_id_md5
                 }
             };
+
+            console.log('query options', queryOptions);
 
             // make query
             this._queryCube(queryOptions, function (err, data) {
