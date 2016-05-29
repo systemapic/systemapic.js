@@ -567,7 +567,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		Wu.DomEvent.on(saveBtn, 'click', this._updateProject.bind(this, options), this);
 
 		// add delete button only if access
-		if (project.store.createdBy == app.Account.getUuid()) {
+		if (project.store.createdBy == app.Account.getUuid() || app.Account.isSuper()) {
 			var delBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-delete', buttonsWrapper, 'Delete');
 			Wu.DomEvent.on(delBtn, 'click', this._deleteProject.bind(this, options), this);
 		}

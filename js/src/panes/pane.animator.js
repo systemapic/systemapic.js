@@ -467,5 +467,17 @@ Wu.Animator = Wu.Evented.extend({
         this.sliderOuterContainer.style.display = 'block';
     },  
 
+    _projectSelected : function (e) {
+
+        // get project
+        var project = app.Projects[e.detail.projectUuid];
+
+        // set project
+        this._project = project;
+
+        // hide 
+        this.hide();
+    }
+
 });
 

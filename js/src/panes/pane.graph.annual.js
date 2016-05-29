@@ -572,7 +572,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
         return fixed;
     },
 
-
     _prepareAnnualAverageData : function (year) {
 
         // set year
@@ -674,6 +673,5 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // this._loadingBar.style.width = '0%';
     },
 
-  
 
 });
