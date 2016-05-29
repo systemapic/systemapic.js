@@ -616,6 +616,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             this._saveCube(masked_cube);
 
         }.bind(this));
+
     },
 
     _onTileUnload : function (e) {

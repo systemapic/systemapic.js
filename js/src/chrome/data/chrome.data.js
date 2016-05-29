@@ -1273,6 +1273,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // create input
         var mask_uploader = Wu.DomUtil.create('input', 'mask-upload-input', toggles_wrapper);
         mask_uploader.setAttribute('type', 'file');
+
+        // create feedback box
+        this._maskFeedback = Wu.DomUtil.create('div', 'mask-feedback', toggles_wrapper);
         
         // file input event
         mask_uploader.onchange = function (e) {
@@ -1281,8 +1284,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             // get file
             var file = mask_uploader.files[0];
             
-            console.log('file:', file);
-
             // only allow .geojson
             if (!_.includes(file.name, '.geojson')) {
                 return this._abortMaskUpload({
@@ -1318,22 +1319,37 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                     mask : {
                         type : 'geojson',
                         mask : geojsonMask,
+                        // todo: add name of mask
                     }
                 }
 
                 // add mask to layer
                 layer.addMask(data);
 
-               
+                // fire layer edited
+                Wu.Mixin.Events.fire('maskUploaded', {detail : {
+                    name : file.name
+                }});
 
             };
 
             return false;
+
         }.bind(this);
 
 
     },
 
+
+    _onMaskUploaded : function (e) {
+
+        // get mask filename
+        var name = e.detail.name;
+
+        // set feedback
+        this._maskFeedback.innerHTML = 'Added ' + name + '!';
+
+    },
 
 
     _createCubeNameBox : function (options) {

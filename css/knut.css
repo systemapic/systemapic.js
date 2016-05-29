@@ -2091,3 +2091,15 @@ text.y-axis-label.y-label {
     cursor: pointer;
 }
 
+
+.mask-upload-input {
+    width: 80px;
+}
+.mask-feedback {
+    width: auto;
+    height: 30px;
+    position: absolute;
+    left: 250px;
+    top: 40px;
+    font-size: 14px;
+}
