@@ -93,12 +93,14 @@ Wu.Animator = Wu.Evented.extend({
         var sliderInnerContainer        = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
         var slider                      = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
         this.sliderButtonsContainer     = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
-        this.stepBackward               = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
-        this.tapBackward                = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
-        this.playButton                 = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');        
-        this.tapForward                 = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
-        this.stepForward                = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');
         this.tickContainer              = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
+
+        // animator buttons
+        this._fastBackBtn               = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
+        this._backBtn                   = Wu.DomUtil.create('div', 'big-slider-tap-backward', this.sliderButtonsContainer, '<i class="fa fa-step-backward"></i>');
+        this._forwardBtn                = Wu.DomUtil.create('div', 'big-slider-tap-forward', this.sliderButtonsContainer, '<i class="fa fa-step-forward"></i>');
+        this._fastForwardBtn            = Wu.DomUtil.create('div', 'big-slider-step-forward', this.sliderButtonsContainer, '<i class="fa fa-fast-forward"></i>');
+        this._playBtn                   = Wu.DomUtil.create('div', 'big-slider-play-button', this.sliderButtonsContainer, '<i class="fa fa-play"></i>');        
 
         // Set number of slider steps
         // var dataLength = (_.size(this._data) > this.options.maxLength) ? this.options.maxLength : _.size(this._data);
@@ -128,11 +130,11 @@ Wu.Animator = Wu.Evented.extend({
     _addHooks : function () {
 
         // dom events
-        Wu.DomEvent.on(this.stepBackward, 'click', this.moveBackward, this);
-        Wu.DomEvent.on(this.tapBackward,  'click', this.stepOneBackward, this);
-        Wu.DomEvent.on(this.stepForward,  'click', this.moveForward, this);
-        Wu.DomEvent.on(this.tapForward,   'click', this.stepOneForward, this);
-        Wu.DomEvent.on(this.playButton,   'click', this.play, this);
+        Wu.DomEvent.on(this._fastBackBtn,       'click', this._moveFastBack, this);
+        Wu.DomEvent.on(this._backBtn,           'click', this._moveBack, this);
+        Wu.DomEvent.on(this._fastForwardBtn,    'click', this._moveFastForward, this);
+        Wu.DomEvent.on(this._forwardBtn,        'click', this._moveForward, this);
+        Wu.DomEvent.on(this._playBtn,           'click', this.play, this);
 
         // slider events
         this.slider.on('update', this._sliderUpdateEvent.bind(this));
@@ -175,11 +177,11 @@ Wu.Animator = Wu.Evented.extend({
 
     _displayButtons : function () {
         // display buttons based on options
-        this.playButton.style.display   = this.options.buttons.play   ? 'inline-block' : 'none';
-        this.stepBackward.style.display = this.options.buttons.yearly ? 'inline-block' : 'none';
-        this.stepForward.style.display  = this.options.buttons.yearly ? 'inline-block' : 'none';
-        this.tapForward.style.display   = this.options.buttons.daily  ? 'inline-block' : 'none';
-        this.tapBackward.style.display  = this.options.buttons.daily  ? 'inline-block' : 'none';
+        this._playBtn.style.display   = this.options.buttons.play   ? 'inline-block' : 'none';
+        this._fastBackBtn.style.display = this.options.buttons.yearly ? 'inline-block' : 'none';
+        this._fastForwardBtn.style.display  = this.options.buttons.yearly ? 'inline-block' : 'none';
+        this._forwardBtn.style.display   = this.options.buttons.daily  ? 'inline-block' : 'none';
+        this._backBtn.style.display  = this.options.buttons.daily  ? 'inline-block' : 'none';
     },
 
     _createGraph : function () { // todo: should separate these more
@@ -197,10 +199,10 @@ Wu.Animator = Wu.Evented.extend({
     _onShadeButtons : function () {
        
         // shade forward button
-        this.tapForward.style.color = 'rgb(81, 92, 111)';
+        this._forwardBtn.style.color = 'rgb(81, 92, 111)';
 
         // remove event
-        Wu.DomEvent.off(this.tapForward,  'click', this.stepOneForward, this);
+        Wu.DomEvent.off(this._forwardBtn,  'click', this._moveForward, this);
 
         // shade slider handle
         this._getSliderHandle().style.background = 'rgb(82, 93, 111)';
@@ -210,10 +212,10 @@ Wu.Animator = Wu.Evented.extend({
     _onUnshadeButtons : function () {
        
         // shade forward button
-        this.tapForward.style.color = '#FCFCFC';
+        this._forwardBtn.style.color = '#FCFCFC';
 
         // reactivate event
-        Wu.DomEvent.on(this.tapForward,  'click', this.stepOneForward, this);
+        Wu.DomEvent.on(this._forwardBtn,  'click', this._moveForward, this);
 
         // shade slider handle
         this._getSliderHandle().style.background = '#ECEDEF';
@@ -342,15 +344,15 @@ Wu.Animator = Wu.Evented.extend({
         var disableBackward = e.detail.diableBackward
 
         if (disableForward) { 
-            Wu.DomUtil.addClass(this.stepForward, 'disable-button');
+            Wu.DomUtil.addClass(this._fastForwardBtn, 'disable-button');
         } else { 
-            Wu.DomUtil.removeClass(this.stepForward, 'disable-button'); 
+            Wu.DomUtil.removeClass(this._fastForwardBtn, 'disable-button'); 
         }
 
         if (disableBackward) { 
-            Wu.DomUtil.addClass(this.stepBackward, 'disable-button');
+            Wu.DomUtil.addClass(this._fastBackBtn, 'disable-button');
         } else { 
-            Wu.DomUtil.removeClass(this.stepBackward, 'disable-button'); 
+            Wu.DomUtil.removeClass(this._fastBackBtn, 'disable-button'); 
         }
     },
 
@@ -374,7 +376,7 @@ Wu.Animator = Wu.Evented.extend({
     startPlaying : function () {
 
         // set pause icon
-        this.playButton.innerHTML = '<i class="fa fa-pause"></i>';
+        this._playBtn.innerHTML = '<i class="fa fa-pause"></i>';
 
         // mark as playing
         this.playing = true;
@@ -391,7 +393,7 @@ Wu.Animator = Wu.Evented.extend({
             } else {                
 
                 // move cursor forward
-                this.stepOneForward();
+                this._moveForward();
             }           
 
         }.bind(this), (1000/this.options.fps)) 
@@ -403,7 +405,7 @@ Wu.Animator = Wu.Evented.extend({
     stopPlaying : function () {
 
         // set play icon
-        this.playButton.innerHTML = '<i class="fa fa-play"></i>';
+        this._playBtn.innerHTML = '<i class="fa fa-play"></i>';
 
         // stop playing
         clearInterval(this.playInterval);
@@ -413,46 +415,58 @@ Wu.Animator = Wu.Evented.extend({
         Wu.Mixin.Events.fire('animationStop');
     },
 
-    stepOneForward : function () {      
+    _moveForward : function () {      
         var value = this._sliderValue + 1;
 
-        console.log('stepOneForward', value);
+        console.log('_moveForward', value);
 
         if ( value > this.options.maxLength ) {
-                this.stepAfterEnd()
-                value = 1;
+            // debug: just return
+            return;
+            
+            value = 1;
+            this._moveNextYear(value)
         }
 
         // set slider value
         this.slider.set(value);
     },
 
-    stepOneBackward : function () {
+    _moveBack : function () {
         var value = this._sliderValue - 1;
 
         console.log('stepOneBackward', value);
         
         if (value <= 0) {
-            this.stepBeforeBeginning();
+
+            // debug: just return
+            return;
+
+            // set value
             value = this.options.maxLength;
+            this._movePreviousYear(value);
         }
 
         this.slider.set(value);
     },
 
-    stepBeforeBeginning : function () {
-        Wu.Mixin.Events.fire('stepBeforeBeginning');
+    _movePreviousYear : function (day) {
+        Wu.Mixin.Events.fire('animatorMovePreviousYear', {detail : {
+            day : day
+        }});
     },
 
-    stepAfterEnd : function () {
-        Wu.Mixin.Events.fire('stepAfterEnd');
+    _moveNextYear : function (day) {
+        Wu.Mixin.Events.fire('animatorMoveNextYear', {detail : {
+            day : day
+        }});
     },    
 
-    moveBackward : function () {
+    _moveFastBack : function () {
         Wu.Mixin.Events.fire('sliderMoveBackward');
     },
 
-    moveForward : function () {
+    _moveFastForward : function () {
         Wu.Mixin.Events.fire('sliderMoveForward');
     },  
 

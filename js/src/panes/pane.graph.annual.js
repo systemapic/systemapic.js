@@ -46,6 +46,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
         Wu.Mixin.Events.on('loadedGraph', this._onLoadedGraph, this);
         Wu.Mixin.Events.on('maskSelected', this._onMaskSelected, this);
         Wu.Mixin.Events.on('maskUnselected', this._onMaskUnselected, this);
+        Wu.Mixin.Events.on('animatorMovePreviousYear', this._onAnimatorMovePreviousYear, this);
+        Wu.Mixin.Events.on('animatorMoveNextYear', this._onAnimatorMoveNextYear, this);
     },
 
     _initContainer : function () {
@@ -336,6 +338,40 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         // set year
         this._current.year = this._current.year + 1;
+
+        // update line graph
+        this._updateLineGraph();
+
+        // update titles
+        this._updateTitles();
+    },
+
+    _onAnimatorMovePreviousYear : function (e) {
+
+        var day = e.detail.day;
+
+        // set year
+        this._current.year = this._current.year - 1;
+
+        // set day
+        this._current.day = day;
+
+        // update line graph
+        this._updateLineGraph();
+
+        // update titles
+        this._updateTitles();
+    },
+
+    _onAnimatorMoveNextYear : function (e) {
+
+        var day = e.detail.day;
+
+        // set year
+        this._current.year = this._current.year + 1;
+
+        // set day
+        this._current.day = day;
 
         // update line graph
         this._updateLineGraph();
