@@ -58,9 +58,6 @@ Wu.Animator = Wu.Evented.extend({
         // set data
         this._data = Wu.parse(data);
 
-        console.log('_renderData', this._data);
-
-
         // create slider
         this._createSlider();
 
@@ -153,8 +150,6 @@ Wu.Animator = Wu.Evented.extend({
     _onSlide : function (values) {
         var value = parseInt(values[0]);
         var limit = this.getSliderLimit();
-
-        console.log('_onSlide; value, limit', value, limit);
 
         // force limit
         if (value > limit) {
@@ -338,8 +333,6 @@ Wu.Animator = Wu.Evented.extend({
 
     updateButtons : function (e) {
 
-        console.error('updateButtons', e);
-
         var disableForward  = e.detail.diableForward;
         var disableBackward = e.detail.diableBackward
 
@@ -418,8 +411,6 @@ Wu.Animator = Wu.Evented.extend({
     _moveForward : function () {      
         var value = this._sliderValue + 1;
 
-        console.log('_moveForward', value);
-
         if ( value > this.options.maxLength ) {
             // debug: just return
             return;
@@ -434,8 +425,6 @@ Wu.Animator = Wu.Evented.extend({
 
     _moveBack : function () {
         var value = this._sliderValue - 1;
-
-        console.log('stepOneBackward', value);
         
         if (value <= 0) {
 
