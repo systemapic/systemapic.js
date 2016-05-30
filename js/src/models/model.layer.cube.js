@@ -235,11 +235,53 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // return if no mask
         if (!mask) return;
 
+        // check if raster mask
+        if (mask.type == 'postgis-raster') return this._initRasterMask();
+
+        // check if vector mask
+        if (mask.type == 'topojson') return this._initVectorMask();
+
+        // catch unknown type
+        console.error('something wrong with the mask!', mask);
+    },
+
+    _initRasterMask : function () {
+        var mask = this.getMask();
+        console.log('_initRasterMask', mask);
+
+        var layer_id = mask.layer_id;
+
+        // get layer from server
+        app.api.getLayer({
+            layer_id : layer_id
+        }, function (err, layerJSON) {
+            if (err) return console.error(err);
+
+            // parse
+            var layerModel = Wu.parse(layerJSON);
+
+            // init layer
+            this._maskLayer = Wu.createLayer(layerModel);
+
+            // add to map
+            this._maskLayer.add();
+
+            // make sure on top
+            this._maskLayer.layer.bringToFront();
+
+        }.bind(this));
+    },
+
+    _initVectorMask : function () {
+
+        // get mask
+        var mask = this.getMask();
+
         // create mask (topojson) layer
         this._maskLayer = new L.TopoJSON();
 
         // add data to layer
-        this._maskLayer.addData(mask);
+        this._maskLayer.addData(mask.geometry);
 
         // make sure on top
         this._maskLayer.bringToFront();
@@ -599,17 +641,22 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         return topoMask;
     },
 
-    addMask : function (data) {
+    addMask : function (data, done) {
 
         // add mask @ server
         app.api.addMask(data, function (err, result) {
-            if (err) return console.error(err);
-
+            if (err) {
+                console.error(err);
+                done && done(err);
+            }
             // parse
             var masked_cube = Wu.parse(result);
 
             // save updated cube
             this._saveCube(masked_cube);
+
+            // callback
+            done && done(null);
 
         }.bind(this));
 

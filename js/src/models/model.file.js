@@ -725,6 +725,91 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 
+	createRasterMaskLayer : function (done) {
+
+		// set styling
+		var defaultCartocss = '#layer {';
+		defaultCartocss += 'raster-opacity: 0.6; '; 
+		defaultCartocss += 'raster-colorizer-default-mode: linear; '; 
+		defaultCartocss += 'raster-colorizer-default-color: transparent; '; 
+		defaultCartocss += 'raster-colorizer-stops: '; 
+		defaultCartocss += '  stop(0, rgba(0,0,0,0)) '; 
+		defaultCartocss += '  stop(1, #5f7df0) '; 
+		defaultCartocss += '  stop(255, #5f7df0); '; 
+		defaultCartocss += ' }';
+
+		// set vars
+		var file = this;
+		var file_id = file.getUuid();
+		var defaultCartocss = defaultCartocss;
+		var project = app.activeProject;
+
+		// create postgis layer
+		app.api.createTileLayer({
+
+			// options
+			"geom_column": "rast",
+			"geom_type": "raster",
+			"raster_band": "",
+			"srid": "",
+			"affected_tables": "",
+			"interactivity": "",
+			"attributes": "",
+			"access_token": app.tokens.access_token,
+			"cartocss_version": "2.0.1",
+			"cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
+			"sql": "(SELECT * FROM " + file_id + ") as sub",
+			"file_id": file_id,
+			"return_model" : true,
+			"projectUuid" : false,
+
+		// callback
+		}, function (err, layerJSON) {
+
+			// catch errors
+			if (err) return done(err);
+
+			// parse 
+			var layer = Wu.parse(layerJSON);
+
+			// catch error
+			if (!layer || !layer.options) return done('failed to parse layer');
+				
+			// create new layer model
+			app.api.createLayer({
+
+				// options
+				projectUuid : false,
+				metadata : layer.options.metadata,
+				title : file.getName(),
+				description : 'Mask layer from ' + file.getName(),
+				file : file.getUuid(),
+				data : { postgis : layer.options }
+
+			// callback
+			}, function (err, body) {
+
+				// catch errors
+				if (err) return done(err);
+
+				// parse
+				var layerModel = Wu.parse(body);
+
+				// create layer model
+				var layer = new Wu.createLayer(layerModel);
+
+				// callback
+				done && done(null, layer);
+
+			});
+			
+		}.bind(this));
+	},
+
+	
+
+
+
 	_createDefaultRasterLayer : function (project, callback) {
 
 		var defaultCartocss = '#layer {';

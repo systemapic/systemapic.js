@@ -2095,11 +2095,25 @@ text.y-axis-label.y-label {
 .mask-upload-input {
     width: 80px;
 }
+
 .mask-feedback {
-    width: auto;
     height: 30px;
-    position: absolute;
-    left: 250px;
-    top: 40px;
+    position: relative;
+    left: 0px;
+    top: 0px;
     font-size: 14px;
+    border-top: 1px solid #d0d0d0;
+    padding-top: 4px;
+    width: auto;
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.dropdown-mask-wrapper {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.upload-mask-wrapper {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

@@ -1251,13 +1251,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     },
 
-    _abortMaskUpload : function (options) {
-        var input = options.input;
-        var err = options.err;
-
-        console.log('_abortMaskUpload', err);
-    },
-
     _createMaskBox : function (options) {
 
         var container = options.container;
@@ -1270,9 +1263,26 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // check for html5 file reader compatability
         if (_.isUndefined(window.FileReader)) return console.error('no filereader available');
 
-        // create input
-        var mask_uploader = Wu.DomUtil.create('input', 'mask-upload-input', toggles_wrapper);
+        // create file upload input
+        var wrap_uploader = Wu.DomUtil.create('div', 'upload-mask-wrapper', toggles_wrapper);
+        var uploader_title = Wu.DomUtil.create('div', 'dropdown-mask-title', wrap_uploader, 'Upload vector mask');
+        var mask_uploader = Wu.DomUtil.create('input', 'mask-upload-input', wrap_uploader);
         mask_uploader.setAttribute('type', 'file');
+
+        // get, sort datasets (rasters only)
+        var mask_datasets = this._getRasterDatasets();
+
+        // create dropdown of datasets
+        var wrap_dropdown = Wu.DomUtil.create('div', 'dropdown-mask-wrapper', toggles_wrapper);
+        var dropdown_title = Wu.DomUtil.create('div', 'dropdown-mask-title', wrap_dropdown, 'Add raster mask from datasets');
+
+        this._cubesetDrowdown = new Wu.Dropdown({
+            fn: this._addDatasetAsMask.bind(this, layer),
+            appendTo: wrap_dropdown,
+            content: mask_datasets,
+            className : 'cubeset-dropdown',
+        });
+
 
         // create feedback box
         this._maskFeedback = Wu.DomUtil.create('div', 'mask-feedback', toggles_wrapper);
@@ -1285,10 +1295,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             var file = mask_uploader.files[0];
             
             // only allow .geojson
+            // var valid_formats = ['geojson', 'topojson'];
             if (!_.includes(file.name, '.geojson')) {
+            // if (valid_formats.indexOf(file.name.split('.').reverse()[0]) == -1) {
                 return this._abortMaskUpload({
                     input : mask_uploader,
-                    err : 'Only .geojson format allowed for uploaded mask'
+                    err : 'Only GeoJSON is accepted for uploaded vector mask'
                 });
             }
 
@@ -1296,7 +1308,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             if (file.size > 5000000) {
                 return this._abortMaskUpload({
                     input : mask_uploader,
-                    err : 'GeoJSON mask larger than 5MB not allowed'
+                    err : 'Masks larger than 5MB not allowed'
                 });
             }
 
@@ -1318,12 +1330,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                     cube_id : cube_id,
                     mask : {
                         type : 'geojson',
-                        mask : geojsonMask,
+                        geometry : geojsonMask,
+                        title : file.name,
                         // todo: add name of mask
                     }
                 }
 
-                // add mask to layer
+                // add mask to layer (server request)
                 layer.addMask(data);
 
                 // fire layer edited
@@ -1340,6 +1353,69 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     },
 
+    _abortMaskUpload : function (options) {
+        var input = options.input;
+        var err = options.err;
+
+        // set message (with error flag)
+        this.setMaskFeedback(err, true);
+    },
+
+    // add dataset as mask on cube layer
+    _addDatasetAsMask : function (layer, dataset_id) {
+
+        // get ids
+        var dataset_id = dataset_id;
+        var cube_id = layer.getCubeId();
+
+        // create tile layer
+        var file = app.Account.getFile(dataset_id);
+        console.log('file: ', file);
+
+
+        // create wu layer
+        file.createRasterMaskLayer(function (err, mask_layer) {
+            if (err) console.error(err);
+
+            console.log('layer: ', mask_layer);
+
+            // add mask to layer (server request)
+            layer.addMask({
+                cube_id : cube_id,
+                mask : {
+                    type : 'postgis-raster',
+                    dataset_id : dataset_id,
+                    layer_id : mask_layer.getUuid(),
+                    title : layer.getTitle()
+                }
+            }, function (err) {
+
+                // close fullscreen
+                this._fullscreen.close();
+
+                // close data pane
+                this.options.chrome.close(this);
+
+                // add and show
+                layer.add();
+                mask_layer.add();
+                mask_layer.flyTo();
+
+                // set feedback
+                app.feedback.setMessage({
+                    title : 'Added mask layer!'
+                }); 
+
+            }.bind(this));
+
+
+            // set feedback
+            // this.setMaskFeedback('Added raster mask to layer.');
+
+        }.bind(this));
+       
+    },
+
 
     _onMaskUploaded : function (e) {
 
@@ -1347,7 +1423,17 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var name = e.detail.name;
 
         // set feedback
-        this._maskFeedback.innerHTML = 'Added ' + name + '!';
+        this.setMaskFeedback('Added ' + name + '!');
+
+    },
+
+    setMaskFeedback : function (message, error) {
+
+        // set message
+        this._maskFeedback.innerHTML = message;
+
+        // set color
+        this._maskFeedback.style.borderColor = error ? '#ff9d9d' : '#d0d0d0';
 
     },
 
@@ -1652,6 +1738,37 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     },
 
+    _getRasterDatasets : function () {
+
+        // get rasters
+        var files = app.Account.getFiles();
+        var datasets = _.filter(files, function (f) {
+            if (!f) return false;
+            if (!f.store) return false;
+            if (!f.store.data) return false;
+            if (!f.store.data.postgis) return false;
+            if (!f.store.data.postgis.data_type) return false;
+            return f.store.data.postgis.data_type == 'raster';
+        });
+       
+        var sorted_datasets = _.sortBy(datasets, function (d) {
+            return d.store.created;
+        }).reverse();
+
+        // create dropdown content
+        var content = [];
+        sorted_datasets.forEach(function (d) {
+            content.push({
+                title : d.getTitle(),
+                disabled : false,
+                value : d.getUuid(),
+                isSelected : false
+            });
+        });
+
+        return content;
+    },
+
     _getDropdownDatasets : function () {
 
         // get rasters
@@ -1664,7 +1781,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             if (!f.store.data.postgis.data_type) return false;
             return f.store.data.postgis.data_type == 'raster';
         });
-
+       
         // create dropdown content
         var content = [];
         datasets.forEach(function (d) {
@@ -3264,7 +3381,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         popupTrigger
         .enter()
         .append('div')
-        .classed('file-popup-trigger fa fa-caret-down', true);
+        .classed('file-popup-trigger fa fa-cog', true);
 
         // Update
         popupTrigger
@@ -3366,7 +3483,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         if (library == 'cube') {
             action.editCube = {
-                name : 'Edit timeseries',
+                name : 'Edit layer',
                 disabled : !canEdit
             }
         }

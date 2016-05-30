@@ -214,6 +214,11 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	getLayer : function (options, done) {
+		var path = '/v2/layers/getLayer';
+		this.post(path, options, done);
+	},
+
 	downloadDataset : function (options, done) {
 		// var path = '/api/file/downloadDataset';
 		var path = '/v2/data/download';
