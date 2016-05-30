@@ -681,12 +681,19 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // should never happen, ideally
         if (!layer) {
             console.error('no layer @ cursor??');
-            console.log('--------------------------');
-            console.log('dataset:', dataset);
-            console.log('cache:', cache);
-            console.log('this._cache', this._cache);
-            console.log('cursor', this._cursor);
-            console.log('--------------------------');
+            // console.log('--------------------------');
+            // console.log('dataset:', dataset);
+            // console.log('cache:', cache);
+            // console.log('this._cache', this._cache);
+            // console.log('cursor', this._cursor);
+            // console.log('--------------------------');
+
+            // fire missing layer event (for animator to fix manually)
+            Wu.Mixin.Events.fire('cubeCacheNoLayer', { detail : { 
+                cube : this 
+            }});
+            
+            // done here
             return;
         }
 
@@ -702,6 +709,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     // update cache
     _updateCache : function () {
+
 
         // determine which datasets should be in cache
         // todo: this is only true for the current year... what when changing years? 
@@ -742,6 +750,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // get available cache
             var cache = this._getAvailableCache();
 
+            // cache.layer.off('load', this._onLayerLoaded, this);
+            // cache.layer.off('load');
+            // cache.layer.on('load', this._onLayerLoaded, this);
+
             // update cache
             cache.dataset_id = dataset.id;
             cache.age = Date.now();
@@ -750,6 +762,9 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             // update layer
             cache.layer.setOptions(layerOptions);
+
+          
+
 
         }, this);
 
@@ -762,11 +777,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         var layer = e.target;
         var dataset = _.find(this._datasets, {id : layer.options.dataset_id});
-        if (!dataset) {
-            console.log('no dataset');
-            return;
-        }
-        console.log('loaded:', dataset.idx, dataset.timestamp);
+       
+        if (!dataset) return;
+
+        console.log('loaded:', dataset.idx);
 
         // mark cache loaded
         var cache = _.find(this._cache, {idx : dataset.idx});
@@ -895,7 +909,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._group.eachLayer(this._hideLayer);
 
         // make sure cache is updated; got all correct layers loaded
-        this._updateCache();
+        // this._updateCache();
 
         // sets cursor at current frame (ie. show layer on map)
         this._updateCursor();

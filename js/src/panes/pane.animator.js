@@ -145,6 +145,14 @@ Wu.Animator = Wu.Evented.extend({
         Wu.Mixin.Events.on('unsetSliderRange', this._onUnsetSliderRange, this);
         Wu.Mixin.Events.on('shadeButtons', this._onShadeButtons, this);
         Wu.Mixin.Events.on('unshadeButtons', this._onUnshadeButtons, this);
+        Wu.Mixin.Events.on('cubeCacheNoLayer', this._onCubeCacheNoLayer, this);
+    },
+
+    _onCubeCacheNoLayer : function (e) {
+        var cube = e.detail.cube;
+
+        // debug: move one step forward
+        this._moveForward();
     },
 
     _onSlide : function (values) {

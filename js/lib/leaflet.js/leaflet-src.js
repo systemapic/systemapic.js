@@ -1,10 +1,10 @@
 /*
- Leaflet 1.0.0-rc.1+269eabc, a JS library for interactive maps. http://leafletjs.com
+ Leaflet 1.0.0-rc.1+878a022, a JS library for interactive maps. http://leafletjs.com
  (c) 2010-2015 Vladimir Agafonkin, (c) 2010-2011 CloudMade
 */
 (function (window, document, undefined) {
 var L = {
-	version: "1.0.0-rc.1+269eabc"
+	version: "1.0.0-rc.1+878a022"
 };
 
 function expose() {
@@ -161,7 +161,7 @@ L.Util = {
 		return L.Util.trim(str).split(/\s+/);
 	},
 
-	// @function setOptions(obj: Object: options: Object): Object
+	// @function setOptions(obj: Object, options: Object): Object
 	// Merges the given properties to the `options` of the `obj` object, returning the resulting options. See `Class options`. Has an `L.setOptions` shortcut.
 	setOptions: function (obj, options) {
 		if (!obj.hasOwnProperty('options')) {
@@ -213,7 +213,7 @@ L.Util = {
 		return (Object.prototype.toString.call(obj) === '[object Array]');
 	},
 
-	// @function indexOf: Number
+	// @function indexOf(array: Array, el: Object): Number
 	// Compatibility polyfill for [Array.prototype.indexOf](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
 	indexOf: function (array, el) {
 		for (var i = 0; i < array.length; i++) {
@@ -520,12 +520,23 @@ L.Evented = L.Class.extend({
 	_off: function (type, fn, context) {
 		var events = this._events,
 		    indexKey = type + '_idx',
-		    indexLenKey = type + '_len';
+		    indexLenKey = type + '_len',
+		    listener, listeners, i, len;
 
 		if (!events) { return; }
 
 		if (!fn) {
 			// clear all listeners for a type if function isn't specified
+			// set the removed listeners to noop so that's not called if remove happens in fire
+			listeners = events[indexKey];
+			for (i in listeners) {
+				listeners[i].fn = L.Util.falseFn;
+			}
+			listeners = events[type] || [];
+			for (i = 0, len = listeners.length; i < len; i++) {
+				listeners[i].fn = L.Util.falseFn;
+			}
+
 			delete events[type];
 			delete events[indexKey];
 			delete events[indexLenKey];
@@ -533,7 +544,7 @@ L.Evented = L.Class.extend({
 		}
 
 		var contextId = context && context !== this && L.stamp(context),
-		    listeners, i, len, listener, id;
+		    id;
 
 		if (contextId) {
 			id = L.stamp(fn) + '_' + contextId;
@@ -724,6 +735,8 @@ L.Mixin = {Events: proto};
 	    chrome    = ua.indexOf('chrome') !== -1,
 	    gecko     = ua.indexOf('gecko') !== -1  && !webkit && !window.opera && !ie,
 
+	    win = navigator.platform.indexOf('Win') === 0,
+
 	    mobile = typeof orientation !== 'undefined' || ua.indexOf('mobile') !== -1,
 	    msPointer = !window.PointerEvent && window.MSPointerEvent,
 	    pointer = window.PointerEvent || msPointer,
@@ -732,6 +745,7 @@ L.Mixin = {Events: proto};
 	    webkit3d = ('WebKitCSSMatrix' in window) && ('m11' in new window.WebKitCSSMatrix()) && !android23,
 	    gecko3d = 'MozPerspective' in doc.style,
 	    opera12 = 'OTransition' in doc.style;
+
 
 	var touch = !window.L_NO_TOUCH && (pointer || 'ontouchstart' in window ||
 			(window.DocumentTouch && document instanceof window.DocumentTouch));
@@ -773,6 +787,11 @@ L.Mixin = {Events: proto};
 		// @property safari: Boolean
 		// `true` for the Safari browser.
 		safari: !chrome && ua.indexOf('safari') !== -1,
+
+
+		// @property win: Boolean
+		// `true` when the browser is running in a Windows platform
+		win: win,
 
 
 		// @property ie3d: Boolean
@@ -1123,7 +1142,7 @@ L.Bounds.prototype = {
 	// Returns `true` if the rectangle contains the given one.
 	// @alternative
 	// @method contains(point: Point): Boolean
-	// Returns `true` if the rectangle contains the given poing.
+	// Returns `true` if the rectangle contains the given point.
 	contains: function (obj) {
 		var min, max;
 
@@ -1295,7 +1314,7 @@ L.DomUtil = {
 	create: function (tagName, className, container) {
 
 		var el = document.createElement(tagName);
-		el.className = className;
+		el.className = className || '';
 
 		if (container) {
 			container.appendChild(el);
@@ -2496,7 +2515,8 @@ L.Map = L.Evented.extend({
 	setMaxBounds: function (bounds) {
 		bounds = L.latLngBounds(bounds);
 
-		if (!bounds) {
+		if (!bounds.isValid()) {
+			this.options.maxBounds = null;
 			return this.off('moveend', this._panInsideMaxBounds);
 		} else if (this.options.maxBounds) {
 			this.off('moveend', this._panInsideMaxBounds);
@@ -2601,7 +2621,7 @@ L.Map = L.Evented.extend({
 		}
 
 		// @section Map state change events
-		// @event resize: Event
+		// @event resize: ResizeEvent
 		// Fired when the map is resized.
 		return this.fire('resize', {
 			oldSize: oldSize,
@@ -2677,7 +2697,7 @@ L.Map = L.Evented.extend({
 
 	// @section Other Methods
 	// @method createPane(name: String, container?: HTMLElement): HTMLElement
-	// Creates a new map pane with the given name if it doesn't exist already,
+	// Creates a new [map pane](#map-pane) with the given name if it doesn't exist already,
 	// then returns it. The pane is created as a children of `container`, or
 	// as a children of the main map pane if not set.
 	createPane: function (name, container) {
@@ -2747,8 +2767,8 @@ L.Map = L.Evented.extend({
 		    max = this.getMaxZoom(),
 		    nw = bounds.getNorthWest(),
 		    se = bounds.getSouthEast(),
-		    size = this.getSize(),
-		    boundsSize = this.project(se, zoom).subtract(this.project(nw, zoom)).add(padding),
+		    size = this.getSize().subtract(padding),
+		    boundsSize = this.project(se, zoom).subtract(this.project(nw, zoom)),
 		    snap = L.Browser.any3d ? this.options.zoomSnap : 1;
 
 		var scale = Math.min(size.x / boundsSize.x, size.y / boundsSize.y);
@@ -2804,13 +2824,13 @@ L.Map = L.Evented.extend({
 	// @section Other Methods
 
 	// @method getPane(pane: String|HTMLElement): HTMLElement
-	// Returns a map pane, given its name or its HTML element (its identity).
+	// Returns a [map pane](#map-pane), given its name or its HTML element (its identity).
 	getPane: function (pane) {
 		return typeof pane === 'string' ? this._panes[pane] : pane;
 	},
 
 	// @method getPanes(): Object
-	// Returns a plain object containing the names of all panes as keys and
+	// Returns a plain object containing the names of all [panes](#map-pane) as keys and
 	// the panes as values.
 	getPanes: function () {
 		return this._panes;
@@ -3005,20 +3025,20 @@ L.Map = L.Evented.extend({
 		this._mapPane = this.createPane('mapPane', this._container);
 		L.DomUtil.setPosition(this._mapPane, new L.Point(0, 0));
 
-		// @pane tilePane: HTMLElement = 2
-		// Pane for tile layers
+		// @pane tilePane: HTMLElement = 200
+		// Pane for `GridLayer`s and `TileLayer`s
 		this.createPane('tilePane');
-		// @pane overlayPane: HTMLElement = 4
-		// Pane for overlays like polylines and polygons
+		// @pane overlayPane: HTMLElement = 400
+		// Pane for vector overlays (`Path`s), like `Polyline`s and `Polygon`s
 		this.createPane('shadowPane');
-		// @pane shadowPane: HTMLElement = 5
-		// Pane for overlay shadows (e.g. marker shadows)
+		// @pane shadowPane: HTMLElement = 500
+		// Pane for overlay shadows (e.g. `Marker` shadows)
 		this.createPane('overlayPane');
-		// @pane markerPane: HTMLElement = 6
-		// Pane for marker icons
+		// @pane markerPane: HTMLElement = 600
+		// Pane for `Icon`s of `Marker`s
 		this.createPane('markerPane');
-		// @pane popupPane: HTMLElement = 7
-		// Pane for popups.
+		// @pane popupPane: HTMLElement = 700
+		// Pane for `Popup`s.
 		this.createPane('popupPane');
 
 		if (!this.options.markerZoomAnimation) {
@@ -3566,7 +3586,7 @@ L.Map.include({
 	// Adds the given layer to the map
 	addLayer: function (layer) {
 		var id = L.stamp(layer);
-		if (this._layers[id]) { return layer; }
+		if (this._layers[id]) { return this; }
 		this._layers[id] = layer;
 
 		layer._mapToAdd = this;
@@ -3756,13 +3776,13 @@ L.CRS.EPSG3395 = L.extend({}, L.CRS.Earth, {
  * @aka L.GridLayer
  *
  * Generic class for handling a tiled grid of HTML elements. This is the base class for all tile layers and replaces `TileLayer.Canvas`.
- * GridLayer can be extended to create a tiled grid of HTML Elements like `<canvas>`, `<img>` or `<div>`. GridLayer will handle creating and animating these DOM elements for you.
+ * GridLayer can be extended to create a tiled grid of HTML elements like `<canvas>`, `<img>` or `<div>`. GridLayer will handle creating and animating these DOM elements for you.
  *
  *
  * @section Synchronous usage
  * @example
  *
- * To create a custom layer, extend GridLayer and impliment the `createTile()` method, which will be passed a `Point` object with the `x`, `y`, and `z` (zoom level) coordinates to draw your tile.
+ * To create a custom layer, extend GridLayer and implement the `createTile()` method, which will be passed a `Point` object with the `x`, `y`, and `z` (zoom level) coordinates to draw your tile.
  *
  * ```js
  * var CanvasLayer = L.GridLayer.extend({
@@ -3776,7 +3796,7 @@ L.CRS.EPSG3395 = L.extend({}, L.CRS.Earth, {
  *         tile.height = size.y;
  *
  *         // get a canvas context and draw something on it using coords.x, coords.y and coords.z
- *         var ctx = canvas.getContext('2d');
+ *         var ctx = tile.getContext('2d');
  *
  *         // return the tile so it can be rendered on screen
  *         return tile;
@@ -3784,10 +3804,10 @@ L.CRS.EPSG3395 = L.extend({}, L.CRS.Earth, {
  * });
  * ```
  *
- * @section Asynchrohous usage
+ * @section Asynchronous usage
  * @example
  *
- * Tile creation can also be asyncronous, this is useful when using a third-party drawing library. Once the tile is finsihed drawing it can be passed to the done() callback.
+ * Tile creation can also be asynchronous, this is useful when using a third-party drawing library. Once the tile is finished drawing it can be passed to the `done()` callback.
  *
  * ```js
  * var CanvasLayer = L.GridLayer.extend({
@@ -3802,8 +3822,12 @@ L.CRS.EPSG3395 = L.extend({}, L.CRS.Earth, {
  *         tile.width = size.x;
  *         tile.height = size.y;
  *
- *         // draw something and pass the tile to the done() callback
- *         done(error, tile);
+ *         // draw something asynchronously and pass the tile to the done() callback
+ *         setTimeout(function() {
+ *             done(error, tile);
+ *         }, 1000);
+ *
+ *         return tile;
  *     }
  * });
  * ```
@@ -3814,6 +3838,8 @@ L.CRS.EPSG3395 = L.extend({}, L.CRS.Earth, {
 
 L.GridLayer = L.Layer.extend({
 
+	// @section
+	// @aka GridLayer options
 	options: {
 		// @option tileSize: Number|Point = 256
 		// Width and height of tiles in the grid. Use a number if width and height are equal, or `L.point(width, height)` otherwise.
@@ -3844,7 +3870,7 @@ L.GridLayer = L.Layer.extend({
 		zIndex: 1,
 
 		// @option bounds: LatLngBounds = undefined
-		// If set, tiles will only be loaded inside inside the set `LatLngBounds`.
+		// If set, tiles will only be loaded inside the set `LatLngBounds`.
 		bounds: null,
 
 		// @option minZoom: Number = 0
@@ -3853,7 +3879,7 @@ L.GridLayer = L.Layer.extend({
 
 		// @option maxZoom: Number = undefined
 		// The maximum zoom level that tiles will be loaded at.
-//		maxZoom: undefined,
+		maxZoom: undefined,
 
 		// @option noWrap: Boolean = false
 		// Whether the layer is wrapped around the antimeridian. If `true`, the
@@ -3862,7 +3888,11 @@ L.GridLayer = L.Layer.extend({
 
 		// @option pane: String = 'tilePane'
 		// `Map pane` where the grid layer will be added.
-		pane: 'tilePane'
+		pane: 'tilePane',
+
+		// @option className: String = ''
+		// A custom class name to assign to the tile layer. Empty by default.
+		className: ''
 	},
 
 	initialize: function (options) {
@@ -4063,7 +4093,7 @@ L.GridLayer = L.Layer.extend({
 	_initContainer: function () {
 		if (this._container) { return; }
 
-		this._container = L.DomUtil.create('div', 'leaflet-layer');
+		this._container = L.DomUtil.create('div', 'leaflet-layer ' + (this.options.className || ''));
 		this._updateZIndex();
 
 		if (this.options.opacity < 1) {
@@ -4374,7 +4404,7 @@ L.GridLayer = L.Layer.extend({
 			if (!this._loading) {
 				this._loading = true;
 				// @event loading: Event
-				// Fired when the grid layer starts loading tiles
+				// Fired when the grid layer starts loading tiles.
 				this.fire('loading');
 			}
 
@@ -4497,7 +4527,7 @@ L.GridLayer = L.Layer.extend({
 		this._tiles[key] = {
 			el: tile,
 			coords: coords,
-			current: true,
+			current: true
 		};
 
 		container.appendChild(tile);
@@ -4513,7 +4543,7 @@ L.GridLayer = L.Layer.extend({
 		if (!this._map) { return; }
 
 		if (err) {
-			// @event tileerror: TileEvent
+			// @event tileerror: TileErrorEvent
 			// Fired when there is an error loading a tile.
 			this.fire('tileerror', {
 				error: err,
@@ -4526,7 +4556,7 @@ L.GridLayer = L.Layer.extend({
 
 		tile = this._tiles[key];
 		if (!tile) { return; }
-		
+
 		tile.loaded = +new Date();
 		if (this._map._fadeAnimated) {
 			L.DomUtil.setOpacity(tile.el, 0);
@@ -4548,7 +4578,7 @@ L.GridLayer = L.Layer.extend({
 
 		if (this._noTilesToLoad()) {
 			this._loading = false;
-			// @event load: TileEvent
+			// @event load: Event
 			// Fired when the grid layer loaded all visible tiles.
 			this.fire('load');
 
@@ -4686,10 +4716,16 @@ L.TileLayer = L.GridLayer.extend({
 		if (options.detectRetina && L.Browser.retina && options.maxZoom > 0) {
 
 			options.tileSize = Math.floor(options.tileSize / 2);
-			options.zoomOffset++;
+
+			if (!options.zoomReverse) {
+				options.zoomOffset++;
+				options.maxZoom--;
+			} else {
+				options.zoomOffset--;
+				options.minZoom++;
+			}
 
 			options.minZoom = Math.max(0, options.minZoom);
-			options.maxZoom--;
 		}
 
 		if (typeof options.subdomains === 'string') {
@@ -4824,7 +4860,7 @@ L.TileLayer = L.GridLayer.extend({
 
 				tile.onload = L.Util.falseFn;
 				tile.onerror = L.Util.falseFn;
-				
+
 				if (!tile.complete) {
 					tile.src = L.Util.emptyImageUrl;
 					L.DomUtil.remove(tile);
@@ -4866,6 +4902,9 @@ L.TileLayer.WMS = L.TileLayer.extend({
 
 	// @section
 	// @aka TileLayer.WMS options
+	// If any custom options not documented here are used, they will be sent to the
+	// WMS server as extra parameters in each request URL. This can be useful for
+	// [non-standard vendor WMS parameters](http://docs.geoserver.org/stable/en/user/services/wms/vendor.html).
 	defaultWmsParams: {
 		service: 'WMS',
 		request: 'GetMap',
@@ -4976,7 +5015,7 @@ L.tileLayer.wms = function (url, options) {
 /*
  * @class ImageOverlay
  * @aka L.ImageOverlay
- * @inherits Layer
+ * @inherits Interactive layer
  *
  * Used to load and display a single image over specific bounds of the map. Extends `Layer`.
  *
@@ -4991,6 +5030,8 @@ L.tileLayer.wms = function (url, options) {
 
 L.ImageOverlay = L.Layer.extend({
 
+	// @section
+	// @aka ImageOverlay options
 	options: {
 		// @option opacity: Number = 1.0
 		// The opacity of the image overlay.
@@ -5001,17 +5042,16 @@ L.ImageOverlay = L.Layer.extend({
 		alt: '',
 
 		// @option interactive: Boolean = false
-		// If `true`, the image overlay will emit mouse events when clicked or hovered.
+		// If `true`, the image overlay will emit [mouse events](#interactive-layer) when clicked or hovered.
 		interactive: false,
 
 		// @option attribution: String = null
 		// An optional string containing HTML to be shown on the `Attribution control`
-		attribution: null
+		attribution: null,
 
 		// @option crossOrigin: Boolean = false
 		// If true, the image will have its crossOrigin attribute set to ''. This is needed if you want to access image pixel data.
-
-		// crossOrigin: false,
+		crossOrigin: false
 	},
 
 	initialize: function (url, bounds, options) { // (String, LatLngBounds, Object)
@@ -5368,7 +5408,7 @@ L.Icon.Default.imagePath = (function () {
 
 /*
  * @class Marker
- * @inherits Layer
+ * @inherits Interactive layer
  * @aka L.Marker
  * L.Marker is used to display clickable/draggable icons on the map. Extends `Layer`.
  *
@@ -5388,8 +5428,7 @@ L.Marker = L.Layer.extend({
 		// Icon class to use for rendering the marker. See [Icon documentation](#L.Icon) for details on how to customize the marker icon. Set to new `L.Icon.Default()` by default.
 		icon: new L.Icon.Default(),
 
-		// @option interactive: Boolean = true
-		// If `false`, the marker will not emit mouse events and will act as a part of the underlying map.
+		// Option inherited from "Interactive layer" abstract class
 		interactive: true,
 
 		// @option draggable: Boolean = false
@@ -5431,31 +5470,6 @@ L.Marker = L.Layer.extend({
 		// FIXME: shadowPane is no longer a valid option
 		nonBubblingEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu']
 	},
-
-	/* @section
-	 *
-	 * You can subscribe to the following events using [these methods](#evented-method).
-	 *
-	 * @event click: MouseEvent
-	 * Fired when the user clicks (or taps) the marker.
-	 *
-	 * @event dblclick: MouseEvent
-	 * Fired when the user double-clicks (or double-taps) the marker.
-	 *
-	 * @event mousedown: MouseEvent
-	 * Fired when the user pushes the mouse button on the marker.
-	 *
-	 * @event mouseover: MouseEvent
-	 * Fired when the mouse enters the marker.
-	 *
-	 * @event mouseout: MouseEvent
-	 * Fired when the mouse leaves the marker.
-	 *
-	 * @event contextmenu: MouseEvent
-	 * Fired when the user right-clicks on the marker.
-	 */
-
-
 
 	/* @section
 	 *
@@ -6227,7 +6241,7 @@ L.Popup = L.Layer.extend({
 
 // @namespace Popup
 // @factory L.popup(options?: Popup options, source?: Layer)
-// Instantiates a Popup object given an optional `options` object that describes its appearance and location and an optional `source` object that is used to tag the popup with a reference to the Layer to which it refers.
+// Instantiates a `Popup` object given an optional `options` object that describes its appearance and location and an optional `source` object that is used to tag the popup with a reference to the Layer to which it refers.
 L.popup = function (options, source) {
 	return new L.Popup(options, source);
 };
@@ -6432,6 +6446,9 @@ L.Layer.include({
 		if (!this._map) {
 			return;
 		}
+
+		// prevent map click
+		L.DomEvent.stop(e);
 
 		// if this inherits from Path its a vector and we can just
 		// open the popup at the new location
@@ -6875,7 +6892,7 @@ L.Map.include({
 /*
  * @class Path
  * @aka L.Path
- * @inherits Layer
+ * @inherits Interactive layer
  *
  * An abstract class that contains options and constants shared between vector
  * overlays (Polygon, Polyline, Circle). Do not use it directly. Extends `Layer`.
@@ -6936,8 +6953,7 @@ L.Path = L.Layer.extend({
 
 		// className: '',
 
-		// @option interactive: Boolean = true
-		// If `false`, the vector will not emit mouse events and will act as a part of the underlying map.
+		// Option inherited from "Interactive layer" abstract class
 		interactive: true
 	},
 
@@ -8830,11 +8846,11 @@ L.GeoJSON = L.FeatureGroup.extend({
 	 * ```
 	 *
 	 * @option onEachFeature: Function = *
-	 * A `Function` that will be called once for each created `Layer`, after it has
+	 * A `Function` that will be called once for each created `Feature`, after it has
 	 * been created and styled. Useful for attaching events and popups to features.
 	 * The default is to do nothing with the newly created layers:
 	 * ```js
-	 * function (layer) {}
+	 * function (feature, layer) {}
 	 * ```
 	 *
 	 * @option filter: Function = *
@@ -9394,15 +9410,21 @@ L.DomEvent = {
 			e.clientY - rect.top - container.clientTop);
 	},
 
+	// Chrome on Win scrolls double the pixels as in other platforms (see #4538),
+	// and Firefox scrolls device pixels, not CSS pixels
+	_wheelPxFactor: (L.Browser.win && L.Browser.chrome) ? 2 :
+	                (L.Browser.gecko) ? window.devicePixelRatio :
+	                1,
+
 	// @function getWheelDelta(ev: DOMEvent): Number
 	// Gets normalized wheel delta from a mousewheel DOM event, in vertical
 	// pixels scrolled (negative if scrolling down).
 	// Events from pointing devices without precise scrolling are mapped to
 	// a best guess of between 50-60 pixels.
 	getWheelDelta: function (e) {
-		return (e.deltaY && e.deltaMode === 0) ? -e.deltaY :        // Pixels
-		       (e.deltaY && e.deltaMode === 1) ? -e.deltaY * 18 :   // Lines
-		       (e.deltaY && e.deltaMode === 2) ? -e.deltaY * 52 :   // Pages
+		return (e.deltaY && e.deltaMode === 0) ? -e.deltaY / L.DomEvent._wheelPxFactor : // Pixels
+		       (e.deltaY && e.deltaMode === 1) ? -e.deltaY * 18 : // Lines
+		       (e.deltaY && e.deltaMode === 2) ? -e.deltaY * 52 : // Pages
 		       (e.deltaX || e.deltaZ) ? 0 :	// Skip horizontal/depth wheel events
 		       e.wheelDelta ? (e.wheelDeltaY || e.wheelDelta) / 2 : // Legacy IE pixels
 		       (e.detail && Math.abs(e.detail) < 32765) ? -e.detail * 18 : // Legacy Moz lines
@@ -9664,7 +9686,7 @@ L.Draggable = L.Evented.extend({
 			// ensure drag is not fired after dragend
 			L.Util.cancelAnimFrame(this._animRequest);
 
-			// @event dragend: Event
+			// @event dragend: DragEndEvent
 			// Fired when the drag ends.
 			this.fire('dragend', {
 				distance: this._newPos.distanceTo(this._startPos)
@@ -11094,15 +11116,31 @@ L.control = function (options) {
 	return new L.Control(options);
 };
 
+/* @section Extension methods
+ * @uninheritable
+ *
+ * Every control should extend from `L.Control` and (re-)implement the following methods.
+ *
+ * @method onAdd(map: Map): HTMLElement
+ * Should return the container DOM element for the control and add listeners on relevant map events. Called on [`control.addTo(map)`](#control-addTo).
+ *
+ * @method onRemove(map: Map)
+ * Optional method. Should contain all clean up code that removes the listeners previously added in [`onAdd`](#control-onadd). Called on [`control.remove()`](#control-remove).
+ */
 
-// adds control-related methods to L.Map
-
+/* @namespace Map
+ * @section Methods for Layers and Controls
+ */
 L.Map.include({
+	// @method addControl(control: Control): this
+	// Adds the given control to the map
 	addControl: function (control) {
 		control.addTo(this);
 		return this;
 	},
 
+	// @method removeControl(control: Control): this
+	// Removes the given control from the map
 	removeControl: function (control) {
 		control.remove();
 		return this;
@@ -11608,8 +11646,8 @@ L.Control.Layers = L.Control.extend({
 	onRemove: function () {
 		this._map.off('zoomend', this._checkDisabledLayers, this);
 
-		for (var id in this._layers) {
-			this._layers[id].layer.off('add remove', this._onLayerChange, this);
+		for (var i = 0; i < this._layers.length; i++) {
+			this._layers[i].layer.off('add remove', this._onLayerChange, this);
 		}
 	},
 
@@ -11633,7 +11671,9 @@ L.Control.Layers = L.Control.extend({
 		layer.off('add remove', this._onLayerChange, this);
 
 		var obj = this._getLayer(L.stamp(layer));
-		this._layers.splice(this._layers.indexOf(obj), 1);
+		if (obj) {
+			this._layers.splice(this._layers.indexOf(obj), 1);
+		}
 		return (this._map) ? this._update() : this;
 	},
 
@@ -11713,8 +11753,9 @@ L.Control.Layers = L.Control.extend({
 	},
 
 	_getLayer: function (id) {
-		for (var i = 0; i <= this._layers.length; i++) {
-			if (L.stamp(this._layers[i].layer) === id) {
+		for (var i = 0; i < this._layers.length; i++) {
+
+			if (this._layers[i] && L.stamp(this._layers[i].layer) === id) {
 				return this._layers[i];
 			}
 		}
@@ -11743,7 +11784,7 @@ L.Control.Layers = L.Control.extend({
 
 		var baseLayersPresent, overlaysPresent, i, obj, baseLayersCount = 0;
 
-		for (i in this._layers) {
+		for (i = 0; i < this._layers.length; i++) {
 			obj = this._layers[i];
 			this._addItem(obj);
 			overlaysPresent = overlaysPresent || obj.overlay;
@@ -12361,10 +12402,12 @@ L.Map.include({
 	},
 
 	// @method locate(options?: Locate options): this
-	// Tries to locate the user using the Geolocation API, firing a `locationfound`
-	// event with location data on success or a `locationerror` event on failure,
+	// Tries to locate the user using the Geolocation API, firing a [`locationfound`](#map-locationfound)
+	// event with location data on success or a [`locationerror`](#map-locationerror) event on failure,
 	// and optionally sets the map view to the user's location with respect to
 	// detection accuracy (or to the world view if geolocation failed).
+	// Note that, if your page doesn't use HTTPS, this method will fail in
+	// modern browsers ([Chrome 50 and newer](https://sites.google.com/a/chromium.org/dev/Home/chromium-security/deprecating-powerful-features-on-insecure-origins))
 	// See `Locate options` for more details.
 	locate: function (options) {
 

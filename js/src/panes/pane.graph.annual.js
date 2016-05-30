@@ -20,6 +20,10 @@ Wu.Graph = Wu.Graph || {};
 // Annual Graph (cyclical)
 Wu.Graph.Annual = Wu.Evented.extend({
 
+    options : {
+        fetchLineGraph : false, // debug, until refactored fetching line graph to cube
+    },
+
     // annual graph contains average of annual data
 
     _initialize : function () {
@@ -432,13 +436,18 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // fetch line graph from server if not done already
         if (!this._cache.line[this._current.year]) {
             
-            // fetch dataset from server
-            this._fetchLineGraph(function () {
 
-                // set line graph
-                this._setLineGraph();
+            if (this.options.fetchLineGraph) {
 
-            }.bind(this))
+                // fetch dataset from server
+                this._fetchLineGraph(function () {
+
+                    // set line graph
+                    this._setLineGraph();
+
+                }.bind(this))
+
+            }
 
         } else {
 
