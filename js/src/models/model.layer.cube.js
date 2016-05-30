@@ -672,6 +672,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                     // geometry : mask_geometry,
                     // mask_id : mask_id,
                     multi_mask : true,
+                    
+                    mask_type : 'multi-polygon',
                     geometries : areas,
                     mask_id : mask_id_md5
                 }
