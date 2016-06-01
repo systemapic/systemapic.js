@@ -23,6 +23,7 @@ Wu.Animator = Wu.Evented.extend({
         // how often to register updates when sliding
         sliderThrottle : 500,
 
+        // active buttons
         buttons : {
             play : false,
             yearly : false,
@@ -33,45 +34,22 @@ Wu.Animator = Wu.Evented.extend({
 
     _initialize : function (options) {
 
-        // fetching data is async, so must wait for callback
-        this._fetchData(this._renderData.bind(this));
-
-        // todo: fetching data should query raster itself. in other words, must be connected to cube layer directly, 
-        // and fetch data thru it.
-
-    },
-  
-    // fetch data from server
-    _fetchData : function (done) { // todo: query raster instead
-
-        // get data from server
-        app.api.getCustomData({
-            name : this.options.data
-        }, done);
-
-    },
-
-    // Callback for when data is ready
-    _renderData : function (err, data) {
-        if (err) return console.error(err);
-
-        // set data
-        this._data = Wu.parse(data);
-
         // create slider
         this._createSlider();
 
         // add hooks
         this._addHooks();       
 
-        // create graph
-        this._createGraph();
-     
         // mark inited
         this._inited = true;
+
     },
 
-    // Set Frames Per Second
+    getContainer : function () {
+        return this.sliderOuterContainer;
+    },
+
+    // set fps
     setFPS : function (fps) {
 
         // set locally
@@ -146,6 +124,9 @@ Wu.Animator = Wu.Evented.extend({
         Wu.Mixin.Events.on('shadeButtons', this._onShadeButtons, this);
         Wu.Mixin.Events.on('unshadeButtons', this._onUnshadeButtons, this);
         Wu.Mixin.Events.on('cubeCacheNoLayer', this._onCubeCacheNoLayer, this);
+        
+        Wu.Mixin.Events.on('hideAnimator', this._onHideAnimator, this);
+        Wu.Mixin.Events.on('showAnimator', this._onShowAnimator, this);
     },
 
     _onCubeCacheNoLayer : function (e) {
@@ -185,18 +166,6 @@ Wu.Animator = Wu.Evented.extend({
         this._fastForwardBtn.style.display  = this.options.buttons.yearly ? 'inline-block' : 'none';
         this._forwardBtn.style.display   = this.options.buttons.daily  ? 'inline-block' : 'none';
         this._backBtn.style.display  = this.options.buttons.daily  ? 'inline-block' : 'none';
-    },
-
-    _createGraph : function () { // todo: should separate these more
-
-        // create graph
-        // this.graph = new Wu.Graph.Year({
-        this.graph = new Wu.Graph.Annual({ // todo: clean the f up
-            data     : this._data,
-            appendTo : this.sliderOuterContainer,
-            type     : this.options.graphType,
-            cube     : this.options.cube
-        });
     },
 
     _onShadeButtons : function () {
@@ -295,12 +264,18 @@ Wu.Animator = Wu.Evented.extend({
 
     // todo: slider should know which date it is without asking graph
     _getCurrentDate : function () {
-    	var date = this.graph.getCurrentDate(this._sliderValue);
+    	var date = this._graph.getCurrentDate(this._sliderValue);
     	return date;
+    },
+
+    plugGraph : function (graph) {
+        this._graph = graph;
     },
 
     // Enable layer
     _layerEnabled : function (e) {
+
+        console.log('_layerEnabled', e);
 
     	// get event payload
         var layer = e.detail.layer;
@@ -321,7 +296,8 @@ Wu.Animator = Wu.Evented.extend({
         var layer = e.detail.layer;
 
         // hide if current layer
-        if (layer.getUuid() == this._currentLayer.getUuid()) {
+        console.log('hiding? ', layer, this.options.cube);
+        if (layer.getUuid() == this.options.cube.getUuid()) {
                 this.hide();
         }
     },
@@ -473,13 +449,23 @@ Wu.Animator = Wu.Evented.extend({
     remove : function (id) {},
 
     hide : function () {
+        console.error('hide');
         this.sliderOuterContainer.style.display = 'none';
     },
 
     show : function () {
+        console.error('snow');
         if (!this._inited) return;
         this.sliderOuterContainer.style.display = 'block';
     },  
+
+    _onHideAnimator : function () {
+        this.hide();
+    },
+
+    _onShowAnimator : function () {
+        this.show();
+    },
 
     _projectSelected : function (e) {
 

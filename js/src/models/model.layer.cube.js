@@ -101,7 +101,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
         // set store
         this._setStore(store);
-
     },
 
     _setStore : function (store) {
@@ -113,8 +112,151 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         this._cube = Wu.parse(this.store.data.cube);
     },
 
+    add : function (type) {
+        this.addTo();
+    },
+
+    addTo : function () {
+        // if (!this._inited) this.initLayer();
+
+        // // mark added
+        // this._added = true;
+
+        // add to map
+        this._addTo();
+
+        // // set cube
+        // Wu.Mixin.Events.fire('animatorSetCube', { detail : { 
+        //     cube : this 
+        // }}); 
+    },
+
+    _addTo : function (type) {
+
+        // ensure inited
+        // if (!this._inited) 
+
+        // ensure inited
+        console.log('ensuring inited');
+        this.initLayer(function (err) {
+
+            console.log('initLayer callbacj', err);
+
+            var map = app._map;
+
+            console.log('_addTo');
+
+            // add leaflet layer group to map
+            this._group.addTo(map);
+
+            // hide layers
+            this._group.eachLayer(this._hideLayer);
+
+            // make sure cache is updated; got all correct layers loaded
+            // this._updateCache();
+
+            // sets cursor at current frame (ie. show layer on map)
+            this._updateCursor();
+
+            // add to active layers
+            app.MapPane.addActiveLayer(this);   // includes baselayers, todo: evented
+
+            // update zindex
+            this._addToZIndex(type); // todo: evented
+
+            // add mask layer
+            if (this._maskLayer) {
+
+                // add mask layer
+                // map.addLayer(this._maskLayer.layer); // todo: put actions on wu layer (eg. this._maskLayer.add())
+               
+                // add mask layer
+                this._maskLayer.add();
+
+                // // activate mask
+                // if (this.options.mask.constantMask) {
+
+                //     // get first layer
+                //     var layers = this._maskLayer.getLayers();
+
+                //     // click maskLayer
+                //     this._onMaskLayerClick({ // fubar: stupid way to init line graph!
+                //         layer : layers[0]
+                //     });
+
+                // }
+            }
+
+            // show legend
+            this._showLegend();
+
+            // mark added
+            this._added = true;
+
+            console.log('fire layer enabled');
+
+            // fire event
+            Wu.Mixin.Events.fire('layerEnabled', { detail : {
+                layer : this,
+                showSlider : true
+            }}); 
+
+        }.bind(this));
+
+
+    },
+
+    remove : function (map) {
+        var map = map || app._map;
+
+        // remove leaflet layer group from map
+        this._group.removeFrom(map);
+
+        // remove mask
+        // map.hasLayer(this._maskLayer) && map.removeLayer(this._maskLayer);
+        this._maskLayer && this._maskLayer.remove();
+
+        // remove from active layers
+        app.MapPane.removeActiveLayer(this);    
+
+        // remove from zIndex
+        this._removeFromZIndex(); // todo: evented
+
+        // hide legend
+        this._hideLegend();
+
+        // remove from descriptionControl if avaialbe.. TODO: make this evented instead
+        // var descriptionControl = app.MapPane.getControls().description;
+        // if (descriptionControl) descriptionControl._removeLayer(this);
+
+        // mark
+        this._added = false;
+    },
+
+    // add leaflet layer only
+    _addThin: function () {
+        if (!this._inited) this.initLayer();
+
+        // only add to map temporarily
+        app._map.addLayer(this.layer);
+        this.layer.bringToFront();
+    },
+
+    // remove leaflet layer only
+    _removeThin : function () {
+        if (!this._inited) this.initLayer();
+
+        // remove from map
+        app._map.removeLayer(this.layer);
+    },
+
     // fired when layer is added to map
-    initLayer : function () {
+    initLayer : function (done) {
+
+        if (this._inited) {
+            done && done();
+            return;
+        }
 
         // listen up
         this._listen();
@@ -125,32 +267,65 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // init cache
         this._initCache();
 
-        // init mask
-        this._initMask();
+        // run async ops
+        async.series([
+            
+            // init mask async
+            this._initMask.bind(this),
+            
+            // init graph async
+            this._initGraph.bind(this)
 
-        // init animator control
-        this._initAnimator();
+        ], function (err) {
 
-        // mark inited
-        this._inited = true;
+            // mark inited
+            this._inited = true;
 
-        // debug
-        app._cubeDebug = this;
+            // debug
+            app._cubeDebug = this;
+
+            // callback
+            done && done();
+
+        }.bind(this));
 
     },
 
-    _initAnimator : function () {
-        
-        // only create one instance
-        if (app.Animator) return;
+    // for storing requested data
+    _data : {},
 
-        // animator control
-        app.Animator = new Wu.Animator({ // refactor to project controls
-            data : 'scf.average.2000.2015', // todo: refactor data fetching
-            // data : 'allYears', // todo: refactor data fetching
-            // hide : true,
-            cube : this
-        });
+    _initGraph : function (done) {
+
+        // get annual data from server
+        app.api.getCustomData({
+
+            // custom data, snow average  todo: make pluggable
+            name : 'scf.average.2000.2015'
+
+        }, function (err, annualJSON) {
+            if (err) return console.error(err);
+
+            // parse
+            this._data.annual = Wu.parse(annualJSON);
+
+            // create animator
+            this._animator = new Wu.Animator({ // refactor to project controls
+                cube : this
+            });
+
+            // create graph
+            this._graph = new Wu.Graph.Annual({ 
+                data     : this._data.annual,
+                appendTo : this._animator.getContainer(),
+                type     : 'annualCycles',
+                cube     : this,
+                animator : this._animator
+            });
+
+            // callback
+            done && done();
+
+        }.bind(this));
 
     },
 
@@ -227,7 +402,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
-    _initMask : function () {
+    _initMask : function (done) {
 
         // get mask
         var mask = this.getMask();
@@ -236,26 +411,34 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         if (!mask) return;
 
         // check if raster mask
-        if (mask.type == 'postgis-raster') return this._initRasterMask();
+        if (mask.type == 'postgis-raster') return this._initRasterMask(done);
 
         // check if vector mask
-        if (mask.type == 'topojson') return this._initVectorMask();
+        if (mask.type == 'topojson') return this._initVectorMask(done);
 
         // catch unknown type
         console.error('something wrong with the mask!', mask);
     },
 
-    _initRasterMask : function () {
-        var mask = this.getMask();
-        console.log('_initRasterMask', mask);
+    _initRasterMask : function (done) {
 
+        // get mask
+        var mask = this.getMask();
+
+        // return if no mask
+        if (!mask) return;
+
+        // get layer id
         var layer_id = mask.layer_id;
 
         // get layer from server
         app.api.getLayer({
             layer_id : layer_id
         }, function (err, layerJSON) {
-            if (err) return console.error(err);
+            if (err) {
+                console.error(err);
+                done && done(err);
+            }
 
             // parse
             var layerModel = Wu.parse(layerJSON);
@@ -264,48 +447,54 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             this._maskLayer = Wu.createLayer(layerModel);
 
             // add to map
-            this._maskLayer.add();
+            // this._maskLayer.add();
 
             // make sure on top
-            this._maskLayer.layer.bringToFront();
+            // this._maskLayer.layer.bringToFront();
+
+            // callback
+            done && done();
 
         }.bind(this));
     },
 
-    _initVectorMask : function () {
+    _initVectorMask : function (done) {
 
         // get mask
         var mask = this.getMask();
 
         // create mask (topojson) layer
-        this._maskLayer = new L.TopoJSON();
+        this._maskLayer = new Wu.TopoJSONLayer(); // todo!
 
         // add data to layer
-        this._maskLayer.addData(mask.geometry);
+        this._maskLayer.layer.addData(mask.geometry);
 
         // make sure on top
-        this._maskLayer.bringToFront();
+        this._maskLayer.layer.bringToFront();
 
         // if mask is to be always selected
         if (this.options.mask.constantMask) {
 
             // set style
-            this._maskLayer.setStyle(this.options.mask.selectedStyle);
+            this._maskLayer.layer.setStyle(this.options.mask.selectedStyle);
 
 
         // if mask should be "clickable"
         } else {
 
             // set style
-            this._maskLayer.setStyle(this.options.mask.style);
+            this._maskLayer.layer.setStyle(this.options.mask.style);
 
             // click event
-            this._maskLayer.on('click', this._onMaskLayerClick.bind(this)); 
+            this._maskLayer.layer.on('click', this._onMaskLayerClick.bind(this)); 
 
             // hover events
-            this._maskLayer.on('mouseover', this._onMaskMouseover.bind(this));
-            this._maskLayer.on('mouseout', this._onMaskMouseout.bind(this));
+            this._maskLayer.layer.on('mouseover', this._onMaskMouseover.bind(this));
+            this._maskLayer.layer.on('mouseout', this._onMaskMouseout.bind(this));
         }
+
+        // callback
+        done && done();
 
     },
 
@@ -319,7 +508,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         } else {
 
             // reset style for all layers
-            this._maskLayer.eachLayer(function (layer) {
+            this._maskLayer.layer.eachLayer(function (layer) {
                 layer.setStyle(this.options.mask.hoverStyle);
             }.bind(this));
         }
@@ -335,7 +524,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         } else {
 
             // reset style for all layers
-            this._maskLayer.eachLayer(function (layer) {
+            this._maskLayer.layer.eachLayer(function (layer) {
                 layer.setStyle(this.options.mask.style);
             }.bind(this));
         }
@@ -365,10 +554,10 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var layer = options.layer;
 
         // get graph object
-        var graph = app.Animator.graph;
+        var graph = this._graph;
 
         // reset style for all layers
-        this._maskLayer.eachLayer(function (layer) {
+        this._maskLayer.layer.eachLayer(function (layer) {
             layer.setStyle(this.options.mask.style);
         }.bind(this));
 
@@ -433,7 +622,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             this._maskSelected(layer);
 
             // reset style for all layers
-            this._maskLayer.eachLayer(function (layer) {
+            this._maskLayer.layer.eachLayer(function (layer) {
                 layer.setStyle(this.options.mask.style);
             }.bind(this));
 
@@ -446,7 +635,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             };
 
             // set selected layer style to all layers
-            this._maskLayer.eachLayer(function (layer) {
+            this._maskLayer.layer.eachLayer(function (layer) {
                 layer.setStyle(this.options.mask.selectedStyle);
             }.bind(this));
 
@@ -455,7 +644,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             var mask_ids = [];
 
             // for each layer
-            this._maskLayer.eachLayer(function (layer) {
+            this._maskLayer.layer.eachLayer(function (layer) {
                 
                 var mask_id = layer.feature.id;
                 var mask_geometry = layer.feature.geometry;
@@ -506,7 +695,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _getGraph : function (done) {
 
         // get graph
-        var graph = app.Animator.graph;
+        var graph = this._graph;
 
         // return graph
         if (graph) return done(null, graph);
@@ -518,8 +707,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _maskSelected : function (layer) {
 
         // reset style for all layers
-        this._maskLayer.eachLayer(function (layer) {
-            layer.setStyle(this.options.mask.selectedStyle);
+        this._maskLayer.layer.eachLayer(function (l) {
+            l.setStyle(this.options.mask.selectedStyle);
         }.bind(this));
 
         // fire mask selected event
@@ -532,8 +721,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _maskUnselected : function (layer) {
 
         // reset style for all layers
-        this._maskLayer.eachLayer(function (layer) {
-            layer.setStyle(this.options.mask.style);
+        this._maskLayer.layer.eachLayer(function (l) {
+            l.setStyle(this.options.mask.style);
         }.bind(this));
 
         // fire mask selected event
@@ -636,9 +825,19 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
+    query : function (options, done) {
+        
+        // add cube id
+        options.cube_id = this.getCubeId();
+
+        console.log('query options', options);
+
+        // query cube
+        app.api.queryCube(options, done);
+    },
+
     getMask : function () {
-        var topoMask = this._cube.mask;
-        return topoMask;
+        return this._cube.mask;
     },
 
     addMask : function (data, done) {
@@ -915,24 +1114,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         if (container) container.style.display = 'none';
     },
 
-    add : function (type) {
-        this.addTo();
-    },
-
-    addTo : function () {
-        if (!this._inited) this.initLayer();
-
-        // mark added
-        this._added = true;
-
-        // add to map
-        this._addTo();
-
-        // set cube
-        Wu.Mixin.Events.fire('animatorSetCube', { detail : { 
-            cube : this 
-        }}); 
-    },
+    
 
     _getCursorLayer : function () {
         var cursor = this._cursor;
@@ -942,104 +1124,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         if (!cache) cache = this._cache[this._cursor];
         if (!cache) return false;
         return cache.layer;
-    },
-
-    _addTo : function (type) {
-        if (!this._inited) this.initLayer();
-
-        var map = app._map;
-
-        // add leaflet layer group to map
-        this._group.addTo(map);
-
-        // hide layers
-        this._group.eachLayer(this._hideLayer);
-
-        // make sure cache is updated; got all correct layers loaded
-        // this._updateCache();
-
-        // sets cursor at current frame (ie. show layer on map)
-        this._updateCursor();
-
-        // add to active layers
-        app.MapPane.addActiveLayer(this);   // includes baselayers, todo: evented
-
-        // update zindex
-        this._addToZIndex(type); // todo: evented
-
-        // add mask layer
-        if (this._maskLayer) {
-
-            // add mask layer
-            map.addLayer(this._maskLayer);
-
-            // activate mask
-            if (this.options.mask.constantMask) {
-
-                // get first layer
-                var layers = this._maskLayer.getLayers();
-
-                // click maskLayer
-                this._onMaskLayerClick({
-                    layer : layers[0]
-                });
-
-            }
-        }
-
-        // show legedn
-        this._showLegend();
-
-        // mark added
-        this._added = true;
-
-        // fire event
-        Wu.Mixin.Events.fire('layerEnabled', { detail : {
-            layer : this,
-            showSlider : true
-        }}); 
-
-    },
-
-    _addThin: function () {
-        if (!this._inited) this.initLayer();
-
-        // only add to map temporarily
-        app._map.addLayer(this.layer);
-        this.layer.bringToFront();
-    },
-
-    _removeThin : function () {
-        if (!this._inited) this.initLayer();
-
-        // remove from map
-        app._map.removeLayer(this.layer);
-    },
-
-    remove : function (map) {
-        var map = map || app._map;
-
-        // remove leaflet layer group from map
-        this._group.removeFrom(map);
-
-        // remove mask
-        map.hasLayer(this._maskLayer) && map.removeLayer(this._maskLayer);
-
-        // remove from active layers
-        app.MapPane.removeActiveLayer(this);    
-
-        // remove from zIndex
-        this._removeFromZIndex();
-
-        // hide legend
-        this._hideLegend();
-
-        // remove from descriptionControl if avaialbe.. TODO: make this evented instead
-        var descriptionControl = app.MapPane.getControls().description;
-        if (descriptionControl) descriptionControl._removeLayer(this);
-
-        // mark
-        this._added = false;
     },
 
     isCube : function () {

@@ -34,12 +34,27 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // create DOM
         this._initContainer();
 
+        // plug animator
+        this._plugAnimator();
+
+        // prepare data
+        this._prepareData();
+
         // init graph
         this._initGraph();
 
         // set initial date (todo: set to last in series)
         this._setDate(2016, 10);
 
+    },
+
+    _plugAnimator : function () {
+
+        // set animator
+        this._animator = this.options.animator;
+
+        // connect graph
+        this._animator.plugGraph(this);
     },
 
     listen : function () {
@@ -60,8 +75,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._nameTitle         = Wu.DomUtil.create('div', 'big-graph-title',               this._infoContainer, 'title');
         this._dateTitle         = Wu.DomUtil.create('div', 'big-graph-current-day',         this._infoContainer, 'day');
         this._graphContainer    = Wu.DomUtil.create('div', 'big-graph-inner-container',     this._container);
-        this._loadingBar        = Wu.DomUtil.create('div', 'graph-loading-bar', this._container);
-        this._legendContainer   = Wu.DomUtil.create('div', 'graph-legend', this._container);
+        this._loadingBar        = Wu.DomUtil.create('div', 'graph-loading-bar',             this._container);
+        this._legendContainer   = Wu.DomUtil.create('div', 'graph-legend',                  this._container);
     },
 
     _initGraph : function () {
@@ -70,8 +85,9 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this.ndx = {};
 
         // prepare this._data if not already done
-        if (_.isEmpty(this._annualAverageData)) this._prepareAnnualAverageData();
-
+        // if (_.isEmpty(this._annualAverageData)) {
+        //     this._prepareAnnualAverageData();
+        // }
 
         // AVERAGE ANNUAL DATA
         // -------------------
@@ -165,54 +181,34 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
             // MAX value
             dc.lineChart(composite)
-                .group(average_max_group)
-                .colors('#DDDDDD')
-                .renderArea(true)       
-                .renderDataPoints(false)
-                .xyTipsOn(false),
+            .group(average_max_group)
+            .colors('#DDDDDD')
+            .renderArea(true)       
+            .renderDataPoints(false)
+            .xyTipsOn(false),
 
             // MIN value
             dc.lineChart(composite)
-                .group(average_min_group)
-                .colors('#3C4759')
-                .renderArea(true)       
-                .renderDataPoints(false)
-                .xyTipsOn(false),
+            .group(average_min_group)
+            .colors('#3C4759')
+            .renderArea(true)       
+            .renderDataPoints(false)
+            .xyTipsOn(false),
 
             // AVERAGE value
             dc.lineChart(composite)
-                .group(average_avg_group)
-                // .colors('#999999')
-                // .colors('rgb(76, 76, 76)')
-                .colors('white')
-                .renderDataPoints(false)
-                .xyTipsOn(false),
+            .group(average_avg_group)
+            .colors('white')
+            .renderDataPoints(false)
+            .xyTipsOn(false),
 
             // THIS YEAR value – LINE
             dc.lineChart(composite)
-                .group(line_group)
-                .colors('#ff6666')
-                .renderDataPoints(false)
-                .xyTipsOn(false),
+            .group(line_group)
+            .colors('#ff6666')
+            .renderDataPoints(false)
+            .xyTipsOn(false),
 
-            // // THIS YEAR value – LAST DATE (DOT)
-            // dc.scatterPlot(composite)
-            //     .group(point_group)
-            //     .symbolSize(8)
-            //     .excludedOpacity(0)
-            //     // .colors('#ff0000')
-            //     .colors('#ff6666')
-            //     .symbol('triangle-up')
-            //     .keyAccessor(function(d) {
-            //         var data = this._cache.line[this._current.year];
-            //         if ( data && d.key == data[data.length-1].date ) return +d.key;
-            //         return false;
-            //     }.bind(this))
-            //     .valueAccessor(function(d) {
-            //         var data = this._cache.line[this._current.year];
-            //         if ( data && d.key == data[data.length-1].date ) return +d.value;
-            //         return false;
-            //     }.bind(this))
         ]);
     
 
@@ -231,9 +227,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         // mark inited
         this._graphInited = true;
-
-        // debug: set default date
-        // this._setDate(2015, 103);
 
     },
 
@@ -292,21 +285,17 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // set date range to graph
         this._composite.x(d3.time.scale().domain([minDate,maxDate]));
 
-        // todo: make sure average-graph is set to current year
-
-        // this._prepareAnnualAverageData(year);
-        // this.ndx.average_crossfilter = crossfilter(this._annualAverageData); 
-        // this._initGraph();
-
         // set slider
-        app.Animator.setSlider(day);
+        this._animator.setSlider(day);
 
         // set cube cursor
-        var timestamp = moment().year(year).dayOfYear(day);
-        this.getCube().setCursor(timestamp);
+        this.getCube().setCursor(moment().year(year).dayOfYear(day));
 
         // update line graph
-        this._updateLineGraph();
+        // this._updateLineGraph();
+
+        // set slider
+        this._animator.setSlider(day);
 
         // update titles
         this._updateTitles();
@@ -433,27 +422,52 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
     _updateLineGraph : function (options) {
 
-        // fetch line graph from server if not done already
-        if (!this._cache.line[this._current.year]) {
-            
+        // if data is available, set graph
+        if (this._cache.line[this._current.year]) return this._setLineGraph();
 
-            if (this.options.fetchLineGraph) {
+        // return if already fetching data
+        if (this._fetching) return console.log('already fetching data...');
 
-                // fetch dataset from server
-                this._fetchLineGraph(function () {
+        // mark fetching (to avoid parallel fetching)
+        this._fetching = true;
 
-                    // set line graph
-                    this._setLineGraph();
+        // data not available yet, need to fetch
+        var cube = this.options.cube;
 
-                }.bind(this))
+        // query data from cube
+        cube.query({
+            query_type : 'scf',
+            // cube_id : this.getCube().getCubeId(),
+            year : this._current.year,   
+            day : this._current.day,
+            options : {
+                currentYearOnly : true,
+                force_query : true,
+                filter_query : false
+            },
 
-            }
+        // callback
+        }, function (err, query_results) {
+            if (err) return console.error(err);
 
-        } else {
+            // parse
+            var fractions = Wu.parse(query_results);
+
+            // parse dates
+            var cache = this._parseDates(fractions);
+
+            console.log('cache', cache);
+
+            // set cache
+            this._cache.line[this._current.year] = cache;
 
             // set line graph
-            this._setLineGraph(options);
-        }
+            this._setLineGraph();
+
+            // mark done fetching
+            this._fetching = false;
+
+        }.bind(this));
 
     },
 
@@ -463,16 +477,13 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._limit = limit;
 
         // set limits for slider
-        app.Animator.setSliderLimit({
+        this._animator.setSliderLimit({
             limit : limit
         });
 
     },
 
     _fetchLineGraph : function (done) {
-
-        // get graph object
-        var graph = app.Animator.graph;
 
         // set query options
         var queryOptions = {
@@ -615,6 +626,13 @@ Wu.Graph.Annual = Wu.Evented.extend({
             });
         });
         return fixed;
+    },
+
+    _prepareData : function () {
+
+        // prepare annual data
+        this._prepareAnnualAverageData();
+
     },
 
     _prepareAnnualAverageData : function (year) {
