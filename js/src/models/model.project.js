@@ -524,7 +524,7 @@ Wu.Model.Project = Wu.Model.extend({
 			if (result.error) return console.error('layer delete result.error:', result.error);
 
 			// remove locally, and from layermenu etc.
-			this._removeLayer(layer);
+			this._removeLayer(this.getLayer(layerUuid));
 
 			// fire event
 			Wu.Mixin.Events.fire('layerDeleted', { detail : {
@@ -535,9 +535,7 @@ Wu.Model.Project = Wu.Model.extend({
 	},
 
 	deleteLayer : function (layer) {
-
 		this.deleteLayerByUuid(layer.getUuid());
-
 	},
 
 	removeLayer : function (layerStore) {

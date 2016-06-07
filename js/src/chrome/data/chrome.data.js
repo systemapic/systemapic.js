@@ -65,12 +65,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     },
 
     _onLayerDeleted : function () {
-        // this._refresh();
+        this._refresh();  // debug: expensive
         this._refreshLayers();
     },
 
     _onLayerEdited : function () {
-        // this._refresh();
+        this._refresh();
         this._refreshLayers();
     },
 

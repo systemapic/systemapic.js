@@ -206,6 +206,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
             dc.lineChart(composite)
             .group(line_group)
             .colors('#ff6666')
+            .dotRadius(1)
             .renderDataPoints(false)
             .xyTipsOn(false),
 
@@ -442,7 +443,7 @@ Wu.Graph.Annual = Wu.Evented.extend({
             day : this._current.day,
             options : {
                 currentYearOnly : true,
-                force_query : true,
+                // force_query : true,
                 filter_query : false
             },
 
