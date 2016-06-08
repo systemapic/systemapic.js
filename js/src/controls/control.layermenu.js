@@ -10,18 +10,15 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	onAdd : function (map) {
 
-		this._innerContainer = Wu.DomUtil.create('div', 'leaflet-control-layermenu');
-
 		// add html
-		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
-		this._innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
-		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', this._innerScroller);
-
+		this._innerContainer = Wu.DomUtil.create('div', 'leaflet-control-layermenu');
+		this._layermenuOuter = Wu.DomUtil.create('div', 'scroller-frame');
+		this._innerScroller = Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
+		this._content = Wu.DomUtil.createId('div', 'layer-menu-inner-content', this._innerScroller);
 		this._bottomContainer = Wu.DomUtil.create('div', 'layers-bottom-container', this._layermenuOuter);
-
 		this._innerContainer.appendChild(this._layermenuOuter);
 
-
+		// mark open
 		this._isOpen = true;
 		this.registerTopButton();
 
@@ -38,21 +35,18 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	registerTopButton : function () {
 
+		var top = app.Chrome.Top;
 
-	        var top = app.Chrome.Top;
+		// add a button to top chrome
+		this._layerButton = top._registerButton({
+		    name : 'layer',
+		    className : 'chrome-button layer',
+		    trigger : this.toggleLayerMenu,
+		    context : this,
+		    project_dependent : false
+		});
 
-	        // add a button to top chrome
-	        this._layerButton = top._registerButton({
-	            name : 'layer',
-	            className : 'chrome-button layer',
-	            trigger : this.toggleLayerMenu,
-	            context : this,
-	            project_dependent : false
-	        });
-
-	        this._layerButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-layers"></i> <span class="layer-button-text">Layers</div>';
-	        
-	        
+		this._layerButton.innerHTML = '<i class="top-button systemapic-icons systemapic-icon-layers"></i> <span class="layer-button-text">Layers</div>';
 
 	},
 
@@ -62,21 +56,30 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	open : function  () {
 
-		Wu.Mixin.Events.fire('_openLayerMenu', {}); 		
+		// fire event
+		Wu.Mixin.Events.fire('_openLayerMenu'); 		
 
-		this._isOpen = true;
+		// set classes
 		Wu.DomUtil.removeClass(this._innerContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._layerButton, 'rounded-layer-button');
 
+		// mark open
+		this._isOpen = true;
+
+		// calc height
 		this.calculateHeight();
 	}, 
 
 	close : function () {
 
+		// mark closed
 		this._isOpen = false;
+
+		// set classes
 		Wu.DomUtil.addClass(this._innerContainer, 'displayNone');
 		Wu.DomUtil.addClass(this._layerButton, 'rounded-layer-button');
 
+		// calc height
 		this.calculateHeight();
 	},
 
@@ -117,13 +120,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// close by default
 		if (!this.editMode) this.closeAll();
 
-		// Set max height
-		// var dimensions = app._getDimensions();
-		// this.resizeEvent(dimensions);
-
+		// open in editMode
 		if (this.editMode) this._forceOpen();
-
-
 
 		// enable layers that are active by default
 		// this._enableDefaultLayers();
@@ -135,12 +133,31 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_enableDefaultLayers : function () {
-		for (var l in this.layers) {
-			var layermenuItem = this.layers[l];
-			if (layermenuItem.item.enabled) {
-				this._enableDefaultLayer(layermenuItem);
-			}
-		}
+		console.error('_enableDefaultLayers');
+
+		// get enabled layers
+		var active = _.filter(this.layers, function (l) {
+			return l || l.item || l.item.enabled;
+		});
+
+		console.log('active,', active);
+
+		// sort layers by z-index
+		var sortedByZindex = _.sortBy(active, function (l) {
+			return parseInt(l.item.zIndex);
+		});
+
+		console.error('sortedByZindex', sortedByZindex);
+
+		// enable each layer
+		sortedByZindex.forEach(this.enableLayer, this);
+
+		// for (var l in this.layers) {
+		// 	var layermenuItem = this.layers[l];
+		// 	if (layermenuItem.item.enabled) {
+		// 		this._enableDefaultLayer(layermenuItem);
+		// 	}
+		// }
 	},
 
 	// refresh for names etc, but keep active layers
@@ -885,8 +902,6 @@ L.Control.Layermenu = Wu.Control.extend({
 			// mark open
 			this._logic[uuid].isOpen = true;
 		}
-
-		// this._setHeight();
 	},
 
 	closeAll : function () {
@@ -921,8 +936,10 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayer : function (item) {
 
+		// don't toggle in edit mode
 		if (this.editMode) return;
 
+		// get layer
 		var layer = item.layer;
 		var _layerName = layer ? layer.getTitle() : 'Folder';
 
@@ -932,12 +949,13 @@ L.Control.Layermenu = Wu.Control.extend({
 		} else {
 			this.enableLayer(item);
 
-			// fire event
+			// fire selected event, todo: necessary to fire both layerSelected and layerEnabled??
 			Wu.Mixin.Events.fire('layerSelected', { detail : {
 				layer : layer
 			}}); 
 		}
 
+		// calc menu height
 		this.calculateHeight();
 	},
 
@@ -966,24 +984,21 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	enableLayer : function (layerItem) {
 
-
-
 		var layer = layerItem.layer;
 
 		// folder click
 		if (!layer) return this.toggleFolder(layerItem); 
 			
 		// add layer to map
-		layer.add();
-		layerItem.on = true;
+		layer.add(); // wu layer
 
-		// Make room for Layer inspector
-		// var dimensions = app._getDimensions();
-		// this.resizeEvent(dimensions);
+		// mark on
+		layerItem.on = true;
 
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
+		// mark editing
 		app.Chrome.Right.options.editingLayer = layer.getUuid();
 
 		// fire event
@@ -995,7 +1010,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// disable by layermenuItem
 	disableLayer : function (layermenuItem) {
-
 
 		var layer = layermenuItem.layer;
 		if (!layer) return;	
@@ -1410,8 +1424,23 @@ L.Control.Layermenu = Wu.Control.extend({
 		// err
 		if (i < 0) return console.error('couldnt save');
 
-		// save
+		var curLayer = this._project.store.layermenu[i];
+
+		// get highest zindex
+		var topLayer = _.max(l, function (ll) {
+			return parseInt(ll.zIndex);
+		});
+
+		var highestz = parseInt(topLayer.zIndex); 
+		var newZ = (topLayer.uuid == curLayer.uuid) ? highestz : highestz + 1; 
+
+		// set z-index
+		if (onoff) this._project.store.layermenu[i].zIndex = newZ;
+
+		// set enabled
 		this._project.store.layermenu[i].enabled = onoff;
+
+		// save
 		this.save();
 	},
 

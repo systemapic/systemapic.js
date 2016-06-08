@@ -19,7 +19,8 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 	
 	_initialize : function () {
-		// connect zindex control
+
+		// create zindex controls
 		this._baselayerZIndex = new Wu.ZIndexControl.Baselayers();
 		this._layermenuZIndex = new Wu.ZIndexControl.Layermenu();
 
@@ -163,34 +164,41 @@ Wu.MapPane = Wu.Pane.extend({
 
 		}, this);
 
-
-		// todo: remove, refactor this?
-		// on map load
+		// on projectSelected
 		map.on('projectSelected', function (e) {
+			// todo: remove, refactor this?	
+
 			// hack due to race conditions
 			setTimeout(function () { 
-				// enable layers that are marked as on by default
+	
+				// get layermenu control			
 				var lm = app.MapPane.getControls().layermenu;
+
+				// enable layers that are marked as on by default
 				lm && lm._enableDefaultLayers();
+			
 			}, 10);
 		});
 
 	},
 
 	_addAttribution : function (map) {
+
+		// create attribution control
 		this._attributionControl = L.control.attribution({position : 'bottomleft', prefix : false});
+
+		// add to map
 		map.addControl(this._attributionControl);
 
+		// set content
 		this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
-		// this._attributionControl.addAttribution('<a class="systemapic-attribution-logo" href="https://systemapic.com" target="_blank"><img src="../images/systemapic-attribution-logo-white.png"></a>');
+		
+		// remove content
 		this._attributionControl.removeAttribution('Leaflet');
 
-		// slack event on attribution
-		Wu.DomEvent.on(this._attributionControl._container, 'click', function () {
-			app.Analytics.onAttributionClick();
-		}, this);
 	},
 
+	// todo: remove??
 	_invalidateTiles : function () {
 		var options = {
 			access_token : app.tokens.access_token, // unique identifier
@@ -201,12 +209,14 @@ Wu.MapPane = Wu.Pane.extend({
 		var controls = this.options.controls;
 		this._controls = {};
 		_.each(controls, function (control) {
+
+			// create controls
 			this._controls[control] = new L.Control[control.camelize()];
+
 		}.bind(this));
 	},
 
 	getControls : function () {
-
 		return this._controls;
 	},
 
@@ -237,22 +247,20 @@ Wu.MapPane = Wu.Pane.extend({
 	// fired on window resize
 	// THIS FUNCTION IS NEVER FIRED, IS IT???
 	resizeEvent : function (d) {
-
+		console.error('deprecated??');
 		this._updateWidth(d);
 	},
     
-    	// THIS FUNCTION IS NEVER FIRED, IS IT???
+    // THIS FUNCTION IS NEVER FIRED, IS IT???
 	_updateWidth : function (d) {
+		console.error('deprecated??');
 		var map = this._map;
 		if (!map || !d) return;
-
 		
 		// set width
 		var w = d.width - parseInt(map._container.offsetLeft) + 'px';
 		map._container.style.width = w;
 		
-		alert('setting map width', w);
-
 		// refresh map size
 		setTimeout(function() {
 			if (map) map.reframe();
@@ -292,10 +300,8 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	setBackgroundColor : function () {
-
 		var bgc = this._project.getBackgroundColor() ? this._project.getBackgroundColor() : '#3C4759 url(../images/canvas.png)';
 		app.MapPane._container.style.background = bgc;
-
 	},
 
 	addBaseLayer : function (baseLayer) {
@@ -305,7 +311,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	removeBaseLayer : function (layer) {
-
 		map.removeLayer(base.layer);
 	},
 
@@ -365,7 +370,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	getActiveLayers : function () {
-
 		return this._activeLayers;
 	},
 
@@ -374,7 +378,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	clearActiveLayers : function () {
-
 		this._activeLayers = [];
 	},
 
@@ -555,12 +558,12 @@ Wu.MapPane = Wu.Pane.extend({
 		// remove carto
 		if (this.cartoCss) this.cartoCss.destroy();
 
-		this.cartoCss 			= null;
-		this._drawControl 		= null;
+		this.cartoCss 				= null;
+		this._drawControl 			= null;
 		this._drawControlLayer 		= null;
-		this._scale 			= null;
-		this.vectorStyle 		= null;
-		this.layerMenu 			= null;
+		this._scale 				= null;
+		this.vectorStyle 			= null;
+		this.layerMenu 				= null;
 		this.legendsControl 		= null;
 		this.descriptionControl 	= null;
 		this.inspectControl 		= null;
@@ -602,7 +605,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	_addLayer : function (layer) {
-
 		layer.addto(this._map);
 	},
 
@@ -672,7 +674,6 @@ Wu.MapPane = Wu.Pane.extend({
 			};
 		
 		this._chart = new Wu.Control.Chart(options);
-
 	},
 
 	// Adds data to existing pop-up
@@ -685,7 +686,6 @@ Wu.MapPane = Wu.Pane.extend({
 			};
 	
 		this._chart.updateExistingPopup(options);
-
 	},
 
 

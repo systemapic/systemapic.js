@@ -134,10 +134,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _addTo : function (type) {
 
         // ensure inited
-        // if (!this._inited) 
-
-        // ensure inited
-        console.log('ensuring inited');
         this.initLayer(function (err) {
 
             console.log('initLayer callbacj', err);
@@ -162,7 +158,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             app.MapPane.addActiveLayer(this);   // includes baselayers, todo: evented
 
             // update zindex
-            this._addToZIndex(type); // todo: evented
+            // this._addToZIndex(type); // todo: evented
 
             // add mask layer
             if (this._maskLayer) {

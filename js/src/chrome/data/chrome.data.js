@@ -290,7 +290,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     _refresh : function (options) {
 
         // debug: don't refresh from projectSelected event
-        if (options && options.event && options.event == 'projectSelected') return;
+        // if (options && options.event && options.event == 'projectSelected') return;
 
         // if no project, return
         if (!this._project) return;

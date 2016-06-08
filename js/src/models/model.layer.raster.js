@@ -163,6 +163,53 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
         this.layer.redraw();
     },
 
+    add : function (type) {
+
+        // mark as base or layermenu layer
+        this._isBase = (type == 'baselayer');
+        
+        // add
+        this.addTo();
+    },
+
+    addTo : function () {
+        if (!this._inited) this.initLayer();
+
+        // add to map
+        this._addTo();
+        
+        // add to controls
+        this.addToControls();
+    },
+
+    _addTo : function (type) {
+        if (!this._inited) this.initLayer();
+
+        var map = app._map;
+
+        // leaflet fn
+        map.addLayer(this.layer);
+
+        // add gridLayer if available
+        if (this.gridLayer) {
+            map.addLayer(this.gridLayer);
+        }
+
+        // add to active layers
+        app.MapPane.addActiveLayer(this);   // includes baselayers
+
+        // update zindex
+        // this._addToZIndex(type);
+        
+        this._added = true;
+
+        // fire event
+        Wu.Mixin.Events.fire('layerEnabled', { detail : {
+            layer : this
+        }}); 
+
+    },
+
 });
 
 
