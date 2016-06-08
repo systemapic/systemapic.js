@@ -1370,14 +1370,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // create tile layer
         var file = app.Account.getFile(dataset_id);
-        console.log('file: ', file);
-
 
         // create wu layer
         file.createRasterMaskLayer(function (err, mask_layer) {
             if (err) console.error(err);
-
-            console.log('layer: ', mask_layer);
 
             // add mask to layer (server request)
             layer.addMask({

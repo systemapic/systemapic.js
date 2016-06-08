@@ -729,7 +729,8 @@ Wu.Model.File = Wu.Model.extend({
 
 		// set styling
 		var defaultCartocss = '#layer {';
-		defaultCartocss += 'raster-opacity: 0.6; '; 
+		// defaultCartocss += 'raster-opacity: 0.6; '; 
+		defaultCartocss += 'raster-opacity: 0; '; 
 		defaultCartocss += 'raster-colorizer-default-mode: linear; '; 
 		defaultCartocss += 'raster-colorizer-default-color: transparent; '; 
 		defaultCartocss += 'raster-colorizer-stops: '; 

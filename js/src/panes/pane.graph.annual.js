@@ -43,8 +43,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // init graph
         this._initGraph();
 
-        // set initial date (todo: set to last in series)
-        this._setDate(2016, 10);
+        // set initial date
+        this._setLastDate();
 
     },
 
@@ -174,6 +174,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
         .clipPadding(10)    
         .elasticY(false)
         .elasticX(false)
+        .renderHorizontalGridLines(true)
+        .renderVerticalGridLines(true)
         .brushOn(false)
         .yAxisLabel('SCF (%)')
         .transitionDuration(0)          
@@ -183,7 +185,9 @@ Wu.Graph.Annual = Wu.Evented.extend({
             dc.lineChart(composite)
             .group(average_max_group)
             .colors('#DDDDDD')
-            .renderArea(true)       
+            .renderArea(true)
+            .renderHorizontalGridLines(true)
+            .renderVerticalGridLines(true)   
             .renderDataPoints(false)
             .xyTipsOn(false),
 
@@ -191,14 +195,20 @@ Wu.Graph.Annual = Wu.Evented.extend({
             dc.lineChart(composite)
             .group(average_min_group)
             .colors('#3C4759')
+            // .colors('#DDDDDD')
+            // .colors('yellow')
             .renderArea(true)       
             .renderDataPoints(false)
+            .renderHorizontalGridLines(true)
+            .renderVerticalGridLines(true)
             .xyTipsOn(false),
 
             // AVERAGE value
             dc.lineChart(composite)
             .group(average_avg_group)
             .colors('white')
+            .renderHorizontalGridLines(true)
+            .renderVerticalGridLines(true)
             .renderDataPoints(false)
             .xyTipsOn(false),
 
@@ -206,6 +216,8 @@ Wu.Graph.Annual = Wu.Evented.extend({
             dc.lineChart(composite)
             .group(line_group)
             .colors('#ff6666')
+            .renderHorizontalGridLines(true)
+            .renderVerticalGridLines(true)
             .dotRadius(1)
             .renderDataPoints(false)
             .xyTipsOn(false),
@@ -215,7 +227,16 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         composite
         .xAxis()
-        .tickFormat(d3.time. format('%b'))
+        .tickFormat(d3.time. format('%b'));
+        
+        // hack gridlines on top
+        composite
+        .on('renderlet', function (table) {
+            var h = document.getElementsByClassName('grid-line horizontal')[0];
+            var v = document.getElementsByClassName('grid-line vertical')[0];
+            h.parentNode.appendChild(h);
+            v.parentNode.appendChild(v);
+        });
 
         // render
         dc.renderAll(); 
@@ -271,6 +292,27 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
     _cache : {
         line : {}
+    },
+
+    _setLastDate : function () {
+
+        // get cube
+        var cube = this.getCube();
+
+        // get datasets
+        var datasets = cube.getDatasets();
+
+        // get last dataset
+        var last = _.last(datasets);
+
+        // get year/day
+        var date = moment(last.timestamp);
+        var year = date.year();
+        var day = date.dayOfYear();
+
+        // set date in graph
+        this._setDate(year, day);
+
     },
 
     _setDate : function (year, day) {
@@ -411,10 +453,10 @@ Wu.Graph.Annual = Wu.Evented.extend({
         });
         var scfTitle = scf ? (Math.round(scf.SCF * 10) / 10) + '%' : '';
 
-        // check limit
-        if (this._current.day >= this._limit) {
-            dateTitle += ' (end of dataset)';
-        }
+        // // check limit
+        // if (this._current.day >= this._limit) {
+        //     dateTitle += ' (most current)';
+        // }
 
         // set titles
         this._nameTitle.innerHTML = nameTitle;
@@ -456,8 +498,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
             // parse dates
             var cache = this._parseDates(fractions);
-
-            console.log('cache', cache);
 
             // set cache
             this._cache.line[this._current.year] = cache;
