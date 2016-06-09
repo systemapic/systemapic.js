@@ -136,11 +136,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         // ensure inited
         this.initLayer(function (err) {
 
-            console.log('initLayer callbacj', err);
-
             var map = app._map;
-
-            console.log('_addTo');
 
             // add leaflet layer group to map
             this._group.addTo(map);
@@ -188,8 +184,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
             // mark added
             this._added = true;
-
-            console.log('fire layer enabled');
 
             // fire event
             Wu.Mixin.Events.fire('layerEnabled', { detail : {
@@ -827,8 +821,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         
         // add cube id
         options.cube_id = this.getCubeId();
-
-        console.log('query options', options);
 
         // query cube
         app.api.queryCube(options, done);

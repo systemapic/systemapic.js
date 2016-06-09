@@ -133,21 +133,16 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_enableDefaultLayers : function () {
-		console.error('_enableDefaultLayers');
 
 		// get enabled layers
 		var active = _.filter(this.layers, function (l) {
 			return l || l.item || l.item.enabled;
 		});
 
-		console.log('active,', active);
-
 		// sort layers by z-index
 		var sortedByZindex = _.sortBy(active, function (l) {
 			return parseInt(l.item.zIndex);
 		});
-
-		console.error('sortedByZindex', sortedByZindex);
 
 		// enable each layer
 		sortedByZindex.forEach(this.enableLayer, this);
