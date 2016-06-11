@@ -188,11 +188,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
 
-		// if (app.mobile) {
-		// 	// Mobile arrow	
-		//     	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
-		// }
-
 	},
 
 	_addHooks : function () {

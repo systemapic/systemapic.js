@@ -8,6 +8,8 @@ Wu.Model.Layer = Wu.Model.extend({
 
     _initialize : function (layer) {
 
+        console.log('LAYER ->', this);
+
         // set source
         this.store = layer; // db object
         
