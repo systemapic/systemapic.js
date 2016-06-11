@@ -1,4 +1,4 @@
- // app.MapPane.layerMenu
+// app.MapPane.layerMenu
 L.Control.Layermenu = Wu.Control.extend({
 
 	type : 'layermenu',
@@ -136,7 +136,9 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// get enabled layers
 		var active = _.filter(this.layers, function (l) {
-			return l || l.item || l.item.enabled;
+			if (!l) return false;
+			if (!l.item) return false;
+			return l.item.enabled;
 		});
 
 		// sort layers by z-index
@@ -147,12 +149,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// enable each layer
 		sortedByZindex.forEach(this.enableLayer, this);
 
-		// for (var l in this.layers) {
-		// 	var layermenuItem = this.layers[l];
-		// 	if (layermenuItem.item.enabled) {
-		// 		this._enableDefaultLayer(layermenuItem);
-		// 	}
-		// }
 	},
 
 	// refresh for names etc, but keep active layers
