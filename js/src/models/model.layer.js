@@ -506,6 +506,7 @@ Wu.Model.Layer = Wu.Model.extend({
     setLegends : function (legends) {
         if (!legends) return;
         this.store.legends = JSON.stringify(legends);
+        console.error('legends', legends);
         this.save('legends');
     },
 

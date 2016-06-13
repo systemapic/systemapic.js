@@ -2,8 +2,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 
-		console.log('opitons', options);
-
 		Wu.setOptions(this, options);
 
 		// OTHER OPTIONS
@@ -93,17 +91,17 @@ Wu.Control.Chart = Wu.Control.extend({
 		var t5 = _.find(csv, {type : 't5'});
 		var t6 = _.find(csv, {type : 't6'});
 
-		console.log('data: ', data);
-		console.log('t1', t1);
-		console.log('t2', t2);
-		console.log('t3', t3);
-		console.log('t4', t4);
-		console.log('t6', t6);
-		console.log('legend:', legend);
-		console.log('display_name', display_name);
-		console.log('csv->', csv);
-		console.log('popupsettings', this.popupSettings);
-		console.log('options', this.options);
+		// console.log('data: ', data);
+		// console.log('t1', t1);
+		// console.log('t2', t2);
+		// console.log('t3', t3);
+		// console.log('t4', t4);
+		// console.log('t6', t6);
+		// console.log('legend:', legend);
+		// console.log('display_name', display_name);
+		// console.log('csv->', csv);
+		// console.log('popupsettings', this.popupSettings);
+		// console.log('options', this.options);
 
 
 		// create container
@@ -117,15 +115,12 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// create inner content
 		_.forEach(data, function (v, k) {
-			console.log('each data', v, k);
 			if (_.isNull(v)) return;
 			if (k == 'the_geom_3857') return;
 			if (k == 'the_geom_4326') return;
 			if (k == 'type') return;
 			if (k == 'comments') return;
 			if (k == 'gid') return;
-
-			console.log('LINE!', v, k);
 
 			// create line
 			var line_wrap = Wu.DomUtil.create('div', 'popup-csv-line-wrap', content);
@@ -156,28 +151,16 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		var tclass = 0;
 
-		console.log('t1[k]]', t1[k]);
 
-		console.log('V == =', v);
-		console.log('k', k);
-		console.log('t1', t1[k])
-		console.log('t2', t2[k])
-		console.log('t3', t3[k])
-		console.log('t4', t4[k])
-		console.log('t5', t5[k])
-		console.log('t6', t6[k])
-
-		if (v <  parseFloat(t1[k])) tclass = 1;
-		if (v >= parseFloat(t2[k])) tclass = 2;
-		if (v >= parseFloat(t3[k])) tclass = 3;
-		if (v >= parseFloat(t4[k])) tclass = 4;
-		if (v >= parseFloat(t5[k])) tclass = 5;
-		if (v >= parseFloat(t6[k])) tclass = 6;
+		if (t1 && v <  parseFloat(t1[k])) tclass = 1;
+		if (t2 && v >= parseFloat(t2[k])) tclass = 2;
+		if (t3 && v >= parseFloat(t3[k])) tclass = 3;
+		if (t4 && v >= parseFloat(t4[k])) tclass = 4;
+		if (t5 && v >= parseFloat(t5[k])) tclass = 5;
+		if (t6 && v >= parseFloat(t6[k])) tclass = 6;
 
 		var content = Wu.DomUtil.create('div', 'popup-csv-class tilstandsklasse-' + tclass);
 		content.innerHTML = tclass ? 'Tilstandsklasse ' + tclass : 'Ukjent tilstandsklasse';
-
-		console.log('content = ', content);
 
 		return content;
 
@@ -680,7 +663,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	// Header
 	createHeader : function (options) {
-		console.error('chart');
 
 		// get vars
 		var headerMeta = options.headerMeta;

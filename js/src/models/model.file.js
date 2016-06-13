@@ -640,11 +640,8 @@ Wu.Model.File = Wu.Model.extend({
             meta : this.getMeta()
         };
 
-        console.log('defaultCSVCarto', options);
-
+        // create custom cartocss
         app.api.customCarto(options, function (err, cartocss) {
-            console.log('err, cartocss', err, cartocss);
-
             done(err, cartocss);
         });
 
@@ -656,8 +653,6 @@ Wu.Model.File = Wu.Model.extend({
         var ops = [];
         var file = this;
         var defaultStyle = file.defaultStyle();
-
-        console.error('createVectorLayer', file);
 
         // create css from json (server side) (json2carto)
         ops.push(function (callback) {
@@ -675,8 +670,6 @@ Wu.Model.File = Wu.Model.extend({
         // create tile layer
         ops.push(function (defaultCartocss, callback) {
 
-            console.log('got defaultCartocss', defaultCartocss);
-            
             var tileLayerJSON = {
                 "geom_column"       : "the_geom_3857",
                 "geom_type"         : "geometry",
@@ -694,8 +687,6 @@ Wu.Model.File = Wu.Model.extend({
                 "projectUuid"       : project.getUuid()
             };
 
-            console.log('craete tile layer POST:', tileLayerJSON);
-
             // create postgis layer
             app.api.createTileLayer(tileLayerJSON, callback);
         });
@@ -703,14 +694,9 @@ Wu.Model.File = Wu.Model.extend({
         // create layer model
         ops.push(function (layerJSON, callback) {
 
-            console.log('layerJSON:', layerJSON);
-            
             // parse
             var layer = Wu.parse(layerJSON);
             if (!layer) return callback('Error parsing layer.');
-
-
-            console.error('craete layer:::', layer, file);
 
             var layerModelJSON = {
                 projectUuid     : project.getUuid(), // pass to automatically attach to project
@@ -724,8 +710,6 @@ Wu.Model.File = Wu.Model.extend({
                 }
             };
 
-            console.log('create wu layer POST', layerModelJSON);
-
             // create new layer model
             file._createLayerModel(layerModelJSON, callback);
         });
@@ -733,10 +717,13 @@ Wu.Model.File = Wu.Model.extend({
         // set feedback and fire events
         ops.push(function (layerJSON, callback) {
 
-            console.log('wu layer back', layerJSON);
-
             // refresh Sidepane Options
             var layer = project.addLayer(layerJSON);
+
+            // hack: add legends
+            if (file.getOriginalFormat() == 'csv') {
+                layer.setLegends(file.get_debug_legends_tilstandsklasser());
+            }
 
             // provide feedback
             app.feedback.setMessage({
@@ -1039,5 +1026,104 @@ Wu.Model.File = Wu.Model.extend({
         var size = this.getDatasize();
         var pretty = Wu.Util.bytesToSize(size);
         return pretty;
+    },
+
+    get_debug_legends_tilstandsklasser : function () {
+        var legends = {
+            "enable": true,
+            "layerMeta": false,
+            "opacitySlider": false,
+            "layerName": "Målinger no. 2",
+            "point": {
+                "all": {
+                    "color": {
+                        "column": false,
+                        "value": "#00dfff"
+                    },
+                    "opacity": {
+                        "column": false,
+                        "value": 1
+                    },
+                    "pointsize": {
+                        "column": false,
+                        "value": 1
+                    },
+                    "isOn": false
+                },
+                "target": [
+                {
+                    "column": "gid",
+                    "color": "#00c9ff",
+                    "opacity": 1,
+                    "value": "",
+                    "width": 5,
+                    "operator": "=",
+                    "name": "Tilstandsklasse 1 – Meget God",
+                    "isOn": true
+                },
+                {
+                    "column": "gid",
+                    "color": "#4fff00",
+                    "opacity": 1,
+                    "value": "",
+                    "width": 5,
+                    "operator": "=",
+                    "name": "Tilstandsklasse 2 – God",
+                    "isOn": true
+                },
+                {
+                    "column": "gid",
+                    "color": "#ffed00",
+                    "opacity": 1,
+                    "value": "",
+                    "width": 5,
+                    "operator": "=",
+                    "name": "Tilstandsklasse 3 – Moderat",
+                    "isOn": true
+                },
+                {
+                    "column": "gid",
+                    "color": "#ffa200",
+                    "opacity": 1,
+                    "value": "",
+                    "width": 5,
+                    "operator": "=",
+                    "name": "Tilstandsklasse 4 – Dårlig",
+                    "isOn": true
+                },
+                {
+                    "column": "gid",
+                    "color": "red",
+                    "opacity": 1,
+                    "value": "",
+                    "width": 5,
+                    "operator": "=",
+                    "name": "Tilstandsklasse 5 – Svært Dårlig",
+                    "isOn": true
+                },
+                {
+                    "column": "gid",
+                    "color": "#ce00c0",
+                    "opacity": 1,
+                    "value": "",
+                    "width": 5,
+                    "operator": "=",
+                    "name": "Tilstandsklasse 6 – Farlig Avfall",
+                    "isOn": true
+                }
+                ]
+            },
+            "polygon": {
+                "all": {},
+                "target": []
+            },
+            "line": {
+                "all": {},
+                "target": []
+            },
+            "html": "<div class=\"legend-each-container\"><div class=\"legend-each-name\">Tilstandsklasse 1 – Meget God</div><div class=\"legend-each-color\" style=\"background:rgba(0,201,255,1);; width: 10px; height: 10px; border-radius: 10px;top: 5px; left: 9px; \"></div></div><div class=\"legend-each-container\"><div class=\"legend-each-name\">Tilstandsklasse 2 – God</div><div class=\"legend-each-color\" style=\"background:rgba(79,255,0,1);; width: 10px; height: 10px; border-radius: 10px;top: 5px; left: 9px; \"></div></div><div class=\"legend-each-container\"><div class=\"legend-each-name\">Tilstandsklasse 3 – Moderat</div><div class=\"legend-each-color\" style=\"background:rgba(255,237,0,1);; width: 10px; height: 10px; border-radius: 10px;top: 5px; left: 9px; \"></div></div><div class=\"legend-each-container\"><div class=\"legend-each-name\">Tilstandsklasse 4 – Dårlig</div><div class=\"legend-each-color\" style=\"background:rgba(255,162,0,1);; width: 10px; height: 10px; border-radius: 10px;top: 5px; left: 9px; \"></div></div><div class=\"legend-each-container\"><div class=\"legend-each-name\">Tilstandsklasse 5 – Svært Dårlig</div><div class=\"legend-each-color\" style=\"background:rgba(255,0,0,1);; width: 10px; height: 10px; border-radius: 10px;top: 5px; left: 9px; \"></div></div><div class=\"legend-each-container\"><div class=\"legend-each-name\">Tilstandsklasse 6 – Farlig Avfall</div><div class=\"legend-each-color\" style=\"background:rgba(206,0,192,1);; width: 10px; height: 10px; border-radius: 10px;top: 5px; left: 9px; \"></div></div>",
+            "gradient": ""
+        }
+        return legends;
     }
 });

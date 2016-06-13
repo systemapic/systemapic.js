@@ -563,6 +563,7 @@ input.chrome-field-input {
     margin-left: 5px;
     margin-bottom: 4px;
     background: rgba(60, 71, 89, 0.6) !important;
+    padding-bottom: 4px;
     }
 
 #app {
