@@ -3151,32 +3151,32 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // Bind container
         var toggleButton =
-                parent
-                        .selectAll('.chrome-switch-container')
-                        .data(function(d) { return [d] });
+            parent
+            .selectAll('.chrome-switch-container')
+            .data(function(d) { return [d] });
 
         // Enter container
         toggleButton
-                .enter()
-                .append('div')
-                .classed('chrome-switch-container', true);
+        .enter()
+        .append('div')
+        .classed('chrome-switch-container', true);
 
         toggleButton
-                .classed('switch-on', function (d) {
-                    var uuid = d.getUuid();
-                    var on = this.isLayerOn(uuid);
-                    return on;
-                }.bind(this));
+        .classed('switch-on', function (d) {
+            var uuid = d.getUuid();
+            var on = this.isLayerOn(uuid);
+            return on;
+        }.bind(this));
 
         toggleButton
-                .on('click', function(d) {
-                    this.toggleLayer(d);
-                }.bind(this));
+        .on('click', function(d) {
+            this.toggleLayer(d);
+        }.bind(this));
 
         // Exit
         toggleButton
-                .exit()
-                .remove();
+        .exit()
+        .remove();
 
     },
 

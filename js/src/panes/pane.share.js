@@ -173,6 +173,8 @@ Wu.Share = Wu.Pane.extend({
 
 	_shareImage : function () {
 
+		return this._setFeedback('Screenshot currently disabled.');
+
 		// take snap
 		app.phantomjs.snap(function (err, file) {
 

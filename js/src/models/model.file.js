@@ -636,6 +636,8 @@ Wu.Model.File = Wu.Model.extend({
         var file = this;
         var defaultStyle = file.defaultStyle();
 
+
+
         // create css from json (server side) (json2carto)
         ops.push(function (callback) {
             file.defaultCarto(defaultStyle, callback);
@@ -661,16 +663,23 @@ Wu.Model.File = Wu.Model.extend({
                 "projectUuid"       : project.getUuid()
             };
 
+            console.log('craete tile layer POST:', tileLayerJSON);
+
             // create postgis layer
             app.api.createTileLayer(tileLayerJSON, callback);
         });
 
         // create layer model
         ops.push(function (layerJSON, callback) {
+
+            console.log('layerJSON:', layerJSON);
             
             // parse
             var layer = Wu.parse(layerJSON);
             if (!layer) return callback('Error parsing layer.');
+
+
+            console.error('craete layer:::', layer, file);
 
             var layerModelJSON = {
                 projectUuid     : project.getUuid(), // pass to automatically attach to project
@@ -684,12 +693,16 @@ Wu.Model.File = Wu.Model.extend({
                 }
             };
 
+            console.log('create wu layer POST', layerModelJSON);
+
             // create new layer model
             file._createLayerModel(layerModelJSON, callback);
         });
 
         // set feedback and fire events
         ops.push(function (layerJSON, callback) {
+
+            console.log('wu layer back', layerJSON);
 
             // refresh Sidepane Options
             var layer = project.addLayer(layerJSON);
