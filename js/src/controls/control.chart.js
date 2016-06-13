@@ -2,10 +2,15 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 
+		console.log('opitons', options);
+
+		Wu.setOptions(this, options);
 
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
+
+		var is_csv = this.checkIfCSV();
 
 		// If we are sampling with polygon (draw)
 		if ( multiPopUp ) {
@@ -17,14 +22,23 @@ Wu.Control.Chart = Wu.Control.extend({
 			// Create content
 			var content = this.multiPointPopUp(multiPopUp);
 
+		// csv 
+		} else if (is_csv) {
+
+			// get layer
+			var layer = options.e.layer;
+
+			// get tooltip
+			this.popupSettings = layer.getTooltip();
+
+			// create custom csv content
+			var content = this.createCSVContent();
 
 		// If we are sampling from point (click)
 		} else {
 
-			if (!e) {
-				console.error('no "e" provided?');
-				return;
-			}
+			// catch error
+			if (!e) return console.error('no "e" provided?');
 
 			// Get pop-up settings
 			this.popupSettings = e.layer.getTooltip();
@@ -53,6 +67,129 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Open popup
 		this.openPopup(e, multiPopUp);
 
+	},
+
+	createCSVContent : function () {
+
+		// get layer
+		var layer = this.options.e.layer;
+
+		// get meta
+		var meta = layer.getMeta();
+
+		// get csv
+		var csv = meta.csv;
+
+		// get data
+		var data = this.options.e.data;
+
+		// get csv classes
+		var display_name = _.find(csv, {type : 'display_name'});
+		var legend = _.find(csv, {type : 'legend'});
+		var t1 = _.find(csv, {type : 't1'});
+		var t2 = _.find(csv, {type : 't2'});
+		var t3 = _.find(csv, {type : 't3'});
+		var t4 = _.find(csv, {type : 't4'});
+		var t5 = _.find(csv, {type : 't5'});
+		var t6 = _.find(csv, {type : 't6'});
+
+		console.log('data: ', data);
+		console.log('t1', t1);
+		console.log('t2', t2);
+		console.log('t3', t3);
+		console.log('t4', t4);
+		console.log('t6', t6);
+		console.log('legend:', legend);
+		console.log('display_name', display_name);
+		console.log('csv->', csv);
+		console.log('popupsettings', this.popupSettings);
+		console.log('options', this.options);
+
+
+		// create container
+		var container = Wu.DomUtil.create('div', 'popup-csv-container');
+
+		// create header
+		var header = Wu.DomUtil.create('div', 'popup-csv-header', container, layer.getTitle());
+
+		// create content wrapper
+		var content = Wu.DomUtil.create('div', 'popup-csv-content', container);
+
+		// create inner content
+		_.forEach(data, function (v, k) {
+			console.log('each data', v, k);
+			if (_.isNull(v)) return;
+			if (k == 'the_geom_3857') return;
+			if (k == 'the_geom_4326') return;
+			if (k == 'type') return;
+			if (k == 'comments') return;
+			if (k == 'gid') return;
+
+			console.log('LINE!', v, k);
+
+			// create line
+			var line_wrap = Wu.DomUtil.create('div', 'popup-csv-line-wrap', content);
+
+			// set name, value
+			var name_div = Wu.DomUtil.create('div', 'popup-csv-line-name', line_wrap, display_name[k]);
+			var value_div = Wu.DomUtil.create('div', 'popup-csv-line-value', line_wrap, v + ' ' + legend[k]);
+
+			// set tilstandsklasse
+			var tclass = this._get_t_class_html(csv, k, v);
+			line_wrap.appendChild(tclass);
+
+		}.bind(this));
+
+		return container;
+	},
+
+	_get_t_class_html : function (csv, k, v) {
+		var t1 = _.find(csv, {type : 't1'});
+		var t2 = _.find(csv, {type : 't2'});
+		var t3 = _.find(csv, {type : 't3'});
+		var t4 = _.find(csv, {type : 't4'});
+		var t5 = _.find(csv, {type : 't5'});
+		var t6 = _.find(csv, {type : 't6'});
+
+		// k = 4
+		// v = 270
+
+		var tclass = 0;
+
+		console.log('t1[k]]', t1[k]);
+
+		console.log('V == =', v);
+		console.log('k', k);
+		console.log('t1', t1[k])
+		console.log('t2', t2[k])
+		console.log('t3', t3[k])
+		console.log('t4', t4[k])
+		console.log('t5', t5[k])
+		console.log('t6', t6[k])
+
+		if (v <  parseFloat(t1[k])) tclass = 1;
+		if (v >= parseFloat(t2[k])) tclass = 2;
+		if (v >= parseFloat(t3[k])) tclass = 3;
+		if (v >= parseFloat(t4[k])) tclass = 4;
+		if (v >= parseFloat(t5[k])) tclass = 5;
+		if (v >= parseFloat(t6[k])) tclass = 6;
+
+		var content = Wu.DomUtil.create('div', 'popup-csv-class tilstandsklasse-' + tclass);
+		content.innerHTML = tclass ? 'Tilstandsklasse ' + tclass : 'Ukjent tilstandsklasse';
+
+		console.log('content = ', content);
+
+		return content;
+
+	},
+
+	checkIfCSV : function () {
+		var options = this.options;
+		var layer = options.e.layer;
+		if (!layer) return;
+
+		// return true if csv key exists on metadata
+		return _.has(layer.getMeta(), 'csv');
 	},
 
 
@@ -543,7 +680,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	// Header
 	createHeader : function (options) {
-
+		console.error('chart');
 
 		// get vars
 		var headerMeta = options.headerMeta;

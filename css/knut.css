@@ -2117,3 +2117,59 @@ text.y-axis-label.y-label {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+
+
+
+.popup-csv-header {
+    font-size: 24px;
+    font-weight: 600;
+    padding-bottom: 10px;
+}
+
+.popup-csv-container {
+    padding: 20px;
+    padding-top: 10px;
+}
+
+.popup-csv-line-wrap:nth-child(odd) {
+    background: #f7f7f7;
+}
+
+.popup-csv-line-name {
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.popup-csv-line-value {
+    font-size: 16px;
+}
+
+.popup-csv-line-wrap {
+    padding-top: 10px;
+}
+
+.popup-csv-class.tilstandsklasse-0 {
+    font-size: 12px;
+}
+.popup-csv-class.tilstandsklasse-1 {
+    /*color: #00c9ff;*/
+}
+.popup-csv-class.tilstandsklasse-2 {
+    /*color: #4fff00;*/
+}
+.popup-csv-class.tilstandsklasse-3 {
+    /*color: #ffed00;*/
+}
+.popup-csv-class.tilstandsklasse-4 {
+    color: #ffa200;
+}
+.popup-csv-class.tilstandsklasse-5 {
+    color: #ff0000;
+}
+.popup-csv-class.tilstandsklasse-6 {
+    color: #ce00c0;
+}
+
+
+

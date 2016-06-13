@@ -269,9 +269,12 @@ Wu.Api = Wu.Class.extend({
 	},
 
 	json2carto : function (options, done) {
-		// var path = '/api/geo/json2carto';
-		// var path = '/v2/carto/json';
 		var path = '/v2/layers/carto/json';
+		this.post(path, options, done);
+	},
+
+	customCarto : function (options, done) {
+		var path = '/v2/layers/carto/custom';
 		this.post(path, options, done);
 	},
 
