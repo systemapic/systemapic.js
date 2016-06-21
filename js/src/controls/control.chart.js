@@ -153,11 +153,12 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 		if (t1 && v <  parseFloat(t1[k])) tclass = 1;
-		if (t2 && v >= parseFloat(t2[k])) tclass = 2;
-		if (t3 && v >= parseFloat(t3[k])) tclass = 3;
-		if (t4 && v >= parseFloat(t4[k])) tclass = 4;
-		if (t5 && v >= parseFloat(t5[k])) tclass = 5;
-		if (t6 && v >= parseFloat(t6[k])) tclass = 6;
+		if (t1 && v >= parseFloat(t1[k])) tclass = 2;
+		if (t2 && v >= parseFloat(t2[k])) tclass = 3;
+		if (t3 && v >= parseFloat(t3[k])) tclass = 4;
+		if (t4 && v >= parseFloat(t4[k])) tclass = 5;
+		if (t5 && v >= parseFloat(t5[k])) tclass = 6;
+		if (t6 && v >= parseFloat(t6[k])) tclass = 7;
 
 		var content = Wu.DomUtil.create('div', 'popup-csv-class tilstandsklasse-' + tclass);
 		content.innerHTML = tclass ? 'Tilstandsklasse ' + tclass : 'Ukjent tilstandsklasse';
