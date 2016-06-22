@@ -158,7 +158,7 @@ L.UtfGrid = (L.Layer || L.Class).extend({
 			if (on.data) {
 				this.fire('mouseover', on);
 				if (this.options.pointerCursor) {
-					this._container.style.cursor = 'cell';
+					this._container.style.cursor = 'crosshair';
 				}
 			}
 
@@ -193,7 +193,10 @@ L.UtfGrid = (L.Layer || L.Class).extend({
 			}
 		}
 
-		return L.extend({ latlng: e.latlng, data: result }, e);
+		return L.extend({ 
+			latlng: e.latlng, 
+			data: result 
+		}, e);
 	},
 
 	//Load up all required json grid files

@@ -121,6 +121,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			if (k == 'type') return;
 			if (k == 'comments') return;
 			if (k == 'gid') return;
+			if (k == 'lat') return;
+			if (k == 'lng') return;
 
 			// create line
 			var line_wrap = Wu.DomUtil.create('div', 'popup-csv-line-wrap', content);
@@ -231,45 +233,57 @@ Wu.Control.Chart = Wu.Control.extend({
 		popup.setContent(content, true);
 	},
 
+	// get real marker position (from data)
 	_getMarkerPosition : function (latlng, e) {
-		// try to calculate true position of point, instead of mouse pos. need to look in data. 
-		// this is kinda specific to globesar's data, but could be made pluggable.
-		// var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
-		return latlng;
+		
+		// return latlng if no data	
+		if (!e.data) return latlng;
+
+		// read latlng from data
+		var lat = e.data.lat;
+		var lng = e.data.lng;
+
+		// return leaflet latlng object
+		return L.latLng(lat, lng);
 	},
 
 	// Add marker circle (not working)
 	_addMarkerCircle : function (latlng) {
 
+		// circle marker styling
 		var styling = { 
-			radius: 10,
+			radius: 15,
 			fillColor: "white",
-			color: "white",
+			color: "gainsboro",
 			weight: 15,
-			opacity : 1,
-			fillOpacity: 0.4
+			opacity : 0.7,
+			fillOpacity: 0
 		};
 
-		this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(app._map);
+		// create circle marker
+		this._circleMarker = L.circleMarker(latlng, styling).addTo(app._map);
 	},
 
 	_addPopupCloseEvent : function () {
 		if (this._popInit) return;
 		this._popInit = true;	// only run once
 
-		var map = app._map;
-		map.on('popupclose',  this._clearPopup, this);
+		// close event
+		app._map.on('popupclose',  this._clearPopup, this);
 	},
 
 	_removePopupCloseEvent : function () {
-		var map = app._map;
-		map.off('popupclose',  this._clearPopup, this);
+
+		// remove close event
+		app._map.off('popupclose',  this._clearPopup, this);
 	},
 
 	_refresh : function () {
 
+		// remove old popup
 		if (this._popup) this._popup._remove();
 		
+		// clear popup
 		this._clearPopup(false);
 	},
 
@@ -283,7 +297,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		this._popup = null;
 
 		// remove marker
-		this.popUpMarkerCircle && app._map.removeLayer(this.popUpMarkerCircle);
+		this._circleMarker && app._map.removeLayer(this._circleMarker);
 
 		// remove event
 		this._removePopupCloseEvent();
@@ -715,7 +729,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			if (!setting) return;
 
-			if ( _key == 'geom' || _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return;
+			if ( _key == 'lat' || _key == 'lng' || _key == 'geom' || _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return;
 			
 			// Do not show field if there is no value
 			if ( !_val ) return;
