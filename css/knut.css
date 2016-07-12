@@ -2190,5 +2190,6 @@ text.y-axis-label.y-label {
     border-radius: 3px;
     top: -7px;
     text-align: center;
+    cursor: -webkit-grab;
 }
 

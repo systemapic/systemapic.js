@@ -200,6 +200,25 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         return m.geometry_type;
     },
 
+    getDisplayNames : function () {
+        // get meta
+        var meta = this.getMeta();
+
+        if (!meta) return;
+
+        // get csv
+        var csv = meta.csv;
+
+        if (!csv) return;
+
+        // get csv classes
+        var display_names = _.find(csv, {type : 'display_name'});
+
+        if (!display_names) return;
+
+        return display_names;
+    },
+
     _invalidateTiles : function () {
         return;
     },

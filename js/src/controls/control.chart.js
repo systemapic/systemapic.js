@@ -8,8 +8,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
 
-		var is_csv = this.checkIfCSV();
-
 		// If we are sampling with polygon (draw)
 		if ( multiPopUp ) {
 
@@ -21,7 +19,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			var content = this.multiPointPopUp(multiPopUp);
 
 		// csv 
-		} else if (is_csv) {
+		} else if (this.isCSV()) {
 
 			// get layer
 			var layer = options.e.layer;
@@ -43,7 +41,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			// Create content
 			var content = this.singlePopUp(e);
-
 		}
 
 		// Return if disabled
@@ -81,6 +78,12 @@ Wu.Control.Chart = Wu.Control.extend({
 		// get data
 		var data = this.options.e.data;
 
+		// get tooltip settings
+		var tooltip = layer.getTooltip();
+
+		// get metafields
+		var fields = tooltip.metaFields;
+
 		// get csv classes
 		var display_name = _.find(csv, {type : 'display_name'});
 		var legend = _.find(csv, {type : 'legend'});
@@ -90,19 +93,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var t4 = _.find(csv, {type : 't4'});
 		var t5 = _.find(csv, {type : 't5'});
 		var t6 = _.find(csv, {type : 't6'});
-
-		// console.log('data: ', data);
-		// console.log('t1', t1);
-		// console.log('t2', t2);
-		// console.log('t3', t3);
-		// console.log('t4', t4);
-		// console.log('t6', t6);
-		// console.log('legend:', legend);
-		// console.log('display_name', display_name);
-		// console.log('csv->', csv);
-		// console.log('popupsettings', this.popupSettings);
-		// console.log('options', this.options);
-
 
 		// create container
 		var container = Wu.DomUtil.create('div', 'popup-csv-container');
@@ -123,6 +113,9 @@ Wu.Control.Chart = Wu.Control.extend({
 			if (k == 'gid') return;
 			if (k == 'lat') return;
 			if (k == 'lng') return;
+
+			var isOn = fields[k].on;
+			if (!isOn) return;
 
 			// create line
 			var line_wrap = Wu.DomUtil.create('div', 'popup-csv-line-wrap', content);
@@ -169,7 +162,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	},
 
-	checkIfCSV : function () {
+	isCSV : function () {
 		var options = this.options;
 		var layer = options.e.layer;
 		if (!layer) return;

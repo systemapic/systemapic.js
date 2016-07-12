@@ -658,6 +658,8 @@ Wu.Model.Layer = Wu.Model.extend({
         return;
     },
 
+    getDisplayNames : function () {},
+
 });
 
 
