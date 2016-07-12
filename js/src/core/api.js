@@ -398,7 +398,6 @@ Wu.Api = Wu.Class.extend({
 		var path = '/v2/cubes/query';
 		this.post(path, options, done);
 	},
-
 	
 	dbFetchArea : function (options, done) {
 		var path = '/v2/query/polygon';
@@ -415,6 +414,10 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	getVectorPoints : function (options, done) {
+		var path = '/v2/query/getVectorPoints';
+		this.post(path, options, done);
+	},
 
 
 
@@ -472,6 +475,19 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 	// helper fn's
 	post : function (path, options, done) {
@@ -507,7 +523,6 @@ Wu.Api = Wu.Class.extend({
 		var options = _.isString(json) ? Wu.parse(json) : json;
 		options.access_token = options.access_token || access_token;
 		var send_json = Wu.stringify(options);
-
 		// send
 		http.send(send_json);
 	},

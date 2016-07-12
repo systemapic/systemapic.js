@@ -86,7 +86,7 @@ L.Control.Legends = Wu.Control.extend({
 
 		// get control active setting from project
 		var active = this._project.getControls()[this.type];
-		
+
 		// if not active in project, hide
 		if (!active) return this._hide();
 

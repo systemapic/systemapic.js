@@ -131,9 +131,7 @@ L.Control.Description = Wu.Control.extend({
 	_listeners : function () {
 		Wu.Mixin.Events.on('updateLegend', this._legendIsBeingUpdated, this);
 		Wu.Mixin.Events.on('phantomjs', this.compactLegend, this);
-
 		Wu.Mixin.Events.on('toggleLeftChrome', this._toggleLeftChrome, this);
-
 	},
 
 	_toggleLeftChrome : function (e) {
@@ -144,7 +142,6 @@ L.Control.Description = Wu.Control.extend({
 		var isOpen = e.detail.leftPaneisOpen;
 		var display = isOpen ? "none" : "block";
 		this._container.style.display = display;
-
 	},
 
 
@@ -403,6 +400,7 @@ L.Control.Description = Wu.Control.extend({
 
 	getLegend : function (layer) {
 		var legendHTML = layer.isVector() ? this.createLegendHTML() : '';
+		console.log('getLEgend', legendHTML);
 		return legendHTML;
 	},
 
@@ -435,7 +433,6 @@ L.Control.Description = Wu.Control.extend({
 
 
 	setHTMLfromStore : function (uuid) {
-
 
 		this.legendUuid = uuid;
 

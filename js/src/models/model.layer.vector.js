@@ -41,9 +41,16 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         // prepare utfgrid
         this._prepareGrid();
 
+        // prepare labels
+        this._prepareLabels();
+
         // enable
         if (options && options.enable) {
+
+            // add to map
             map.addLayer(this.layer);
+
+            // ensure on top
             this.layer.bringToFront();
         }
 
@@ -52,12 +59,12 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     },
 
     setData : function (data) {
-        if (!data) return console.error('no styloe to set!');
+        if (!data) return console.error('no style to set!');
         this.store.data.postgis = data;
         this.save('data');
     },
+
     setStyle : function (data) {
-        console.error('deprecated??');
         return this.setData(data);
     },
 
@@ -122,6 +129,75 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
             maxRequests : 0,
             maxZoom : 19
         });
+
+    },
+
+    _prepareLabels : function () {
+
+        // check config settigns
+        if (!app.options.custom || !app.options.custom.labels) return;
+
+        // point type
+        if (this.getGeometryType() == 'ST_Point') {
+            this._preparePointLabels();
+        }
+
+    },
+
+    _preparePointLabels : function () {
+
+        var options = {
+            layer_id : this.getPostGISLayerId()
+        }
+
+        // fetch data from server
+        app.api.getVectorPoints(options, function (err, points) {
+            if (err) return console.error(err);
+
+            // parse
+            var p = Wu.parse(points);
+
+            // add labels
+            this._addPointLabels(p.points);
+
+        }.bind(this));
+
+    },
+
+    _addPointLabels : function (points) {
+
+        _.forEach(points, function (p) {
+
+            // get data
+            var label_text = p.comments;
+            var lat = p.lat;
+            var lng = p.lng;
+
+            // dont add label if no text
+            if (_.isNull(label_text) || _.isUndefined(label_text) || !label_text) return;
+
+            // add label to map
+            var myIcon = L.divIcon({
+                className: 'hidden-marker', 
+                html : '<div class="vector-point-label">' + label_text + '</div>'
+            });
+            L.marker([lat, lng], {icon: myIcon}).addTo(app._map);
+
+        });
+
+    },
+
+    getPostGISLayerId : function () {
+        var pg = this.getPostGISData();
+        if (!pg) return false;
+        var layer_id = pg.layer_id;
+        return layer_id;
+    },
+
+    getGeometryType : function () {
+        var m = this.getMeta();
+        if (!m || !m.geometry_type) return;
+        return m.geometry_type;
     },
 
     _invalidateTiles : function () {
@@ -194,6 +270,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         if (this._event === undefined || this._event.x == event.x) {
             
         } else {
+
             // clear old
             app.MapPane._clearPopup();
         }
