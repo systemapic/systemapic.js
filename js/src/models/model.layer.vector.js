@@ -157,15 +157,26 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
             // parse
             var p = Wu.parse(points);
 
+            // store locally
+            this._labelPoints = p.points;
+
             // add labels
-            this._addPointLabels(p.points);
+            this._addPointLabels();
 
         }.bind(this));
 
     },
 
-    _addPointLabels : function (points) {
+    _addPointLabels : function () {
 
+        if (!this.labelsEnabled()) return;
+
+        var points = this._labelPoints;
+
+        // create local store
+        this._labels = this._labels || [];
+
+        // add label for each point
         _.forEach(points, function (p) {
 
             // get data
@@ -176,15 +187,39 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
             // dont add label if no text
             if (_.isNull(label_text) || _.isUndefined(label_text) || !label_text) return;
 
-            // add label to map
+            // create custom icon (as label)
             var myIcon = L.divIcon({
                 className: 'hidden-marker', 
                 html : '<div class="vector-point-label">' + label_text + '</div>'
             });
-            L.marker([lat, lng], {icon: myIcon}).addTo(app._map);
 
+            // create label
+            var label = L.marker([lat, lng], {icon: myIcon}).addTo(app._map);
+
+            // remember label
+            this._labels.push(label);
+
+        }.bind(this));
+
+    },
+
+    _onShowLabels : function (e) {
+        if (this._labels && _.isArray(this._labels) && _.size(this._labels) > 0) return;
+
+        // add labels
+        this._addPointLabels(); // todo: not only for points!
+    },
+
+    _onHideLabels : function (e) {
+        if (!this._labels || !_.isArray(this._labels)) return;
+
+        // remove each label
+        _.forEach(this._labels, function (l) {
+            l.remove();
         });
 
+        // clear local store
+        this._labels = [];
     },
 
     getPostGISLayerId : function () {

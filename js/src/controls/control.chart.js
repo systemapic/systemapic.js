@@ -64,10 +64,10 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	},
 
-	createCSVContent : function () {
+	createCSVContent : function (layer) {
 
 		// get layer
-		var layer = this.options.e.layer;
+		var layer = layer || this.options.e.layer;
 
 		// get meta
 		var meta = layer.getMeta();
@@ -114,7 +114,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			if (k == 'lat') return;
 			if (k == 'lng') return;
 
-			var isOn = fields[k].on;
+			// check if the field is enabled in popup settings
+			var isOn = _.isUndefined(fields[k]) ? false : fields[k].on;
 			if (!isOn) return;
 
 			// create line
@@ -221,8 +222,22 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Todo: enable popup-settings for draw selection
 		if ( multiPopUp ) return;
 
-		var content = this.singlePopUp(e);
+		if (this.isCSV()) {
 
+			// get layer
+			var layer = options.e.layer;
+
+			// get tooltip
+			this.popupSettings = layer.getTooltip();
+
+			// create content
+			var content = this.createCSVContent(layer);
+		
+		} else {
+			var content = this.singlePopUp(e);
+		}
+
+		// set content to popup
 		popup.setContent(content, true);
 	},
 

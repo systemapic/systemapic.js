@@ -464,6 +464,12 @@ Wu.Model.Layer = Wu.Model.extend({
         return meta;
     },
 
+    labelsEnabled : function () {
+        var t = this.getTooltip();
+        if (!t) return false;
+        return t.labels;
+    },
+
     setTooltip : function (meta) {
         this.store.tooltip = JSON.stringify(meta);
         this.save('tooltip');

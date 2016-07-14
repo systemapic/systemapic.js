@@ -143,9 +143,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
         Wu.DomEvent.on(titleInput, 'blur', this.saveTitle, this);
     },
 
-    // UNUSED Function
-    //initDescription : function () {
-    //},
 
     initDisable : function () {
 
@@ -153,7 +150,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
         var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
         
         // Header
-        var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Enable');
+        var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Popup/labels');
         // var headerExtra = Wu.DomUtil.create('span', 'chrome-content-header-gray', header, ' (auto detected)');
 
         if ( typeof this.tooltipMeta.enable == 'undefined' ) {
@@ -179,12 +176,45 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
             appendTo : enableDisableLine.container,
             fn       : this._saveEnableSwitch.bind(this)
         });
+
+
+        var labelsToggleLine = new Wu.fieldLine({
+            id       : 'enable',
+            appendTo : sectionWrapper,
+            title    : 'Enable labels',
+            input    : false
+        });     
+
+        var labelsToggle = new Wu.button({
+            id       : 'enable-pop-up',
+            type     : 'switch',
+            isOn     : this.tooltipMeta.labels,
+            right    : false,
+            appendTo : labelsToggleLine.container,
+            fn       : this._toggleLabels.bind(this)
+        });
    
+    },
+
+    _toggleLabels : function (e, enabled) {
+       
+        // save
+        this.tooltipMeta.labels = enabled;
+        this._layer.setTooltip(this.tooltipMeta);
+
+        // fire event
+        if (enabled) {
+            this._layer.fire('showLabels');
+        } else {
+            this._layer.fire('hideLabels');
+        }
+
+        
     },
 
     // Init meta fields and time series
     initFields : function () {
-        this.fieldListFromObject('Fields');
+        this.fieldListFromObject('Active fields');
         if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
     },
 
