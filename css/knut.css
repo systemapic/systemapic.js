@@ -2193,3 +2193,93 @@ text.y-axis-label.y-label {
     cursor: -webkit-grab;
 }
 
+
+
+
+/*experimental hover popup*/
+
+.hover-popup-line {
+    display: flex;
+}
+
+.hover-popup-container {
+    width: auto;
+    max-height: 70%;
+    background: #3c4759;
+    position: absolute;
+    bottom: 30px;
+    left: 6px;
+    z-index: 1000;
+    border-radius: 3px;
+    opacity: 0.9;
+    overflow: hidden;
+}
+
+.hover-popup-content {
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px;
+    float: left;
+}
+
+.hover-popup-title {
+    padding: 5px;
+    font-size: 14px;
+    padding-left: 0px;
+    padding-top: 0px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.hover-popup-value {
+    float: left;
+    /*padding-right: 8px;*/
+    font-weight: 900;
+}
+
+.hover-popup-key {
+    float: left;
+    margin-right: 6px;
+}
+
+.hover-popup-t {
+    border: 1px solid rgba(220, 220, 220, 0.34);
+    width: 10px;
+    height: 10px;
+    float: left;
+    padding: 2px;
+    margin-top: 3px;
+    margin-right: 4px;
+}
+
+.hover-popup-legend {
+    text-indent: -10px;
+    padding-left: 14px;
+}
+
+
+.t-color-0 {
+    background-color: none;
+}
+.t-color-1 {
+    background-color: #00c9ff;
+}
+.t-color-2 {
+    background-color: #4fff00;
+}
+.t-color-3 {
+    background-color: #ffed00;
+}
+.t-color-4 {
+    background-color: #ffa200;
+}
+.t-color-5 {
+    background-color: #ff0000;
+}
+.t-color-6 {
+    background-color: #ce00c0;
+}
+.t-color-7 {
+    background-color: white;
+}

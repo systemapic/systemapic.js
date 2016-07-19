@@ -47,6 +47,11 @@ Wu.MapPane = Wu.Pane.extend({
 
         // adjust padding, etc.
         this._adjustLayout();
+
+        // experimental: hover popup
+        if (app.options.custom.hoverPopup) {
+            this.hoverPopup = Wu.hoverPopup();
+        }
     },
 
     _projectSelected : function (e) {
@@ -697,3 +702,165 @@ Wu.MapPane = Wu.Pane.extend({
 
     
 });
+
+
+
+
+
+
+
+
+
+
+// experimental: hover popup with config switch
+
+
+Wu.HoverPopup = L.Evented.extend({
+
+    options : {
+        // contentType : 'table',
+    },
+
+    _cache : {},
+
+    initialize : function (options) {
+        L.setOptions(this, options);
+
+        // create frame
+        this._initContainer();
+    },
+
+    _initContainer : function () {
+
+        // container to append popup to
+        var appendTo = app._appPane;
+
+        // create container, append
+        this._container = Wu.DomUtil.create('div', 'hover-popup-container displayNone', appendTo);
+
+    },
+
+    addContent : function (options) {
+
+        // show container
+        Wu.DomUtil.removeClass(this._container, 'displayNone');
+
+        // check if already added
+        if (this._cache[options.id]) return;
+
+        // create content
+        this._createContent(options);
+        
+    },
+
+    _removing : {},
+
+    removeContent : function (options) {
+
+        // find container in cache
+        var container = this._cache[options.id];
+
+        // remove from DOM
+        Wu.DomUtil.remove(this._cache[options.id]);
+
+        // remove from cache
+        delete this._cache[options.id];
+
+        // hide popup if no content in cache
+        if (!_.size(this._cache)) {
+            Wu.DomUtil.addClass(this._container, 'displayNone');
+        }
+
+    },
+
+
+    _createContent : function (options) {
+
+        // create wrapper
+        var container = Wu.DomUtil.create('div', 'hover-popup-content', this._container);
+       
+        // save in cache
+        this._cache[options.id] = container;
+        
+        // create title
+        var title = Wu.DomUtil.create('div', 'hover-popup-title', container, options.data.title);
+
+        var sorted_rows = _.sortBy(options.data.rows, 't').reverse();
+
+        // create inner content
+        if (this.options.contentType == 'table') {
+            
+            // as table
+            this._fillTableContent(sorted_rows, container);
+        
+        } else {
+        
+            // as divs
+            this._fillContent(sorted_rows, container);
+        
+        }
+
+       
+
+        
+    },
+
+    _fillContent : function (sorted_rows, container) {
+
+        // create each row
+        _.forEach(sorted_rows, function (r) {
+            var row = Wu.DomUtil.create('div', 'hover-popup-line', container);
+            var t = Wu.DomUtil.create('div', 'hover-popup-t', row); // todo: tilstandsklasse farge
+            var key = Wu.DomUtil.create('div', 'hover-popup-key', row, r.key);
+            var value = Wu.DomUtil.create('div', 'hover-popup-value', row, r.value.toString());
+            var legend = Wu.DomUtil.create('div', 'hover-popup-legend', row, r.legend);
+
+            value.setAttribute('key', r.k); // debugging
+
+            // set color for tilstandsklasse
+            Wu.DomUtil.addClass(t, 't-color-' + r.t);
+        });
+    },
+
+    _fillTableContent : function (sorted_rows, container) {
+
+        // <table>
+        var table = Wu.DomUtil.create('table', 'hover-popup-table', container);
+
+        // <thead>
+        var thead = Wu.DomUtil.create('thead', 'hover-popup-thead', table);
+        
+        // <tr>
+        var theadtr = Wu.DomUtil.create('tr', 'hover-popup-tr', thead);
+
+        // <th>
+        var th1 = Wu.DomUtil.create('th', 'hover-popup-th', theadtr, ''); // color
+        var th2 = Wu.DomUtil.create('th', 'hover-popup-th', theadtr, 'Compound'); // color
+        var th3 = Wu.DomUtil.create('th', 'hover-popup-th', theadtr, 'Value'); // color
+        var th4 = Wu.DomUtil.create('th', 'hover-popup-th', theadtr, 'Legend'); // color
+
+        // <tbody>
+        var tbody = Wu.DomUtil.create('tbody', 'hover-popup-tr', table);
+
+
+        // create each row
+        _.forEach(sorted_rows, function (r) {
+
+            var row = Wu.DomUtil.create('tr', 'hover-popup-tr', tbody);
+            var t = Wu.DomUtil.create('td', 'hover-popup-t', row); // todo: tilstandsklasse farge
+            var key = Wu.DomUtil.create('td', 'hover-popup-key', row, r.key);
+            var value = Wu.DomUtil.create('td', 'hover-popup-value', row, r.value.toString());
+            var legend = Wu.DomUtil.create('td', 'hover-popup-legend', row, r.legend);
+
+            // value.setAttribute('key', r.k); // debugging
+
+            // set color for tilstandsklasse
+            Wu.DomUtil.addClass(t, 't-color-' + r.t);
+        });
+    },
+
+});
+
+Wu.hoverPopup = function (options) {
+    return new Wu.HoverPopup(options);
+}
