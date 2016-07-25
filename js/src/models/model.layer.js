@@ -219,6 +219,7 @@ Wu.Model.Layer = Wu.Model.extend({
     },
 
     remove : function (map) {
+        console.error('remove');
         var map = map || app._map;
 
         // leaflet fn
@@ -392,7 +393,6 @@ Wu.Model.Layer = Wu.Model.extend({
         for (var c in columns) {
             field = c;
         }
-
         
         var style = {
             field : field,
@@ -512,7 +512,6 @@ Wu.Model.Layer = Wu.Model.extend({
     setLegends : function (legends) {
         if (!legends) return;
         this.store.legends = JSON.stringify(legends);
-        console.error('legends', legends);
         this.save('legends');
     },
 
@@ -609,13 +608,28 @@ Wu.Model.Layer = Wu.Model.extend({
         var grid = this.gridLayer;
         if (!grid || !on) return;
 
-        var startEvent = 'click';
-        var endEvent = 'mouseup';
+        // experimental: hover popup in config
+        if (app.options.custom.hoverPopup) {
 
-        grid[on]('mousedown', this._gridOnMousedown, this);     
-        grid[on](endEvent, this._gridOnMouseup, this);  
-        grid[on](startEvent, this._gridOnClick, this);
+            // add movemouse event to grid
+            grid[on]('mousemove', this._gridOnHover, this);
+            grid[on]('mouseover', this._gridOnMouseOver, this);
+            grid[on]('mouseout', this._gridOnMouseOut, this);
+
+        } else {
+            
+            // click popup
+            grid[on]('mousedown', this._gridOnMousedown, this);     
+            grid[on]('mouseup', this._gridOnMouseup, this);  
+            grid[on]('click', this._gridOnClick, this);
+        }
+
     },
+
+    // experimental: hover popup in config
+    _gridOnHover : function () {},
+    _gridOnMouseOver : function () {},
+    _gridOnMouseOut : function () {},
 
     _removeGridEvents : function () {
         this._setGridEvents('off');

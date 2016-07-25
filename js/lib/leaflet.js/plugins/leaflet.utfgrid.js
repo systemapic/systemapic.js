@@ -166,6 +166,7 @@ L.UtfGrid = (L.Layer || L.Class).extend({
 		} else if (on.data) {
 			this.fire('mousemove', on);
 		}
+
 	},
 
 	_objectForEvent: function (e) {

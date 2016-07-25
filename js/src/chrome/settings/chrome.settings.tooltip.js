@@ -44,26 +44,31 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
     },
 
     _refresh : function () {
-
-        if ( this._inited ) this._flush();
+        
+        // flush
+        this._inited && this._flush();
+        
+        // refresh
         this._initLayout();
     },
 
     _flush : function () {
 
+        // clear content
         this._midSection.innerHTML = '';
     },
 
     // Runs on init
     show : function () {
-
         if (!this._inited) this._initLayout();
 
+        // clear
         this._fieldsWrapper.innerHTML = '';
 
         // hide others
         this.hideAll();
 
+        // mark
         this.showing = true;
 
         // show this
@@ -76,15 +81,17 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
         var layerUuid = this._getActiveLayerUuid();
         if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);
 
-        // Select layer we're working on
-        var options = this.layerSelector.childNodes;
-        for ( var k in options ) {
-            if ( options[k].value == layerUuid ) options[k].selected = true;
-        }       
+        // select in dropdown
+        this.layerSelector.setValue({
+            value : layerUuid,
+            title : this._layer.getTitle()
+        });
+
     },
 
     // Event run when layer selected 
     _selectedActiveLayer : function (value, uuid) {
+        console.error('selecting!');
 
         var layerUuid = uuid || value;
 
@@ -99,7 +106,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
         this.tooltipMeta = this._layer.getTooltip();
         
         // Get layermeta
-        var layerMeta = JSON.parse(this._layer.store.metadata);
+        var layerMeta = Wu.parse(this._layer.store.metadata);
 
         // If no tooltip meta stored, create from layer meta
         if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
@@ -108,9 +115,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
         // Init title
         this.initTitle();
-
-        // // Init description
-        // this.initDescription();
 
         // Init enable/disable
         this.initDisable();     

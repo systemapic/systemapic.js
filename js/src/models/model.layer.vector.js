@@ -13,6 +13,9 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     _listenLocally : function () {
         Wu.DomEvent.on(this.layer, 'load', this._onLayerLoaded, this);
         Wu.DomEvent.on(this.layer, 'loading', this._onLayerLoading, this);
+        
+        this.on('disabled', this._onLayerDisabled);
+        this.on('enabled', this._onLayerEnabled);
     },
 
     _onLayerLoading : function () {
@@ -70,7 +73,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
 
     // on change in style editor, etc.
     updateStyle : function (style) {
-
         var layerUuid = style.layerUuid;
         var postgisOptions = style.options;
 
@@ -82,7 +84,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     },
 
     _refreshLayer : function (layerUuid) {
-
         this.layer.setOptions({
             layerUuid : layerUuid
         });
@@ -129,7 +130,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
             maxRequests : 0,
             maxZoom : 19
         });
-
     },
 
     _prepareLabels : function () {
@@ -141,7 +141,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         if (this.getGeometryType() == 'ST_Point') {
             this._preparePointLabels();
         }
-
     },
 
     _preparePointLabels : function () {
@@ -203,6 +202,14 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
 
     },
 
+    _onLayerDisabled : function (e) {
+        this._onHideLabels(e);
+    },
+
+     _onLayerEnabled : function (e) {
+        this._onShowLabels(e);
+    },
+
     _onShowLabels : function (e) {
         if (this._labels && _.isArray(this._labels) && _.size(this._labels) > 0) return;
 
@@ -236,6 +243,25 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     },
 
     getDisplayNames : function () {
+       
+        var csv = this.getCSV();
+
+        if (!csv) return;
+
+        // get csv classes
+        return _.find(csv, {type : 'display_name'});
+    },
+
+    getLegendNames : function () {
+        var csv = this.getCSV();
+
+        if (!csv) return;
+
+        // get csv classes
+        return _.find(csv, {type : 'legend'});
+    },
+
+    getCSV : function () {
         // get meta
         var meta = this.getMeta();
 
@@ -244,14 +270,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
         // get csv
         var csv = meta.csv;
 
-        if (!csv) return;
-
-        // get csv classes
-        var display_names = _.find(csv, {type : 'display_name'});
-
-        if (!display_names) return;
-
-        return display_names;
+        return csv;
     },
 
     _invalidateTiles : function () {
@@ -259,12 +278,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     },
 
     _updateGrid : function (l) {
-
-        // refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
-        // and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
-        // - also, removed listeners in L.UtfGrid (onAdd)
-        // 
-
         if (this.gridLayer) {
             this.gridLayer._update();
         }
@@ -291,6 +304,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
 
         // add grid events
         this._addGridEvents();
+
     },
 
 
@@ -331,9 +345,179 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
 
     },
 
+
+    _gridOnHover : function (e) {},
+
+    _fetching : {},
+    _cache : {},
+
+    // todo: move custom logic to popup-plugin
+    _gridOnMouseOver : function (e) {
+        if (!e.data || app.MapPane._drawing) return;
+        
+        var gid = e.data.gid;
+        var layer_id = e.target.options.layerUuid;
+        var popup = app.MapPane.hoverPopup;
+        var popup_id = gid + layer_id;
+
+        // already fetching, will catch on callback
+        if (this._fetching[popup_id]) return;
+
+        // check if data already fetched
+        if (this._cache[popup_id]) {
+
+            // add content to popup
+            popup.addContent({
+                id : popup_id,
+                data : this._cache[popup_id],
+                layer : this
+            });
+
+        } else {
+
+            var keys = Object.keys(e.data);
+            var column = keys[0];
+            var row = e.data[column];
+            var postgis_layer_id = this.store.data.postgis.layer_id;
+           
+            // fetch data from server
+            app.api.dbFetch({
+                column : column,
+                row : row,
+                layer_id : layer_id,
+                access_token : app.tokens.access_token
+            }, function (ctx, json) {
+               
+                // parse
+                var data = Wu.parse(json);
+
+                if (!data) return;
+
+                // format data for popup 
+                var formattedData = this._formatPopupData(data);
+
+                // add content to popup
+                popup.addContent({
+                    id : popup_id,
+                    data : formattedData,
+                });
+
+                // save to local cache
+                this._cache[popup_id] = formattedData;
+
+                // mark as done fetching
+                this._fetching[popup_id] = false;
+          
+            }.bind(this));
+
+            // mark as fetching
+            this._fetching[popup_id] = true;
+        }
+
+    },
+
+    _fetchedData : function (ctx, json) {
+
+        // parse
+        var data = Wu.parse(json);
+
+        if (!data) return;
+
+        // store locally
+        this._cache[popup_id] = data;
+
+        // mark as done fetching
+        this._fetching[popup_id] = false;
+
+        // add content to popup
+        popup.addContent({
+            id : popup_id,
+            data : data
+        });
+
+    },
+
+    _formatPopupData : function (data) {
+
+        var fieldNames = this.getDisplayNames();
+
+        var legends = this.getLegendNames();
+
+        var csv = this.getCSV();
+
+        // get tooltip settings
+        var tooltip = this.getTooltip();
+
+        // get metafields
+        var fields = tooltip.metaFields;
+
+
+        var rows = [];
+
+        _.forEach(data, function (value, key) {
+            
+            // check if the field is enabled in popup settings
+            var isOn = _.isUndefined(fields[key]) ? false : fields[key].on;
+
+            if (key && fieldNames[key] && !_.isNull(value) && isOn) {   
+
+                rows.push({
+                    value : value,
+                    key : fieldNames[key].camelize(),
+                    legend : legends[key],
+                    t : this._get_t_class_html(csv, key, value),
+                    k : key // debug
+                });
+
+            }
+        }.bind(this));
+
+        var formattedData = {
+            title : this.getTitle(),
+            rows : rows
+        };
+
+        return formattedData;
+    },
+
+    _get_t_class_html : function (csv, k, v) {
+
+        var t1 = _.find(csv, {type : 't1'});
+        var t2 = _.find(csv, {type : 't2'});
+        var t3 = _.find(csv, {type : 't3'});
+        var t4 = _.find(csv, {type : 't4'});
+        var t5 = _.find(csv, {type : 't5'});
+        var t6 = _.find(csv, {type : 't6'});
+
+        var tclass = 0;
+
+        if (t1 && v <  parseFloat(t1[k])) tclass = 1;
+        if (t1 && v >= parseFloat(t1[k])) tclass = 2;
+        if (t2 && v >= parseFloat(t2[k])) tclass = 3;
+        if (t3 && v >= parseFloat(t3[k])) tclass = 4;
+        if (t4 && v >= parseFloat(t4[k])) tclass = 5;
+        if (t5 && v >= parseFloat(t5[k])) tclass = 6;
+        if (t6 && v >= parseFloat(t6[k])) tclass = 7;
+
+        return tclass;
+    },
+
+
+    _gridOnMouseOut : function (e) {
+        var gid = e.data.gid;
+        var layer_id = e.target.options.layerUuid;
+
+        var popup = app.MapPane.hoverPopup;
+        var popup_id = gid + layer_id;
+
+        popup.removeContent({
+            id : popup_id
+        });
+
+    },
+
     _gridOnClick : function (e) {
-        if (!e.data) return;
-        if (app.MapPane._drawing) return;
+        if (!e.data || app.MapPane._drawing) return;
 
         // pass layer
         e.layer = this;
@@ -346,7 +530,7 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
                 return;
             }
 
-            var data = JSON.parse(json);
+            var data = Wu.parse(json);
 
             e.data = data;
             var event = e.originalEvent;
