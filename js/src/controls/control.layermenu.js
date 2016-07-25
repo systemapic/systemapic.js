@@ -992,6 +992,9 @@ L.Control.Layermenu = Wu.Control.extend({
 			layer : layer
 		}});
 
+		// fire on layer
+		layer.fire('enabled');
+
 	},
 
 	// disable by layermenuItem
@@ -1012,6 +1015,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.Mixin.Events.fire('layerDisabled', { detail : {
 			layer : layer
 		}}); 
+
+		// fire on layer
+		layer.fire('disabled');
 	},
 
 	// disable by layer

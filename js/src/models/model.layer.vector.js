@@ -13,6 +13,9 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     _listenLocally : function () {
         Wu.DomEvent.on(this.layer, 'load', this._onLayerLoaded, this);
         Wu.DomEvent.on(this.layer, 'loading', this._onLayerLoading, this);
+        
+        this.on('disabled', this._onLayerDisabled);
+        this.on('enabled', this._onLayerEnabled);
     },
 
     _onLayerLoading : function () {
@@ -197,6 +200,14 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
 
         }.bind(this));
 
+    },
+
+    _onLayerDisabled : function (e) {
+        this._onHideLabels(e);
+    },
+
+     _onLayerEnabled : function (e) {
+        this._onShowLabels(e);
     },
 
     _onShowLabels : function (e) {

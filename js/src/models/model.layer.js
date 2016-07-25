@@ -219,6 +219,7 @@ Wu.Model.Layer = Wu.Model.extend({
     },
 
     remove : function (map) {
+        console.error('remove');
         var map = map || app._map;
 
         // leaflet fn
