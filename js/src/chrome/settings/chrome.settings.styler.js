@@ -156,8 +156,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			container : this._legendWrapper
 		};
 
-		console.log('legendOptions', legendOptions);
-
 		this._legendStyler = new Wu.Legend(legendOptions);
 
 		Wu.DomUtil.removeClass(this._legendStyler._legensOuter, 'displayNone');		

@@ -301,12 +301,15 @@ Wu.Util = {
 	checkDisconnect : function (response) {
 		var string = response.substring(0,15);
 		if (string == '<!doctype html>')  {
+			
 			// we got a disconnect!!!
-			app.feedback.setError({
-				title : 'You have been logged out.', 
-				description : 'Please reload the page to log back in.',
-				clearTimer : false
-			});
+			// app.feedback.setError({
+			// 	title : 'You have been logged out.', 
+			// 	description : 'Please reload the page to log back in.',
+			// 	clearTimer : false
+			// });
+
+			app._login('You have been logged out. Please log back in.')
 
 			return false;
 		}
@@ -372,6 +375,7 @@ Wu.Util = {
 				} else {
 					console.log('http.status: ', http.status);
 					console.log('httP', http);
+					Wu.Util.checkDisconnect(http.responseText);
 					done && done(http.status, http.responseText);
 				}
 			}
@@ -410,6 +414,7 @@ Wu.Util = {
 				} else {
 					console.log('http.status: ', http.status);
 					console.log('httP', http);
+					Wu.Util.checkDisconnect(http.responseText);
 					done && done(http.status, http.responseText);
 				}
 			}
@@ -509,6 +514,7 @@ Wu.Util = {
 				} else {
 					console.log('http.status: ', http.status);
 					console.log('httP', http);
+					Wu.Util.checkDisconnect(http.responseText);
 					done && done(http.status, http.responseText);
 				}
 			}
