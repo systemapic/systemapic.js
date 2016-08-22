@@ -609,7 +609,7 @@ Wu.Model.Layer = Wu.Model.extend({
         if (!grid || !on) return;
 
         // experimental: hover popup in config
-        if (app.options.custom.hoverPopup) {
+        if (app.options.custom && app.options.custom.hoverPopup) {
 
             // add movemouse event to grid
             grid[on]('mousemove', this._gridOnHover, this);

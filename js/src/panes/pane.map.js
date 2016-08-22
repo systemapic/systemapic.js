@@ -49,7 +49,7 @@ Wu.MapPane = Wu.Pane.extend({
         this._adjustLayout();
 
         // experimental: hover popup
-        if (app.options.custom.hoverPopup) {
+        if (app.options.custom && app.options.custom.hoverPopup) {
             this.hoverPopup = Wu.hoverPopup();
         }
     },
