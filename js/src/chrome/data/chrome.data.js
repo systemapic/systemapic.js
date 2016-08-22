@@ -657,11 +657,24 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 files = provider.data;
             }
 
+
             // get file list, sorted by last updated
             provider.data = _.sortBy(_.toArray(files), function (f) {
+
+                // need to parseInt dataSize
                 if (sortBy === 'dataSize') {
                     return parseInt(f.store[sortBy]);
                 }
+
+                if (sortBy === 'lastUpdated') {
+                    var m = moment(f.store.lastUpdated).valueOf();
+                    return m;
+                }
+
+                // if (sortBy === 'created') {
+                //     // unix timestamp
+                //     var m = moment(f.store.created).valueOf();
+                // }
 
                 return f.store[sortBy];
             });
@@ -672,7 +685,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
             // containers
             var D3container = this.fileListContainers[p].D3container;
-            var data = this.fileProviders[p].data;
+            var data = provider.data;
+
+            // update
             this.initFileList(D3container, data, p);
         }
 
@@ -753,7 +768,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     initFileList : function (D3container, data, library) {
 
         // debug: only do hundred files
-        var data = _.sample(data, 100);
+        // var data = _.sample(data, 100);
 
 
         // BIND
