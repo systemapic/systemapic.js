@@ -159,6 +159,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // add mask layer
             if (this._maskLayer) {
 
+                console.log('this._maskLayer', this._maskLayer);
+
                 // add mask layer
                 // map.addLayer(this._maskLayer.layer); // todo: put actions on wu layer (eg. this._maskLayer.add())
                
@@ -286,7 +288,7 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
 
     _initGraph : function (done) {
 
-        // get annual data from server
+        // get data from server
         app.api.getCustomData({
 
             // custom data, snow average  todo: make pluggable
@@ -311,6 +313,8 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
                 cube     : this,
                 animator : this._animator
             });
+
+            console.log('this._graph', this._graph);
 
             // callback
             done && done();
@@ -395,25 +399,37 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
     _initMask : function (done) {
 
         // get mask
-        var mask = this.getMask();
+        var masks = this.getMask();
 
         // return if no mask
-        if (!mask) return;
+        if (!masks || _.isEmpty(masks)) return;
 
-        // check if raster mask
-        if (mask.type == 'postgis-raster') return this._initRasterMask(done);
+        masks = _.isArray(masks) ? masks : [masks];
 
-        // check if vector mask
-        if (mask.type == 'topojson') return this._initVectorMask(done);
+        masks.forEach(function (m) {
+
+            // check if raster mask
+            if (m.type == 'postgis-raster') return this._initRasterMask(m, done);
+
+            // check if vector mask
+            if (m.type == 'topojson') return this._initVectorMask(m, done);
+
+        }.bind(this));
 
         // catch unknown type
-        console.error('something wrong with the mask!', mask);
+        // console.error('something wrong with the mask!', mask);
+
+
     },
 
-    _initRasterMask : function (done) {
+    _masks : [],
+
+    _initRasterMask : function (mask, done) {
+
+        console.error('RASTER MASK');
 
         // get mask
-        var mask = this.getMask();
+        // var mask = this.getMask();
 
         // return if no mask
         if (!mask) return;
@@ -433,14 +449,17 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
             // parse
             var layerModel = Wu.parse(layerJSON);
 
+            console.log('---> layerModel', layerModel);
+
             // init layer
-            this._maskLayer = Wu.createLayer(layerModel);
+            // this._maskLayer = Wu.createLayer(layerModel);
+            var maskLayer = Wu.createLayer(layerModel);
 
-            // add to map
-            // this._maskLayer.add();
+            // set 
+            if (!this._maskLayer) this._maskLayer = maskLayer;
 
-            // make sure on top
-            // this._maskLayer.layer.bringToFront();
+            // add to masks array
+            this._masks.push(maskLayer);
 
             // callback
             done && done();
@@ -448,13 +467,18 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         }.bind(this));
     },
 
-    _initVectorMask : function (done) {
+    _initVectorMask : function (mask, done) {
+
+        console.error('VECTOR MASK');
 
         // get mask
-        var mask = this.getMask();
+        // var mask = this.getMask();
 
         // create mask (topojson) layer
-        this._maskLayer = new Wu.TopoJSONLayer(); // todo!
+        // this._maskLayer = new Wu.TopoJSONLayer(); // todo!
+        this._maskLayer = new Wu.TopoJSONLayer();
+
+        console.log('this._maskLayer', this._maskLayer);
 
         // add data to layer
         this._maskLayer.layer.addData(mask.geometry);
@@ -1103,8 +1127,6 @@ Wu.CubeLayer = Wu.Model.Layer.extend({
         var container = layer.getContainer();
         if (container) container.style.display = 'none';
     },
-
-    
 
     _getCursorLayer : function () {
         var cursor = this._cursor;

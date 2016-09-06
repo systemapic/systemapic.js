@@ -65,10 +65,10 @@ Wu.Animator = Wu.Evented.extend({
 
         // create divs
         this.sliderOuterContainer       = Wu.DomUtil.create('div', 'big-slider-outer-container', app._appPane);
-        var sliderInnerContainer        = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
-        var slider                      = Wu.DomUtil.create('div', 'big-slider', sliderInnerContainer);
-        this.sliderButtonsContainer     = Wu.DomUtil.create('div', 'big-slider-button-container', sliderInnerContainer);
-        this.tickContainer              = Wu.DomUtil.create('div', 'big-slider-tick-container', sliderInnerContainer);
+        this.sliderInnerContainer        = Wu.DomUtil.create('div', 'big-slider-inner-container', this.sliderOuterContainer);
+        var slider                      = Wu.DomUtil.create('div', 'big-slider', this.sliderInnerContainer);
+        this.sliderButtonsContainer     = Wu.DomUtil.create('div', 'big-slider-button-container', this.sliderInnerContainer);
+        this.tickContainer              = Wu.DomUtil.create('div', 'big-slider-tick-container', this.sliderInnerContainer);
 
         // animator buttons
         this._fastBackBtn               = Wu.DomUtil.create('div', 'big-slider-step-backward', this.sliderButtonsContainer, '<i class="fa fa-fast-backward"></i>');
@@ -100,6 +100,13 @@ Wu.Animator = Wu.Evented.extend({
         // hide/show buttons according to options
         this._displayButtons();
 
+    },
+
+    addExtraPane : function () {
+        Wu.DomUtil.addClass(this.sliderInnerContainer, 'bottom-right-border-radius-only');
+    },
+    removeExtraPane : function () {
+        Wu.DomUtil.removeClass(this.sliderInnerContainer, 'bottom-right-border-radius-only');
     },
 
     _addHooks : function () {
@@ -275,8 +282,6 @@ Wu.Animator = Wu.Evented.extend({
     // Enable layer
     _layerEnabled : function (e) {
 
-        console.log('_layerEnabled', e);
-
     	// get event payload
         var layer = e.detail.layer;
         var show = e.detail.showSlider;
@@ -296,7 +301,6 @@ Wu.Animator = Wu.Evented.extend({
         var layer = e.detail.layer;
 
         // hide if current layer
-        console.log('hiding? ', layer, this.options.cube);
         if (layer.getUuid() == this.options.cube.getUuid()) {
                 this.hide();
         }

@@ -1312,7 +1312,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             // only allow .geojson
             // var valid_formats = ['geojson', 'topojson'];
             if (!_.includes(file.name, '.geojson')) {
-            // if (valid_formats.indexOf(file.name.split('.').reverse()[0]) == -1) {
                 return this._abortMaskUpload({
                     input : mask_uploader,
                     err : 'Only GeoJSON is accepted for uploaded vector mask'
@@ -1419,9 +1418,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
             }.bind(this));
 
-
-            // set feedback
-            // this.setMaskFeedback('Added raster mask to layer.');
 
         }.bind(this));
        

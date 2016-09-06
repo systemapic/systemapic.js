@@ -185,10 +185,21 @@ L.Control.Description = Wu.Control.extend({
 		this._calculateHeight();
 	},
 
+	_layerEnabled : function (e) {
+
+		console.log('control.description layerEnabled', e, this.layers);
+	},
+
+	_layerDisabled : function (e) {
+		console.log('layer _layerDisabled', e);
+	},	
+
 	showHide : function () {
+		console.error('showHide', this);
 
 		// Hide if empty
 		if ( !this.layers || this.isEmpty(this.layers) ) {
+			console.log('HIDING!');
 			this._hide();
 			return;
 		}
@@ -198,6 +209,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_hide : function () {	
+		console.error('TODO: hide/show not working. refactor!');
 		this._container.style.display = 'none'; 
 		this.isOpen = false;
 
@@ -296,6 +308,8 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_removeLayer : function (layer) {
+
+		console.log('_removeLayer', layer, this);
 
 		// Delete layer from store
 		var layerUuid = layer.getUuid();

@@ -1,4 +1,13 @@
 
+
+// --------------------------------------------
+// THIS IS A CUSTOM PLUGIN CREATED FOR GLOBESAR 
+// --------------------------------------------
+//
+// - it communicates with new API endpoints which must be present on the server-side
+// - all interaction with layer (adding masks, filter) should happen through this plugin
+//
+//
 // annual graph control
 // --------------------
 //
@@ -13,6 +22,7 @@
 //  + everything is for the current year, it's an annual graph after all, so that's the reference point
 //  + should listen to events for all kinds of actions - ie. be controlled by events, not by fn's
 //  + 
+
 
 // init main object (could be others)
 Wu.Graph = Wu.Graph || {};
@@ -36,6 +46,9 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         // plug animator
         this._plugAnimator();
+
+        // add options
+        this._addOptionsPane();
 
         // prepare data
         this._prepareData();
@@ -77,6 +90,29 @@ Wu.Graph.Annual = Wu.Evented.extend({
         this._graphContainer    = Wu.DomUtil.create('div', 'big-graph-inner-container',     this._container);
         this._loadingBar        = Wu.DomUtil.create('div', 'graph-loading-bar',             this._container);
         this._legendContainer   = Wu.DomUtil.create('div', 'graph-legend',                  this._container);
+
+    },
+
+    _addOptionsPane : function () {
+        
+        // if editor
+        if (this.isEditor()) {
+ 
+            // add extra pane to graph
+            this._optionsContainer = Wu.DomUtil.create('div', 'graph-options', this._container);
+
+            // fix border-radius for main pane
+            Wu.DomUtil.addClass(this._container, 'top-right-border-radius-only');
+
+            // fix border-radius for animator        
+            if (this._animator) this._animator.addExtraPane();
+
+        }
+
+    },
+
+    isEditor : function () {
+        return app.activeProject.isEditor();
     },
 
     _initGraph : function () {
@@ -496,8 +532,12 @@ Wu.Graph.Annual = Wu.Evented.extend({
             // parse
             var fractions = Wu.parse(query_results);
 
+
             // parse dates
             var cache = this._parseDates(fractions);
+
+            console.log('GOT LINE GRAPH', cache);
+
 
             // set cache
             this._cache.line[this._current.year] = cache;

@@ -47,13 +47,13 @@ Wu.Control = L.Control.extend({
 	_layerEnabled 	 : function () {},
 	_layerDisabled 	 : function () {},
 	_updateView 	 : function () {},
-	_refresh 	 : function () {},
+	_refresh 	 	 : function () {},
 	_onFileImported  : function () {},
 	_onFileDeleted   : function () {},
 	_onLayerAdded    : function () {},
 	_onLayerEdited   : function () {},
 	_onLayerStyleEdited   : function () {},
 	_onLayerDeleted  : function () {},
-	_off 		 : function () {},
+	_off 		 	 : function () {},
 
 });

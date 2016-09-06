@@ -2283,3 +2283,38 @@ text.y-axis-label.y-label {
 .t-color-7 {
     background-color: white;
 }
+
+
+.graph-options {
+    width: 200px;
+    position: absolute;
+    left: -200px;
+    background: #3c4759;
+    height: 367px;
+    top: 0;
+    border-radius: 4px 0px 0px 4px;
+}
+
+.top-right-border-radius-only {
+    border-radius: 0 5px 0 0 !important;
+}
+.bottom-right-border-radius-only {
+    border-radius: 0 0 5px 0 !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
