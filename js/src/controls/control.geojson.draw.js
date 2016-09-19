@@ -227,27 +227,28 @@ L.Polyline.include({
 	}
 });
 
-L.Polygon.include({
-	toGeoJSON: function () {
-		var coords = [L.GeoJSON.latLngsToCoords(this.getLatLngs())],
-		    i, len, hole;
+// L.Polygon.include({
+// 	toGeoJSON: function () {
+// 		console.error('L.polygon toGeoJSON');
+// 		var coords = [L.GeoJSON.latLngsToCoords(this.getLatLngs())],
+// 		    i, len, hole;
 
-		coords[0].push(coords[0][0]);
+// 		coords[0].push(coords[0][0]);
 
-		if (this._holes) {
-			for (i = 0, len = this._holes.length; i < len; i++) {
-				hole = L.GeoJSON.latLngsToCoords(this._holes[i]);
-				hole.push(hole[0]);
-				coords.push(hole);
-			}
-		}
+// 		if (this._holes) {
+// 			for (i = 0, len = this._holes.length; i < len; i++) {
+// 				hole = L.GeoJSON.latLngsToCoords(this._holes[i]);
+// 				hole.push(hole[0]);
+// 				coords.push(hole);
+// 			}
+// 		}
 
-		return L.GeoJSON.getFeature(this, {
-			type: 'Polygon',
-			coordinates: coords
-		});
-	}
-});
+// 		return L.GeoJSON.getFeature(this, {
+// 			type: 'Polygon',
+// 			coordinates: coords
+// 		});
+// 	}
+// });
 
 (function () {
 	function multiToGeoJSON(type) {

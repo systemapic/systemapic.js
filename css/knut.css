@@ -2293,6 +2293,7 @@ text.y-axis-label.y-label {
     height: 367px;
     top: 0;
     border-radius: 4px 0px 0px 4px;
+    display: none;
 }
 
 .top-right-border-radius-only {
