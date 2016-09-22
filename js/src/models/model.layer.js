@@ -710,7 +710,7 @@ Wu.createLayer = function (layer) {
     if (isRaster) return new Wu.RasterLayer(layer);
 
     // cubes
-    if (layer.data.cube) return new Wu.CubeLayer(layer);
+    if (layer.data.cube) return new Wu.Model.Layer.CubeLayer(layer);
 
     // mapbox
     if (layer.data.mapbox) return new Wu.MapboxLayer(layer);

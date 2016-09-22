@@ -34,6 +34,8 @@ Wu.Animator = Wu.Evented.extend({
 
     _initialize : function (options) {
 
+        console.log('ANIMATOR INIT!');
+
         // create slider
         this._createSlider();
 

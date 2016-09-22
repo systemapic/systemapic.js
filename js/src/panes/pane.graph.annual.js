@@ -28,7 +28,7 @@
 Wu.Graph = Wu.Graph || {};
 
 // Annual Graph (cyclical)
-Wu.Graph.Annual = Wu.Evented.extend({
+Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
     options : {
         fetchLineGraph : false, // debug, until refactored fetching line graph to cube
@@ -37,6 +37,9 @@ Wu.Graph.Annual = Wu.Evented.extend({
     // annual graph contains average of annual data
 
     _initialize : function () {
+
+        console.log('GRAPH INIT!');
+
 
         // listen to events
         this.listen();
@@ -50,15 +53,34 @@ Wu.Graph.Annual = Wu.Evented.extend({
         // add options
         this._addOptionsPane();
 
-        // prepare data
-        this._prepareData();
-
-        // init graph
-        this._initGraph();
+        // set data
+        this.setData(this.options.data);
 
         // set initial date
         this._setLastDate();
 
+    },
+
+    setData : function (data) {
+
+        // set data
+        this._data = data;
+
+        // prepare data
+        this._prepareData();
+    
+        // create graph
+        this._createGraph();
+
+    },
+
+    setMask : function (mask) {
+        
+        // set mask
+        this._mask = mask;
+
+        // set data
+        this.setData(mask.data);
     },
 
     _plugAnimator : function () {
@@ -71,21 +93,23 @@ Wu.Graph.Annual = Wu.Evented.extend({
     },
 
     listen : function () {
-        Wu.Mixin.Events.on('sliderUpdate', this._onSliderUpdate, this);
-        Wu.Mixin.Events.on('sliderMoveForward', this._onSliderMoveForward, this);
-        Wu.Mixin.Events.on('sliderMoveBackward', this._onSliderMoveBackward, this);
-        Wu.Mixin.Events.on('loadingGraph', this._onLoadingGraph, this);
-        Wu.Mixin.Events.on('loadedGraph', this._onLoadedGraph, this);
-        Wu.Mixin.Events.on('maskSelected', this._onMaskSelected, this);
-        Wu.Mixin.Events.on('maskUnselected', this._onMaskUnselected, this);
-        Wu.Mixin.Events.on('animatorMovePreviousYear', this._onAnimatorMovePreviousYear, this);
-        Wu.Mixin.Events.on('animatorMoveNextYear', this._onAnimatorMoveNextYear, this);
+        Wu.Mixin.Events.on('sliderUpdate',              this._onSliderUpdate,               this);
+        Wu.Mixin.Events.on('sliderMoveForward',         this._onSliderMoveForward,          this);
+        Wu.Mixin.Events.on('sliderMoveBackward',        this._onSliderMoveBackward,         this);
+        Wu.Mixin.Events.on('loadingGraph',              this._onLoadingGraph,               this);
+        Wu.Mixin.Events.on('loadedGraph',               this._onLoadedGraph,                this);
+        Wu.Mixin.Events.on('maskSelected',              this._onMaskSelected,               this);
+        Wu.Mixin.Events.on('maskUnselected',            this._onMaskUnselected,             this);
+        Wu.Mixin.Events.on('animatorMovePreviousYear',  this._onAnimatorMovePreviousYear,   this);
+        Wu.Mixin.Events.on('animatorMoveNextYear',      this._onAnimatorMoveNextYear,       this);
     },
 
     _initContainer : function () {
         this._container         = Wu.DomUtil.create('div', 'big-graph-outer-container',     this.options.appendTo);
         this._infoContainer     = Wu.DomUtil.create('div', 'big-graph-info-container',      this._container);
         this._nameTitle         = Wu.DomUtil.create('div', 'big-graph-title',               this._infoContainer, 'title');
+        this._maskTitle         = Wu.DomUtil.create('div', 'big-graph-mask-title',          this._infoContainer, 'title');
+        this._maskDescription   = Wu.DomUtil.create('div', 'big-graph-mask-description',    this._infoContainer, 'title');
         this._dateTitle         = Wu.DomUtil.create('div', 'big-graph-current-day',         this._infoContainer, 'day');
         this._graphContainer    = Wu.DomUtil.create('div', 'big-graph-inner-container',     this._container);
         this._loadingBar        = Wu.DomUtil.create('div', 'graph-loading-bar',             this._container);
@@ -115,14 +139,14 @@ Wu.Graph.Annual = Wu.Evented.extend({
         return app.activeProject.isEditor();
     },
 
-    _initGraph : function () {
+    _createGraph : function () {
 
         // store crossfilters, dimensions, etc
         this.ndx = {};
 
         // prepare this._data if not already done
         // if (_.isEmpty(this._annualAverageData)) {
-        //     this._prepareAnnualAverageData();
+        //     this._prepareData();
         // }
 
         // AVERAGE ANNUAL DATA
@@ -188,10 +212,12 @@ Wu.Graph.Annual = Wu.Evented.extend({
         });
 
         // create line group
-        var line_group = line_dimension.group().reduceSum(function(d) { return d.SCF; });
+        // var line_group = line_dimension.group().reduceSum(function(d) { return d.SCF; });
+        var line_group = line_dimension.group().reduceSum(function(d) { return d.scf; });
 
         // create point group (for last red triangle)
-        var point_group = line_dimension.group().reduceSum(function(d) { return d.SCF });
+        // var point_group = line_dimension.group().reduceSum(function(d) { return d.SCF });
+        var point_group = line_dimension.group().reduceSum(function(d) { return d.scf });
 
 
 
@@ -260,7 +286,6 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
         ]);
     
-
         composite
         .xAxis()
         .tickFormat(d3.time. format('%b'));
@@ -289,26 +314,34 @@ Wu.Graph.Annual = Wu.Evented.extend({
     },
 
     _updateLegend : function () {
+        if (this._legends) {
+            // just update
+        
+        } else {
 
-        var year_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
-        var average_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
-        var minmax_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+            this._legends = {};
 
-        var minmax_color = Wu.DomUtil.create('div', 'graph-legend-color', minmax_container);
-        var average_color = Wu.DomUtil.create('div', 'graph-legend-color', average_container);
-        var year_color = Wu.DomUtil.create('div', 'graph-legend-color', year_container);
+            var year_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+            var average_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+            var minmax_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
 
-        var minmax_text = Wu.DomUtil.create('div', 'graph-legend-text', minmax_container);
-        var average_text = Wu.DomUtil.create('div', 'graph-legend-text', average_container);
-        var year_text = Wu.DomUtil.create('div', 'graph-legend-text', year_container);
+            var minmax_color = Wu.DomUtil.create('div', 'graph-legend-color', minmax_container);
+            var average_color = Wu.DomUtil.create('div', 'graph-legend-color', average_container);
+            var year_color = Wu.DomUtil.create('div', 'graph-legend-color', year_container);
 
-        minmax_text.innerHTML = 'Max/min: 2000-2015';
-        average_text.innerHTML = 'Average: 2000-2015';
-        year_text.innerHTML = 'Current year';
+            this._legends.minmax_text = Wu.DomUtil.create('div', 'graph-legend-text', minmax_container);
+            this._legends.average_text = Wu.DomUtil.create('div', 'graph-legend-text', average_container);
+            this._legends.year_text = Wu.DomUtil.create('div', 'graph-legend-text', year_container);
 
-        minmax_color.style.background = '#DCDCD7';
-        average_color.style.background = 'white';
-        year_color.style.background = '#F3504A';
+            this._legends.minmax_text.innerHTML = 'Max/min: 2000-2015';
+            this._legends.average_text.innerHTML = 'Average: 2000-2015';
+            this._legends.year_text.innerHTML = 'Current year';
+
+            minmax_color.style.background = '#DCDCD7';
+            average_color.style.background = 'white';
+            year_color.style.background = '#F3504A';
+
+        }
 
     },
 
@@ -470,33 +503,44 @@ Wu.Graph.Annual = Wu.Evented.extend({
     },
 
     _getTitle : function () {
-        var title = this.options.cube.getTitle();
-        if (this._maskSelected) {
-            title += ' - Vassdrag Z 33';
-        }
-        return title;
+        return this.options.cube.getTitle();
     },
 
-    _updateTitles : function (options) {
-
+    _getDateTitle : function () {
         // get titles
-        var nameTitle = this._getTitle();
         var date = moment().year(this._current.year).dayOfYear(this._current.day);
         var dateTitle = date.format('MMMM Do YYYY');
         var cache = this._cache.line[this._current.year];
         var scf = _.find(cache, function (c) {
             return c.date.isSame(date, 'day');
         });
-        var scfTitle = scf ? (Math.round(scf.SCF * 10) / 10) + '%' : '';
+        var scfTitle = scf ? (Math.round(scf.scf * 10) / 10) + '%' : '';
+        return dateTitle + ' &nbsp;&nbsp;&nbsp;   <span style="font-weight:900">SCF: ' + scfTitle + '</span>';
+    },
 
-        // // check limit
-        // if (this._current.day >= this._limit) {
-        //     dateTitle += ' (most current)';
-        // }
+    _getMaskTitle : function () {
+        if (!this._mask) return;
+        var d = this._mask.title;
+        if (_.isString(d)) return d.camelize();
+        return '';
+
+    },
+
+    _getMaskDescription : function () {
+        // return 'Nedbørsfelt som har koden bla bla bla.'
+        if (!this._mask) return;
+        var d = this._mask.description;
+        if (_.isString(d)) return d.camelize();
+        return '';
+    },
+
+    _updateTitles : function (options) {
 
         // set titles
-        this._nameTitle.innerHTML = nameTitle;
-        this._dateTitle.innerHTML = dateTitle + ' &nbsp;&nbsp;&nbsp;   <span style="font-weight:900">SCF: ' + scfTitle + '</span>';
+        this._nameTitle.innerHTML = this._getTitle();
+        this._maskTitle.innerHTML = this._getMaskTitle();
+        this._maskDescription.innerHTML = this._getMaskDescription();
+        this._dateTitle.innerHTML = this._getDateTitle();
     },
 
     _updateLineGraph : function (options) {
@@ -508,36 +552,38 @@ Wu.Graph.Annual = Wu.Evented.extend({
         if (this._fetching) return console.log('already fetching data...');
 
         // mark fetching (to avoid parallel fetching)
-        this._fetching = true;
+        // this._fetching = true;
 
         // data not available yet, need to fetch
         var cube = this.options.cube;
 
+        console.error('FETHING!!', this._mask);
+
         // query data from cube
         cube.query({
-            query_type : 'scf',
+            // query_type : 'scf',
+            query_type : 'scf-geojson',
             // cube_id : this.getCube().getCubeId(),
+            mask_id : this._mask ? this._mask.id : 'mask-gkceetoa', // debug
             year : this._current.year,   
             day : this._current.day,
             options : {
                 currentYearOnly : true,
-                // force_query : true,
+                force_query : true,
                 filter_query : false
             },
 
         // callback
         }, function (err, query_results) {
-            if (err) return console.error(err);
+            if (err) return console.error(err, query_results);
 
             // parse
             var fractions = Wu.parse(query_results);
-
 
             // parse dates
             var cache = this._parseDates(fractions);
 
             console.log('GOT LINE GRAPH', cache);
-
 
             // set cache
             this._cache.line[this._current.year] = cache;
@@ -702,27 +748,21 @@ Wu.Graph.Annual = Wu.Evented.extend({
         var fixed = [];
         data.forEach(function (d) {
             fixed.push({
-                SCF : d.SCF,
+                // SCF : d.SCF,
+                SCF : d.scf,
                 date : new Date(moment().year(d.Year).dayOfYear(d.Doy).toString())
             });
         });
         return fixed;
     },
 
-    _prepareData : function () {
-
-        // prepare annual data
-        this._prepareAnnualAverageData();
-
-    },
-
-    _prepareAnnualAverageData : function (year) {
+    _prepareData : function (year) {
 
         // set year
         var year = year || 2016;
 
-        // passed from constructor
-        var data = this.options.data;
+        // get data
+        var data = this._data;
 
         // clear
         this._annualAverageData = [];
@@ -734,49 +774,46 @@ Wu.Graph.Annual = Wu.Evented.extend({
 
             // get this day's values
             var today = _.filter(data, function (d) {
-                return d.Doy == doy;
+                return d.doy == doy;
             });
 
-
-            // // get this day's max
-            // var max = _.max(today, function (d) {
-            //     return d.SCF;
-            // }).SCF;
-
-            // // get this day's min
-            // var min = _.min(today, function (d) {
-            //     return d.SCF;
-            // }).SCF;
-
-            // // get this day's avg
-            // var sum = 0;
-            // _.times(today.length, function (i) {
-            //     sum += today[i].SCF;
-            // });
-            // var avg = sum/today.length;
-
-            // // get this day's min
-            // var min = _.min(today, function (d) {
-            //     return d.SCF;
-            // }).SCF;
-
-            // // get this day's avg
-            // var sum = 0;
-            // _.times(today.length, function (i) {
-            //     sum += today[i].SCF;
-            // });
-            // var avg = sum/today.length;
+            // { 
+            //     age : "0.99",
+            //     ccf : "99.19",
+            //     doy : "1",
+            //     scf : "82.61",
+            //     year : "2001"
+            // }
 
             // get this day's max
-            var max = today[0].SCFmax; // read from prepared values in json
-            var min = today[0].SCFmin;
-            var avg = today[0].SCFmean;
+            var max = _.max(today, function (d) {
+                return d.scf;
+            }).scf;
+
+            // get this day's min
+            var min = _.min(today, function (d) {
+                return d.scf;
+            }).scf;
+
+            // get this day's avg
+            var sum = 0;
+            _.times(today.length, function (i) {
+                sum += parseFloat(today[i].scf);
+            });
+            var avg = sum/today.length;
+         
+
+            // deprecated
+            // // get this day's max
+            // var max = today[0].SCFmax; // read from prepared values in json
+            // var min = today[0].SCFmin;
+            // var avg = today[0].SCFmean;
 
             // add to array
             this._annualAverageData.push({
                 no   : doy,
                 max  : max,
-                date : moment().year(year).dayOfYear(data[doy].Doy), // year doesn't matter, as it's avg for all years
+                date : moment().year(year).dayOfYear(data[doy].doy), // year doesn't matter, as it's avg for all years
                 min  : min,
                 avg  : avg,
             });

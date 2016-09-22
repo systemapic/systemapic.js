@@ -2219,7 +2219,7 @@ input.chrome-field-input {
     width: 100%;
     bottom: 50px;
     padding-left: 100px;
-    text-align: center;
+    text-align: left;
     margin: auto;
     padding-right: 100px;
     }
@@ -2356,10 +2356,12 @@ input.chrome-field-input {
         }
 
 .big-graph-current-day {
-        font-weight: 600;
-        font-size: 18px;
-        margin: 0;    
-        }  
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0;    
+    margin-top: 10px;
+    margin-bottom: 10px;
+}  
 
 
 
