@@ -24,6 +24,20 @@ Wu.App = Wu.Class.extend({
 		// auth
 		app.api.auth(app.authed);
 
+		
+	},
+
+	raven : function () {
+
+		// error handling
+		Raven.config('https://594a4e7cc65f4e39bdd0337276e391b5@sentry.io/100809').install();
+
+		Raven.setUserContext({
+		    email: 'matt@example.com',
+		    id: '123'
+		});
+
+		Raven.setRelease(Wu.version);
 	},
 
 	authed : function (err, access_token) {

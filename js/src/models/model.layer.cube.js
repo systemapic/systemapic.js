@@ -44,6 +44,25 @@
 //       CubeLayer.Deformation
 
 
+// REFACTOR - todo
+// ========
+// 
+// Refactoring of Cube layer, Animator and Graph
+// 
+// - Should all be separated as much as possible, and work independently
+// - Cube layer should only contain datasets and layer logic
+// - In terms of showing layers in cube, the animator is needed (kinda always)
+// - Both there should be possible to have different plugins to control the content of the cube layer
+// - Thus Animator should be a separate plugin altogether
+// - Animator should control Cube layers, decide which layers are shown on map, etc.
+// - Animator should work without Graph plugin
+// - Graph plugin should be able to listen to Animator and know which datasets are active (for its cursor)
+// - Graph plugin should work without Animator .... 
+// - Events should control everything, obviously
+// - Cube layer should be oblivious to everything, except which dataset to display
+// - Masks belong to Cube layer
+
+
 // metalayer with several postgis raster layers 
 Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
@@ -143,7 +162,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             this._group.eachLayer(this._hideLayer);
 
             // make sure cache is updated; got all correct layers loaded
-            // this._updateCache();
+            this._updateCache();
 
             // sets cursor at current frame (ie. show layer on map)
             this._updateCursor();
@@ -192,7 +211,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         this._group.removeFrom(map);
 
         // remove mask
-        if (this.hasMask) {
+        if (this.hasMask()) {
             this._maskLayers.forEach(function (maskLayer) {
                 maskLayer.remove();
             });
@@ -274,45 +293,22 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _initGraph : function (done) {
 
-        // // get data from server
-        // app.api.getCustomData({
+        var masks = this.getMasks();
 
-        //     // custom data, snow average  todo: make pluggable
-        //     name : 'scf.average.2000.2015'
+        // create animator
+        this._animator = new Wu.Animator({ // refactor to project controls
+            cube : this
+        });
 
-        // }, function (err, annualJSON) {
-        //     if (err) {
-        //         done && done(err);
-        //         return console.error(err);
-        //     }  
-
-        //     // parse
-        //     this._data.annual = Wu.parse(annualJSON);
-
-        //     console.log('DATATDATATA', this._data.annual);
-
-
-            var masks = this.getMasks();
-
-            // create animator
-            this._animator = new Wu.Animator({ // refactor to project controls
-                cube : this
-            });
-
-            // create graph
-            this._graph = new Wu.Graph.SnowCoverFraction({ 
-                // data     : this._data.annual,
-                data     : masks[0].data,
-                appendTo : this._animator.getContainer(),
-                type     : 'annualCycles',
-                cube     : this,
-                animator : this._animator
-            });
-
-        //     // callback
-        //     done && done();
-
-        // }.bind(this));
+        // create graph
+        this._graph = new Wu.Graph.SnowCoverFraction({ 
+            // data     : this._data.annual,
+            data     : masks[0].data,
+            appendTo : this._animator.getContainer(),
+            type     : 'annualCycles',
+            cube     : this,
+            animator : this._animator
+        });
 
     },
 
@@ -346,6 +342,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _initCache : function () {
+
+        console.log('INIT CACHE!!!!!!!!!!!!!');
 
         // set datasets
         this._initDatasets();
@@ -381,6 +379,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
         }.bind(this));
 
+        console.log('this._cache', this._cache);
+
         // set default layer
         this.layer = this._cache[this.options.cacheSize[0]].layer;
 
@@ -413,7 +413,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         }.bind(this));
 
         // select first mask by default
-        // this.setDefaultMask();
+        this.setDefaultMask();
 
     },
 
@@ -526,7 +526,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         // make sure on top
         maskLayer.layer.bringToFront();
 
-        
         // set popup content
         maskLayer.layer.bindTooltip(function (layer) {
 
@@ -619,7 +618,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         this._graph.setMask(mask);
 
         // update data in graph
-        this._graph.setData(mask.data);
+        // this._graph.setData(mask.data);
     },
 
     getMaskById : function (id) {
@@ -981,14 +980,24 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         // find index of dataset corresponding to current date
         var didx = this._findDatasetByTimestamp(timestamp);
 
+        console.error('move cursor, timestamp, didx', timestamp, didx, this._datasets);
+
         if (didx < 0) {
             console.error('no dataset corresponding to timestamp');
 
-            // hide
-            this._hideLayer(this.layer);
+            // // try getting last dataset
+            // var didx = this._findLastDataset();
 
-            // done
-            return;
+            // // if still not dataset
+            // if (didx < 0) {
+
+                // hide
+                this._hideLayer(this.layer);
+
+                // done
+                return;
+
+            // }
         }
 
         // set direction (for cache algorithm)
@@ -1109,9 +1118,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             // update layer
             cache.layer.setOptions(layerOptions);
 
-          
-
-
         }, this);
 
     },
@@ -1202,6 +1208,16 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             return d.formattedTime == b;
         });
         return didx;
+    },
+
+    _findLastDataset : function () {
+        var f = this.options.timeFormat;
+        // var b = moment(t).format(f); // YYYY-DDDD of animation
+        var didx = _.max(this._datasets, function (d) { 
+            return d.idx;
+        });
+        var d = didx ? didx.idx : -1;
+        return d;
     },
 
     _showLayer : function (layer) {

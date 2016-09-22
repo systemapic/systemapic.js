@@ -2325,7 +2325,10 @@ text.y-axis-label.y-label {
     height: 13px;
 }
 
-
+.big-graph-inner-container {
+    min-height: 220px;
+    min-width: 500px;
+}
 
 
 
