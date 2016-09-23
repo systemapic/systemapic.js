@@ -152,6 +152,8 @@ Wu.Model.Layer = Wu.Model.extend({
             flyOptions.minZoom = zoom;
         }
 
+        flyOptions.maxZoom = 18;
+
         // fly
         map.fitBounds(bounds, flyOptions);
     },
