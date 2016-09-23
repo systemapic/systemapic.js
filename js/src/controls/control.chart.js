@@ -185,7 +185,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// set latlng
 		var latlng = multiPopUp ? multiPopUp.center : e.latlng;
-		
+
 		// return if no content
 		if (!content) return this._clearPopup();
 		
@@ -244,8 +244,11 @@ Wu.Control.Chart = Wu.Control.extend({
 	// get real marker position (from data)
 	_getMarkerPosition : function (latlng, e) {
 		
+		// debug. problems with e.data.lat/lng coming from dataset, which may be any projection... 
+		return latlng; 
+		
 		// return latlng if no data	
-		if (!e.data) return latlng;
+		if (!e.data || !e.data.lat || !e.data.lng) return latlng;
 
 		// read latlng from data
 		var lat = e.data.lat;
