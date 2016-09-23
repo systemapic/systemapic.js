@@ -38,9 +38,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
     _initialize : function () {
 
-        console.log('GRAPH INIT!');
-
-
         // listen to events
         this.listen();
 
@@ -49,15 +46,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
         // plug animator
         this._plugAnimator();
-
-        // add options
-        // this._addOptionsPane();
-
-        // set data
-        // this.setData(this.options.data, this._setLastDate.bind(this));
-
-        // set initial date
-        // this._setLastDate();
 
     },
 
@@ -79,8 +67,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
     setMask : function (mask) {
 
-        console.log('setmask', mask);
-        
         // set mask
         this._mask = mask;
 
@@ -126,25 +112,119 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
         this._loadingBar        = Wu.DomUtil.create('div', 'graph-loading-bar',             this._container);
         this._legendContainer   = Wu.DomUtil.create('div', 'graph-legend',                  this._container);
 
+        // add editor items
+        if (this.isEditor()) {
+            this._addEditorPane();
+        }
+
     },
 
-    // _addOptionsPane : function () {
-        
-    //     // if editor
-    //     if (this.isEditor()) {
- 
-    //         // add extra pane to graph
-    //         this._optionsContainer = Wu.DomUtil.create('div', 'graph-options', this._container);
+    _addEditorPane : function () {
 
-    //         // fix border-radius for main pane
-    //         Wu.DomUtil.addClass(this._container, 'top-right-border-radius-only');
+        // container
+        this._editorPane = Wu.DomUtil.create('div', 'big-graph-editor-pane');
 
-    //         // fix border-radius for animator        
-    //         if (this._animator) this._animator.addExtraPane();
+        // insert above outer container
+        this.options.appendTo.insertBefore(this._editorPane, this.options.appendTo.firstChild);
 
+        // title
+        this._editorPaneTitle = Wu.DomUtil.create('div', 'big-graph-editor-pane-title', this._editorPane, 'Layer options');
+
+        // mask filter
+        this._filterPane = Wu.DomUtil.create('div', 'big-graph-editor-filter-pane', this._editorPane);
+
+        // filter title
+        this._filterPaneTitle = Wu.DomUtil.create('div', 'big-graph-editor-filter-title', this._filterPane, 'Enable mask filters:');
+
+        // todo: filter active per mask
+        // // get masks
+        // var masks = this.getCube().getMasks();
+
+        // // create checkboxes
+        // masks.forEach(function (mask) {
+
+        //     console.log('filter mask ->', mask);
+
+        //     // create checkbox
+        //     var checkbox = this._createMaskCheckbox(mask, this._filterPane);
+
+        // }.bind(this));
+
+        // mask filter
+        var checkbox = this._createFilterCheckbox({
+            appendTo : this._filterPane
+        });
+
+
+
+    },
+
+     _createFilterCheckbox : function (options) {
+
+        var checkbox = Wu.DomUtil.create('div', 'checkbox');
+        var input = Wu.DomUtil.create('input', '', checkbox);
+        input.setAttribute('type', 'checkbox');
+        input.id = 'checkbox-' + Wu.Util.getRandomChars(5);
+        var label = Wu.DomUtil.create('label', '', checkbox);
+        label.setAttribute('for', input.id);
+        label.innerHTML = 'Only show data within mask.';
+
+        // mark checked if active
+        console.log('check if active', this.getCube().getFilterMask());
+        if (this.getCube().getFilterMask()) {
+            input.setAttribute('checked', '');
+        }
+
+        // check event
+        Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
+            console.log('onchange c', e);
+
+            // toggle
+            if (this.getCube().getFilterMask()) {
+                this.getCube().setFilterMask(false);
+            } else {
+                this.getCube().setFilterMask(true);
+            }
+
+            this.getCube()._updateCache();
+        }.bind(this));
+
+        options.appendTo.appendChild(checkbox);
+
+        return checkbox;
+    },
+
+    // _createMaskCheckbox : function (mask, appendTo) {
+
+    //     var checkbox = Wu.DomUtil.create('div', 'checkbox');
+    //     var input = Wu.DomUtil.create('input', '', checkbox);
+    //     input.setAttribute('type', 'checkbox');
+    //     input.id = 'checkbox-' + mask.id;
+    //     var label = Wu.DomUtil.create('label', '', checkbox);
+    //     label.setAttribute('for', input.id);
+    //     label.innerHTML = mask.title ? mask.title.camelize() : 'Mask with no name';
+
+    //     // mark checked if active
+    //     console.log('check if active', this.getCube().getActiveMask(), mask.id);
+    //     if (this.getCube().getActiveMask() == mask.id) {
+    //         input.setAttribute('checked', '');
     //     }
 
+
+    //     // check event
+    //     Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
+    //         console.log('onchange c', e);
+    //     });
+
+    //     appendTo.appendChild(checkbox);
+
+    //     return checkbox;
     // },
+
+    _activateFilter : function () {
+
+    },
+
 
     isEditor : function () {
         return app.activeProject.isEditor();
@@ -370,7 +450,7 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
     _current : {
         // defaults
-        year : 2016,
+        year : 2015,
         day : 1
     },
 
@@ -404,8 +484,10 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
     _setDate : function (year, day) {
         
         // set dates
-        this._current.year = year || this._current.year || 2016;
-        this._current.day = day || this._current.day || 1;
+        // this._current.year = year || this._current.year || 2016;
+        this._current.year = year || this._current.year;
+        // this._current.day = day || this._current.day || 1;
+        this._current.day = day || this._current.day;
 
         // set graph dates
         var minDate = moment().year(this._current.year).dayOfYear(1);
@@ -571,11 +653,9 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
         // data not available yet, need to fetch
         var cube = this.options.cube;
 
-        console.error('FETHING!!', this._mask);
-
         var query_options = {
             query_type : 'scf-geojson',
-            mask_id : this._mask ? this._mask.id : 'mask-gkceetoa', // debug
+            mask_id : this._mask ? this._mask.id : false, //'mask-gkceetoa', // debug
             year : this._current.year,   
             day : this._current.day,
             options : {
@@ -584,8 +664,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
                 filter_query : false
             },
         }
-
-        console.log('query_options', query_options);
 
         // query data from cube
         cube.query(query_options, function (err, query_results) {
@@ -596,8 +674,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
             // parse dates
             var cache = this._parseDates(fractions);
-
-            console.log('GOT LINE GRAPH', cache);
 
             if (!cache || !_.isArray(cache) || !_.size(cache)) return;
 
@@ -653,8 +729,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
                 filter_query : false
             },
         }
-
-        console.log('_fetchLineGraph ', query_options)
 
 
         // query server for data
@@ -774,7 +848,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
     },
 
     getCurrentDate : function () {
-        console.log('getcurrentdate', this._current);
         return moment().dayOfYear(this._current.day).year(this._current.year);
     },
 
@@ -793,12 +866,11 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
     _prepareData : function (year) {
 
         // set year
-        var year = year || 2016;
+        // var year = year || 2016;
+        var year = year || this._current.year;
 
         // get data
         var data = this._data;
-
-        console.error('prepare data', data);
 
         // clear
         this._annualAverageData = [];

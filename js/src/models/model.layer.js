@@ -338,6 +338,26 @@ Wu.Model.Layer = Wu.Model.extend({
         return this.store.file;
     },
 
+    setActiveMask : function (mask) {
+        if (!_.isString(mask)) return console.error('Mask must be stringified.');
+        this.store.active_mask = mask;
+        // this.save('active_mask');
+    },
+
+    getActiveMask : function () {
+        // mask_id
+        return this.store.active_mask || null;
+    },
+
+    setFilterMask : function (bool) {
+        this.store.filter_mask = bool;
+        this.save('filter_mask');
+    },
+
+    getFilterMask : function () {
+        return this.store.filter_mask || false;
+    },
+
     getAttribution : function () {
         return this.store.attribution;
     },

@@ -343,8 +343,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _initCache : function () {
 
-        console.log('INIT CACHE!!!!!!!!!!!!!');
-
         // set datasets
         this._initDatasets();
 
@@ -361,7 +359,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
                 subdomains : app.options.servers.cubes.subdomains,
                 maxRequests : 0,
                 dataset_id : null,
-                cache : null
+                cache : null,
+                mask_id : null
             });
 
             // add load event
@@ -378,8 +377,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             });
 
         }.bind(this));
-
-        console.log('this._cache', this._cache);
 
         // set default layer
         this.layer = this._cache[this.options.cacheSize[0]].layer;
@@ -617,6 +614,12 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         // update mask in graph
         this._graph.setMask(mask);
 
+        // store 
+        this.setActiveMask(mask.id);
+
+        // update cache
+        this._updateCache();
+
         // update data in graph
         // this._graph.setData(mask.data);
     },
@@ -641,8 +644,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _onMapClick : function (e) {
         // fires AFTER maskLayer events
-
-        console.error('_onMapClick', e);
 
         // not applicable if constantMask is active
         if (this.options.mask.constantMask) return;
@@ -980,24 +981,14 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         // find index of dataset corresponding to current date
         var didx = this._findDatasetByTimestamp(timestamp);
 
-        console.error('move cursor, timestamp, didx', timestamp, didx, this._datasets);
-
         if (didx < 0) {
             console.error('no dataset corresponding to timestamp');
 
-            // // try getting last dataset
-            // var didx = this._findLastDataset();
+            // hide
+            this._hideLayer(this.layer);
 
-            // // if still not dataset
-            // if (didx < 0) {
-
-                // hide
-                this._hideLayer(this.layer);
-
-                // done
-                return;
-
-            // }
+            // done
+            return;
         }
 
         // set direction (for cache algorithm)
@@ -1085,38 +1076,61 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             });
 
             // if already in cache, all good
-            if (cached) return;
 
-            // set layer options
-            var layerOptions = {
-                dataset_id : dataset.id,
-                cache : Wu.Util.getRandomChars(6)
+            if (cached) {
+
+                var cacheOptions = {
+                    mask_id : this.getFilterMask() ? this.getActiveMask() : null,
+                    loaded : false,
+                    age : Date.now()
+                }
+
+                 // update layer
+                cached.layer.setOptions(cacheOptions);
+                
+                return;
+
+            } else {
+
+                // set layer options
+                var layerOptions = {
+                    dataset_id : dataset.id,
+                    cache : Wu.Util.getRandomChars(6),
+                    mask_id : null
+                }
+
+                // if mask filter is active
+                if (this.getFilterMask()) {
+                    layerOptions.mask_id = this.getActiveMask();
+                }
+
+                // (20) loaded: 107 -- bug
+                // -----------------------
+                // clues:
+                // - has to do with cache that is not yet completely loaded
+                // - when thus reused, shit happens
+                // - seems if layer is overwritten, then as soon as first 20 tiles are loaded, 
+                //  the next 20 tiles all fire "loaded" event.
+                // - fix with https://github.com/systemapic/systemapic.js/issues/210
+
+                // get available cache
+                var cache = this._getAvailableCache();
+
+                // cache.layer.off('load', this._onLayerLoaded, this);
+                // cache.layer.off('load');
+                // cache.layer.on('load', this._onLayerLoaded, this);
+
+                // update cache
+                cache.dataset_id = dataset.id;
+                cache.age = Date.now();
+                cache.idx = dataset.idx;
+                cache.loaded = false;
+
+                // update layer
+                cache.layer.setOptions(layerOptions);
+
             }
 
-            // (20) loaded: 107 -- bug
-            // -----------------------
-            // clues:
-            // - has to do with cache that is not yet completely loaded
-            // - when thus reused, shit happens
-            // - seems if layer is overwritten, then as soon as first 20 tiles are loaded, 
-            //  the next 20 tiles all fire "loaded" event.
-            // - fix with https://github.com/systemapic/systemapic.js/issues/210
-
-            // get available cache
-            var cache = this._getAvailableCache();
-
-            // cache.layer.off('load', this._onLayerLoaded, this);
-            // cache.layer.off('load');
-            // cache.layer.on('load', this._onLayerLoaded, this);
-
-            // update cache
-            cache.dataset_id = dataset.id;
-            cache.age = Date.now();
-            cache.idx = dataset.idx;
-            cache.loaded = false;
-
-            // update layer
-            cache.layer.setOptions(layerOptions);
 
         }, this);
 
@@ -1350,7 +1364,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _getTileUrl : function () {
         var access_token = '?access_token=' + app.tokens.access_token;
-        var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}';
+        var url = app.options.servers.cubes.uri + '{cube_id}/{dataset_id}/{z}/{x}/{y}.png' + access_token + '&cache={cache}&mask_id={mask_id}';
         return url;
     },
 

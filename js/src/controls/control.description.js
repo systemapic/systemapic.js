@@ -187,19 +187,18 @@ L.Control.Description = Wu.Control.extend({
 
 	_layerEnabled : function (e) {
 
-		console.log('control.description layerEnabled', e, this.layers);
+		// console.log('control.description layerEnabled', e, this.layers);
 	},
 
 	_layerDisabled : function (e) {
-		console.log('layer _layerDisabled', e);
+		// console.log('layer _layerDisabled', e);
 	},	
 
 	showHide : function () {
-		console.error('showHide', this);
+		// console.error('showHide', this);
 
 		// Hide if empty
 		if ( !this.layers || this.isEmpty(this.layers) ) {
-			console.log('HIDING!');
 			this._hide();
 			return;
 		}
@@ -209,7 +208,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_hide : function () {	
-		console.error('TODO: hide/show not working. refactor!');
+		// console.error('TODO: hide/show not working. refactor!');
 		this._container.style.display = 'none'; 
 		this.isOpen = false;
 
@@ -309,7 +308,7 @@ L.Control.Description = Wu.Control.extend({
 
 	_removeLayer : function (layer) {
 
-		console.log('_removeLayer', layer, this);
+		// console.log('_removeLayer', layer, this);
 
 		// Delete layer from store
 		var layerUuid = layer.getUuid();
@@ -414,7 +413,7 @@ L.Control.Description = Wu.Control.extend({
 
 	getLegend : function (layer) {
 		var legendHTML = layer.isVector() ? this.createLegendHTML() : '';
-		console.log('getLEgend', legendHTML);
+		// console.log('getLEgend', legendHTML);
 		return legendHTML;
 	},
 

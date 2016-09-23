@@ -34,8 +34,6 @@ Wu.Animator = Wu.Evented.extend({
 
     _initialize : function (options) {
 
-        console.log('ANIMATOR INIT!');
-
         // create slider
         this._createSlider();
 
@@ -455,12 +453,10 @@ Wu.Animator = Wu.Evented.extend({
     remove : function (id) {},
 
     hide : function () {
-        console.error('hide');
         this.sliderOuterContainer.style.display = 'none';
     },
 
     show : function () {
-        console.error('snow');
         if (!this._inited) return;
         this.sliderOuterContainer.style.display = 'block';
     },  
