@@ -1,4 +1,4 @@
-Wu.version = '1.5.1';
+Wu.version = '1.6.0';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -10,7 +10,7 @@ Wu.App = Wu.Class.extend({
 	initialize : function (options) {
 
 		// print version
-		console.log('Systemapic v.' + Wu.version);
+		console.log('Mapic v.' + Wu.version);
 
 		// set global app
 		window.app = Wu.app = this; // todo: remove Wu.app, use only window.app
