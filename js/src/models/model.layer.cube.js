@@ -180,7 +180,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
                 this._maskLayers.forEach(function (maskLayer) {
                     maskLayer.add();
                 });
-              
+
             }
 
             // show legend
@@ -217,6 +217,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         };
 
         // remove from active layers
+        // todo: evented!
         app.MapPane.removeActiveLayer(this);    
 
         // remove from zIndex
@@ -294,7 +295,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _flush : function () {
         this.remove();
-        app.MapPane._clearPopup();
+        app.MapPane._clearPopup(); // todo: evented
         this._removeGridEvents();
     },
 
@@ -304,7 +305,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
     _initGraph : function (done) {
 
         // create animator
-        this._animator = new Wu.Graph.Animator({ // refactor to project controls
+        this._animator = new Wu.Graph.Animator({ // refactor to project controls (or some editor control)
             layer : this
         });
 
