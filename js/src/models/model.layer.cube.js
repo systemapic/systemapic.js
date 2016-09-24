@@ -189,14 +189,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             // mark added
             this._added = true;
 
-            console.log('[[[[[[cube]]]]]]]]:', this, this.getUuid(), this._cube.cube_id);
-
-            // // fire event
-            // Wu.Mixin.Events.fire('layerEnabled', { detail : {
-            //     layer : this,
-            //     showSlider : true
-            // }}); 
-
             // fire layer enabled
             this.fire('enabled', {
                 layer : this
