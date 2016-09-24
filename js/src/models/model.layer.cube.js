@@ -69,7 +69,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
     options : {
         
         // frames to cache [before, after]
-        cacheSize : [5, 10], 
+        cacheSize : [0, 1], 
         
         // moment format at which to compare dates (year/day only here)
         timeFormat : 'YYYY-DDDD', 
@@ -78,34 +78,39 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         mask : {
 
             defaultStyle : {
-                fillColor : '#3388ff',
-                fillOpacity : 0.1,
-                color : '#3388ff',
-                opacity : 0.2,
+                // fillColor : '#3388ff',
+                fillColor : 'yellow',
+                // fillOpacity : 0.1,
+                fillOpacity : 0,
+                // color : '#3388ff',
+                color : 'yellow',
+                opacity : 0.4,
                 weight : 2,
             },
 
             hoverStyle : {
-                fillColor : '#3388ff',
+                // fillColor : '#3388ff',
+                fillColor : 'yellow',
                 fillOpacity : 0.2,
-                color : '#3388ff',
-                opacity : 0.6,
+                // color : '#3388ff',
+                color : 'yellow',
+                opacity : 0.9,
                 weight : 2,
             },
 
             selectedStyle : {
                 fillColor : 'black',
                 fillOpacity : 0,
-                color : 'red',
-                opacity : 0.8,
+                color : '#d35658',
+                opacity : 0.6,
                 weight : 2,
             },
 
             selectedHoverStyle : {
                 fillColor : 'black',
-                fillOpacity : 0.1,
+                fillOpacity : 0,
                 color : 'red',
-                opacity : 0.5,
+                opacity : 0.9,
                 weight : 2,
             },
 
@@ -114,6 +119,9 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
             // to have mask active by default
             constantMask : true,
+
+            // fly to mask on click
+            flyTo : false,
         },
 
         // empty, transparent png
@@ -170,9 +178,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             // add to active layers
             app.MapPane.addActiveLayer(this);   // includes baselayers, todo: evented
 
-            // update zindex
-            // this._addToZIndex(type); // todo: evented
-
             // add mask layer
             if (this.hasMask()) {
 
@@ -188,6 +193,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
             // mark added
             this._added = true;
+
+            console.log('cube:', this);
 
             // fire event
             Wu.Mixin.Events.fire('layerEnabled', { detail : {
@@ -332,6 +339,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             
             // prepare index for quicker search
             d.idx = n;
+
         });
 
         // set
@@ -530,7 +538,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             var html = mask.title ? mask.title.camelize() : 'Click to enable mask.';
 
             // add description if available, todo: add <span> styling
-            if (mask.description) html += '<br>' + mask.description;
+            // if (mask.description) html += '<br>' + mask.description;
 
             // return
             return html;
@@ -578,6 +586,9 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
             // do nothing, because we always want one mask to be selected (for now)
 
+            // fly to mask
+            this._flyToMask(maskLayer);
+
         // turn on
         } else {
 
@@ -586,7 +597,25 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
             // select mask            
             this.selectMask(maskLayer);
+
+            // fly to mask
+            this._flyToMask(maskLayer);
         }
+    },
+
+    _flyToMask : function (maskLayer) {
+
+        // optional
+        if (!this.options.mask.flyTo) return;
+
+        console.log('flyto', maskLayer);
+
+        var bounds = maskLayer.layer.getBounds();
+
+        console.log('bounds', bounds);
+
+        app._map.flyToBounds(bounds);
+
     },
 
     setDefaultMask : function (maskLayer) {

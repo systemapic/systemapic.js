@@ -51,12 +51,15 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
     setData : function (data, done) {
 
+        // set timeframe
+        this.setTimeFrame();
+
         // set data
         this._data = data;
 
         // prepare data
         this._prepareData();
-    
+
         // create graph
         this._createGraph();
 
@@ -133,98 +136,47 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
         // mask filter
         this._filterPane = Wu.DomUtil.create('div', 'big-graph-editor-filter-pane', this._editorPane);
 
-        // filter title
-        this._filterPaneTitle = Wu.DomUtil.create('div', 'big-graph-editor-filter-title', this._filterPane, 'Enable mask filters:');
-
-        // todo: filter active per mask
-        // // get masks
-        // var masks = this.getCube().getMasks();
-
-        // // create checkboxes
-        // masks.forEach(function (mask) {
-
-        //     console.log('filter mask ->', mask);
-
-        //     // create checkbox
-        //     var checkbox = this._createMaskCheckbox(mask, this._filterPane);
-
-        // }.bind(this));
-
         // mask filter
         var checkbox = this._createFilterCheckbox({
             appendTo : this._filterPane
         });
 
-
-
     },
 
      _createFilterCheckbox : function (options) {
 
+        // create checkbox
         var checkbox = Wu.DomUtil.create('div', 'checkbox');
         var input = Wu.DomUtil.create('input', '', checkbox);
         input.setAttribute('type', 'checkbox');
         input.id = 'checkbox-' + Wu.Util.getRandomChars(5);
+        
+        // create label
         var label = Wu.DomUtil.create('label', '', checkbox);
         label.setAttribute('for', input.id);
         label.innerHTML = 'Only show data within mask.';
 
         // mark checked if active
-        console.log('check if active', this.getCube().getFilterMask());
         if (this.getCube().getFilterMask()) {
             input.setAttribute('checked', '');
         }
 
         // check event
         Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
-            console.log('onchange c', e);
 
             // toggle
-            if (this.getCube().getFilterMask()) {
-                this.getCube().setFilterMask(false);
-            } else {
-                this.getCube().setFilterMask(true);
-            }
+            this.getCube().setFilterMask(!this.getCube().getFilterMask());
 
+            // update cache
             this.getCube()._updateCache();
+
         }.bind(this));
 
+        // add to DOM
         options.appendTo.appendChild(checkbox);
 
         return checkbox;
     },
-
-    // _createMaskCheckbox : function (mask, appendTo) {
-
-    //     var checkbox = Wu.DomUtil.create('div', 'checkbox');
-    //     var input = Wu.DomUtil.create('input', '', checkbox);
-    //     input.setAttribute('type', 'checkbox');
-    //     input.id = 'checkbox-' + mask.id;
-    //     var label = Wu.DomUtil.create('label', '', checkbox);
-    //     label.setAttribute('for', input.id);
-    //     label.innerHTML = mask.title ? mask.title.camelize() : 'Mask with no name';
-
-    //     // mark checked if active
-    //     console.log('check if active', this.getCube().getActiveMask(), mask.id);
-    //     if (this.getCube().getActiveMask() == mask.id) {
-    //         input.setAttribute('checked', '');
-    //     }
-
-
-    //     // check event
-    //     Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
-    //         console.log('onchange c', e);
-    //     });
-
-    //     appendTo.appendChild(checkbox);
-
-    //     return checkbox;
-    // },
-
-    _activateFilter : function () {
-
-    },
-
 
     isEditor : function () {
         return app.activeProject.isEditor();
@@ -274,8 +226,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
         var minDate = average_dimension.bottom(1)[0].date;  // this is jan 1 2015.. shouldn't be a YEAR per say, since it messes with the line graph (which needs to be in same year to display)
         var maxDate = average_dimension.top(1)[0].date;     
 
-        // console.log('minDate, maxDate', minDate, maxDate);
-
         // DATA FOR CURRENT YEAR
         // ---------------------
 
@@ -287,8 +237,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
         // // debug: fix date formats
         var line_data = this._debugFixData(this_year_data);
-
-        // console.log('line_data', line_data);
 
         // line_data array:
         // ----------------
@@ -307,11 +255,9 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
         });
 
         // create line group
-        // var line_group = line_dimension.group().reduceSum(function(d) { return d.SCF; });
         var line_group = line_dimension.group().reduceSum(function(d) { return d.scf; });
 
         // create point group (for last red triangle)
-        // var point_group = line_dimension.group().reduceSum(function(d) { return d.SCF });
         var point_group = line_dimension.group().reduceSum(function(d) { return d.scf });
 
 
@@ -352,8 +298,6 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
             dc.lineChart(composite)
             .group(average_min_group)
             .colors('#3C4759')
-            // .colors('#DDDDDD')
-            // .colors('yellow')
             .renderArea(true)       
             .renderDataPoints(false)
             .renderHorizontalGridLines(true)
@@ -450,7 +394,7 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
     _current : {
         // defaults
-        year : 2015,
+        year : 2016,
         day : 1
     },
 
@@ -481,12 +425,22 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
 
     },
 
+    setTimeFrame : function () {
+        var cube = this.getCube();
+        var datasets = cube.getDatasets();
+        var last = _.last(datasets);
+        var date = moment(last.timestamp);
+        var year = date.year();
+        var day = date.dayOfYear();
+        this._current.year = year;
+        this._current.day = day;
+        console.log('setTimeFrame', this._current);
+    },
+
     _setDate : function (year, day) {
         
         // set dates
-        // this._current.year = year || this._current.year || 2016;
         this._current.year = year || this._current.year;
-        // this._current.day = day || this._current.day || 1;
         this._current.day = day || this._current.day;
 
         // set graph dates
@@ -660,7 +614,7 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
             day : this._current.day,
             options : {
                 currentYearOnly : true,
-                force_query : false,
+                // force_query : true,
                 filter_query : false
             },
         }
@@ -725,7 +679,7 @@ Wu.Graph.SnowCoverFraction = Wu.Evented.extend({
             day : this._current.day,
             options : {
                 currentYearOnly : true,
-                force_query : false,
+                // force_query : true,
                 filter_query : false
             },
         }
