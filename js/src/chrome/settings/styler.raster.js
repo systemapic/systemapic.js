@@ -8,7 +8,7 @@ Wu.RasterStyler = Wu.Class.extend({
 		this.options = options;
 
 		// Default styling
-		var defaultStops = [{val : 80, col : { r : 0, g : 0, b : 255, a : 1 } }, { val : 180, col : { r : 255, g : 0, b : 0, a : 1 } }];
+		var defaultStops = [{val : 100, col : { r : 255, g : 255, b : 255, a : 0 } }, { val : 200, col : { r : 255, g : 255, b : 255, a : 1 } }];
 		var defaultRange = { min : this.options.rangeMin, max : this.options.rangeMax };
 
 		// Get stops
