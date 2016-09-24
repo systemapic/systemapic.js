@@ -767,9 +767,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // └─┘┴ ┴└─┘┴ ┴  └  ┴┴─┘└─┘  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─
     initFileList : function (D3container, data, library) {
 
-        // debug: only do hundred files
-        // var data = _.sample(data, 100);
-
+        // debug: only get a few last datasets
+        var data = _.sortBy(data, 'lastUpdated').splice(0, 50);
 
         // BIND
         var dataListLine = D3container
