@@ -41,7 +41,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Client Logo
 		var clientLogoConfig = app.options.logos.clientLogo;
-		if (clientLogoConfig) {
+		if (clientLogoConfig && clientLogoConfig.active) {
 			this._clientLogo = Wu.DomUtil.create('div', 'chrome-button chrome-client-logo', this._buttonWrapper);
 			this._clientLogo.style.backgroundImage = clientLogoConfig.backgroundImage;
 			this._clientLogo.style.backgroundSize = clientLogoConfig.backgroundSize;
@@ -81,8 +81,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// create button
 		var buttonDiv = Wu.DomUtil.create('div', className);
 
-		// css exp // hacky!
-		var referenceNode = this._buttonWrapper.lastChild.previousSibling;
+		// css exp // hacky! (depending if logo is shown or not)
+		var clientLogoConfig = app.options.logos.clientLogo;
+		var referenceNode = (clientLogoConfig && clientLogoConfig.active) ? this._buttonWrapper.lastChild.previousSibling : this._buttonWrapper.lastChild;
 		this._buttonWrapper.insertBefore(buttonDiv, referenceNode);
 
 		// save
@@ -116,9 +117,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 	initDefault : function () {
-
-		// this._setUsername();
-		this._setPortalLogo();
 
 		// Init CPU clock
 		this.initCPUclock(this._container);
@@ -223,7 +221,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		}.bind(this), 50);
 	},
 
-	
 	_showHideLayerButton : function () {
 	},
 
@@ -240,6 +237,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_shortenTitle : function (title) {
 		var maxLength = this._getMaxTitleLength();
+		console.log('maxLength', maxLength);
 		if (!title || !_.isString(title) || title.length <= maxLength) return title;
 		var cutString = title.substring(0, maxLength-1) + '...';
 		return cutString;
@@ -248,12 +246,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_getMaxTitleLength : function () {
 		var screenSize = Wu.Util.getWindowSize();
 		if (screenSize.width < 1120) return 15;
-		if (screenSize.width < 1280) return 20;
-		if (screenSize.width < 1320) return 25;
-		if (screenSize.width < 1360) return 30;
-		if (screenSize.width < 1421) return 35;
-		if (screenSize.width < 1821) return 50;
-		if (screenSize.width < 2221) return 70; // guessing, todo: test on large screen
+		if (screenSize.width < 1280) return 30;
+		if (screenSize.width < 1320) return 35;
+		if (screenSize.width < 1360) return 50;
+		if (screenSize.width < 1421) return 65;
+		if (screenSize.width < 1821) return 80;
+		if (screenSize.width < 2221) return 90; // guessing, todo: test on large screen
 		return 100;
 	},
 
@@ -261,20 +259,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setProjectTitle();
 	},
 
-	_setPortalLogo : function () {
-	},
-
 	_toggleLeftPane : function (e) {
-		
 		this._leftPaneisOpen ? this.closeLeftPane() : this.openLeftPane();
 		Wu.Mixin.Events.fire('toggleLeftChrome', {detail : {leftPaneisOpen : this._leftPaneisOpen }}); 
-
-
 	},
 
 	openLeftPane : function () {
-
-
 
 		// close other tabs
 		Wu.Mixin.Events.fire('closeMenuTabs');

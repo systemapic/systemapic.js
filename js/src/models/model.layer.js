@@ -97,10 +97,15 @@ Wu.Model.Layer = Wu.Model.extend({
 
         this._added = true;
 
-        // fire event
-        Wu.Mixin.Events.fire('layerEnabled', { detail : {
+        // // fire event
+        // Wu.Mixin.Events.fire('layerEnabled', { detail : {
+        //     layer : this
+        // }}); 
+
+        // fire layer enabled
+        this.fire('enabled', {
             layer : this
-        }}); 
+        });
 
     },
 
@@ -219,7 +224,6 @@ Wu.Model.Layer = Wu.Model.extend({
     },
 
     remove : function (map) {
-        console.error('remove');
         var map = map || app._map;
 
         // leaflet fn
@@ -242,6 +246,11 @@ Wu.Model.Layer = Wu.Model.extend({
         if ( descriptionControl ) descriptionControl._removeLayer(this);
 
         this._added = false;
+
+        // fire layer enabled
+        this.fire('disabled', {
+            layer : this
+        });
     },
 
     getActiveLayers : function () {
@@ -375,30 +384,30 @@ Wu.Model.Layer = Wu.Model.extend({
         return app.activeProject.store.uuid;
     },
 
-    setCartoid : function (cartoid) {
-        console.error('deprecated??');
-        this.store.data.cartoid = cartoid;
-        this.save('data');
-    },
+    // setCartoid : function (cartoid) {
+    //     console.error('deprecated??');
+    //     this.store.data.cartoid = cartoid;
+    //     this.save('data');
+    // },
 
-    getCartoid : function () {
-        console.error('deprecated??');
-        if (this.store.data) return this.store.data.cartoid;
-    },
+    // getCartoid : function () {
+    //     console.error('deprecated??');
+    //     if (this.store.data) return this.store.data.cartoid;
+    // },
 
     getName : function () {
         return this.getTitle();
     },
 
-    // set postgis styling 
-    setLayerStyle : function (options, callback) {
-        console.error('deprecated??');
-    },
+    // // set postgis styling 
+    // setLayerStyle : function (options, callback) {
+    //     console.error('deprecated??');
+    // },
 
-    // set json representation of style in editor (for easy conversion)
-    setEditorStyle : function (options, callback) {
-        console.error('deprecated??');
-    },
+    // // set json representation of style in editor (for easy conversion)
+    // setEditorStyle : function (options, callback) {
+    //     console.error('deprecated??');
+    // },
 
     getEditorStyle : function () {
         return this.getDefaultEditorStyle();
@@ -426,26 +435,26 @@ Wu.Model.Layer = Wu.Model.extend({
         return style;
     },
 
-    setCartoCSS : function (json, callback) {
-        console.error('deprecated??');
+    // setCartoCSS : function (json, callback) {
+    //     console.error('deprecated??');
 
-        // send to server
-        app.api.setCartocss(json, callback.bind(this));
+    //     // send to server
+    //     app.api.setCartocss(json, callback.bind(this));
     
-        // set locally on layer
-        this.setCartoid(json.cartoid);
-    },
+    //     // set locally on layer
+    //     this.setCartoid(json.cartoid);
+    // },
 
-    getCartoCSS : function (cartoid, callback) {
-        console.error('deprecated??');
+    // getCartoCSS : function (cartoid, callback) {
+    //     console.error('deprecated??');
 
-        var json = {
-            cartoid : cartoid
-        };
+    //     var json = {
+    //         cartoid : cartoid
+    //     };
 
-        // get cartocss from server
-        app.api.getCartocss(json, callback);
-    },
+    //     // get cartocss from server
+    //     app.api.getCartocss(json, callback);
+    // },
 
     getMeta : function () {
         var metajson = this.store.metadata;

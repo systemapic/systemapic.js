@@ -27,7 +27,7 @@ Wu.Model.Layer.GeoJSONMaskLayer = Wu.Model.Layer.extend({
 
     _initLayer : function () {
 
-        // ensure simple geometry of geojson (as far as possible)
+        // ensure simple geometry of geojson (as far as possible) // todo: move to import
         var geojson = this.ensureFlat(this.options.geojson);
 
         // create geojson layer
@@ -68,12 +68,10 @@ Wu.Model.Layer.GeoJSONMaskLayer = Wu.Model.Layer.extend({
 
     add : function () {
         this._map.addLayer(this.layer);
-        // this._addEvents();
     },
 
     remove : function () {
         this._map.removeLayer(this.layer);
-        // this._removeEvents();
     },
 
 });

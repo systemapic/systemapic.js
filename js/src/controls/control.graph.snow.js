@@ -28,10 +28,7 @@
 //  - since object survives changing projects, the events must be silenced.
 
 
-// init main object (could be others)
-// todo: Wu.Graph = Wu.Evented.extend({}), 
-// Wu.Graph = Wu.Graph || {};
-
+// created by cube layer
 // Annual Graph (cyclical)
 Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
@@ -39,16 +36,10 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         fetchLineGraph : false, // debug, until refactored fetching line graph to cube
     },
 
-    // annual graph contains average of annual data
-
     _initialize : function () {
 
         // set project
         this._project = app.activeProject;
-
-        // listen to events
-        // this.listen();
-        // _listen is called from parent
 
         // create DOM
         this._initContainer();
@@ -61,7 +52,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     setData : function (data, done) {
 
         // set timeframe
-        this.setTimeFrame();
+        this.setDefaultTimeFrame();
 
         // set data
         this._data = data;
@@ -77,9 +68,15 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     },
 
-    setMask : function (mask) {
+    onMaskSelected : function (options) {
+        this.setMask(options.mask);
+    },
 
-        console.error('setMask', mask);
+    onMaskUnselected : function (options) {
+
+    },
+
+    setMask : function (mask) {
 
         // set mask
         this._mask = mask;
@@ -100,35 +97,39 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._animator = this.options.animator;
 
         // connect graph
-        this._animator.plugGraph(this);
+        this._animator.plugGraph(this); // todo: create event for this
+
+        // listen for animator events
+        this._animator.on('update', this.onUpdateTimeframe.bind(this));
     },
 
-    _listen : function (onoff) {
-        var onoff = onoff || 'on';
-        Wu.Mixin.Events[onoff]('sliderUpdate',              this._onSliderUpdate,               this);
-        Wu.Mixin.Events[onoff]('sliderMoveForward',         this._onSliderMoveForward,          this);
-        Wu.Mixin.Events[onoff]('sliderMoveBackward',        this._onSliderMoveBackward,         this);
-        Wu.Mixin.Events[onoff]('loadingGraph',              this._onLoadingGraph,               this);
-        Wu.Mixin.Events[onoff]('loadedGraph',               this._onLoadedGraph,                this);
-        Wu.Mixin.Events[onoff]('maskSelected',              this._onMaskSelected,               this);
-        Wu.Mixin.Events[onoff]('maskUnselected',            this._onMaskUnselected,             this);
-        Wu.Mixin.Events[onoff]('animatorMovePreviousYear',  this._onAnimatorMovePreviousYear,   this);
-        Wu.Mixin.Events[onoff]('animatorMoveNextYear',      this._onAnimatorMoveNextYear,       this);
-    },
+    _listen : function () {
 
-    destroy : function () {
-        this.listen('off');
+        // Wu.Mixin.Events.on('sliderUpdate',              this._onSliderUpdate,               this);
+        // Wu.Mixin.Events.on('sliderMoveForward',         this._onSliderMoveForward,          this); // yearly
+        // Wu.Mixin.Events.on('sliderMoveBackward',        this._onSliderMoveBackward,         this);
+        // Wu.Mixin.Events.on('loadingGraph',              this._onLoadingGraph,               this);
+        // Wu.Mixin.Events.on('loadedGraph',               this._onLoadedGraph,                this);
+        // Wu.Mixin.Events[onoff]('maskSelected',              this._onMaskSelected,               this);
+        // Wu.Mixin.Events[onoff]('maskUnselected',            this._onMaskUnselected,             this);
+        // Wu.Mixin.Events[onoff]('animatorMovePreviousYear',  this._onAnimatorMovePreviousYear,   this);
+        // Wu.Mixin.Events[onoff]('animatorMoveNextYear',      this._onAnimatorMoveNextYear,       this);
 
-        Wu.DomUtil.remove(this._container);
+        // animator events
+        // this._animator.on('update', this.onUpdateTimeframe.bind(this));
+        // this._animator.on('sliderMoveForward', this._onSliderUpdate.bind(this));
+        // this._animator.on('sliderMoveBackward', this._onSliderUpdate.bind(this));
 
-        this._data = null;
-        // this._composite.remove();
-        this.ndx = null;
 
-        this._animator.destroy();
+        // layer events 
+        // (todo: rename options.cube to this._layer for more generic )
+        this.options.cube.on('maskSelected', this.onMaskSelected.bind(this));
+        this.options.cube.on('maskUnselected', this.onMaskUnselected.bind(this));
     },
 
     _initContainer : function () {
+        if (this._containerInited) return;
+
         this._container         = Wu.DomUtil.create('div', 'big-graph-outer-container',     this.options.appendTo);
         this._infoContainer     = Wu.DomUtil.create('div', 'big-graph-info-container',      this._container);
         this._nameTitle         = Wu.DomUtil.create('div', 'big-graph-title',               this._infoContainer, 'title');
@@ -140,10 +141,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._legendContainer   = Wu.DomUtil.create('div', 'graph-legend',                  this._container);
 
         // add editor items
-        if (this.isEditor()) {
-            this._addEditorPane();
-        }
+        if (this.isEditor()) this._addEditorPane();
 
+        this._containerInited = true;
     },
 
     _addEditorPane : function () {
@@ -443,7 +443,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     },
 
-    setTimeFrame : function () {
+    setDefaultTimeFrame : function () {
         // return if already set
         if (this._current && this._current.year && this._current.day) return; 
        
@@ -488,10 +488,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._updateTitles();
     },
 
-    _onSliderUpdate : function (e) {
-
-        // set current day
-        this._current.day = e.detail.value;
+    onUpdateTimeframe : function (options) {
+        var value = options.value;
+        this._current.day = value;
 
         // update line graph
         this._updateLineGraph({
@@ -502,7 +501,35 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._updateTitles();
     },
 
+    setTime : function (time) {
+
+        // ensure proper time
+        if (!time || !_.isObject(time)) return console.error('wrong time');
+
+        // set current time
+        this._current.day = time.day || this._current.day;
+        this._current.year = time.year || this._current.year;
+
+        // update line graph
+        this._updateLineGraph({
+            evented : true
+        });
+
+        // update titles
+        this._updateTitles();
+
+    },
+
+    onUpdateTimeframe : function (options) {
+        this.setTime({
+            day : options.day, // value from animator
+            year : options.year
+        });
+    },
+
+    // for yearly movement, currently not in use
     _onSliderMoveBackward : function (e) {
+        console.error('backawars!', e);
 
         // set year
         this._current.year = this._current.year - 1;
@@ -514,7 +541,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._updateTitles();
     },
 
+    // for yearly movement, currently not in use
     _onSliderMoveForward : function (e) {
+        console.error('forward!', e);
 
         // set year
         this._current.year = this._current.year + 1;
@@ -560,22 +589,22 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._updateTitles();
     },
 
-    _onMaskSelected : function (e) {
-        this._maskSelected = true;
-        this._updateTitles();
-    },
+    // _onMaskSelected : function (e) {
+    //     this._maskSelected = true;
+    //     this._updateTitles();
+    // },
 
-    _onMaskUnselected : function () {
+    // _onMaskUnselected : function () {
 
-        // get default graph
-        this._fetchLineGraph(this._setLineGraph.bind(this));
+    //     // get default graph
+    //     this._fetchLineGraph(this._setLineGraph.bind(this));
 
-        // mark
-        this._maskSelected = false;
+    //     // mark
+    //     this._maskSelected = false;
 
-        // update titles
-        this._updateTitles();
-    },
+    //     // update titles
+    //     this._updateTitles();
+    // },
 
     _getTitle : function () {
         return this.options.cube.getTitle();
@@ -818,7 +847,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _shadeButtons : function () {
-        Wu.Mixin.Events.fire('shadeButtons');
+        Wu.Mixin.Events.fire('shadeButtons'); // refactor
     },
 
     _unshadeButtons : function () {

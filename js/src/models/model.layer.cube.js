@@ -69,7 +69,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
     options : {
         
         // frames to cache [before, after]
-        cacheSize : [0, 1], 
+        cacheSize : [1, 1], 
         
         // moment format at which to compare dates (year/day only here)
         timeFormat : 'YYYY-DDDD', 
@@ -78,21 +78,16 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         mask : {
 
             defaultStyle : {
-                // fillColor : '#3388ff',
                 fillColor : 'yellow',
-                // fillOpacity : 0.1,
                 fillOpacity : 0,
-                // color : '#3388ff',
                 color : 'yellow',
                 opacity : 0.4,
                 weight : 2,
             },
 
             hoverStyle : {
-                // fillColor : '#3388ff',
                 fillColor : 'yellow',
                 fillOpacity : 0.2,
-                // color : '#3388ff',
                 color : 'yellow',
                 opacity : 0.9,
                 weight : 2,
@@ -130,7 +125,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _cache : [],
 
-    initialize : function (store) {
+    _initialize : function (store) {
 
         // set store
         this._setStore(store);
@@ -194,13 +189,18 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             // mark added
             this._added = true;
 
-            console.log('cube:', this);
+            console.log('[[[[[[cube]]]]]]]]:', this, this.getUuid(), this._cube.cube_id);
 
-            // fire event
-            Wu.Mixin.Events.fire('layerEnabled', { detail : {
-                layer : this,
-                showSlider : true
-            }}); 
+            // // fire event
+            // Wu.Mixin.Events.fire('layerEnabled', { detail : {
+            //     layer : this,
+            //     showSlider : true
+            // }}); 
+
+            // fire layer enabled
+            this.fire('enabled', {
+                layer : this
+            });
 
         }.bind(this));
 
@@ -235,6 +235,11 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
         // mark
         this._added = false;
+
+        // fire layer enabled
+        this.fire('disabled', {
+            layer : this
+        });
     },
 
     // add leaflet layer only
@@ -295,22 +300,28 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     },
 
+    _flush : function () {
+        this.remove();
+        app.MapPane._clearPopup();
+        this._removeGridEvents();
+    },
+
     // for storing requested data
     _data : {},
 
     _initGraph : function (done) {
 
-        var masks = this.getMasks();
-
         // create animator
-        this._animator = new Wu.Animator({ // refactor to project controls
-            cube : this
+        this._animator = new Wu.Graph.Animator({ // refactor to project controls
+            layer : this
         });
+
+        var masks = this.getMasks();
 
         // create graph
         this._graph = new Wu.Graph.SnowCoverFraction({ 
             // data     : this._data.annual,
-            data     : masks[0].data,
+            data     : masks[0].data, // todo: create dummy data in graph
             appendTo : this._animator.getContainer(),
             type     : 'annualCycles',
             cube     : this,
@@ -396,6 +407,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _initMask : function (done) {
 
+        this._maskLayers = [];
+
         // get mask
         var masks = this.getMasks();
 
@@ -415,6 +428,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             // check if vector mask
             if (m.type == 'geojson') return this._initGeoJSONMask(m, done);
 
+            console.error('Unsupported mask', m);
+
         }.bind(this));
 
         // select first mask by default
@@ -425,93 +440,11 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
     _masks : [],
 
     _initRasterMask : function (mask, done) {
-
         console.error('todo: RASTER MASK');
-        // todo: this._maskLayers = array
-
-        // get mask
-        // var mask = this.getMasks();
-
-        // return if no mask
-        // if (!mask) return;
-
-        // // get layer id
-        // var layer_id = mask.layer_id;
-
-        // // get layer from server
-        // app.api.getLayer({
-        //     layer_id : layer_id
-        // }, function (err, layerJSON) {
-        //     if (err) {
-        //         console.error(err);
-        //         done && done(err);
-        //     }
-
-        //     // parse
-        //     var layerModel = Wu.parse(layerJSON);
-
-        //     console.log('---> layerModel', layerModel);
-
-        //     // init layer
-        //     // this._maskLayer = Wu.createLayer(layerModel);
-        //     var maskLayer = Wu.createLayer(layerModel);
-
-        //     // set 
-        //     if (!this._maskLayer) this._maskLayer = maskLayer;
-
-        //     // add to masks array
-        //     this._masks.push(maskLayer);
-
-        //     // callback
-        //     done && done();
-
-        // }.bind(this));
     },
 
     _initTopoJSONMask : function (mask, done) {
-
         console.error('todo: topojson mask');
-        // todo: this._maskLayers = array
-
-        // get mask
-        // var mask = this.getMasks();
-
-        // create mask (topojson) layer
-        // this._maskLayer = new Wu.TopoJSONLayer(); // todo!
-        // this._maskLayer = new Wu.TopoJSONLayer();
-
-        // console.log('this._maskLayer', this._maskLayer);
-
-        // // add data to layer
-        // this._maskLayer.layer.addData(mask.geometry);
-
-        // // make sure on top
-        // this._maskLayer.layer.bringToFront();
-
-        // // if mask is to be always selected
-        // if (this.options.mask.constantMask) {
-
-        //     // set style
-        //     this._maskLayer.layer.setStyle(this.options.mask.selectedStyle);
-
-
-        // // if mask should be "clickable"
-        // } else {
-
-        //     // set style
-        //     this._maskLayer.layer.setStyle(this.options.mask.style);
-
-        //     // click event
-        //     this._maskLayer.layer.on('click', this._onMaskLayerClick.bind(this)); 
-
-        //     // hover events
-        //     this._maskLayer.layer.on('mouseover', this._onMaskMouseover.bind(this));
-        //     this._maskLayer.layer.on('mouseout', this._onMaskMouseout.bind(this));
-        // }
-
-        // // callback
-        // done && done();
-
     },
 
     _maskLayers : [],
@@ -537,9 +470,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             // add title
             var html = mask.title ? mask.title.camelize() : 'Click to enable mask.';
 
-            // add description if available, todo: add <span> styling
-            // if (mask.description) html += '<br>' + mask.description;
-
             // return
             return html;
             
@@ -554,35 +484,25 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         maskLayer.layer.on('mouseover', this._onMaskMouseover.bind(this, maskLayer));
         maskLayer.layer.on('mouseout', this._onMaskMouseout.bind(this, maskLayer));
 
-
         // callback
         done && done();
 
     },
 
     _onMaskMouseover : function (maskLayer, e) {
-        if (maskLayer.selected) {
-            maskLayer.layer.setStyle(this.options.mask.selectedHoverStyle);
-        } else {
-            maskLayer.layer.setStyle(this.options.mask.hoverStyle);
-        }
+        var style = maskLayer.selected ? this.options.mask.selectedHoverStyle : this.options.mask.hoverStyle;
+        maskLayer.layer.setStyle(style);
     },
 
     _onMaskMouseout : function (maskLayer, e) {
-        if (maskLayer.selected) {
-            maskLayer.layer.setStyle(this.options.mask.selectedStyle);
-        } else {
-            maskLayer.layer.setStyle(this.options.mask.defaultStyle);
-        }
+        var style = maskLayer.selected ? this.options.mask.selectedStyle : this.options.mask.defaultStyle;
+        maskLayer.layer.setStyle(style);
     },
 
     _onMaskClick : function (maskLayer, e) {
         
         // turn off
         if (maskLayer.selected) {
-
-            // reset all selected masks
-            // this.unselectAllMasks();
 
             // do nothing, because we always want one mask to be selected (for now)
 
@@ -604,22 +524,16 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
     },
 
     _flyToMask : function (maskLayer) {
-
-        // optional
         if (!this.options.mask.flyTo) return;
 
-        console.log('flyto', maskLayer);
-
+        // get bounds, fly
         var bounds = maskLayer.layer.getBounds();
-
-        console.log('bounds', bounds);
-
         app._map.flyToBounds(bounds);
-
     },
 
     setDefaultMask : function (maskLayer) {
         var maskLayer = maskLayer || this._maskLayers[0];
+        if (!maskLayer) return;
 
         // select mask
         this.selectMask(maskLayer);
@@ -640,8 +554,10 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         // get mask (with data)
         var mask = this.getMaskById(maskLayer.options.id);
 
-        // update mask in graph
-        this._graph.setMask(mask);
+        // fire mask selected
+        this.fire('maskSelected', {
+            mask : mask
+        });
 
         // store 
         this.setActiveMask(mask.id);
@@ -649,8 +565,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         // update cache
         this._updateCache();
 
-        // update data in graph
-        // this._graph.setData(mask.data);
     },
 
     getMaskById : function (id) {
@@ -692,154 +606,154 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
     },  
 
 
-    _singleFeatureQuery : function (options) {
+    // _singleFeatureQuery : function (options) {
         
-        // get layer
-        var layer = options.layer;
+    //     // get layer
+    //     var layer = options.layer;
 
-        // get graph object
-        var graph = this._graph;
+    //     // get graph object
+    //     var graph = this._graph;
 
-        // reset style for all layers
-        this._maskLayer.layer.eachLayer(function (layer) {
-            layer.setStyle(this.options.mask.defaultStyle);
-        }.bind(this));
+    //     // reset style for all layers
+    //     this._maskLayer.layer.eachLayer(function (layer) {
+    //         layer.setStyle(this.options.mask.defaultStyle);
+    //     }.bind(this));
 
-        // style for single feature
-        var selectedSingleStyle = {
-            fillColor : 'white',
-            fillOpacity : 0,
-            color : 'yellow',
-            opacity : 0.8,
-            weight : 2,
-        };
+    //     // style for single feature
+    //     var selectedSingleStyle = {
+    //         fillColor : 'white',
+    //         fillOpacity : 0,
+    //         color : 'yellow',
+    //         opacity : 0.8,
+    //         weight : 2,
+    //     };
 
-        // set selected layer style
-        layer.setStyle(selectedSingleStyle);
+    //     // set selected layer style
+    //     layer.setStyle(selectedSingleStyle);
 
-        // make sure selected layer is on top
-        layer.bringToFront();
+    //     // make sure selected layer is on top
+    //     layer.bringToFront();
 
-        // set mask properties
-        var mask_id = layer.feature.id;
-        var mask_geometry = layer.feature.geometry;
+    //     // set mask properties
+    //     var mask_id = layer.feature.id;
+    //     var mask_geometry = layer.feature.geometry;
 
-        // set query options
-        var queryOptions = {
-            query_type : 'scf', // snow cover fraction
-            cube_id : this.getCubeId(),
-            year : graph._current.year,
-            day : graph._current.day,
-            options : {
-                currentYearOnly : true,
-                // force_query : true
-            },
-            mask : {
-                geometry : mask_geometry,
-                mask_id : mask_id
-            }
-        };
+    //     // set query options
+    //     var queryOptions = {
+    //         query_type : 'scf', // snow cover fraction
+    //         cube_id : this.getCubeId(),
+    //         year : graph._current.year,
+    //         day : graph._current.day,
+    //         options : {
+    //             currentYearOnly : true,
+    //             // force_query : true
+    //         },
+    //         mask : {
+    //             geometry : mask_geometry,
+    //             mask_id : mask_id
+    //         }
+    //     };
 
-        // make query
-        this._queryCube(queryOptions, function (err, data) {
-            if (err) return console.error(err, data);
+    //     // make query
+    //     this._queryCube(queryOptions, function (err, data) {
+    //         if (err) return console.error(err, data);
 
-            // add data to graph
-            graph.addLineData({
-                data : data
-            });
+    //         // add data to graph
+    //         graph.addLineData({
+    //             data : data
+    //         });
 
-        });
+    //     });
 
-    },
+    // },
 
-    _multiFeatureQuery : function (options) {
+    // _multiFeatureQuery : function (options) {
 
-        // get layer
-        var layer = options.layer;
+    //     // get layer
+    //     var layer = options.layer;
 
-        // get graph object
-        this._getGraph(function (err, graph) {
-            if (err) return console.error(err);
+    //     // get graph object
+    //     this._getGraph(function (err, graph) {
+    //         if (err) return console.error(err);
 
-            // set mask as active
-            this._maskSelected(layer);
+    //         // set mask as active
+    //         this._maskSelected(layer);
 
-            // reset style for all layers
-            this._maskLayers.forEach(function (maskLayer) {            
-                maskLayer.layer.eachLayer(function (layer) {
-                    layer.setStyle(this.options.mask.defaultStyle);
-                }.bind(this));
-            });
+    //         // reset style for all layers
+    //         this._maskLayers.forEach(function (maskLayer) {            
+    //             maskLayer.layer.eachLayer(function (layer) {
+    //                 layer.setStyle(this.options.mask.defaultStyle);
+    //             }.bind(this));
+    //         });
 
-            // style for selected features
-            var selectedWholeStyle = {
-                fillColor : 'red',
-                fillOpacity : 0.3,
-                color : 'red',
-                opacity : 0.3,
-            };
+    //         // style for selected features
+    //         var selectedWholeStyle = {
+    //             fillColor : 'red',
+    //             fillOpacity : 0.3,
+    //             color : 'red',
+    //             opacity : 0.3,
+    //         };
 
-            // set selected layer style to all layers
-            this._maskLayers.forEach(function (maskLayer) {            
-                maskLayer.layer.eachLayer(function (layer) {
-                    layer.setStyle(this.options.mask.selectedStyle);
-                }.bind(this));
-            });
+    //         // set selected layer style to all layers
+    //         this._maskLayers.forEach(function (maskLayer) {            
+    //             maskLayer.layer.eachLayer(function (layer) {
+    //                 layer.setStyle(this.options.mask.selectedStyle);
+    //             }.bind(this));
+    //         });
             
-            var ops = [];
-            var areas = [];
-            var mask_ids = [];
+    //         var ops = [];
+    //         var areas = [];
+    //         var mask_ids = [];
 
-            // for each layer
-            this._maskLayer.layer.eachLayer(function (layer) {
+    //         // for each layer
+    //         this._maskLayer.layer.eachLayer(function (layer) {
                 
-                var mask_id = layer.feature.id;
-                var mask_geometry = layer.feature.geometry;
+    //             var mask_id = layer.feature.id;
+    //             var mask_geometry = layer.feature.geometry;
 
-                // remember
-                areas.push(mask_geometry);
-                mask_ids.push(mask_id);
+    //             // remember
+    //             areas.push(mask_geometry);
+    //             mask_ids.push(mask_id);
 
-            }.bind(this));
+    //         }.bind(this));
 
-            // md5 of all mask_ids
-            var mask_id_md5 = forge.md.md5.create().update(mask_ids.join('')).digest().toHex();
+    //         // md5 of all mask_ids
+    //         var mask_id_md5 = forge.md.md5.create().update(mask_ids.join('')).digest().toHex();
 
-            // set query options
-            var queryOptions = {
-                query_type : 'scf', // snow cover fraction
-                cube_id : this.getCubeId(),
-                year : graph._current.year,
-                day : graph._current.day,
-                options : {
-                    currentYearOnly : true,
-                    // force_query : true
-                },
-                mask : {
-                    // geometry : mask_geometry,
-                    // mask_id : mask_id,
-                    multi_mask : true,
+    //         // set query options
+    //         var queryOptions = {
+    //             query_type : 'scf', // snow cover fraction
+    //             cube_id : this.getCubeId(),
+    //             year : graph._current.year,
+    //             day : graph._current.day,
+    //             options : {
+    //                 currentYearOnly : true,
+    //                 // force_query : true
+    //             },
+    //             mask : {
+    //                 // geometry : mask_geometry,
+    //                 // mask_id : mask_id,
+    //                 multi_mask : true,
                     
-                    mask_type : 'multi-polygon',
-                    geometries : areas,
-                    mask_id : mask_id_md5
-                }
-            };
+    //                 mask_type : 'multi-polygon',
+    //                 geometries : areas,
+    //                 mask_id : mask_id_md5
+    //             }
+    //         };
 
-            // make query
-            this._queryCube(queryOptions, function (err, data) {
+    //         // make query
+    //         this._queryCube(queryOptions, function (err, data) {
               
-                // add data to graph
-                graph.addLineData({
-                    data : data
-                });
+    //             // add data to graph
+    //             graph.addLineData({
+    //                 data : data
+    //             });
 
-            });
+    //         });
 
-        }.bind(this));
+    //     }.bind(this));
 
-    },
+    // },
 
     // async, waiting, to get graph object
     _getGraph : function (done) {
@@ -861,11 +775,18 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             l.setStyle(this.options.mask.selectedStyle);
         }.bind(this));
 
-        // fire mask selected event
-        Wu.Mixin.Events.fire('maskSelected', { detail : { 
-            layer : layer 
-        }}); 
+        // // fire mask selected event
+        // Wu.Mixin.Events.fire('maskSelected', { detail : { 
+        //     layer : layer 
+        // }}); 
 
+        // this._graph.fire('maskSelected', {
+        //     layer : layer
+        // })
+
+        this.fire('maskSeleceted', {
+            layer : layer
+        });
     },
 
     _maskUnselected : function (layer) {
@@ -875,10 +796,15 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             l.setStyle(this.options.mask.defaultStyle);
         }.bind(this));
 
-        // fire mask selected event
-        Wu.Mixin.Events.fire('maskUnselected', { detail : { 
-            layer : layer 
-        }}); 
+        // // fire mask selected event
+        // Wu.Mixin.Events.fire('maskUnselected', { detail : { 
+        //     layer : layer 
+        // }}); 
+
+        // fire event on 
+        this._graph.fire('maskSelected', {
+            layer : layer
+        });
 
     },
 
@@ -1108,6 +1034,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
             if (cached) {
 
+                // update layer with latest mask
                 var cacheOptions = {
                     mask_id : this.getFilterMask() ? this.getActiveMask() : null,
                     loaded : false,
@@ -1125,12 +1052,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
                 var layerOptions = {
                     dataset_id : dataset.id,
                     cache : Wu.Util.getRandomChars(6),
-                    mask_id : null
-                }
-
-                // if mask filter is active
-                if (this.getFilterMask()) {
-                    layerOptions.mask_id = this.getActiveMask();
+                    mask_id : this.getFilterMask() ? this.getActiveMask() : null,
                 }
 
                 // (20) loaded: 107 -- bug
@@ -1191,19 +1113,17 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         if (this._cursorDirection > 0) {
 
             // return lowest cached dataset index
-            var cache = _.min(this._cache, function (c) {
+            return _.min(this._cache, function (c) {
                 return c.idx;
             }); 
-            return cache;
 
         // if going backwards in time
         } else {
 
             // return highest cached dataset index
-            var cache = _.max(this._cache, function (c) {
+            return _.max(this._cache, function (c) {
                 return c.idx;
             });
-            return cache;
         }
        
     },
@@ -1255,7 +1175,6 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _findLastDataset : function () {
         var f = this.options.timeFormat;
-        // var b = moment(t).format(f); // YYYY-DDDD of animation
         var didx = _.max(this._datasets, function (d) { 
             return d.idx;
         });

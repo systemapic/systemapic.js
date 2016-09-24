@@ -249,28 +249,28 @@ Wu.MapPane = Wu.Pane.extend({
         }});
     },
 
-    // fired on window resize
-    // THIS FUNCTION IS NEVER FIRED, IS IT???
-    resizeEvent : function (d) {
-        console.error('deprecated??');
-        this._updateWidth(d);
-    },
+    // // fired on window resize
+    // // THIS FUNCTION IS NEVER FIRED, IS IT???
+    // resizeEvent : function (d) {
+    //     console.error('deprecated??');
+    //     this._updateWidth(d);
+    // },
     
-    // THIS FUNCTION IS NEVER FIRED, IS IT???
-    _updateWidth : function (d) {
-        console.error('deprecated??');
-        var map = this._map;
-        if (!map || !d) return;
+    // // THIS FUNCTION IS NEVER FIRED, IS IT???
+    // _updateWidth : function (d) {
+    //     console.error('deprecated??');
+    //     var map = this._map;
+    //     if (!map || !d) return;
         
-        // set width
-        var w = d.width - parseInt(map._container.offsetLeft) + 'px';
-        map._container.style.width = w;
+    //     // set width
+    //     var w = d.width - parseInt(map._container.offsetLeft) + 'px';
+    //     map._container.style.width = w;
         
-        // refresh map size
-        setTimeout(function() {
-            if (map) map.reframe();
-        }, 300); // time with css
-    },
+    //     // refresh map size
+    //     setTimeout(function() {
+    //         if (map) map.reframe();
+    //     }, 300); // time with css
+    // },
     
     getZIndexControls : function () {
         var z = {

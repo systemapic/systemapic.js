@@ -936,6 +936,9 @@ L.Control.Layermenu = Wu.Control.extend({
 			this.enableLayer(item);
 
 			// fire selected event, todo: necessary to fire both layerSelected and layerEnabled??
+			// todo: refactor this, 
+			// only thing this is necessary for, is to show correct layer in editor
+			// in chrome/settings/chrome.settings.js
 			Wu.Mixin.Events.fire('layerSelected', { detail : {
 				layer : layer
 			}}); 
@@ -987,13 +990,15 @@ L.Control.Layermenu = Wu.Control.extend({
 		// mark editing
 		app.Chrome.Right.options.editingLayer = layer.getUuid();
 
-		// fire event
-		Wu.Mixin.Events.fire('layerEnabled', { detail : {
-			layer : layer
-		}});
+		// // fire event
+		// Wu.Mixin.Events.fire('layerEnabled', { detail : {
+		// 	layer : layer
+		// }});
 
-		// fire on layer
-		layer.fire('enabled');
+		// // fire on layer
+		// layer.fire('enabled', {
+		// 	layer : layer
+		// });
 
 	},
 
@@ -1011,13 +1016,13 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		app.Chrome.Right.options.editingLayer = false;
 
-		// fire event
-		Wu.Mixin.Events.fire('layerDisabled', { detail : {
-			layer : layer
-		}}); 
+		// // fire event
+		// Wu.Mixin.Events.fire('layerDisabled', { detail : {
+		// 	layer : layer
+		// }}); 
 
-		// fire on layer
-		layer.fire('disabled');
+		// // fire on layer
+		// layer.fire('disabled');
 	},
 
 	// disable by layer

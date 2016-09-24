@@ -13,6 +13,7 @@ Wu.Evented = L.Evented.extend({ // inheriting from 1.0.0-rc3 L.Evented, makes it
     },      
 
     _listen : function () {
+        Wu.Mixin.Events.on('projectUnload',   this._onProjectUnload, this);
         Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
         Wu.Mixin.Events.on('projectDeleted',  this._onProjectDeleted, this);
         Wu.Mixin.Events.on('editEnabled',     this._editEnabled, this);
@@ -30,6 +31,7 @@ Wu.Evented = L.Evented.extend({ // inheriting from 1.0.0-rc3 L.Evented, makes it
 
     // dummies
     _projectSelected : function () {},
+    _onProjectUnload : function () {},
     _initialize      : function () {},
     _initContainer   : function () {},
     _editEnabled     : function () {},

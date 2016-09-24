@@ -383,10 +383,8 @@ Wu.Model.Project = Wu.Model.extend({
 
 
 	_unload : function () {
-
 		// load random project
 		app.MapPane._flush();
-		// app.HeaderPane._flush();
 		this.selected = false;
 	},
 
@@ -399,9 +397,6 @@ Wu.Model.Project = Wu.Model.extend({
 		};
 		
 		var callback = callback || this._deleted;
-
-		// post with callback:    path       data    callback   context of cb
-		// Wu.Util.postcb('/api/project/delete', json, callback || this._deleted, this);
 
 		app.api.deleteProject(options, callback.bind(this));
 	},
@@ -590,15 +585,15 @@ Wu.Model.Project = Wu.Model.extend({
 		return this.store.lastUpdated;
 	},
 
-	getClient : function () {
-		console.log('TODO: remove this!');
-		// return app.Clients[this.store.client];
-	},
+	// getClient : function () {
+	// 	console.log('TODO: remove this!');
+	// 	// return app.Clients[this.store.client];
+	// },
 
-	getClientUuid : function () {
-		console.log('TODO: remove this!');
-		// return this.store.client;
-	},
+	// getClientUuid : function () {
+	// 	console.log('TODO: remove this!');
+	// 	// return this.store.client;
+	// },
 
 	getBaselayers : function () {
 		return this.store.baseLayers;
@@ -654,14 +649,10 @@ Wu.Model.Project = Wu.Model.extend({
 	},
 
 	getDataLayers : function () {
-
 		var pg_layers = this.getPostGISLayers();
 		var r_layers = this.getRasterLayers();
-
 		var data_layers = pg_layers.concat(r_layers);
-
 		return data_layers;
-
 	},
 
 	// debug
@@ -701,8 +692,6 @@ Wu.Model.Project = Wu.Model.extend({
 			return layer.store.data.postgis.layer_id == layer_id;
 		});
 	},
-
-	
 
 	getLayerFromFile : function (fileUuid) {
 		return _.find(this.layers, function (l) {
@@ -899,7 +888,6 @@ Wu.Model.Project = Wu.Model.extend({
 		this._update('pending');
 	},
 
-
 	setPopupPosition : function (pos) {
 		this._popupPosition = pos;
 	},
@@ -939,9 +927,7 @@ Wu.Model.Project = Wu.Model.extend({
 	},
 
 	setName : function (name) {
-
 		this._update('name', name);
-		
 	},
 
 	setDescription : function (description) {

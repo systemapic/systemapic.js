@@ -33,16 +33,52 @@ Wu.Graph.Animator = Wu.Evented.extend({
 
     _initialize : function (options) {
 
+        // set layer
+        this._layer = this.options.layer;
+
         // create slider
         this._createSlider();
 
         // add hooks
-        this._addHooks();       
+        this.listen();       
 
         // mark inited
         this._inited = true;
 
     },
+
+
+    listen : function (onoff) {
+        var onoff = onoff || 'on';
+
+        // dom events
+        Wu.DomEvent[onoff](this._fastBackBtn,       'click', this._moveFastBack, this);
+        Wu.DomEvent[onoff](this._backBtn,           'click', this._moveBack, this);
+        Wu.DomEvent[onoff](this._fastForwardBtn,    'click', this._moveFastForward, this);
+        Wu.DomEvent[onoff](this._forwardBtn,        'click', this._moveForward, this);
+        Wu.DomEvent[onoff](this._playBtn,           'click', this.play, this);
+
+        // slider events
+        this.slider[onoff]('update', this._sliderUpdateEvent.bind(this));
+        this.slider[onoff]('set', this._sliderSetEvent.bind(this));
+        this.slider[onoff]('slide', this._onSlide.bind(this));
+
+        // listen for events
+        Wu.Mixin.Events[onoff]('setSlider', this.setSlider, this);
+        Wu.Mixin.Events[onoff]('updateSliderButtons', this.updateButtons, this);
+        Wu.Mixin.Events[onoff]('setSliderRange', this._onSetSliderRange, this);
+        Wu.Mixin.Events[onoff]('unsetSliderRange', this._onUnsetSliderRange, this);
+        Wu.Mixin.Events[onoff]('shadeButtons', this._onShadeButtons, this);
+        Wu.Mixin.Events[onoff]('unshadeButtons', this._onUnshadeButtons, this);
+        Wu.Mixin.Events[onoff]('cubeCacheNoLayer', this._onCubeCacheNoLayer, this);
+        
+        // Wu.Mixin.Events[onoff]('hideAnimator', this._onHideAnimator, this);
+        // Wu.Mixin.Events[onoff]('showAnimator', this._onShowAnimator, this);
+
+        this._layer.on('enabled', this._layerEnabled.bind(this));
+        this._layer.on('disabled', this._layerDisabled.bind(this));
+    },
+
 
     getContainer : function () {
         return this.sliderOuterContainer;
@@ -108,36 +144,9 @@ Wu.Graph.Animator = Wu.Evented.extend({
         Wu.DomUtil.removeClass(this.sliderInnerContainer, 'bottom-right-border-radius-only');
     },
 
-    _addHooks : function (onoff) {
-        var onoff = onoff || 'on';
-        // dom events
-        Wu.DomEvent[onoff](this._fastBackBtn,       'click', this._moveFastBack, this);
-        Wu.DomEvent[onoff](this._backBtn,           'click', this._moveBack, this);
-        Wu.DomEvent[onoff](this._fastForwardBtn,    'click', this._moveFastForward, this);
-        Wu.DomEvent[onoff](this._forwardBtn,        'click', this._moveForward, this);
-        Wu.DomEvent[onoff](this._playBtn,           'click', this.play, this);
-
-        // slider events
-        this.slider[onoff]('update', this._sliderUpdateEvent.bind(this));
-        this.slider[onoff]('set', this._sliderSetEvent.bind(this));
-        this.slider[onoff]('slide', this._onSlide.bind(this));
-
-        // listen for events
-        Wu.Mixin.Events[onoff]('setSlider', this.setSlider, this);
-        Wu.Mixin.Events[onoff]('updateSliderButtons', this.updateButtons, this);
-        Wu.Mixin.Events[onoff]('setSliderRange', this._onSetSliderRange, this);
-        Wu.Mixin.Events[onoff]('unsetSliderRange', this._onUnsetSliderRange, this);
-        Wu.Mixin.Events[onoff]('shadeButtons', this._onShadeButtons, this);
-        Wu.Mixin.Events[onoff]('unshadeButtons', this._onUnshadeButtons, this);
-        Wu.Mixin.Events[onoff]('cubeCacheNoLayer', this._onCubeCacheNoLayer, this);
-        
-        Wu.Mixin.Events[onoff]('hideAnimator', this._onHideAnimator, this);
-        Wu.Mixin.Events[onoff]('showAnimator', this._onShowAnimator, this);
-    },
-
     remove : function () {
-        this._addHooks('off');
-        Wu.DomUtil.remove(this.sliderOuterContainer);
+        // this._addHooks('off');
+        // Wu.DomUtil.remove(this.sliderOuterContainer);
     },  
 
     _onCubeCacheNoLayer : function (e) {
@@ -243,10 +252,10 @@ Wu.Graph.Animator = Wu.Evented.extend({
         // set slider value
         this._sliderValue = value ? Math.round(value) : 0;
 
-        // fire slider update event (for graph)
-        Wu.Mixin.Events.fire('sliderUpdate', { detail : {
-            value : this._sliderValue,
-        }});
+        // fire update
+        this.fire('update', {
+            day : this._sliderValue
+        });
     },
 
     // @ event: update layers
@@ -286,9 +295,8 @@ Wu.Graph.Animator = Wu.Evented.extend({
     // Enable layer
     _layerEnabled : function (e) {
 
-        // get event payload
-        var layer = e.detail.layer;
-        var show = e.detail.showSlider;
+        // get layer
+        var layer = e.layer;
 
         // set current layer
         this._currentLayer = layer;
@@ -297,17 +305,12 @@ Wu.Graph.Animator = Wu.Evented.extend({
         this.setTitle(layer.getTitle());
 
         // show
-        if (show) this.show();
+        this.show();
     },
 
     // Disable layer
     _layerDisabled : function (e) {
-        var layer = e.detail.layer;
-
-        // hide if current layer
-        if (layer.getUuid() == this.options.cube.getUuid()) {
-                this.hide();
-        }
+        this.hide();
     },
 
     // Set slider value
@@ -456,37 +459,22 @@ Wu.Graph.Animator = Wu.Evented.extend({
 
 
     hide : function () {
-        console.error('animator hide');
         this.sliderOuterContainer.style.display = 'none';
     },
 
     show : function () {
-        console.error('animator show');
         if (!this._inited) return;
         this.sliderOuterContainer.style.display = 'block';
     },  
 
     _onHideAnimator : function () {
-        console.log('_onHideAnimator');
         this.hide();
     },
 
     _onShowAnimator : function () {
-        console.log('_onShoAnimator');
         this.show();
     },
 
-    _projectSelected : function (e) {
-
-        // get project
-        var project = app.Projects[e.detail.projectUuid];
-
-        // set project
-        this._project = project;
-
-        // hide 
-        this.hide();
-    }
 
 });
 
