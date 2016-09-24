@@ -1,6 +1,6 @@
 Wu.Pane.Login = Wu.Pane.extend({
 
-	_description : 'Log in',
+	_description : 'Sign in to Mapic',
 	
 	setDescription : function (text) {
 		this._description = text;
@@ -16,7 +16,11 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._login_wrapper = Wu.DomUtil.create('div', 'login-wrapper', this._loginFullscreen);
 		this._login_box = Wu.DomUtil.create('div', 'login-box', this._login_wrapper);
 
-		// logo
+		// colors from login
+		this._login_box.style.backgroundColor = app.options.logos.loginLogo.backgroundColor;
+		this._login_box.style.color = app.options.logos.loginLogo.color;
+
+		// logos
 		this._createLogo();
 
 		// login content wrapper
