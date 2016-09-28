@@ -367,6 +367,26 @@ Wu.Model.Layer = Wu.Model.extend({
         return this.store.filter_mask || false;
     },
 
+    // todo: create options object which can allow any option switch (ie. JSON)
+    setAverageDataOption : function (bool) {
+        var options = Wu.parse(this.store.options);
+        if (!options) {
+            options = {
+                average_data : bool
+            } 
+        } else {
+            options.average_data = bool;
+        }
+        this.store.options = Wu.stringify(options);
+        this.save('options');
+    },
+
+    getAverageDataOption : function () {
+        var options = Wu.parse(this.store.options);
+        if (!options) return false;
+        return options.average_data;
+    },
+
     getAttribution : function () {
         return this.store.attribution;
     },

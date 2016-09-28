@@ -34,6 +34,10 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     options : {
         fetchLineGraph : false, // debug, until refactored fetching line graph to cube
+        editorOptions : {
+            mask : true,
+            avg : true
+        }
     },
 
     _initialize : function () {
@@ -105,24 +109,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     _listen : function () {
 
-        // Wu.Mixin.Events.on('sliderUpdate',              this._onSliderUpdate,               this);
-        // Wu.Mixin.Events.on('sliderMoveForward',         this._onSliderMoveForward,          this); // yearly
-        // Wu.Mixin.Events.on('sliderMoveBackward',        this._onSliderMoveBackward,         this);
-        // Wu.Mixin.Events.on('loadingGraph',              this._onLoadingGraph,               this);
-        // Wu.Mixin.Events.on('loadedGraph',               this._onLoadedGraph,                this);
-        // Wu.Mixin.Events[onoff]('maskSelected',              this._onMaskSelected,               this);
-        // Wu.Mixin.Events[onoff]('maskUnselected',            this._onMaskUnselected,             this);
-        // Wu.Mixin.Events[onoff]('animatorMovePreviousYear',  this._onAnimatorMovePreviousYear,   this);
-        // Wu.Mixin.Events[onoff]('animatorMoveNextYear',      this._onAnimatorMoveNextYear,       this);
-
-        // animator events
-        // this._animator.on('update', this.onUpdateTimeframe.bind(this));
-        // this._animator.on('sliderMoveForward', this._onSliderUpdate.bind(this));
-        // this._animator.on('sliderMoveBackward', this._onSliderUpdate.bind(this));
-
-
         // layer events 
-        // (todo: rename options.cube to this._layer for more generic )
+        // (todo: rename options.cube to this._layer for more generic flow)
         this.options.cube.on('maskSelected', this.onMaskSelected.bind(this));
         this.options.cube.on('maskUnselected', this.onMaskUnselected.bind(this));
     },
@@ -132,6 +120,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         this._container         = Wu.DomUtil.create('div', 'big-graph-outer-container',     this.options.appendTo);
         this._infoContainer     = Wu.DomUtil.create('div', 'big-graph-info-container',      this._container);
+        this._pluginContainer   = Wu.DomUtil.create('div', 'big-graph-plugin-container',    this._container);
         this._nameTitle         = Wu.DomUtil.create('div', 'big-graph-title',               this._infoContainer, 'title');
         this._maskTitle         = Wu.DomUtil.create('div', 'big-graph-mask-title',          this._infoContainer, 'title');
         this._maskDescription   = Wu.DomUtil.create('div', 'big-graph-mask-description',    this._infoContainer, 'title');
@@ -142,6 +131,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // add editor items
         if (this.isEditor()) this._addEditorPane();
+
+        // add yearly graph
+        this._createAverageDataPane();
 
     },
 
@@ -160,13 +152,22 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._filterPane = Wu.DomUtil.create('div', 'big-graph-editor-filter-pane', this._editorPane);
 
         // mask filter
-        var checkbox = this._createFilterCheckbox({
-            appendTo : this._filterPane
-        });
+        if (this.options.editorOptions.mask) {        
+            var checkbox = this._createFilterCheckbox({
+                appendTo : this._filterPane
+            });
+        }
 
+        // average data switch
+        if (this.options.editorOptions.avg) {        
+            var checkbox_avgdata = this._createAverageDataCheckbox({
+                appendTo : this._filterPane
+            });
+        }
     },
 
-     _createFilterCheckbox : function (options) {
+
+    _createFilterCheckbox : function (options) {
 
         // create checkbox
         var checkbox = Wu.DomUtil.create('div', 'checkbox');
@@ -199,6 +200,102 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         options.appendTo.appendChild(checkbox);
 
         return checkbox;
+    },
+
+
+    _createAverageDataCheckbox : function (options) {
+
+        // create checkbox
+        var checkbox = Wu.DomUtil.create('div', 'checkbox');
+        var input = Wu.DomUtil.create('input', '', checkbox);
+        input.setAttribute('type', 'checkbox');
+        input.id = 'checkbox-' + Wu.Util.getRandomChars(5);
+        
+        // create label
+        var label = Wu.DomUtil.create('label', '', checkbox);
+        label.setAttribute('for', input.id);
+        label.innerHTML = 'Enabled dropdown for yearly average data';
+
+        // mark checked if active
+        if (this.getCube().getAverageDataOption()) {
+            input.setAttribute('checked', '');
+        }
+
+        // check event
+        Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
+
+            // toggle
+            this.getCube().setAverageDataOption(!this.getCube().getAverageDataOption());
+
+            // hide if not activated
+            if (this.getCube().getAverageDataOption()) {
+                this._average_pane.container.style.display = 'block';
+            } else {
+                this._average_pane.container.style.display = 'none';
+            }
+
+        }.bind(this));
+
+        // add to DOM
+        options.appendTo.appendChild(checkbox);
+
+        return checkbox;
+    },
+
+
+   
+    _createAverageDataPane : function () {
+
+        // range
+        var years = _.range(2001, 2016);
+
+        // create pane
+        var pane = this._average_pane = {};
+        pane.container = Wu.DomUtil.create('div', 'average-data-pane-container', this._pluginContainer);
+
+        // create title
+        var title = Wu.DomUtil.create('div', 'average-data-pane-title', pane.container, 'Yearly graphs');
+
+        // create select
+        var btn_group = Wu.DomUtil.create('div', 'btn-group', pane.container);
+        var btn = Wu.DomUtil.create('button', 'btn btn-default dropdown-toggle', btn_group, 'Select year(s)...');
+        btn.setAttribute('data-toggle', 'dropdown');
+        var span = Wu.DomUtil.create('span', 'caret', btn);
+        var ul = Wu.DomUtil.create('ul', 'dropdown-menu bullet pull-left pull-top', btn_group);
+
+        // years
+        years.forEach(function (y) {
+                var li = Wu.DomUtil.create('li', '', ul);
+                var input = Wu.DomUtil.create('input', '', li);
+                input.id = 'years-dropdown-' + y;
+                input.setAttribute('type', 'checkbox');
+                input.setAttribute('name', y);
+                input.setAttribute('value', y);
+                var label = Wu.DomUtil.create('label', '', li, y);
+                label.setAttribute('for', input.id);
+
+                // event
+                Wu.DomEvent.on(input, 'click', function (e) {
+                    var checked = e.target.checked;
+
+                    // toggle
+                    this._averageDataToggle(y, checked);
+
+                }.bind(this))
+        }.bind(this));
+
+        // hide if not activated
+        if (this.getCube().getAverageDataOption()) {
+            this._average_pane.container.style.display = 'block';
+        } else {
+            this._average_pane.container.style.display = 'none';
+        }
+
+    },
+
+    _averageDataToggle : function (year, checked) {
+        console.log('toggle', year, checked);
+
     },
 
     isEditor : function () {
@@ -266,6 +363,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // create line group
         var line_group = line_dimension.group().reduceSum(function(d) { return d.scf; });
+        var line_group2 = line_dimension.group().reduceSum(function(d) { return d.scf; });
 
         // create point group (for last red triangle)
         var point_group = line_dimension.group().reduceSum(function(d) { return d.scf });
@@ -355,6 +453,63 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         // mark inited
         this._graphInited = true;
 
+    },
+
+     _setLineGraph : function (options) {
+        if (!this._graphInited) return;
+
+        // Clear old data
+        this.ndx.line_crossfilter.remove();
+
+        // get cached line graph data
+        var cache = this.cache();
+
+        // filter out period
+        var today = moment().year(this._current.year).dayOfYear(this._current.day);
+        var period = _.filter(cache, function (d) {
+            return d.date.isBefore(today);
+        });
+
+        // add data, triggers automatically
+        this.ndx.line_crossfilter.add(period);
+
+
+        // // filter out period
+        // var today2 = moment().year(this._current.year).dayOfYear(this._current.day);
+        // var period2 = _.filter(cache, function (d) {
+        //     return d.date.isBefore(today2);
+        // });
+
+        // var period3 = [];
+        // period2.forEach(function (p) {
+        //     var a = p;
+        //     a.scf += 2;
+        //     period3.push(a)
+        // });
+
+        // console.log('today2', today2, period, period2, this.ndx, this);
+        // console.log('period: ', period);
+        // console.log('this.ndx', this.ndx);
+
+        // var data = [period, period3]
+
+        // // add data, triggers automatically
+        // this.ndx.line_crossfilter.add(data);
+
+        // redraw
+        dc.redrawAll();
+
+        // calculate limit of dataset
+        var limit = _.size(this.cache()) + 1;
+
+        // set limit
+        this._setLimit(limit);
+
+        // update titles
+        this._updateTitles();
+       
+        // check if end of dataset
+        this._checkEnds();
     },
 
     _updateLegend : function () {
@@ -706,39 +861,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         return cache;
     },
 
-    _setLineGraph : function (options) {
-        if (!this._graphInited) return;
-
-        // Clear old data
-        this.ndx.line_crossfilter.remove();
-
-        // get cached line graph data
-        var cache = this.cache();
-
-        // filter out period
-        var today = moment().year(this._current.year).dayOfYear(this._current.day);
-        var period = _.filter(cache, function (d) {
-            return d.date.isBefore(today);
-        });
-
-        // add data, triggers automatically
-        this.ndx.line_crossfilter.add(period);
-
-        // redraw
-        dc.redrawAll();
-
-        // calculate limit of dataset
-        var limit = _.size(this.cache()) + 1;
-
-        // set limit
-        this._setLimit(limit);
-
-        // update titles
-        this._updateTitles();
-       
-        // check if end of dataset
-        this._checkEnds();
-    },
+   
 
     _checkEnds : function () {
 

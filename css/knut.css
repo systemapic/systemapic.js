@@ -2023,7 +2023,7 @@ g.axis.y {
 
 .graph-legend {
     position: absolute;
-    top: 270px;
+    bottom: 60px;
     left: 66px;
     font-size: 10px;
     width: 128px;
@@ -2680,7 +2680,23 @@ input[type="radio"] .styled:checked + label::after {
 }
 
 .big-graph-info-container {
-    text-align: center;
+    text-align: left;
+    /*width: 70%;*/
 }
 
 
+.big-graph-plugin-container {
+    height: 102px;
+    margin: 10px;
+    right: 20px;
+    position: absolute;
+    top: 0px;
+    width: 160px;
+}
+
+.average-data-pane-title {
+    margin: 5px;
+}
+.average-data-pane-container {
+    position: absolute;
+}
