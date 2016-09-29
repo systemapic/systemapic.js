@@ -2681,14 +2681,14 @@ input[type="radio"] .styled:checked + label::after {
 
 .big-graph-info-container {
     text-align: left;
-    /*width: 70%;*/
+    max-width: 330px;
 }
 
 
 .big-graph-plugin-container {
     height: 102px;
     margin: 10px;
-    right: 20px;
+    right: -10px;
     position: absolute;
     top: 0px;
     width: 160px;
