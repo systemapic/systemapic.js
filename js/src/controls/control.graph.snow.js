@@ -680,6 +680,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             '#56494C',
             '#5C5D8D',
             '#8DE4FF',
+            'red',
+            'yellow',
         ]
 
         // add yearly lines

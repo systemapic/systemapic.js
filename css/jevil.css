@@ -2333,9 +2333,9 @@ input.chrome-field-input {
     border-radius: 5px;
     }
 
-    path.line {
+   /* path.line {
         stroke-width: 1.0 !important;       
-        }
+        }*/
 
     .sub._0 path.line,
     .sub._1 path.line {
