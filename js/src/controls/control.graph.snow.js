@@ -139,7 +139,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     // },
 
     yearly : function (data) {
-        var years = _.range(2014, 2016);
+        var years = _.range(2000, 2016);
         var yearly_data = [];
 
         _.times(365, function (i) {
@@ -155,39 +155,18 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             }.bind(this))            
 
             yearly_data.push(item);
+
         }.bind(this));
-
-        
-        console.log('yearly data --->>>>', yearly_data);
-        console.log('LENGTH OF', yearly_data.length);
-
-        // var yearly = _.filter(data, function (d) {
-        //     return d.year == year;
-        // });
-
-        // var yearly_data = [];
-
-        // yearly.forEach(function (y) {
-        //     var item = {
-        //         scf : parseFloat(y.scf),
-        //         date : moment().year(fake_year).dayOfYear(y.doy)
-        //     }
-        //     yearly_data.push(item);
-        // });
 
         return yearly_data;
     },
 
     _get_yearly_scf : function (data, year, doy) {
-
         var scf = _.find(data, function (d) {
             return d.year == year && d.doy == doy;
         });
-
-        console.log('found scf!', scf);
-
+        if (!scf) return -10000; // to make sure it's outside graph.. hacky.. 
         return parseFloat(scf.scf);
-
     },
 
 
@@ -242,7 +221,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     setData : function (data, done) {
 
-        console.error('setData', data);
+        // console.error('setData', data);
 
         // data is all data for mask
         // should define range already here,
@@ -258,7 +237,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         this.parse(data, function (err, parsed) {
 
-            console.log('-----> parsed ------>', parsed);
+            // console.log('-----> parsed ------>', parsed);
 
             // this.cache().data(parsed) = parsed;
 
@@ -298,7 +277,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     setMask : function (mask) {
 
         // return;
-        console.error('setMask', mask);
+        // console.error('setMask', mask);
 
         // set current mask
         this._mask = mask;
@@ -521,6 +500,14 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     _selectedYears : {},
 
+    getSelectedYears : function () {
+         var s = [];
+        _.forEach(this._selectedYears, function (v, k) {
+            if (v) s.push(k);
+        });
+        return s;
+    },
+
     _averageDataToggle : function (year, checked) {
         console.log('toggle', year, checked);
 
@@ -528,25 +515,16 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._selectedYears[year] = checked;
 
         // set line graph to selected years
-        this._setSelectedYearsLineGraph();
+        // this._setSelectedYearsLineGraph();
+        this._setLineGraph();
 
     },
 
-    _setSelectedYearsLineGraph : function () {
-        var years = _.filter(this._selectedYears, function (value, key) {
-            return key;
-        });
+    // _setSelectedYearsLineGraph : function () {
+    //     var selectedYears = this.getSelectedYears();
+    //     console.log('selectedYears ==>', selectedYears);
 
-        var selectedYears = [];
-
-        _.forEach(this._selectedYears, function (value, key) {
-            console.log('s: ', value, key);
-            if (value) selectedYears.push(key);
-        });
-
-        console.log('selectedYears ==>', selectedYears);
-
-    },
+    // },
 
     isEditor : function () {
         return app.activeProject.isEditor();
@@ -606,14 +584,15 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         var line_dimension = this.ndx.line_crossfilter.dimension(function(d) { return d.date; });
 
         // create line group
-        // var line_groups = [];
-        // var range = _.range(2014, 2016);
-        // range.forEach(function (r) {
-        //     line_groups.push(line_dimension.group().reduceSum(function(d) { return d.scf[r]; }));
-        // });
+        var line_groups = [];
+        var range = _.range(2000, 2017);
+        range.forEach(function (r) {
+            console.log('dimension...', r);
+            line_groups.push(line_dimension.group().reduceSum(function(d) { return d.scf[r]; }));
+        });
 
-        var line_group  = line_dimension.group().reduceSum(function(d) { return d.scf[2014]; });
-        var line_group2 = line_dimension.group().reduceSum(function(d) { return d.scf[2015]; });
+        // var line_group  = line_dimension.group().reduceSum(function(d) { return d.scf[2014]; });
+        // var line_group2 = line_dimension.group().reduceSum(function(d) { return d.scf[2015]; });
 
         // create point group (for last red triangle)
         // var point_group = line_dimension.group().reduceSum(function(d) { return d.scf });
@@ -658,41 +637,65 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             .renderDataPoints(false)
             .xyTipsOn(false),
 
-            // yearly line
-            dc.lineChart(composite)
-            .group(line_group)
-            .colors('#ff6666')
-            .renderHorizontalGridLines(true)
-            .renderVerticalGridLines(true)
-            .dotRadius(1)
-            .renderDataPoints(false)
-            .xyTipsOn(false),
+            // // yearly line
+            // dc.lineChart(composite)
+            // .group(line_group)
+            // .colors('#ff6666')
+            // .renderHorizontalGridLines(true)
+            // .renderVerticalGridLines(true)
+            // .dotRadius(1)
+            // .renderDataPoints(false)
+            // .xyTipsOn(false),
 
-            // yearly line
-            dc.lineChart(composite)
-            .group(line_group2)
-            .colors('green')
+            // // yearly line
+            // dc.lineChart(composite)
+            // .group(line_group2)
+            // .colors('green')
+            // .renderHorizontalGridLines(true)
+            // .renderVerticalGridLines(true)
+            // .dotRadius(2)
+            // .renderDataPoints(false)
+            // .xyTipsOn(false),
+        ]
+
+        // colors, to always have same for same year
+        // var yearly_colors = randomColor({
+        //     count : 10,
+        //     luminosity : 'light'
+        // })
+
+        var yearly_colors = [
+            '#F9DC5C',
+            '#BE5035',
+            '#F4FFFD',
+            '#011936',
+            '#465362',
+            '#93E1D8',
+            '#29E7CD',
+            '#2D1E2F',
+            '#FCF6B1',
+            '#F39C6B',
+            '#FF3864',
+            '#284B63',
+            '#56494C',
+            '#5C5D8D',
+            '#8DE4FF',
+        ]
+
+        // add yearly lines
+        line_groups.forEach(function (lg, i) {
+            compose_charts.push(dc.lineChart(composite)
+            .group(lg)
+            // .colors(randomColor({
+            //     seed : i,
+            // }))
+            .colors(yearly_colors[i])
             .renderHorizontalGridLines(true)
             .renderVerticalGridLines(true)
             .dotRadius(2)
             .renderDataPoints(false)
-            .xyTipsOn(false),
-        ]
-
-        // // add yearly lines
-        // line_groups.forEach(function (l) {
-        //     var c = dc.lineChart(composite)
-        //     .group(l)
-        //     .colors(randomColor())
-        //     .renderHorizontalGridLines(true)
-        //     .renderVerticalGridLines(true)
-        //     .dotRadius(1)
-        //     .renderArea(false)
-        //     .renderDataPoints(false)
-        //     .xyTipsOn(false);
-
-        //     compose_charts.push(c)
-        // });
+            .xyTipsOn(false))
+        });
 
         // create composite graph
         composite
@@ -745,7 +748,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     // run each time linegraph changes at all
     // eg. when clicking on slider
     // this needs to happen, because we only want to show data
-     _setLineGraph : function (options) {
+    _setLineGraph : function (options) {
         if (!this._graphInited) return;
 
         console.log('current line crossfilter', this.ndx.line_crossfilter);
@@ -786,11 +789,17 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         var cache = parsed_cache.years;
 
-        console.log('cache: coltrrane', cache);
+        var cache = this._filterSelectedYears(cache);
+
+        // console.log('cache: coltrrane', cache);
         console.log('parsed cache: miles', parsed_cache);
 
+
+        // var selectedYears = this.getSelectedYears();
+        // console.log('UPDATING LINE --> selected years :', selectedYears);
+
         // filter out period
-        var today = moment().year(this._current.year).dayOfYear(this._current.day);
+        // var today = moment().year(this._current.year).dayOfYear(this._current.day);
         // var today = moment().dayOfYear(this._current.day); // works without year also!
 
         // // filter out data
@@ -830,6 +839,30 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
        
         // check if end of dataset
         this._checkEnds();
+    },
+
+    _filterSelectedYears : function (cache) {
+        var selectedYears = this.getSelectedYears();
+
+        var filtered = [];
+
+        cache.forEach(function (c) {
+
+            var item = {
+                date : c.date, 
+                scf : {}
+            }
+
+            selectedYears.forEach(function (s) {
+                item.scf[s] = c.scf[s];
+            });
+            filtered.push(item);
+        });
+
+        console.log('_filterSelectedYears cache', cache);
+
+        return filtered;
+
     },
 
     _updateLegend : function () {
