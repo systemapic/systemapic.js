@@ -1,5 +1,3 @@
-    
-
 // --------------------------------------------
 // THIS IS A CUSTOM PLUGIN CREATED FOR GLOBESAR 
 // --------------------------------------------
@@ -21,7 +19,6 @@
 //  + should take a dataset for linechart - which is just an array of points in time - and display this for the current year
 //  + everything is for the current year, it's an annual graph after all, so that's the reference point
 //  + should listen to events for all kinds of actions - ie. be controlled by events, not by fn's
-//  + 
 
 // events
 // ------
@@ -73,23 +70,30 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     },
 
+    // get/set parsed based on mask.id
+    parsed : function (parsed) {
+        if (parsed) {
+            this._parsed[this._mask.id] = parsed;
+        } else {
+            return this._parsed[this._mask.id];
+        }
+    },  
+
     parse : function (data, done) {
 
-        console.log('this', this);
+        // check store
+        if (this.parsed()) return done(null, this.parsed());
 
-        // add current year (need to fetch from server)
-        // 1. refactor cube.query to standalone
-        // 2. set 2016 here
-        // 3. fetch all line graph data from this parsed
-
+        // query non-data year (ie. query from actual raster datasets)
         this.query_yearly('2016', function (err, queried_data) {
-            if (err) console.error('query err', err);
+            if (err) return done(err);
 
-            var parsed = {
-                mma : this.average(data),
-            }
+            var parsed = {}
 
+            // min/max/avg 
+            parsed.mma = this.average(data);
 
+            // resample to year/doy
             queried_data.forEach(function (q) {
                 var item = {
                     scf : q.scf,
@@ -99,14 +103,17 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
                 data.push(item);
             });
 
+            // yearly
             parsed.years = this.yearly(data);
+
+            // store
+            this.parsed(parsed);
 
             // return 
             done && done(null, parsed);
 
         }.bind(this));
 
-        // return parsed;
     },
 
     query_yearly : function (year, done) {
@@ -142,9 +149,19 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     yearly : function (data) {
         var range = this.getRange();
-        // var years = _.range(range[0], this._range.datasets[1]+1); // hacky: takes first from data, last from dataset
-        var years = _.range(range[0], range[1]+1); // hacky: takes first from data, last from dataset
+        var years = _.range(range[0], range[1]+1); 
         var yearly_data = [];
+
+        // optimize data search, divide into years
+        var dataRange = this.dataRange();
+        var yearly_range = _.range(dataRange[0], dataRange[1] + 1);
+        var opti_data = {};
+
+        yearly_range.forEach(function (r) {
+            opti_data[r] = _.filter(data, function (d) {
+                return d.year == r;
+            });
+        });
 
         _.times(365, function (i) {
             var doy = i+1;
@@ -155,8 +172,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             }
 
             years.forEach(function (y) {
-                var scf = _.find(data, function (d) {   // expensive op! todo: cut into years first
-                    return d.year == y && d.doy == doy;
+                var scf = _.find(opti_data[y], function (d) {   // expensive op! todo: cut into years first
+                    return d.doy == doy;
                 });
                 item.scf[y] = scf ? scf.scf : false;
             }.bind(this))            
@@ -209,10 +226,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
                 min  : parseFloat(min),
                 avg  : avg, 
                 date : moment.utc().year(this._current.year).dayOfYear(doy), // year doesn't matter, as it's avg for all years
-                                                                             // however: need to add a YEAR/DATE when adding to graph, 
+            });                                                              // however: need to add a YEAR/DATE when adding to graph, 
                                                                              // due to graph needing a date to know it should display data
-            });
-
+            
         }.bind(this));
 
         return average;
@@ -221,22 +237,12 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     setData : function (data, done) {
 
-        // console.error('setData', data);
-
-
-
-        // data is all data for mask
-        // should define range already here,
-        // as well as parse data
-
-        // set timeframe
-        // timeframe is for raster layers
+        // set timeframe & range
         this._setTimeFrame();
 
         // parse
         this.parse(data, function (err, parsed) {
-
-            this._parsed[this._mask.id] = parsed;
+            if (err) console.error('this.parse err', err);
 
             // create avg pane
             this._createAverageDataPane();
@@ -248,7 +254,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             done && done();
 
         }.bind(this));
-
     },
 
     _parsed : {},
@@ -260,7 +265,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     onMaskUnselected : function (options) {
     },
 
-  
     // called when clicking mask on map
     // or when defaultMask is set on cube
     // without mask, there's no graph... 
@@ -321,12 +325,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._graphContainer         = Wu.DomUtil.create('div', 'big-graph-inner-container',            this._container);
         this._loadingBar             = Wu.DomUtil.create('div', 'graph-loading-bar',                    this._container);
         
-
         // add editor items
         if (this.isEditor()) this._addEditorPane();
-
-        // add yearly graph
-        // this._createAverageDataPane();
 
     },
 
@@ -351,12 +351,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             });
         }
 
-        // // average data switch
-        // if (this.options.editorOptions.avg) {        
-        //     var checkbox_avgdata = this._createAverageDataCheckbox({
-        //         appendTo : this._filterPane
-        //     });
-        // }
     },
 
 
@@ -394,46 +388,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         return checkbox;
     },
-
-
-    // _createAverageDataCheckbox : function (options) {
-
-    //     // create checkbox
-    //     var checkbox = Wu.DomUtil.create('div', 'checkbox');
-    //     var input = Wu.DomUtil.create('input', '', checkbox);
-    //     input.setAttribute('type', 'checkbox');
-    //     input.id = 'checkbox-' + Wu.Util.getRandomChars(5);
-        
-    //     // create label
-    //     var label = Wu.DomUtil.create('label', '', checkbox);
-    //     label.setAttribute('for', input.id);
-    //     label.innerHTML = 'Enabled dropdown for yearly average data';
-
-    //     // mark checked if active
-    //     if (this.cube().getAverageDataOption()) {
-    //         input.setAttribute('checked', '');
-    //     }
-
-    //     // check event
-    //     Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
-
-    //         // toggle
-    //         this.cube().setAverageDataOption(!this.cube().getAverageDataOption());
-
-    //         // hide if not activated
-    //         if (this.cube().getAverageDataOption()) {
-    //             this._average_pane.container.style.display = 'block';
-    //         } else {
-    //             this._average_pane.container.style.display = 'none';
-    //         }
-
-    //     }.bind(this));
-
-    //     // add to DOM
-    //     options.appendTo.appendChild(checkbox);
-
-    //     return checkbox;
-    // },
    
     _createAverageDataPane : function () {
         if (this._average_pane) return;
@@ -459,13 +413,15 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // years
         years.forEach(function (y, i) {
+          
             var li = Wu.DomUtil.create('li', '', ul);
             var input = Wu.DomUtil.create('input', '', li);
+            var label = Wu.DomUtil.create('label', '', li, y);
+
             input.id = 'years-dropdown-' + y;
             input.setAttribute('type', 'checkbox');
             input.setAttribute('name', y);
             input.setAttribute('value', y);
-            var label = Wu.DomUtil.create('label', '', li, y);
             label.setAttribute('for', input.id);
 
             // event
@@ -486,12 +442,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         }.bind(this));
 
-        // // hide if not activated
-        // if (this.cube().getAverageDataOption()) {
-        //     this._average_pane.container.style.display = 'block';
-        // } else {
-        //     this._average_pane.container.style.display = 'none';
-        // }
     },
 
     _selectedYears : {},
@@ -505,7 +455,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _averageDataToggle : function (year, checked) {
-        console.log('toggle', year, checked);
 
         // remember
         this._selectedYears[year] = checked;
@@ -560,7 +509,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     isEditor : function () {
         return app.activeProject.isEditor();
     },
-
 
     // should run only once! 
     // 
@@ -823,6 +771,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
        
         // check if end of dataset
         this._checkEnds();
+
     },
 
     _filterSelectedYears : function (cache) {
@@ -911,7 +860,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     _setTimeFrame : function () {
 
         // set avg data range
-        this._range.data[this._mask.id] = this.setDataRange();
+        this._range.data[this._mask.id] = this.dataRange();
 
         // return if already set
         if (this._current && this._current.year && this._current.day) return; 
@@ -920,9 +869,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._current = this.getDatasetsEndDate();
 
         // set range
-        this._range.datasets = this.setDatasetRange();
-
-        console.log('this._range', this._range);
+        this._range.datasets = this.datasetRange();
     },
 
     _range : {
@@ -935,7 +882,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         return range;
     },
 
-    setDatasetRange : function () {
+    datasetRange : function () {
         var datasets = this.cube().getDatasets();
         var last = _.last(datasets);
         var first = _.first(datasets);
@@ -944,7 +891,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         return [firstYear, lastYear];
     },
 
-    setDataRange : function () {
+    dataRange : function () {
         var data = this._mask.data;
         var first = _.first(data);
         var last = _.last(data);
