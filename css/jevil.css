@@ -2326,7 +2326,7 @@ input.chrome-field-input {
 .big-graph-outer-container {
     background: white;
     padding: 20px;
-    padding-right: 0px;
+    /*padding-right: 0px;*/
     position: absolute;
     right: 100px;
     bottom: 110px;
@@ -2471,7 +2471,7 @@ input.chrome-field-input {
     }
 
 .big-slider-inner-container {
-    width: 520px;
+    width: 600px;
     padding-left: 50px;
     padding-right: 50px;
     padding-top: 10px;
@@ -2527,7 +2527,8 @@ input.chrome-field-input {
 .big-slider-button-container {
     position: absolute;
     bottom: 8px;
-    width: 100%;
+    /*width: 100%;*/
+    width: 530px;
     text-align: center;
     left: 0;    
 }

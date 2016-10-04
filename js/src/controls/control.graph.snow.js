@@ -1,4 +1,4 @@
-
+    
 
 // --------------------------------------------
 // THIS IS A CUSTOM PLUGIN CREATED FOR GLOBESAR 
@@ -27,6 +27,7 @@
 // ------
 //  - since object survives changing projects, the events must be silenced.
 
+moment().utc();
 
 // created by cube layer
 // Annual Graph (cyclical)
@@ -37,7 +38,26 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         editorOptions : {
             mask : true,
             avg : true
-        }
+        },
+        colors : [
+            '#F9DC5C',
+            '#BE5035',
+            '#F4FFFD',
+            '#011936',
+            '#465362',
+            '#93E1D8',
+            '#29E7CD',
+            '#2D1E2F',
+            '#FCF6B1',
+            '#F39C6B',
+            '#FF3864',
+            '#284B63',
+            '#56494C',
+            '#5C5D8D',
+            '#8DE4FF',
+            'red',
+            'yellow',
+        ]
     },
 
     _initialize : function () {
@@ -55,21 +75,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     parse : function (data, done) {
 
-        // console.log('PARSE', data);
-
-        var parsed = {
-            // mma : [36], // min, max, average of all full years
-            mma : this.average(data),
-            // years : {
-            //     // 2016 : [], // queried data,
-            //     // 2015 : [], // data from file
-            //     // 2014 : [], // data from file
-            //     // 2016 : this.yearly(data, '2016'),
-            //     2015 : this.yearly(data, '2015', '2016'),
-            //     2014 : this.yearly(data, '2014', '2016'),
-            // }
-            years : this.yearly(data)
-        }
+        console.log('this', this);
 
         // add current year (need to fetch from server)
         // 1. refactor cube.query to standalone
@@ -79,12 +85,26 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this.query_yearly('2016', function (err, queried_data) {
             if (err) console.error('query err', err);
 
-            // parsed.years['2016'] = queried_data;
+            var parsed = {
+                mma : this.average(data),
+            }
+
+
+            queried_data.forEach(function (q) {
+                var item = {
+                    scf : q.scf,
+                    year : q.date.year(),
+                    doy : q.date.dayOfYear()
+                }
+                data.push(item);
+            });
+
+            parsed.years = this.yearly(data);
 
             // return 
             done && done(null, parsed);
 
-        });
+        }.bind(this));
 
         // return parsed;
     },
@@ -119,27 +139,11 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     },
 
-    // yearly : function (data, year, fake_year) {
-
-    //     var yearly = _.filter(data, function (d) {
-    //         return d.year == year;
-    //     });
-
-    //     var yearly_data = [];
-
-    //     yearly.forEach(function (y) {
-    //         var item = {
-    //             scf : parseFloat(y.scf),
-    //             date : moment().year(fake_year).dayOfYear(y.doy)
-    //         }
-    //         yearly_data.push(item);
-    //     });
-
-    //     return yearly_data;
-    // },
 
     yearly : function (data) {
-        var years = _.range(2000, 2016);
+        var range = this.getRange();
+        // var years = _.range(range[0], this._range.datasets[1]+1); // hacky: takes first from data, last from dataset
+        var years = _.range(range[0], range[1]+1); // hacky: takes first from data, last from dataset
         var yearly_data = [];
 
         _.times(365, function (i) {
@@ -147,11 +151,14 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
             var item = {
                 scf : {}, 
-                date : moment().year(2016).dayOfYear(doy) // fake year, correct doy
+                date : moment.utc().year(2016).dayOfYear(doy) // fake year, correct doy
             }
 
             years.forEach(function (y) {
-                item.scf[y] = this._get_yearly_scf(data, y, doy);
+                var scf = _.find(data, function (d) {   // expensive op! todo: cut into years first
+                    return d.year == y && d.doy == doy;
+                });
+                item.scf[y] = scf ? scf.scf : false;
             }.bind(this))            
 
             yearly_data.push(item);
@@ -161,15 +168,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         return yearly_data;
     },
 
-    _get_yearly_scf : function (data, year, doy) {
-        var scf = _.find(data, function (d) {
-            return d.year == year && d.doy == doy;
-        });
-        if (!scf) return -10000; // to make sure it's outside graph.. hacky.. 
-        return parseFloat(scf.scf);
-    },
 
-
+    // calculate min/max/avg of scf per year
     average : function (data) {
 
         // clear
@@ -206,15 +206,15 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             average.push({
                 doy   : doy,
                 max  : parseFloat(max),
-                date : moment().year(this._current.year).dayOfYear(doy), // year doesn't matter, as it's avg for all years
-                // however: need to add a YEAR/DATE when adding to graph, due to graph needing a date to know it should display data
                 min  : parseFloat(min),
-                avg  : avg,
+                avg  : avg, 
+                date : moment.utc().year(this._current.year).dayOfYear(doy), // year doesn't matter, as it's avg for all years
+                                                                             // however: need to add a YEAR/DATE when adding to graph, 
+                                                                             // due to graph needing a date to know it should display data
             });
 
         }.bind(this));
 
-        // console.log('AVERAGE', average);
         return average;
     },
 
@@ -223,25 +223,23 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // console.error('setData', data);
 
+
+
         // data is all data for mask
         // should define range already here,
         // as well as parse data
 
         // set timeframe
         // timeframe is for raster layers
-        this._setCurrentTime();
+        this._setTimeFrame();
 
-        // set data
-        // this._cache.data[this._mask.id] = data;
-        // this.cache().data(data);
-
+        // parse
         this.parse(data, function (err, parsed) {
 
-            // console.log('-----> parsed ------>', parsed);
-
-            // this.cache().data(parsed) = parsed;
-
             this._parsed[this._mask.id] = parsed;
+
+            // create avg pane
+            this._createAverageDataPane();
 
             // create graph (mma)
             this._createGraph(parsed);
@@ -262,22 +260,11 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     onMaskUnselected : function (options) {
     },
 
-    // // get/set mask
-    // mask : function (mask) {
-    //     if (mask) {
-    //         this._mask = mask;
-    //     } else {
-    //         return this._mask || false;
-    //     }
-    // },
-
+  
     // called when clicking mask on map
     // or when defaultMask is set on cube
     // without mask, there's no graph... 
     setMask : function (mask) {
-
-        // return;
-        // console.error('setMask', mask);
 
         // set current mask
         this._mask = mask;
@@ -318,22 +305,28 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     _initContainer : function () {
         if (this._container) return;
 
-        this._container         = Wu.DomUtil.create('div', 'big-graph-outer-container',     this.options.appendTo);
-        this._infoContainer     = Wu.DomUtil.create('div', 'big-graph-info-container',      this._container);
-        this._pluginContainer   = Wu.DomUtil.create('div', 'big-graph-plugin-container',    this._container);
-        this._nameTitle         = Wu.DomUtil.create('div', 'big-graph-title',               this._infoContainer, 'title');
-        this._maskTitle         = Wu.DomUtil.create('div', 'big-graph-mask-title',          this._infoContainer, 'title');
-        this._maskDescription   = Wu.DomUtil.create('div', 'big-graph-mask-description',    this._infoContainer, 'title');
-        this._dateTitle         = Wu.DomUtil.create('div', 'big-graph-current-day',         this._infoContainer, 'day');
-        this._graphContainer    = Wu.DomUtil.create('div', 'big-graph-inner-container',     this._container);
-        this._loadingBar        = Wu.DomUtil.create('div', 'graph-loading-bar',             this._container);
-        this._legendContainer   = Wu.DomUtil.create('div', 'graph-legend',                  this._container);
+        this._container              = Wu.DomUtil.create('div', 'big-graph-outer-container',            this.options.appendTo);
+        this._infoContainer          = Wu.DomUtil.create('div', 'big-graph-info-container',             this._container);
+        
+        this._pluginMainContainer    = Wu.DomUtil.create('div', 'big-graph-plugin-container',           this._container);
+        this._pluginContainer        = Wu.DomUtil.create('div', 'big-graph-plugin-main-container',      this._pluginMainContainer);
+        this._pluginLegendsContainer = Wu.DomUtil.create('div', 'big-graph-plugin-legends-container',   this._pluginMainContainer);
+        this._pluginLegendsHeader    = Wu.DomUtil.create('div', 'graph-legend',                         this._pluginLegendsContainer);
+        this._legendContainer        = Wu.DomUtil.create('div', 'graph-legend',                         this._pluginLegendsContainer);
+               
+        this._nameTitle              = Wu.DomUtil.create('div', 'big-graph-title',                      this._infoContainer, 'title');
+        this._maskTitle              = Wu.DomUtil.create('div', 'big-graph-mask-title',                 this._infoContainer, 'title');
+        this._maskDescription        = Wu.DomUtil.create('div', 'big-graph-mask-description',           this._infoContainer, 'title');
+        this._dateTitle              = Wu.DomUtil.create('div', 'big-graph-current-day',                this._infoContainer, 'day');
+        this._graphContainer         = Wu.DomUtil.create('div', 'big-graph-inner-container',            this._container);
+        this._loadingBar             = Wu.DomUtil.create('div', 'graph-loading-bar',                    this._container);
+        
 
         // add editor items
         if (this.isEditor()) this._addEditorPane();
 
         // add yearly graph
-        this._createAverageDataPane();
+        // this._createAverageDataPane();
 
     },
 
@@ -403,50 +396,52 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
 
-    _createAverageDataCheckbox : function (options) {
+    // _createAverageDataCheckbox : function (options) {
 
-        // create checkbox
-        var checkbox = Wu.DomUtil.create('div', 'checkbox');
-        var input = Wu.DomUtil.create('input', '', checkbox);
-        input.setAttribute('type', 'checkbox');
-        input.id = 'checkbox-' + Wu.Util.getRandomChars(5);
+    //     // create checkbox
+    //     var checkbox = Wu.DomUtil.create('div', 'checkbox');
+    //     var input = Wu.DomUtil.create('input', '', checkbox);
+    //     input.setAttribute('type', 'checkbox');
+    //     input.id = 'checkbox-' + Wu.Util.getRandomChars(5);
         
-        // create label
-        var label = Wu.DomUtil.create('label', '', checkbox);
-        label.setAttribute('for', input.id);
-        label.innerHTML = 'Enabled dropdown for yearly average data';
+    //     // create label
+    //     var label = Wu.DomUtil.create('label', '', checkbox);
+    //     label.setAttribute('for', input.id);
+    //     label.innerHTML = 'Enabled dropdown for yearly average data';
 
-        // mark checked if active
-        if (this.cube().getAverageDataOption()) {
-            input.setAttribute('checked', '');
-        }
+    //     // mark checked if active
+    //     if (this.cube().getAverageDataOption()) {
+    //         input.setAttribute('checked', '');
+    //     }
 
-        // check event
-        Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
+    //     // check event
+    //     Wu.DomEvent.on(checkbox, 'mouseup', function (e) {
 
-            // toggle
-            this.cube().setAverageDataOption(!this.cube().getAverageDataOption());
+    //         // toggle
+    //         this.cube().setAverageDataOption(!this.cube().getAverageDataOption());
 
-            // hide if not activated
-            if (this.cube().getAverageDataOption()) {
-                this._average_pane.container.style.display = 'block';
-            } else {
-                this._average_pane.container.style.display = 'none';
-            }
+    //         // hide if not activated
+    //         if (this.cube().getAverageDataOption()) {
+    //             this._average_pane.container.style.display = 'block';
+    //         } else {
+    //             this._average_pane.container.style.display = 'none';
+    //         }
 
-        }.bind(this));
+    //     }.bind(this));
 
-        // add to DOM
-        options.appendTo.appendChild(checkbox);
+    //     // add to DOM
+    //     options.appendTo.appendChild(checkbox);
 
-        return checkbox;
-    },
+    //     return checkbox;
+    // },
    
     _createAverageDataPane : function () {
+        if (this._average_pane) return;
 
         // range
-        console.log('range: ', this._cahce);
-        var years = _.range(2000, 2017);
+        // var years = _.range(2000, 2017);
+        var range = this.getRange();
+        var years = _.range(range[0], range[1] + 1);
 
         // create pane
         var pane = this._average_pane = {};
@@ -484,7 +479,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
             // set default year (hacky, but what to do)
             if (i == years.length-1) {
-                input.click();
+                setTimeout(function () {
+                    input.click();
+                }, 300);
             }
 
         }.bind(this));
@@ -495,7 +492,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         // } else {
         //     this._average_pane.container.style.display = 'none';
         // }
-
     },
 
     _selectedYears : {},
@@ -503,7 +499,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     getSelectedYears : function () {
          var s = [];
         _.forEach(this._selectedYears, function (v, k) {
-            if (v) s.push(k);
+            if (v) s.push(parseInt(k));
         });
         return s;
     },
@@ -515,16 +511,51 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._selectedYears[year] = checked;
 
         // set line graph to selected years
-        // this._setSelectedYearsLineGraph();
         this._setLineGraph();
 
+        // set legend
+        this._setLegends();
     },
 
-    // _setSelectedYearsLineGraph : function () {
-    //     var selectedYears = this.getSelectedYears();
-    //     console.log('selectedYears ==>', selectedYears);
+    _setLegends : function () {
+        var selectedYears = this.getSelectedYears();
+        var range = this.getRange();
+        var allYears = _.range(range[0], range[1] + 1);
 
-    // },
+        // create legends
+        allYears.forEach(function (s, i) {
+
+            // if should be active
+            if (_.indexOf(selectedYears, s) >= 0) {
+
+                var div = this._legendsDOM[s];
+
+                if (div) {
+                    // show if already created
+                    Wu.DomUtil.removeClass(div, 'displayNone');
+                } else {
+
+                    // create legend
+                    var legend = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+                    var legend_color = Wu.DomUtil.create('div', 'graph-legend-color', legend);
+                    var legend_text = Wu.DomUtil.create('div', 'graph-legend-text', legend, s);
+
+                    // set color
+                    legend_color.style.background = this.options.colors[i];
+
+                    // rememeber
+                    this._legendsDOM[s] = legend;
+                }
+            } else {
+
+                // hide
+                var div = this._legendsDOM[s];
+                if (div) Wu.DomUtil.addClass(div, 'displayNone');
+            }
+        }.bind(this));
+    },
+ 
+    _legendsDOM : {},
 
     isEditor : function () {
         return app.activeProject.isEditor();
@@ -585,9 +616,10 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // create line group
         var line_groups = [];
-        var range = _.range(2000, 2017);
-        range.forEach(function (r) {
-            console.log('dimension...', r);
+        // var range = _.range(2000, 2017); // todo: get range dynamically
+        var range = this.getRange();
+        var line_group_range = _.range(range[0], range[1] + 1);
+        line_group_range.forEach(function (r) {
             line_groups.push(line_dimension.group().reduceSum(function(d) { return d.scf[r]; }));
         });
 
@@ -637,60 +669,15 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             .renderDataPoints(false)
             .xyTipsOn(false),
 
-            // // yearly line
-            // dc.lineChart(composite)
-            // .group(line_group)
-            // .colors('#ff6666')
-            // .renderHorizontalGridLines(true)
-            // .renderVerticalGridLines(true)
-            // .dotRadius(1)
-            // .renderDataPoints(false)
-            // .xyTipsOn(false),
-
-            // // yearly line
-            // dc.lineChart(composite)
-            // .group(line_group2)
-            // .colors('green')
-            // .renderHorizontalGridLines(true)
-            // .renderVerticalGridLines(true)
-            // .dotRadius(2)
-            // .renderDataPoints(false)
-            // .xyTipsOn(false),
         ]
 
         // colors, to always have same for same year
-        // var yearly_colors = randomColor({
-        //     count : 10,
-        //     luminosity : 'light'
-        // })
+        var yearly_colors = this.options.colors;
 
-        var yearly_colors = [
-            '#F9DC5C',
-            '#BE5035',
-            '#F4FFFD',
-            '#011936',
-            '#465362',
-            '#93E1D8',
-            '#29E7CD',
-            '#2D1E2F',
-            '#FCF6B1',
-            '#F39C6B',
-            '#FF3864',
-            '#284B63',
-            '#56494C',
-            '#5C5D8D',
-            '#8DE4FF',
-            'red',
-            'yellow',
-        ]
-
-        // add yearly lines
+        // add yearly lines to composite array
         line_groups.forEach(function (lg, i) {
             compose_charts.push(dc.lineChart(composite)
             .group(lg)
-            // .colors(randomColor({
-            //     seed : i,
-            // }))
             .colors(yearly_colors[i])
             .renderHorizontalGridLines(true)
             .renderVerticalGridLines(true)
@@ -753,8 +740,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     _setLineGraph : function (options) {
         if (!this._graphInited) return;
 
-        console.log('current line crossfilter', this.ndx.line_crossfilter);
-
         // Clear old data
         this.ndx.line_crossfilter.remove();
 
@@ -789,12 +774,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // var all_scf_years = this.get_all_scf_years();
 
-        var cache = parsed_cache.years;
+        var cache = this._filterSelectedYears(parsed_cache.years);
 
-        var cache = this._filterSelectedYears(cache);
-
-        // console.log('cache: coltrrane', cache);
-        console.log('parsed cache: miles', parsed_cache);
+        // console.log('parsed cache: miles', parsed_cache);
 
 
         // var selectedYears = this.getSelectedYears();
@@ -845,26 +827,18 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     _filterSelectedYears : function (cache) {
         var selectedYears = this.getSelectedYears();
-
         var filtered = [];
-
         cache.forEach(function (c) {
-
             var item = {
                 date : c.date, 
                 scf : {}
             }
-
             selectedYears.forEach(function (s) {
                 item.scf[s] = c.scf[s];
             });
             filtered.push(item);
         });
-
-        console.log('_filterSelectedYears cache', cache);
-
         return filtered;
-
     },
 
     _updateLegend : function () {
@@ -872,26 +846,26 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         this._legends = {};
 
+        // get data range
+        var range = this.getRange();
+        var rangeText = [range[0], range[1]-1].join('-');
+        
         // create divs
-        var year_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
-        var average_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
-        var minmax_container = Wu.DomUtil.create('div', 'graph-legend-module', this._legendContainer);
+        var year_container = Wu.DomUtil.create('div', 'graph-legend-header', this._pluginLegendsHeader, rangeText);
+        var average_container = Wu.DomUtil.create('div', 'graph-legend-module', this._pluginLegendsHeader);
+        var minmax_container = Wu.DomUtil.create('div', 'graph-legend-module', this._pluginLegendsHeader);
         var minmax_color = Wu.DomUtil.create('div', 'graph-legend-color', minmax_container);
         var average_color = Wu.DomUtil.create('div', 'graph-legend-color', average_container);
-        var year_color = Wu.DomUtil.create('div', 'graph-legend-color', year_container);
         this._legends.minmax_text = Wu.DomUtil.create('div', 'graph-legend-text', minmax_container);
         this._legends.average_text = Wu.DomUtil.create('div', 'graph-legend-text', average_container);
-        this._legends.year_text = Wu.DomUtil.create('div', 'graph-legend-text', year_container);
 
         // set values
-        this._legends.minmax_text.innerHTML = 'Max/min: 2000-2015';
-        this._legends.average_text.innerHTML = 'Average: 2000-2015';
-        this._legends.year_text.innerHTML = 'Current year';
+        this._legends.minmax_text.innerHTML = 'Min/max';
+        this._legends.average_text.innerHTML = 'Average';
 
         // set colors
         minmax_color.style.background = '#DCDCD7';
         average_color.style.background = 'white';
-        year_color.style.background = '#F3504A';
 
     },
 
@@ -912,7 +886,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         var last = _.last(datasets);
 
         // get date
-        var date = moment(last.timestamp);
+        var date = moment.utc(last.timestamp);
 
         // return day/year    
         return {
@@ -934,12 +908,49 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._dateSet = true;
     },
 
-    _setCurrentTime : function () {
+    _setTimeFrame : function () {
+
+        // set avg data range
+        this._range.data[this._mask.id] = this.setDataRange();
+
         // return if already set
         if (this._current && this._current.year && this._current.day) return; 
 
         // set current time to last day in dataset timeseries
         this._current = this.getDatasetsEndDate();
+
+        // set range
+        this._range.datasets = this.setDatasetRange();
+
+        console.log('this._range', this._range);
+    },
+
+    _range : {
+        datasets : [],
+        data : {} // by mask
+    },
+
+    getRange : function () {
+        var range = [this._range.data[this._mask.id][0], this._range.datasets[1]];
+        return range;
+    },
+
+    setDatasetRange : function () {
+        var datasets = this.cube().getDatasets();
+        var last = _.last(datasets);
+        var first = _.first(datasets);
+        var firstYear = moment.utc(first.timestamp).year();
+        var lastYear = moment.utc(last.timetamp).year();
+        return [firstYear, lastYear];
+    },
+
+    setDataRange : function () {
+        var data = this._mask.data;
+        var first = _.first(data);
+        var last = _.last(data);
+        var firstYear = moment.utc().year(first.year).dayOfYear(first.doy);
+        var lastYear = moment.utc().year(last.year).dayOfYear(last.doy);
+        return [firstYear.year(), lastYear.year()];
     },
 
     _setDate : function (year, day) {
@@ -949,8 +960,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._current.day = day || this._current.day;
 
         // set graph dates
-        var minDate = moment().year(this._current.year).dayOfYear(1);
-        var maxDate = moment().year(this._current.year + 1).dayOfYear(-1); // last day of year
+        var minDate = moment.utc().year(this._current.year).dayOfYear(1);
+        var maxDate = moment.utc().year(this._current.year + 1).dayOfYear(-1); // last day of year
 
         // set date range to graph
         this._composite.x(d3.time.scale().domain([minDate,maxDate]));
@@ -959,7 +970,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._animator.setSlider(day);
 
         // set cube cursor
-        this.cube().setCursor(moment().year(year).dayOfYear(day));
+        this.cube().setCursor(moment.utc().year(year).dayOfYear(day));
 
         // set slider
         this._animator.setSlider(day);
@@ -999,7 +1010,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // update titles
         this._updateTitles();
-
     },
 
     onUpdateTimeframe : function (options) {
@@ -1036,7 +1046,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _onAnimatorMovePreviousYear : function (e) {
-
         var day = e.detail.day;
 
         // set year
@@ -1053,7 +1062,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _onAnimatorMoveNextYear : function (e) {
-
         var day = e.detail.day;
 
         // set year
@@ -1075,7 +1083,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     _getDateTitle : function () {
         // get titles
-        var date = moment().year(this._current.year).dayOfYear(this._current.day);
+        var date = moment.utc().year(this._current.year).dayOfYear(this._current.day);
         var dateTitle = date.format('MMMM Do YYYY');
         var cache = this.cache().mask();
         var scf = _.find(cache, function (c) {
@@ -1086,7 +1094,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _getMaskTitle : function () {
-        // if (!this._mask) return;
         if (!this._mask) return;
         var d = this._mask.title;
         if (_.isString(d)) return d.camelize();
@@ -1095,7 +1102,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _getMaskDescription : function () {
-        // if (!this._mask) return;
         if (!this._mask) return;
         var d = this._mask.description;
         if (_.isString(d)) return d.camelize();
@@ -1109,9 +1115,9 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._maskTitle.innerHTML = this._getMaskTitle();
         this._maskDescription.innerHTML = this._getMaskDescription();
         this._dateTitle.innerHTML = this._getDateTitle();
-        
     },
 
+    // todo: move query to separate fn (use one above)
     _updateLineGraph : function (options) {
 
         // if data is available, set graph
@@ -1126,7 +1132,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         // data not available yet, need to fetch
         var query_options = {
             query_type : 'scf-geojson',
-            // mask_id : this._mask ? this._mask.id : false, //'mask-gkceetoa', // debug
             mask_id : this._mask ? this._mask.id : false, //'mask-gkceetoa', // debug
             year : this._current.year,   
             day : this._current.day,
@@ -1174,6 +1179,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         }
     },
 
+    // todo: clean up this shiait
     cache : function () {
         return {
             data : function (data) {
@@ -1211,28 +1217,10 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
     },
 
-    // addLineData : function (options) {
-
-    //     // parse dates
-    //     var data = this._parseDates(options.data);
-
-    //     // validate
-    //     if (!_.isArray(data)) return console.error('Malformed data', data);
-
-    //     // get year
-    //     var year = moment(data[0].date).year();
-
-    //     // set data to cache
-    //     this.cache(data, year);
-
-    //     // update line graph
-    //     this._setLineGraph();
-    // },
-
     _parseDates : function (cache) {
         if (!_.isArray(cache)) return;
         cache.forEach(function (c) {
-            c.date = moment(c.date);
+            c.date = moment.utc(c.date);
         });
         return cache;
     },
@@ -1243,7 +1231,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         var cache = this.cache().mask();
 
         // filter out period
-        var today = moment().year(this._current.year).dayOfYear(this._current.day + 1);
+        var today = moment.utc().year(this._current.year).dayOfYear(this._current.day + 1);
         var period = _.find(cache, function (d) {
             return d.date.isSame(today, 'day');
         });
@@ -1274,82 +1262,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     getCurrentDate : function () {
-        return moment().dayOfYear(this._current.day).year(this._current.year);
+        return moment.utc().dayOfYear(this._current.day).year(this._current.year);
     },
-
-    _debugFixData : function (data) {
-        var fixed = [];
-        data.forEach(function (d) {
-            fixed.push({
-                scf : d.scf,
-                date : new Date(moment().year(d.year).dayOfYear(d.doy).toString())
-            });
-        });
-        return fixed;
-    },
-
-    // _prepareData : function (year) {
-
-    //     // set year
-    //     var year = year || this._current.year;
-
-    //     // get data
-    //     // var data = this._data;
-    //     // var data = this._cache.data[this._mask.id];
-    //     var data = this.cache().data();
-
-    //     // clear
-    //     this._annualAverageData = [];
-
-    //     // for each day
-    //     _.times(365, function (n) {
-
-    //         var doy = n+1;
-
-    //         // get this day's values
-    //         var today = _.filter(data, function (d) {
-    //             return d.doy == doy;
-    //         });
-
-    //         // { 
-    //         //     age : "0.99",
-    //         //     ccf : "99.19",
-    //         //     doy : "1",
-    //         //     scf : "82.61",
-    //         //     year : "2001"
-    //         // }
-
-    //         // get this day's max
-    //         var max = _.max(today, function (d) {
-    //             return d.scf;
-    //         }).scf;
-
-    //         // get this day's min
-    //         var min = _.min(today, function (d) {
-    //             return d.scf;
-    //         }).scf;
-
-    //         // get this day's avg
-    //         var sum = 0;
-    //         _.times(today.length, function (i) {
-    //             sum += parseFloat(today[i].scf);
-    //         });
-    //         var avg = sum/today.length;
-         
-    //         // add to array
-    //         this._annualAverageData.push({
-    //             no   : doy,
-    //             max  : max,
-    //             date : moment().year(year).dayOfYear(data[doy].doy), // year doesn't matter, as it's avg for all years - but must be this._current.year
-    //             min  : min,
-    //             avg  : avg,
-    //         });
-
-    //         // console.log('this._ann', this._annualAverageData);
-
-    //     }.bind(this));
-
-    // },
 
     _onLoadedGraph : function () {
         this.hideLoading();
@@ -1374,6 +1288,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
 
 
+// todo: move to separate scripts (or remove altogether)
+// 
 // randomColor by David Merfield under the CC0 license
 // https://github.com/davidmerfield/randomColor/
 
