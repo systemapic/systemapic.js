@@ -37,6 +37,11 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             avg : true
         },
         colors : [
+
+            '#e31a1c', // red
+            '#ff7f00', // orange
+            '#33a02c', // green
+            '#1f78b4', // blue
             '#F9DC5C',
             '#BE5035',
             '#F4FFFD',
@@ -54,6 +59,18 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             '#8DE4FF',
             'red',
             'yellow',
+            // '#a6cee3',
+            // '#1f78b4',
+            // '#b2df8a',
+            // '#33a02c',
+            // '#fb9a99',
+            // '#e31a1c',
+            // '#fdbf6f',
+            // '#ff7f00',
+            // '#cab2d6',
+            // '#6a3d9a',
+            // '#ffff99',
+            // '#b15928',
         ]
     },
 
@@ -156,7 +173,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         var dataRange = this.dataRange();
         var yearly_range = _.range(dataRange[0], dataRange[1] + 1);
         var opti_data = {};
-
         yearly_range.forEach(function (r) {
             opti_data[r] = _.filter(data, function (d) {
                 return d.year == r;
@@ -175,7 +191,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
                 var scf = _.find(opti_data[y], function (d) {   // expensive op! todo: cut into years first
                     return d.doy == doy;
                 });
-                item.scf[y] = scf ? scf.scf : false;
+                item.scf[y] = scf ? parseFloat(scf.scf) : false;
             }.bind(this))            
 
             yearly_data.push(item);
@@ -466,13 +482,17 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._setLegends();
     },
 
+    getColor : function (i) {
+        return this.options.colors[i];
+    },
+
     _setLegends : function () {
         var selectedYears = this.getSelectedYears();
         var range = this.getRange();
         var allYears = _.range(range[0], range[1] + 1);
 
         // create legends
-        allYears.forEach(function (s, i) {
+        allYears.reverse().forEach(function (s, i) {
 
             // if should be active
             if (_.indexOf(selectedYears, s) >= 0) {
@@ -490,7 +510,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
                     var legend_text = Wu.DomUtil.create('div', 'graph-legend-text', legend, s);
 
                     // set color
-                    legend_color.style.background = this.options.colors[i];
+                    legend_color.style.background = this.getColor(i);
 
                     // rememeber
                     this._legendsDOM[s] = legend;
@@ -511,50 +531,25 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     // should run only once! 
-    // 
     _createGraph : function (data) {
-        // if (!this._annualAverageData) return;
 
         // store crossfilters, dimensions, etc
         this.ndx = {};
 
-        // AVERAGE CROSSFILTER
-        // -------------------        
-        // this._annualAverageData array = 
-        // [{
-        //     avg : 79.990875,
-        //     date : Moment,
-        //     max : 89.6246,
-        //     min : 64.1556,
-        //     no : 1,
-        // }] // x 365
-
         // create average (background chart) crossfilter
-        // this.ndx.average_crossfilter = crossfilter(this._annualAverageData); // this._annualAverageData is avgs for 365 days
         this.ndx.average_crossfilter = crossfilter(data.mma); // this._annualAverageData is avgs for 365 days
 
-        // set dimensions (?)
+        // set dimension
         var average_dimension = this.ndx.average_crossfilter.dimension(function(d) { return d.date; });
 
-        // create groups (?)
+        // create groups 
         var average_max_group = average_dimension.group().reduceSum(function(d) { return d.max });
         var average_min_group = average_dimension.group().reduceSum(function(d) { return d.min });
         var average_avg_group = average_dimension.group().reduceSum(function(d) { return d.avg });
 
-        // get max/min date (?)
+        // get max/min date 
         var minDate = average_dimension.bottom(1)[0].date;  // this is jan 1 2015.. shouldn't be a YEAR per say, since it messes with the line graph (which needs to be in same year to display)
         var maxDate = average_dimension.top(1)[0].date;     
-
- 
-
-
-        // YEARLY LINE CROSSFILTER
-        // -----------------------
-        // line_data array = 
-        // [{
-        //     SCF : 77.6827,
-        //     date : Thu Jan 01 2015 18:17:07 GMT+0100 (CET),
-        // }] // x 365
 
         // create red line (this year's data) crossfilter
         this.ndx.line_crossfilter = crossfilter([]);
@@ -564,23 +559,11 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         // create line group
         var line_groups = [];
-        // var range = _.range(2000, 2017); // todo: get range dynamically
         var range = this.getRange();
         var line_group_range = _.range(range[0], range[1] + 1);
-        line_group_range.forEach(function (r) {
+        line_group_range.reverse().forEach(function (r) {
             line_groups.push(line_dimension.group().reduceSum(function(d) { return d.scf[r]; }));
         });
-
-        // var line_group  = line_dimension.group().reduceSum(function(d) { return d.scf[2014]; });
-        // var line_group2 = line_dimension.group().reduceSum(function(d) { return d.scf[2015]; });
-
-        // create point group (for last red triangle)
-        // var point_group = line_dimension.group().reduceSum(function(d) { return d.scf });
-
-
-
-        // COMPOSITE CHART
-        // ---------------
 
         // create composite chart @ container
         var composite = this._composite = dc.compositeChart(this._graphContainer)
@@ -619,20 +602,28 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
         ]
 
-        // colors, to always have same for same year
-        var yearly_colors = this.options.colors;
+        // helper fn to filter out falsey values in line graph
+        function remove_falseys(source_group) {
+            return {
+                all : function () {
+                    return source_group.all().filter(function(d) {
+                        return d.value != false;
+                    });
+                }
+            };
+        }
 
         // add yearly lines to composite array
         line_groups.forEach(function (lg, i) {
             compose_charts.push(dc.lineChart(composite)
-            .group(lg)
-            .colors(yearly_colors[i])
+            .group(remove_falseys(lg))
+            .colors(this.getColor(i))
             .renderHorizontalGridLines(true)
             .renderVerticalGridLines(true)
             .dotRadius(2)
             .renderDataPoints(false)
             .xyTipsOn(false))
-        });
+        }.bind(this));
 
         // create composite graph
         composite
@@ -643,7 +634,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         .clipPadding(10)    
         .elasticY(false)
         .elasticX(false)
-        .on('renderlet', this._gridlines)
+        .on('renderlet', this._onRenderlet)
         .renderHorizontalGridLines(true)
         .renderVerticalGridLines(true)
         .brushOn(false)
@@ -671,15 +662,26 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _onGridMousemove : function (e) {
-        console.log('_onGridMousemove', e);
     },
 
-    _gridlines : function (table) {
+    _onRenderlet : function (chart) {
         // hack gridlines on top
         var h = document.getElementsByClassName('grid-line horizontal')[0];
         var v = document.getElementsByClassName('grid-line vertical')[0];
         h.parentNode.appendChild(h);
         v.parentNode.appendChild(v);
+
+        // todo: add labels on hover
+        // chart.selectAll('path.line')
+        // // chart.selectAll('g.stack_0')
+        //     .on('mouseover.foo', function(d) {
+        //         console.log('d', d, arguments);
+        //         // chart.select('.display-qux').text(dateFormat(d.data.key) + ': ' + d.data.value);
+        //     })
+        //     .on('mouseout.foo', function(d) {
+        //         console.log('d out', d);
+        //         // chart.select('.display-qux').text('');
+        //     });
     },
 
     // run each time linegraph changes at all
@@ -691,74 +693,27 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         // Clear old data
         this.ndx.line_crossfilter.remove();
 
-        // // create line dimension
-        // var line_dimension = this.ndx.line_crossfilter.dimension(function(d) { 
-        //     return d.date; 
-        // });
-
-        // // create line group
-        // var line_group = line_dimension.group().reduceSum(function(d) { return d.scf / 2; });
-
-
-        // // create line dimension
-        // var line_dimension = this.ndx.line_crossfilter.dimension(function(d) { 
-        //     return d.date; 
-        // });
-
-        // // create line group
-        // var line_group = line_dimension.group().reduceSum(function(d) { return d.scf / 2; });
-
-        // need to have ALL line graph data for all years in cache
-        // incl. old (from this._data) as well as current year (from query)
-        // then, here - all data is removed, and then added for each active year...
-
-
         // get cached line graph data
-        var cache = this.cache().mask();
-
         var parsed_cache = this._parsed[this._mask.id];
-
-        // var cache = parsed_cache.years['2016'];
-
-        // var all_scf_years = this.get_all_scf_years();
-
         var cache = this._filterSelectedYears(parsed_cache.years);
 
-        // console.log('parsed cache: miles', parsed_cache);
-
-
-        // var selectedYears = this.getSelectedYears();
-        // console.log('UPDATING LINE --> selected years :', selectedYears);
-
-        // filter out period
-        // var today = moment().year(this._current.year).dayOfYear(this._current.day);
-        // var today = moment().dayOfYear(this._current.day); // works without year also!
-
-        // // filter out data
-        // var period = _.filter(cache, function (d) { 
-        //     return d.date.isBefore(today);
-        // });
-        // var period2 = _.filter(cache, function (d) {
-        //     return d.date.isAfter(today);
-        // });
-
-
-        // var merged = parsed_cache.years['2016'].concat(parsed_cache.years['2015']);
+        // filter out current year's data @ current year's date
+        // with filter @ composite
+        var currentYear = this._current.year;
+        var currentDay = this._current.day;
+        var today = moment().year(currentYear).dayOfYear(currentDay);
+        var clone = cache.slice();
+        clone.forEach(function (c) {
+            if (c.date.isAfter(today)) {
+               c.scf[currentYear] = false;
+            }
+        });
 
         // add data to line_crossfilter
-        // this.ndx.line_crossfilter.add(period);
-        // this.ndx.line_crossfilter.add(merged);
-        this.ndx.line_crossfilter.add(cache);
-
-
-        // console.log('added period', period);
-        // console.log('added merged', merged);
-        // this.ndx.line_crossfilter.add(parsed_cache.years['2015']);
+        this.ndx.line_crossfilter.add(clone);
 
         // redraw
-        console.time('redraw');
         dc.redrawAll();
-        console.timeEnd('redraw');
 
         // calculate limit of dataset
         var limit = _.size(this.cache().mask()) + 1;
