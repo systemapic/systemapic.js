@@ -39,12 +39,14 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             selectYear : 'Select year(s)',
             minmax : 'Min/max',
             average : 'Average',
+            layerPrefix : 'Data',
         },
         nor : {
             yearlyGraphs : 'Årlige verdier',
             selectYear : 'Velg år',
             minmax : 'Min/maks',
-            average : 'Gjennomsnitt'
+            average : 'Gjennomsnitt',
+            layerPrefix : 'Data',
         },
     },
     locale : function () {
@@ -342,13 +344,20 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._pluginLegendsContainer = Wu.DomUtil.create('div', 'big-graph-plugin-legends-container',   this._pluginMainContainer);
         this._pluginLegendsHeader    = Wu.DomUtil.create('div', 'graph-legend',                         this._pluginLegendsContainer);
         this._legendContainer        = Wu.DomUtil.create('div', 'graph-legend',                         this._pluginLegendsContainer);
-               
-        this._maskTitle              = Wu.DomUtil.create('div', 'big-graph-mask-title',                 this._infoContainer, 'title');
-        this._nameTitle              = Wu.DomUtil.create('div', 'big-graph-title',                      this._infoContainer, 'title');
-        this._maskDescription        = Wu.DomUtil.create('div', 'big-graph-mask-description',           this._infoContainer, 'title');
-        this._dateTitle              = Wu.DomUtil.create('div', 'big-graph-current-day',                this._infoContainer, 'day');
+        
+        // mask titles
+        this._maskTitle              = Wu.DomUtil.create('div', 'big-graph-mask-title',                 this._infoContainer, '');
+        this._layerTitle             = Wu.DomUtil.create('div', 'big-graph-title',                      this._infoContainer, '');
+        
+        // mask meta
+        this._maskMeta               = Wu.DomUtil.create('div', 'big-graph-mask-meta-container',        this._infoContainer);
+        
+       
+        // date text
+        this._dateTitle              = Wu.DomUtil.create('div', 'big-graph-current-day',                this._container, '');
+       
+        // container for graph
         this._graphContainer         = Wu.DomUtil.create('div', 'big-graph-inner-container',            this._container);
-        this._loadingBar             = Wu.DomUtil.create('div', 'graph-loading-bar',                    this._container);
         
         // add editor items
         if (this.isEditor()) this._addEditorPane();
@@ -1000,8 +1009,10 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         var scf = _.find(cache, function (c) {
             return c.date.isSame(date, 'day');
         });
-        var scfTitle = scf ? (Math.round(scf.scf * 10) / 10) + '%' : '';
-        return dateTitle + ' &nbsp;&nbsp;&nbsp;   <span style="font-weight:900">SCF: ' + scfTitle + '</span>';
+        var scfTitle = scf ? 'SCF: ' + (Math.round(scf.scf * 10) / 10) + '%' : '';
+        // return dateTitle + ' &nbsp;&nbsp;&nbsp;   <span style="font-weight:900">SCF: ' + scfTitle + '</span>';
+
+        return [dateTitle, scfTitle];
     },
 
     getMaskMeta : function () {
@@ -1026,12 +1037,45 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     },
 
     _updateTitles : function (options) {
+        
+        // clear old
+        this._maskMeta.innerHTML = '';
 
-        // set titles
-        this._nameTitle.innerHTML = this._getTitle();
-        this._maskTitle.innerHTML = this._getMaskTitle();
-        this._maskDescription.innerHTML = this._getMaskDescription();
-        this._dateTitle.innerHTML = this._getDateTitle();
+        var meta = this.getMaskMeta();
+
+        _.forEach(meta, function (value, key, m) {
+            
+            // skip title
+            if (key == 'title') return;
+
+            // skip debugs
+            if (key == value) return;
+
+            // skip empty entries
+            if (_.isEmpty(value)) return;
+
+            // create meta div
+            var div = Wu.DomUtil.create('div', 'big-graph-mask-meta-item', this._maskMeta);
+            var html = '<span class="mask-item-title">' + _.capitalize(key) + ': </span>';
+            html +=  '<span class="mask-item-value">' + _.capitalize(value) + '</span>';
+            div.innerHTML = html;
+
+        }.bind(this))
+
+        // layer title
+        var layerhtml = '<span class="mask-item-title">' + this.locale().layerPrefix + ': </span>';
+        layerhtml +=  '<span class="mask-item-value">' + _.capitalize(this._getTitle()) + '</span>';
+        this._layerTitle.innerHTML = layerhtml;
+
+        // mask title
+        this._maskTitle.innerHTML = this._getMaskTitle();   
+
+        // date        
+        var datetitle = this._getDateTitle();
+        var datehtml =  '<div class="date-item-scf">' + datetitle[1] + '</div>';
+        datehtml += '<div class="date-item-date">' + datetitle[0] + '</div>';
+        this._dateTitle.innerHTML = datehtml;
+
     },
 
     // todo: move query to separate fn (use one above)
