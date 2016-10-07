@@ -30,6 +30,27 @@ moment().utc();
 // Annual Graph (cyclical)
 Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
 
+    // languages
+    localization : {
+        lang : 'nor',
+        // lang : 'eng',
+        eng : {
+            yearlyGraphs : 'Yearly graphs',
+            selectYear : 'Select year(s)',
+            minmax : 'Min/max',
+            average : 'Average',
+        },
+        nor : {
+            yearlyGraphs : 'Årlige verdier',
+            selectYear : 'Velg år',
+            minmax : 'Min/maks',
+            average : 'Gjennomsnitt'
+        },
+    },
+    locale : function () {
+        return this.localization[this.localization.lang];
+    },
+
     options : {
         fetchLineGraph : false, // debug, until refactored fetching line graph to cube
         editorOptions : {
@@ -406,11 +427,11 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         pane.container = Wu.DomUtil.create('div', 'average-data-pane-container', this._pluginContainer);
 
         // create title
-        var title = Wu.DomUtil.create('div', 'average-data-pane-title', pane.container, 'Yearly graphs');
+        var title = Wu.DomUtil.create('div', 'average-data-pane-title', pane.container, this.locale().yearlyGraphs);
 
         // create select
         var btn_group = Wu.DomUtil.create('div', 'btn-group', pane.container);
-        var btn = Wu.DomUtil.create('button', 'btn btn-default dropdown-toggle', btn_group, 'Select year(s)');
+        var btn = Wu.DomUtil.create('button', 'btn btn-default dropdown-toggle', btn_group, this.locale().selectYear);
         btn.setAttribute('data-toggle', 'dropdown');
         var span = Wu.DomUtil.create('span', 'caret', btn);
         var ul = Wu.DomUtil.create('ul', 'dropdown-menu bullet pull-left pull-top', btn_group);
@@ -752,8 +773,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._legends.average_text = Wu.DomUtil.create('div', 'graph-legend-text', average_container);
 
         // set values
-        this._legends.minmax_text.innerHTML = 'Min/max';
-        this._legends.average_text.innerHTML = 'Average';
+        this._legends.minmax_text.innerHTML = this.locale().minmax; //'Min/max';
+        this._legends.average_text.innerHTML = this.locale().average; //'Average';
 
         // set colors
         minmax_color.style.background = '#DCDCD7';
@@ -974,7 +995,7 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
     _getDateTitle : function () {
         // get titles
         var date = moment.utc().year(this._current.year).dayOfYear(this._current.day);
-        var dateTitle = date.format('MMMM Do YYYY');
+        var dateTitle = date.format('Do MMMM, YYYY');
         var cache = this.cache().mask();
         var scf = _.find(cache, function (c) {
             return c.date.isSame(date, 'day');
