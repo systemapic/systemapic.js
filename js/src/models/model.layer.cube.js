@@ -66,6 +66,20 @@
 // metalayer with several postgis raster layers 
 Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
+    // languages
+    localization : {
+        lang : 'nor',
+        eng : {
+            clickToEnableMask : 'Click to enable mask.'
+        },
+        nor : {
+            clickToEnableMask : 'Trykk for å velge maske.'
+        },
+    },
+    locale : function () {
+        return this.localization[this.localization.lang];
+    },
+
     options : {
         
         // frames to cache [before, after]
@@ -445,6 +459,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
     _maskLayers : [],
 
+   
+
     _initGeoJSONMask : function (mask, done) {
 
         // create mask (geojson) layer
@@ -467,7 +483,7 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
             // add title
             var title = meta && meta.title ? meta.title.camelize() : '';
-            var tip = this.isMaskActive(mask) ? '' : '(Click to enable mask.)';
+            var tip = this.isMaskActive(mask) ? '' : this.locale().clickToEnableMask; 
 
             var html = '<div class="tooltip-snow">' + title + '<span class="tooltip-snow-span"><br>' + tip + '</span></div>';
 
