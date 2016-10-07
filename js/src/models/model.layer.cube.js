@@ -78,17 +78,17 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         mask : {
 
             defaultStyle : {
-                fillColor : 'yellow',
+                fillColor : '#d35658',
                 fillOpacity : 0,
-                color : 'yellow',
+                color : '#d35658',
                 opacity : 0.4,
                 weight : 2,
             },
 
             hoverStyle : {
-                fillColor : 'yellow',
+                fillColor : '#d35658',
                 fillOpacity : 0.2,
-                color : 'yellow',
+                color : '#d35658',
                 opacity : 0.9,
                 weight : 2,
             },
@@ -96,8 +96,8 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
             selectedStyle : {
                 fillColor : 'black',
                 fillOpacity : 0,
-                color : '#d35658',
-                opacity : 0.6,
+                color : 'red',
+                opacity : 0.9,
                 weight : 2,
             },
 
@@ -117,6 +117,9 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
 
             // fly to mask on click
             flyTo : false,
+
+            // tooltip
+            tooltip : true
         },
 
         // empty, transparent png
@@ -460,26 +463,36 @@ Wu.Model.Layer.CubeLayer = Wu.Model.Layer.extend({
         // set popup content
         maskLayer.layer.bindTooltip(function (layer) {
 
+            var meta = mask.meta;
+
             // add title
-            var html = mask.title ? mask.title.camelize() : 'Click to enable mask.';
+            var title = meta && meta.title ? meta.title.camelize() : '';
+            var tip = this.isMaskActive(mask) ? '' : '(Click to enable mask.)';
+
+            var html = '<div class="tooltip-snow">' + title + '<span class="tooltip-snow-span"><br>' + tip + '</span></div>';
 
             // return
             return html;
             
-        }, {
+        }.bind(this), {
             // see http://leafletjs.com/reference-1.0.0.html#tooltip
             className : 'mask-tooltip',
-            permanent : true
+            // permanent : true
         });
 
         // click events
         maskLayer.layer.on('click', this._onMaskClick.bind(this, maskLayer));
         maskLayer.layer.on('mouseover', this._onMaskMouseover.bind(this, maskLayer));
-        maskLayer.layer.on('mouseout', this._onMaskMouseout.bind(this, maskLayer));
+        maskLayer.layer.on('mouseout',  this._onMaskMouseout.bind(this, maskLayer));
 
         // callback
         done && done();
+    },
 
+    isMaskActive : function (mask) {
+        var active = this.getActiveMask();
+        if (active && active == mask.id) return true;
+        return false;
     },
 
     _onMaskMouseover : function (maskLayer, e) {

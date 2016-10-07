@@ -2772,3 +2772,14 @@ button.btn.btn-default.dropdown-toggle:focus {
     text-align: left;
     padding-bottom: 2px;
 }
+
+.tooltip-snow {
+    width: auto;
+    position: relative;
+    white-space: nowrap;
+    line-height: 12px;
+}
+span.tooltip-snow-span {
+    font-size: 10px;
+    white-space: nowrap;
+}

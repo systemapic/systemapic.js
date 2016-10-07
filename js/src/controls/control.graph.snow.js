@@ -59,18 +59,6 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
             '#8DE4FF',
             'red',
             'yellow',
-            // '#a6cee3',
-            // '#1f78b4',
-            // '#b2df8a',
-            // '#33a02c',
-            // '#fb9a99',
-            // '#e31a1c',
-            // '#fdbf6f',
-            // '#ff7f00',
-            // '#cab2d6',
-            // '#6a3d9a',
-            // '#ffff99',
-            // '#b15928',
         ]
     },
 
@@ -334,8 +322,8 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         this._pluginLegendsHeader    = Wu.DomUtil.create('div', 'graph-legend',                         this._pluginLegendsContainer);
         this._legendContainer        = Wu.DomUtil.create('div', 'graph-legend',                         this._pluginLegendsContainer);
                
-        this._nameTitle              = Wu.DomUtil.create('div', 'big-graph-title',                      this._infoContainer, 'title');
         this._maskTitle              = Wu.DomUtil.create('div', 'big-graph-mask-title',                 this._infoContainer, 'title');
+        this._nameTitle              = Wu.DomUtil.create('div', 'big-graph-title',                      this._infoContainer, 'title');
         this._maskDescription        = Wu.DomUtil.create('div', 'big-graph-mask-description',           this._infoContainer, 'title');
         this._dateTitle              = Wu.DomUtil.create('div', 'big-graph-current-day',                this._infoContainer, 'day');
         this._graphContainer         = Wu.DomUtil.create('div', 'big-graph-inner-container',            this._container);
@@ -995,17 +983,23 @@ Wu.Graph.SnowCoverFraction = Wu.Graph.extend({
         return dateTitle + ' &nbsp;&nbsp;&nbsp;   <span style="font-weight:900">SCF: ' + scfTitle + '</span>';
     },
 
+    getMaskMeta : function () {
+        if (!this._mask) return;
+        return this._mask.meta;
+    },
+
     _getMaskTitle : function () {
         if (!this._mask) return;
-        var d = this._mask.title;
+        var meta = this.getMaskMeta();
+        var d = meta ? meta.title : '';
         if (_.isString(d)) return d.camelize();
         return '';
-
     },
 
     _getMaskDescription : function () {
         if (!this._mask) return;
-        var d = this._mask.description;
+        var meta = this.getMaskMeta();
+        var d = meta ? meta.description : '';
         if (_.isString(d)) return d.camelize();
         return '';
     },
