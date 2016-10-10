@@ -155,7 +155,7 @@
     }
 
 .layers-container {
-    margin-bottom: 35px;
+    margin-bottom: 15px;
     }
 
 .baselayer-dropdown-wrapper {
@@ -192,6 +192,7 @@
     padding-bottom: 3px;
     font-size: 21px;
     font-weight: 600;
+    margin-top: 20px;
     }
 
 .file-list-separator {
@@ -893,6 +894,7 @@ input.chrome-field-input {
 
 .chrome-layer-list-wrapper {
     padding: 30px;
+    padding-top: 0px;
     }
 
 .chrome-content-header.layer-list-container-title.layer-list {

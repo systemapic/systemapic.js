@@ -109,21 +109,30 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // Layer list container
     _createLayerListContainer : function () {
 
+        // todo: - create preview icons for background layers
+        //       - clean up DOM, wrap categories
+
+        // data layers
         this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer);
-
         this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Layers');
-
-        // Containers
         this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListWrapper);
 
         // base layers
         this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Background layer');
         this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListWrapper);
-
-        // Background color selector
         this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);
 
-        // Lines
+
+        var wms_debug = false;
+        if (wms_debug) {
+
+            // wms layers
+            this._wmsLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'WMS layers');
+
+        }
+
+
+        // separator line
         this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListWrapper);
 
     },
