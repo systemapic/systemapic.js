@@ -2818,15 +2818,50 @@ span.mask-item-value {
 }
 
 
+.wms-button {
+    left: 0;
+    float: right;
+    padding-right: 20px;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    line-height: 1;
+    background: #3C4759;
+    margin-top: 3px;
+    right: 14px;
+    border-radius: 4px;
+    top: 5px;
+    width: 110px;
+    font-size: 14px;
+    padding: 10px;
+    margin: 5px;
+    position: relative;
+}
 
+.wms-content-attributes-name {
+    float: left;
+    padding-right: 5px;
+}
 
+.wms-content-attributes-wrapper {
+    position: relative;
+    width: 100%;
+}
 
+.wms-content-container {
+    padding: 10px;
+    cursor: pointer;
+}
 
-
-
-
-
-
+.wms-content-header {
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: underline;
+}
+.wms-content-attributes-container {
+    margin-left: 5px;
+}
 
 
 

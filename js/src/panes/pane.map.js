@@ -14,7 +14,8 @@ Wu.MapPane = Wu.Pane.extend({
             'mouseposition',
             'baselayertoggle',
             // 'cartocss',
-            'draw'
+            'draw',
+            'wms'
         ]
     },
     

@@ -31,6 +31,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     _onLayerAdded : function (options) {
 
+        console.log('_onLayerAdded', options);
+
         var uuid = options.detail.layerUuid;
 
         // remember
@@ -38,6 +40,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // Get layer object
         var layer = this._project.getLayer(uuid);
+
+        console.log('_onLayerAdded found layer', layer);
 
         if (!layer.store.metadata) {
             app.feedback.setError({
@@ -123,11 +127,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);
 
 
-        var wms_debug = false;
+        var wms_debug = true;
         if (wms_debug) {
 
-            // wms layers
-            this._wmsLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'WMS layers');
+            // create wms
+            this._createWMSLayers();
 
         }
 
@@ -137,6 +141,71 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     },
 
+    _createWMSLayers : function () {
+        
+        // wms layers
+        this._wmsLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'WMS layers');
+
+        // get available wms layers from server
+        app.api.getWMSLayers({}, function (err, wms_layers) {
+            console.log('getWMSLayers', err, wms_layers);
+
+
+        });
+
+        // debug btn
+        var btn = Wu.DomUtil.create('div', 'wms-button', this._wmsLayers, 'Create layer');
+        Wu.DomEvent.on(btn, 'click', function () {
+
+            console.log('creating layer');
+
+            var project = app.activeProject;
+
+             // create Wu.CubeLayer
+            var wmsLayer = {
+                projectUuid : project.getUuid(), // pass to automatically attach to project
+                data : { 
+                    wms : {
+                        source : 'http://195.1.20.83/wms-follo/',
+                        layers : [
+                            'EIENDOMSKART'
+                        ]
+                    }
+                },
+                metadata : null,
+                title : 'New wms layer',
+                description : 'WMS layer description',
+                // file : 'file-' + cube.cube_id,
+                // style : JSON.stringify(this.get_default_cube_cartocss()) // save default json style
+            }
+
+            // create Wu layer
+            app.api.createLayer(wmsLayer, function (err, wmsLayerJSON) {
+
+                console.log('createLayer', wmsLayer, wmsLayerJSON);
+
+                var wmsLayer = Wu.parse(wmsLayerJSON);
+
+                var layer = project.addLayer(wmsLayer);
+
+                console.log('added to layer', layer);
+
+                // select project
+                Wu.Mixin.Events.fire('layerAdded', { detail : {
+                    projectUuid : project.getUuid(),
+                    layerUuid : wmsLayer.uuid
+                }});
+
+                // open fullscreen for editing
+                // this._openCubeLayerEditFullscreen(layer);
+
+            }.bind(this));
+
+        });
+
+    },
+
+  
     // File list container
     _createFileListContainer : function () {
 
@@ -298,6 +367,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // perhaps better to remove d3 completely, and just create divs normally, then update store the divs in an object on file_id keys
     _refresh : function (options) {
 
+        console.error('_refresh!');
+
         // debug: don't refresh from projectSelected event
         // if (options && options.event && options.event == 'projectSelected') return;
 
@@ -316,6 +387,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // only update list if project is editable
         if (this._project.isEditable()) {
+
+            console.log('isEditable');
 
             // Layer list
             this._initLayerList();
@@ -2757,7 +2830,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             var provider = layerBundle.key;
 
             // only do our layers
-            if (provider == 'postgis' || provider == 'cube') {
+            if (provider == 'postgis' || provider == 'cube' || provider == 'wms') {
 
                 var layers = layerBundle.layers;
 
@@ -2810,7 +2883,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     sortLayers : function (layers) {
 
-        var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube'];
+        var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube', 'wms'];
         var results = [];
 
         keys.forEach(function (key) {
@@ -2830,6 +2903,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         }, this);
 
         this.numberOfProviders = results.length;
+        console.log('results:', results);
         return results;
     },
 
@@ -2870,6 +2944,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             // Do not allow postgis layers to be in the baselayer dropdown
             if ( provider.key == "postgis" ) return;
             if ( provider.key == "cube" ) return;
+            if ( provider.key == "wms" ) return;
             if ( provider.key == "raster"  ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
 
             // Get each provider (mapbox, google, etc)
@@ -3289,7 +3364,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                     return d.getTitle();
                 }.bind(this))
                 .on('dblclick', function (d) {
-                    var editable = (library == 'postgis' || library == 'raster');
+                    var editable = (library == 'postgis' || library == 'raster' || library == 'wms');
                     editable && this.activateLayerInput(d, library);
                 }.bind(this));
 
@@ -3383,7 +3458,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     createLayerPopUpTrigger : function (parent, type) {
 
-        if ( type != 'postgis' && type != 'cube') return;
+        if ( type != 'postgis' && type != 'cube' && type != 'wms') return;
 
         // Bind
         var popupTrigger = parent

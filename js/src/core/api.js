@@ -241,6 +241,10 @@ Wu.Api = Wu.Class.extend({
 
 
   	// LAYERS
+  	getWMSLayers : function (options, done) {
+  		var path  = '/v2/layers/wms';
+  		this.get(path, options, done);
+  	},
 
 
 	deleteLayer : function (options, done) {
