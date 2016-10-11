@@ -51,34 +51,66 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
             layers: layer_name,
             transparent: true,
             format: 'image/png',
-            prepareContent : this._prepareContent.bind(this),
+            openContent : this.openContent.bind(this),
             parentLayer : this
         });
 
-        // on popup close
-        app._map.on('popupclose', function (e) {
-
-            // get popups
-            var popup = e.popup;
-            var open_popup = this.layer.getPopup();
-
-            // remove polygon is closed popup is our popup
-            if (popup._leaflet_id == open_popup._leaflet_id) {
-                _.forEach(this._overlays, function (o) {
-                    o.remove();
-                    delete this._overlays[o];
-                }.bind(this));
-                // this._currentOverlay.remove();
-            }
-
-        }.bind(this));
     },
 
 
+    openContent : function (options) {
+
+        // clear old
+        this.clearSelection();
+
+        // parse content
+        console.time('_prepareContent');
+        var parsed_content = this._prepareContent(options.content);
+        console.timeEnd('_prepareContent');
+
+        // get info box
+        var info_box = this.getInfoBox();
+
+        // clear
+        info_box.innerHTML = '';
+
+        // append
+        info_box.appendChild(parsed_content);
+    },
+
+    getInfoBox : function () {
+        if (!this._infobox) this._createInfoBox();
+        return this._infobox;
+    },
+
+    _createInfoBox : function () {
+        var container = Wu.DomUtil.create('div', 'wms-info-box', app._appPane);
+        var content = Wu.DomUtil.create('div', 'wms-info-box-content', container);
+        var closeBtn = Wu.DomUtil.create('div', 'wms-info-box-close-btn', container, 'x');
+
+        // set infobox
+        this._infobox = content;
+
+        // set close event
+        Wu.DomEvent.on(closeBtn, 'click', this.clearSelection.bind(this));
+    },
+
+    clearSelection : function () {
+    
+        // remove polygons
+        _.forEach(this._overlays, function (o) {
+            o.remove();
+            delete this._overlays[o];
+        }.bind(this));
+
+        // remove description box
+        var infobox = this.getInfoBox();
+
+        // clear
+        if (infobox) infobox.innerHTML = '';
+    },
+
     _prepareContent : function (content) {
-
-        console.log('_prepareContent', this);
-
         if (!this._added) return;
 
         // parse content
@@ -88,6 +120,21 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
         // create container
         var html = Wu.DomUtil.create('div', 'wms-content');
+
+        var content = _.sortBy(content, function (cont) {
+            return cont.FeatureType;
+        });
+
+        // get "eiendom" index
+        // add eiendom to front
+        var ie = _.findIndex(content, function (con) {
+            return con.FeatureType == 'Eiendom';
+        });
+        var eiendom = _.find(content, function (c) {
+            return c.FeatureType == 'Eiendom';
+        });
+        content.splice(ie, 1);
+        content.unshift(eiendom);
 
         _.forEach(content, function (c) {
 
@@ -140,10 +187,10 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
                 // add geojson
                 var overlay = this._overlays[c.FeatureType] = L.geoJSON(polygon, {
                     style : {
-                        // "color": "#ff7800",
-                        "color": "red",
+                        "color": "yellow",
                         "weight": 5,
-                        "opacity": 0.65
+                        "opacity": 0.65,
+                        "fillOpacity" : 0.1
                     }
                 });
 
@@ -153,10 +200,11 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
             } else {
 
-                var exempt = ['Kommune', 'Vei', 'Kommuneplan'];
-                // if (c.FeatureType != 'Kommune' && c.FeatureType != 'Vei') {
-                if (!_.includes(exempt, c.FeatureType)) {
+                // var exempt = ['Kommune', 'Vei', 'Kommuneplan'];
+                
+                var exempt = [];
 
+                if (!_.includes(exempt, c.FeatureType)) {
 
                     // create polygon from geometry
                     var geometry = [];
@@ -164,35 +212,50 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
                         geometry.push([g.X, g.Y]);
                     });
 
-                    // create polygon
-                    var polygon = turf.polygon([geometry]);
+                    // first/last
+                    var first = _.first(c.Geometry.Positions);
+                    var last = _.last(c.Geometry.Positions);
+
+                    var isPolygon = (first.X == last.X && first.Y == last.Y);
+
+                    if (isPolygon) {
+
+                        // create polygon
+                        console.time('turf.polygon');
+                        var geojson = turf.polygon([geometry]);
+                        console.timeEnd('turf.polygon');
+                        
+                    } else {
+                       
+                        // is polyline
+                        console.time('turf.linestring');
+                        var geojson = turf.linestring(geometry);
+                        console.timeEnd('turf.linestring');
+                    }
 
                     // add geojson
-                    var overlay = this._overlays[c.FeatureType] = L.geoJSON(polygon, {
+                    var overlay = this._overlays[c.FeatureType] = L.geoJSON(geojson, {
                         style : {
                             "color": "#ff7800",
                             "weight": 5,
-                            "opacity": 0.65
+                            "opacity": 0.65,
+                            "fillOpacity" : 0.2
                         }
                     });
 
-                    // hover events on popup
+                    // highlight polygon on hover
                     Wu.DomEvent.on(container, 'mouseenter', function (e) {
-                        console.log('mouseenter', e);
-                        container.style.background = 'gainsboro';
+                        container.style.background = 'rgb(99, 109, 125)';
                         overlay.addTo(app._map);
                     });
-                     // hover events on popup
+                    // highlight polygon on hover
                     Wu.DomEvent.on(container, 'mouseleave', function (e) {
-                        console.log('mouseleave', e);
                         container.style.background = '';
                         overlay.remove();
                     });
 
                 } 
             }
-
-
 
         }.bind(this));
 
@@ -391,8 +454,9 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
     options : {
-        prepareContent : function () {},
-        parentLayer : null
+        // prepareContent : function () {},
+        parentLayer : null,
+        openContent : function () {}
     },
   
     onAdd: function (map) {
@@ -414,6 +478,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     },
 
     getFeatureInfo: function (evt) {
+        console.time('getFeatureInfo');
         // Make an AJAX request to the server and hope for the best
         var url = this.getFeatureInfoUrl(evt.latlng);
         var showResults = L.Util.bind(this.showGetFeatureInfo, this);
@@ -421,6 +486,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         $.ajax({
             url: url,
             success: function (data, status, xhr) {
+                console.timeEnd('getFeatureInfo');
                 var err = typeof data === 'string' ? null : data;
                 showResults(err, evt.latlng, data);
             },
@@ -431,6 +497,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     },
 
     getFeatureInfoUrl: function (latlng) {
+        
         // Construct a GetFeatureInfo request URL given a point
         var point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
         var size = this._map.getSize();
@@ -507,19 +574,27 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         // don't add if layer was removed from map while querying
         if (!this.options.parentLayer.isAdded()) return;
 
-        // parse content
-        var parsed_content = this.options.prepareContent(content);
+        // open content in description box
+        this.options.openContent({
+            latlng : latlng,
+            content : content
+        });
 
-        // open popup
-        var popup = this._popup = L.popup({ 
-            maxWidth: 800,
-            minWidth : 200,
-            offset : L.point(0, -20),
-            className : 'wms-popup-fixed'
-        })
-        .setLatLng(latlng)
-        .setContent(parsed_content)
-        .openOn(this._map);
+        return;
+
+        // // parse content
+        // var parsed_content = this.options.prepareContent(content);
+
+        // // open popup
+        // var popup = this._popup = L.popup({ 
+        //     maxWidth: 800,
+        //     minWidth : 200,
+        //     offset : L.point(0, -20),
+        //     className : 'wms-popup-fixed'
+        // })
+        // .setLatLng(latlng)
+        // .setContent(parsed_content)
+        // .openOn(this._map);
     },
 
 });
