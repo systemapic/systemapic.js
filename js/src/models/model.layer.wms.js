@@ -24,8 +24,6 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
     _prepareLayer : function () {
 
-        console.log('_prepareLayer');
-
         // set ids
         // var fileUuid    = this._fileUuid;   // file id of geojson
         // var cartoid     = this.store.data.cartoid || this._defaultCartoid;
@@ -171,15 +169,19 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
             });
 
-            console.log('FeatureType', c.FeatureType);
+            // create polygon from geometry
+            var geometry = [];
+            _.forEach(c.Geometry.Positions, function (g) {
+                geometry.push([g.X, g.Y]);
+            });
 
             if (c.FeatureType == 'Eiendom') {
 
-                // create polygon from geometry
-                var geometry = [];
-                _.forEach(c.Geometry.Positions, function (g) {
-                    geometry.push([g.X, g.Y]);
-                });
+                // // create polygon from geometry
+                // var geometry = [];
+                // _.forEach(c.Geometry.Positions, function (g) {
+                //     geometry.push([g.X, g.Y]);
+                // });
 
                 // create polygon
                 var polygon = turf.polygon([geometry]);
@@ -197,6 +199,27 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
                 // add permanently
                 overlay.addTo(app._map);
 
+                // highlight polygon on hover
+                Wu.DomEvent.on(container, 'mouseenter', function (e) {
+                    container.style.background = 'rgb(99, 109, 125)';
+                    overlay.setStyle({
+                        "color": "yellow",
+                        "weight": 5,
+                        "opacity": 0.65,
+                        "fillOpacity" : 0.2
+                    });
+                });
+                // highlight polygon on hover
+                Wu.DomEvent.on(container, 'mouseleave', function (e) {
+                    container.style.background = '';
+                    overlay.setStyle({
+                        "color": "yellow",
+                        "weight": 5,
+                        "opacity": 0.65,
+                        "fillOpacity" : 0.1
+                    });
+                });
+
 
             } else {
 
@@ -206,11 +229,11 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
                 if (!_.includes(exempt, c.FeatureType)) {
 
-                    // create polygon from geometry
-                    var geometry = [];
-                    _.forEach(c.Geometry.Positions, function (g) {
-                        geometry.push([g.X, g.Y]);
-                    });
+                    // // create polygon from geometry
+                    // var geometry = [];
+                    // _.forEach(c.Geometry.Positions, function (g) {
+                    //     geometry.push([g.X, g.Y]);
+                    // });
 
                     // first/last
                     var first = _.first(c.Geometry.Positions);
@@ -218,19 +241,25 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
                     var isPolygon = (first.X == last.X && first.Y == last.Y);
 
-                    if (isPolygon) {
-
-                        // create polygon
-                        console.time('turf.polygon');
-                        var geojson = turf.polygon([geometry]);
-                        console.timeEnd('turf.polygon');
+                     try {
                         
-                    } else {
-                       
-                        // is polyline
-                        console.time('turf.linestring');
-                        var geojson = turf.linestring(geometry);
-                        console.timeEnd('turf.linestring');
+                        // if (isPolygon) {
+
+                        //     // create polygon
+                        //     var geojson = turf.polygon([geometry]);
+                            
+                        // } else {
+                           
+                        //     // is polyline
+                        //     var geojson = turf.linestring(geometry);
+                        // }
+
+                        var geojson = isPolygon ? turf.polygon([geometry]) : turf.linestring(geometry);
+
+                    } catch (e) {
+                        console.log('turf err', e);
+                        console.log('c', c);
+                        return;
                     }
 
                     // add geojson
@@ -483,17 +512,58 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         var url = this.getFeatureInfoUrl(evt.latlng);
         var showResults = L.Util.bind(this.showGetFeatureInfo, this);
 
-        $.ajax({
-            url: url,
-            success: function (data, status, xhr) {
-                console.timeEnd('getFeatureInfo');
-                var err = typeof data === 'string' ? null : data;
-                showResults(err, evt.latlng, data);
-            },
-            error: function (xhr, status, error) {
-                showResults(error);  
-            }
-        });
+        var ops = {};
+
+        console.log('evt', evt);
+
+        ops.feature = function (callback) {
+            $.ajax({
+                url: url,
+                success: function (data, status, xhr) {
+                    console.timeEnd('getFeatureInfo');
+                    var err = typeof data === 'string' ? null : data;
+                    callback(err, data);
+                },
+                error: function (xhr, status, error) {
+                    callback(error);  
+                }
+            });
+        };
+
+        ops.geocoding = function (callback) {
+
+            var url = [
+                'https://maps.googleapis.com/maps/api/geocode/json?',
+                'latlng=',
+                evt.latlng.lat + ',' + evt.latlng.lng,
+                '&key=AIzaSyCavrqiBU2rP7UljU4y3-UQP4h8gjB1IEw'
+            ];
+            
+            $.ajax({
+                url: url.join(''),
+                success: function (data, status, xhr) {
+                    console.log('google reverse geocoding', data, status);
+                    var err = typeof data === 'string' ? null : data;
+                    callback(null, data);
+                },
+                error: function (xhr, status, error) {
+                    callback(null);  
+                }
+            });
+        };
+
+        async.parallel(ops, function (err, results) {
+            console.log('async done!', err, results);
+            showResults(err, evt.latlng, results.feature);
+            console.log('geocoding: ', results.geocoding);
+        }); 
+
+       
+
+       
+
+        // https://maps.googleapis.com/maps/api/geocode/json?latlng=40.714224,-73.961452&key=AIzaSyBVrB_4RHkrlLHIpK15VHs1LrwFszWvfPI
+
     },
 
     getFeatureInfoUrl: function (latlng) {
@@ -548,11 +618,11 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         var params = {
             service: 'WMS',
             srs: 'EPSG:4326',
-            tolerance : 15,  
+            tolerance : 25,  
             y : latlng.lat,
             x : latlng.lng,
             appId : 'CPC-Kommunekart',
-            querylayers : 'SKI_WMS-FOLLO:EIENDOMSKART'
+            // querylayers : 'SKI_WMS-FOLLO:EIENDOMSKART'
         };
 
         var querylayers = 'SKI_WMS-FOLLO:EIENDOMSKART,KULTURMINNER,PBLTILTAK,BYGGESAKER_UNDER_ARBEID,KP2,RP2,BP3VN2,RP3VN2,KP3,AR5,VEIKATEGORI,RODER;GeoServer_WMS_DOK:layergroup_63;Follo-WMS-TURKART-SOMMER:SYKKELRUTE,SYKKELRUTEFORSLAG,FOTRUTE,FOTRUTEFORSLAG;AreaWMS:0213;';
@@ -580,21 +650,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
             content : content
         });
 
-        return;
-
-        // // parse content
-        // var parsed_content = this.options.prepareContent(content);
-
-        // // open popup
-        // var popup = this._popup = L.popup({ 
-        //     maxWidth: 800,
-        //     minWidth : 200,
-        //     offset : L.point(0, -20),
-        //     className : 'wms-popup-fixed'
-        // })
-        // .setLatLng(latlng)
-        // .setContent(parsed_content)
-        // .openOn(this._map);
     },
 
 });
