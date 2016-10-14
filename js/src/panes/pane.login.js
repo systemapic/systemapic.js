@@ -24,7 +24,6 @@ Wu.Pane.Login = Wu.Pane.extend({
 		this._createLogo();
 
 		// login content wrapper
-
 		this._loginInner = Wu.DomUtil.create('div', 'login-inner', this._login_box);
 		this._forgotInner = Wu.DomUtil.create('div', 'login-forgot-inner', this._login_box);
 
@@ -140,7 +139,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 
 	addEvents : function () {
 		// add events
-		Wu.DomEvent.on(this._loginFullscreen, 'click', this.close, this);
+		// Wu.DomEvent.on(this._loginFullscreen, 'click', this.close, this);
 		Wu.DomEvent.on(this._login_box, 'click', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(this._loginBtn, 'click', this._doLogin, this);
 		Wu.DomEvent.on(this._cancelBtn, 'click', this.close, this);
@@ -151,7 +150,7 @@ Wu.Pane.Login = Wu.Pane.extend({
 
 	removeEvents : function () {
 		// remove events
-		Wu.DomEvent.off(this._loginFullscreen, 'click', this.close, this);
+		// Wu.DomEvent.off(this._loginFullscreen, 'click', this.close, this);
 		Wu.DomEvent.off(this._login_box, 'click', Wu.DomEvent.stop, this);
 		Wu.DomEvent.off(this._loginBtn, 'click', this._doLogin, this);
 		Wu.DomEvent.off(this._cancelBtn, 'click', this.close, this);

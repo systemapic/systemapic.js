@@ -9,6 +9,7 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
         // data not loaded
         this.loaded = false;
 
+       
     },
 
     initLayer : function () {
@@ -42,7 +43,11 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
         // });
 
         var wms_source = 'http://195.1.20.83/wms-follo/';
-        var layer_name = 'EIENDOMSKART';
+        // var layer_name = 'EIENDOMSKART';
+
+        // console.log('_prepareLayer', this);
+
+        var layer_name = this._getFirstWMSLayer();
 
         // create layer
         this.layer = L.tileLayer.betterWms(wms_source, {
@@ -55,6 +60,15 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
     },
 
+    _getFirstWMSLayer : function () {
+        var wms = this.store.data.wms;
+        var layer = wms.layers[0];
+        return layer;
+    },
+
+    project : function () {
+        return app.activeProject;
+    },
 
     openContent : function (options) {
 
@@ -62,9 +76,7 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
         this.clearSelection();
 
         // parse content
-        console.time('_prepareContent');
         var parsed_content = this._prepareContent(options.content);
-        console.timeEnd('_prepareContent');
 
         // get info box
         var info_box = this.getInfoBox();
@@ -77,8 +89,8 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
     },
 
     getInfoBox : function () {
-        if (!this._infobox) this._createInfoBox();
-        return this._infobox;
+        if (!this.project()._infobox) this._createInfoBox();
+        return this.project()._infobox;
     },
 
     _createInfoBox : function () {
@@ -87,7 +99,8 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
         var closeBtn = Wu.DomUtil.create('div', 'wms-info-box-close-btn', container, 'x');
 
         // set infobox
-        this._infobox = content;
+        // this._infobox = content;
+        this.project()._infobox = content;
 
         // set close event
         Wu.DomEvent.on(closeBtn, 'click', this.clearSelection.bind(this));
@@ -108,16 +121,31 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
         if (infobox) infobox.innerHTML = '';
     },
 
-    _prepareContent : function (content) {
+    _getGeocodingAddress : function (content) {
+        var f = '';
+        if (!content) return f;
+        if (!content.results) return f;
+        if (!_.size(content.results)) return f;
+        return content.results[0].formatted_address;
+    },
+
+    _prepareContent : function (results) {
         if (!this._added) return;
 
         // parse content
-        var content = Wu.parse(content);
+        var content = Wu.parse(results.feature);
 
-        console.log('content', content);
-
-        // create container
+        // create containers
         var html = Wu.DomUtil.create('div', 'wms-content');
+        var main_header = Wu.DomUtil.create('div', 'wms-header', html);
+        var main_content = Wu.DomUtil.create('div', 'wms-content', html);
+
+        // set header
+        main_header.innerHTML = 'Plananalyse';
+
+        // address bar
+        var address_text = this._getGeocodingAddress(results.geocoding);
+        var address_header = Wu.DomUtil.create('div', 'wms-address', main_content, address_text);
 
         var content = _.sortBy(content, function (cont) {
             return cont.FeatureType;
@@ -140,7 +168,7 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
             if (c.FeatureType == 'Teiggrense') return;
 
             // container
-            var container = Wu.DomUtil.create('div', 'wms-content-container', html);
+            var container = Wu.DomUtil.create('div', 'wms-content-container', main_content);
             var header = Wu.DomUtil.create('div', 'wms-content-header', container);
             var attributes = Wu.DomUtil.create('div', 'wms-content-attributes-container', container);
 
@@ -160,7 +188,8 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
 
                 // create link
                 if (a.Name == 'Link') {
-                    value = '<a href="' + value + '" target="_blank">Se eiendom</a>';
+                    value = '<a href="' + value + '" target="_blank">Se mer informasjon</a>';
+                    name = 'Info:';
                 } 
                 
                 // add values
@@ -189,7 +218,7 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
                 // add geojson
                 var overlay = this._overlays[c.FeatureType] = L.geoJSON(polygon, {
                     style : {
-                        "color": "yellow",
+                        "color": "red",
                         "weight": 5,
                         "opacity": 0.65,
                         "fillOpacity" : 0.1
@@ -203,7 +232,7 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
                 Wu.DomEvent.on(container, 'mouseenter', function (e) {
                     container.style.background = 'rgb(99, 109, 125)';
                     overlay.setStyle({
-                        "color": "yellow",
+                        "color": "red",
                         "weight": 5,
                         "opacity": 0.65,
                         "fillOpacity" : 0.2
@@ -213,7 +242,7 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
                 Wu.DomEvent.on(container, 'mouseleave', function (e) {
                     container.style.background = '';
                     overlay.setStyle({
-                        "color": "yellow",
+                        "color": "red",
                         "weight": 5,
                         "opacity": 0.65,
                         "fillOpacity" : 0.1
@@ -257,8 +286,7 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
                         var geojson = isPolygon ? turf.polygon([geometry]) : turf.linestring(geometry);
 
                     } catch (e) {
-                        console.log('turf err', e);
-                        console.log('c', c);
+                        console.log('turf err', e, c);
                         return;
                     }
 
@@ -454,8 +482,8 @@ Wu.WMSLayer = Wu.Model.Layer.extend({
         this._removeFromZIndex();
 
         // remove from descriptionControl if avaialbe
-        var descriptionControl = app.MapPane.getControls().description;
-        if ( descriptionControl ) descriptionControl._removeLayer(this);
+        // var descriptionControl = app.MapPane.getControls().description;
+        // if ( descriptionControl ) descriptionControl._removeLayer(this);
 
         // remove overlays
         _.forEach(this._overlays, function (o) {
@@ -507,20 +535,20 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     },
 
     getFeatureInfo: function (evt) {
-        console.time('getFeatureInfo');
         // Make an AJAX request to the server and hope for the best
         var url = this.getFeatureInfoUrl(evt.latlng);
         var showResults = L.Util.bind(this.showGetFeatureInfo, this);
 
         var ops = {};
 
-        console.log('evt', evt);
+
+        // set progress bar
+        app.ProgressBar.timedProgress(1500)
 
         ops.feature = function (callback) {
             $.ajax({
                 url: url,
                 success: function (data, status, xhr) {
-                    console.timeEnd('getFeatureInfo');
                     var err = typeof data === 'string' ? null : data;
                     callback(err, data);
                 },
@@ -542,7 +570,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
             $.ajax({
                 url: url.join(''),
                 success: function (data, status, xhr) {
-                    console.log('google reverse geocoding', data, status);
                     var err = typeof data === 'string' ? null : data;
                     callback(null, data);
                 },
@@ -553,9 +580,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         };
 
         async.parallel(ops, function (err, results) {
-            console.log('async done!', err, results);
-            showResults(err, evt.latlng, results.feature);
-            console.log('geocoding: ', results.geocoding);
+            showResults(err, evt.latlng, results);
         }); 
 
        

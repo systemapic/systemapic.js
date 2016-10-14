@@ -157,7 +157,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         var btn = Wu.DomUtil.create('div', 'wms-button', this._wmsLayers, 'Create layer');
         Wu.DomEvent.on(btn, 'click', function () {
 
-            console.log('creating layer');
+            
 
             var project = app.activeProject;
 
@@ -168,16 +168,20 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                     wms : {
                         source : 'http://195.1.20.83/wms-follo/',
                         layers : [
-                            'EIENDOMSKART'
+                            // 'EIENDOMSKART'
+                            // 'RP3VN2'
+                            'KP3'
                         ]
                     }
                 },
                 metadata : null,
-                title : 'New wms layer',
+                title : 'Kommuneplan',
                 description : 'WMS layer description',
                 // file : 'file-' + cube.cube_id,
                 // style : JSON.stringify(this.get_default_cube_cartocss()) // save default json style
             }
+
+            console.log('creating layer', wmsLayer);
 
             // create Wu layer
             app.api.createLayer(wmsLayer, function (err, wmsLayerJSON) {

@@ -43,7 +43,7 @@ Wu.App = Wu.Class.extend({
 	authed : function (err, access_token) {
 
 		// catch err
-		if (err) return console.error('Something went horribly wrong: ', err);
+		if (err) return console.error('Something went wrong: ', err);
 
 		// set access_token
 		app.tokens = Wu.parse(access_token);
@@ -169,6 +169,15 @@ Wu.App = Wu.Class.extend({
 		// log entry
 		app._logEntry();
 
+		// force login
+		app._forceLogin();
+
+	},
+
+	_forceLogin : function () {
+		if (app.options.force_login && app.Account.isPublic()) {
+			this._login('Welcome! Please log in.');
+		}
 	},
 
 	_logEntry : function () {
