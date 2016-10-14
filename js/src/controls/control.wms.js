@@ -266,17 +266,12 @@ L.Control.Wms = Wu.Control.extend({
             Wu.DomUtil.addClass(item, 'active');
         }
 
-        
-        // Google Analytics event tracking
-        app.Analytics.setGaEvent(['Controls', 'Baselayer toggle: ' + layer.getTitle()]);
 
     },
 
     toggle : function () {
         this._isOpen ? this.collapse() : this.expand();
 
-        // Google Analytics event tracking
-        app.Analytics.setGaEvent(['Controls', 'Baselayer toggle click']);
     },
 
     collapse : function () {

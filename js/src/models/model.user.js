@@ -367,11 +367,15 @@ Wu.User = Wu.Class.extend({
 	_logout : function () {
 		
 		// slack monitor
-		app.Socket.sendUserEvent({
-		    	user : app.Account.getFullName(),
-		    	event : 'logged out.',
-		    	description : '',
-		    	timestamp : Date.now()
+		// app.Socket.sendUserEvent({
+		//     	user : app.Account.getFullName(),
+		//     	event : 'logged out.',
+		//     	description : '',
+		//     	timestamp : Date.now()
+		// });
+
+		app.log('logout', {
+			category : 'Users'
 		});
 
 		// redirect to logout

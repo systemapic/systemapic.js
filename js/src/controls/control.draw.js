@@ -131,12 +131,6 @@ L.Control.Draw = Wu.Control.extend({
 
 			var layer_name = this._getPostGISLayerName(resultObject.layer_id);
 
-			// analytics/slack
-			app.Analytics.onPolygonQuery({
-				result : resultObject,
-				layer_name : layer_name
-			});
-
 		}.bind(this));
 		
 	},

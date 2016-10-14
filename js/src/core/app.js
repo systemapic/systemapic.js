@@ -21,9 +21,11 @@ Wu.App = Wu.Class.extend({
 		// init api
 		app.api = new Wu.Api({});
 
+		// analytics
+		app.analytics = new Wu.Analytics();
+
 		// auth
 		app.api.auth(app.authed);
-
 		
 	},
 
@@ -31,11 +33,6 @@ Wu.App = Wu.Class.extend({
 
 		// error handling
 		Raven.config('https://594a4e7cc65f4e39bdd0337276e391b5@sentry.io/100809').install();
-
-		Raven.setUserContext({
-		    email: 'matt@example.com',
-		    id: '123'
-		});
 
 		Raven.setRelease(Wu.version);
 	},
@@ -160,8 +157,7 @@ Wu.App = Wu.Class.extend({
 		// select project
 		Wu.Mixin.Events.fire('appReady');
 
-		// analytics
-		app.Analytics = new Wu.Analytics();
+		
 
 		// init sniffers
 		app._initSniffers();
@@ -186,11 +182,12 @@ Wu.App = Wu.Class.extend({
 		var browser = b.fullName + ' ' + b.majorVersion + '.' + b.minorVersion;
 		var os = o.fullName + ' ' + o.majorVersion + '.' + o.minorVersion;
 
-		app.Socket.sendUserEvent({
-		    	user : app.Account.getFullName(),
-		    	event : 'entered',
-		    	description : 'the wu: `' + browser + '` on `' + os + '`',
-		    	timestamp : Date.now()
+		app.log('login', {
+		    	info : {
+		    		browser : browser,
+		    		os : os
+		    	},
+		    	category : 'Users'
 		});
 	},
 

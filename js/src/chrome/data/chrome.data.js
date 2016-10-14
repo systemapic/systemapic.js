@@ -261,11 +261,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         if (this._isOpen) {
 
             // fire event
-            app.Socket.sendUserEvent({
-                user : app.Account.getFullName(),
-                event : 'opened',
-                description : 'the data library',
-                timestamp : Date.now()
+            // app.Socket.sendUserEvent({
+            app.log('opened:datalibrary', {
+                category : 'Data Library'
             });
         }
     },
