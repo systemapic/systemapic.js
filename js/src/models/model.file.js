@@ -926,6 +926,10 @@ Wu.Model.File = Wu.Model.extend({
 
             // create new layer model
             this._createLayerModel(options, function (err, layerModel) {
+                if (err) return app.feedback.setError({
+                    title : 'Something went wrong',
+                    description : err
+                });
 
                 // create layer on project
                 var layer = project.addLayer(layerModel);
@@ -950,10 +954,7 @@ Wu.Model.File = Wu.Model.extend({
 
     _createLayerModel : function (options, done) {
         app.api.createLayer(options, function (err, body) {
-            if (err) return app.feedback.setError({
-                title : 'Something went wrong',
-                description : err
-            });
+            if (err) return done(err);
             var layerModel = Wu.parse(body);
             done(null, layerModel);
         });

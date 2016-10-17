@@ -346,27 +346,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		}, 3000);
 	},
 
-	_GAtoggleLayerPane : function () {
-
-		// Google Analytics event tracking
-		app.Analytics.setGaEvent(['Controls', 'Layers: toggle open/close']);		
-
-		// Fire toggle function
-		this.toggleLayerPane();
-
-	},
 
 	toggleLayerPane : function () {
 		this._open ? this.closeLayerPane() : this.openLayerPane();
-	},
-
-	_GAcloseLayerPane : function () {
-
-		// Google Analytics event tracking
-		app.Analytics.setGaEvent(['Controls', 'Layers: close']);
-
-		// Fire close layer pane function
-		this.closeLayerPane();
 	},
 
 	closeLayerPane : function () {

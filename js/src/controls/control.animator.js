@@ -296,7 +296,10 @@ Wu.Graph.Animator = Wu.Evented.extend({
     _layerEnabled : function (e) {
 
         // get layer
-        var layer = e.layer;
+        var layer = e.layer || e.detail.layer;
+
+        // only support cube layer. todo: destroy animator (ie. so not listening to events) when not active
+        if (!layer.isCube()) return;
 
         // set current layer
         this._currentLayer = layer;

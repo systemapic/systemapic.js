@@ -172,11 +172,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 	_onLayMenuOpen : function () {
-
 		if ( !app.isMobile || !app.isMobile.mobile ) return;
-
 		this.closeLeftPane();
-
 	},
 
 	addHooks : function () {

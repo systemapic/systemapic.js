@@ -1000,9 +1000,6 @@ Wu.Control.Chart = Wu.Control.extend({
 				columns: [reg_x, reg_y]
 			});
 
-			// analytics/slack
-			app.Analytics.onEnabledRegression();
-		
 		} else {
 
 			Wu.DomUtil.removeClass(elem, 'switch-on');

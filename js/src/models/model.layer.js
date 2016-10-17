@@ -772,6 +772,9 @@ Wu.createLayer = function (layer) {
     // google
     if (layer.data.google) return new Wu.GoogleLayer(layer);
 
+    // wms
+    if (layer.data.wms) return new Wu.WMSLayer(layer);
+
     // catch-all error layer
     return new Wu.ErrorLayer();
 };

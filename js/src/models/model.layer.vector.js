@@ -25,11 +25,11 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
     _onLayerLoaded : function () {
         var loadTime = Date.now() - this._loadStart;
 
-        // fire loaded event
-        app.Analytics._eventLayerLoaded({
-            layer : this.getTitle(),
-            load_time : loadTime
-        });
+        // // fire loaded event
+        // app.Analytics._eventLayerLoaded({
+        //     layer : this.getTitle(),
+        //     load_time : loadTime
+        // });
     },
 
     update : function (options, callback) {
@@ -542,8 +542,6 @@ Wu.VectorLayer = Wu.Model.Layer.extend({
             // open popup
             app.MapPane._addPopupContent(e);
 
-            // analytics/slack
-            app.Analytics.onPointQuery(e);
         });
     },
 

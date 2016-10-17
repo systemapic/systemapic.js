@@ -1278,11 +1278,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		}
 
 		// send event
-		app.Socket.sendUserEvent({
-		    	user : app.Account.getFullName(),
-		    	event : '`updated project` ' + project.getTitle(),
-		    	description : description,
-		    	timestamp : Date.now()
+		// app.Socket.sendUserEvent({
+		app.log('updated:project', {
+		    	info : description,
+		    	project : project,
+		    	category : 'project'
 		});
 	},
 
@@ -1442,19 +1442,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	_togglePane : function () {
 
+		console.error('deprecated?');
+
 		// right chrome
 		var chrome = this.options.chrome;
 
 		// open/close
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 
-		// fire open event
-		if (this._isOpen) app.Socket.sendUserEvent({
-			user : app.Account.getFullName(),
-			event : 'opened',
-			description : 'the left pane',
-			timestamp : Date.now()
-		});
 	},
 
 	_show : function () {

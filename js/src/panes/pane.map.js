@@ -14,7 +14,8 @@ Wu.MapPane = Wu.Pane.extend({
             'mouseposition',
             'baselayertoggle',
             // 'cartocss',
-            'draw'
+            'draw',
+            'wms'
         ]
     },
     
@@ -196,7 +197,7 @@ Wu.MapPane = Wu.Pane.extend({
         map.addControl(this._attributionControl);
 
         // set content
-        this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
+        this._attributionControl.addAttribution('<a href="http://mapic.io">Powered by Mapic</a>');
         
         // remove content
         this._attributionControl.removeAttribution('Leaflet');
