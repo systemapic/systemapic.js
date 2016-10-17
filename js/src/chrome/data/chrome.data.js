@@ -41,8 +41,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // Get layer object
         var layer = this._project.getLayer(uuid);
 
-        console.log('_onLayerAdded found layer', layer);
-
         if (!layer.store.metadata) {
             app.feedback.setError({
                 title : 'Missing metadata',
@@ -127,7 +125,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         this._colorSelectorWrapper = Wu.DomUtil.create('div', 'base-layer-color-selector-wrapper displayNone', this._layerListWrapper);
 
 
-        var wms_debug = true;
+        var wms_debug = false;
         if (wms_debug) {
 
             // create wms
