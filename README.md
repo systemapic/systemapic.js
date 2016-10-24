@@ -4,7 +4,7 @@ This is the open source client library front-end for Mapic.
 
 Please see the [wiki](https://github.com/mapic/mapic.js/wiki) for more information.
 
-# Install
+## Install
 See [mapic/mapic](https://github.com/mapic/mapic) for installation instructions.
 
 
