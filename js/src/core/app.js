@@ -157,8 +157,6 @@ Wu.App = Wu.Class.extend({
 		// select project
 		Wu.Mixin.Events.fire('appReady');
 
-		
-
 		// init sniffers
 		app._initSniffers();
 
