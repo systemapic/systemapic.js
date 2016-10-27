@@ -29,7 +29,7 @@ Wu.User = Wu.Class.extend({
 	},
 
 	isPublic : function () {
-		return this.store.uuid == 'systemapic-public';	
+		return this.store.uuid == 'mapic-public';	
 	},
 
 	isContact : function () {
