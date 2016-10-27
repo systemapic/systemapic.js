@@ -2825,12 +2825,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // Create PROJECT LAYERS section, with D3 container
         var sortedLayers = this.sortedLayers = this.sortLayers(this._project.layers);
 
+        console.log('sortedLayers', sortedLayers);
+
         sortedLayers.forEach(function (layerBundle) {
 
             var provider = layerBundle.key;
 
             // only do our layers
-            if (provider == 'postgis' || provider == 'cube' || provider == 'wms') {
+            // if (provider == 'postgis' || provider == 'cube' || provider == 'wms') {
+            if (provider == 'postgis' || provider == 'cube') {
 
                 var layers = layerBundle.layers;
 
@@ -2862,6 +2865,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     _refreshLayers : function () {
 
+        console.log('this.layerProviders', this.layerProviders);
+
         // layers
         for (var p in this.layerProviders) {
             var provider = this.layerProviders[p];
@@ -2869,6 +2874,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             provider.data = _.toArray(layers);
             var D3container = this.layerListContainers[p].D3container;
             var data = this.layerProviders[p].data;
+
+            console.log('data', data);
 
             // redraw layer list
             this.initLayerList(D3container, data, p);
