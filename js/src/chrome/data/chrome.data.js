@@ -147,15 +147,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // get available wms layers from server
         app.api.getWMSLayers({}, function (err, wms_layers) {
             console.log('getWMSLayers', err, wms_layers);
-
-
         });
 
         // debug btn
         var btn = Wu.DomUtil.create('div', 'wms-button', this._wmsLayers, 'Create layer');
         Wu.DomEvent.on(btn, 'click', function () {
-
-            
 
             var project = app.activeProject;
 
@@ -367,8 +363,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // perhaps better to remove d3 completely, and just create divs normally, then update store the divs in an object on file_id keys
     _refresh : function (options) {
 
-        console.error('_refresh!');
-
         // debug: don't refresh from projectSelected event
         // if (options && options.event && options.event == 'projectSelected') return;
 
@@ -387,8 +381,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // only update list if project is editable
         if (this._project.isEditable()) {
-
-            console.log('isEditable');
 
             // Layer list
             this._initLayerList();
@@ -577,6 +569,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 this.currentSort = sortType[type];
                 this._sortFiles();
             }, this);
+
         }.bind(this));
 
         this.sortOrderWraper = Wu.DomUtil.create('div', 'files-sort-order-switch-wraper', this.sortOptions);
@@ -720,7 +713,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     },
 
-
     _refreshFiles : function (options) {
         options = options || {};
 
@@ -738,7 +730,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
                 });
                 files = provider.data;
             }
-
 
             // get file list, sorted by last updated
             provider.data = _.sortBy(_.toArray(files), function (f) {
@@ -2825,8 +2816,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // Create PROJECT LAYERS section, with D3 container
         var sortedLayers = this.sortedLayers = this.sortLayers(this._project.layers);
 
-        console.log('sortedLayers', sortedLayers);
-
         sortedLayers.forEach(function (layerBundle) {
 
             var provider = layerBundle.key;
@@ -2875,8 +2864,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             var D3container = this.layerListContainers[p].D3container;
             var data = this.layerProviders[p].data;
 
-            console.log('data', data);
-
             // redraw layer list
             this.initLayerList(D3container, data, p);
         }
@@ -2890,7 +2877,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     sortLayers : function (layers) {
 
-        var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube', 'wms'];
+        // var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube', 'wms'];
+        var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'cube'];
         var results = [];
 
         keys.forEach(function (key) {
@@ -2910,7 +2898,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         }, this);
 
         this.numberOfProviders = results.length;
-        console.log('results:', results);
+        // console.log('results:', results);
         return results;
     },
 
@@ -3287,6 +3275,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
     // TOGGLE LAYERS
 
     toggleLayer : function (layer) {
+        console.log('toggleLayer', layer);
         var uuid = layer.getUuid();
         var on = this.isLayerOn(uuid);
         on ? this.removeLayer(layer) : this.addLayer(layer);
