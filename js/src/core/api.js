@@ -231,7 +231,7 @@ Wu.Api = Wu.Class.extend({
 	},
 
 	importStatus : function (options, done) {
-		var path = '/v2/data/import/status';
+		var path = '/v2/data/status';
 		this.get(path, options, done);
 	},
 
