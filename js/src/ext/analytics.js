@@ -1,43 +1,3 @@
-// ******************* //
-// * CUSTOM GA STUFF * //
-// ******************* //
-
-// General overview
-// https://developers.google.com/analytics/devguides/collection/analyticsjs/
-
-// Field references:
-// https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference
-
-// About custom dimensions
-// https://developers.google.com/analytics/devguides/platform/customdimsmets
-
-// Analytics API explorer:
-// http://developers.google.com/apis-explorer/?hl=en_US#p/analytics/v3/analytics.data.ga.get 
-// (unique ID for maps.systemapic.com => 98026334)
-
-// Må ingorere IP adressen til phantom på i GA... 
-// http://web-design-weekly.com/snippets/exclude-ip-address-from-google-analytics/
-
-
-// ****************************** //
-// * CUSTOM DIMENSIONS OVERVIEW * //
-// ****************************** //
-
-// dimension1  = Project ID (Hit)
-// dimension2  = Username (Session)
-// dimension3  = Software version (Session)
-// dimension4  = Client ID (Hit)
-// dimension5  = User ID (Session)
-// dimension6  = Project Name (Hit)
-// dimension7  = Client Name (Hit)
-// dimension8  = New Project ID (Hit)
-// dimension9  = Deleted Project (Name)
-// dimension10 = New User (ID)
-// dimension11 = New User (Name)
-// dimension12 = Delted User (Name)
-// dimension13 = User IP (Session)
-
-
 
 Wu.Analytics = Wu.Class.extend({
 
@@ -51,11 +11,6 @@ Wu.Analytics = Wu.Class.extend({
 		ga('create', app.options.ga.id, 'auto');
 		ga('send', 'pageview');
 	},
-
-
-
-
-
 
 	fire : function (event, options) {
 		console.log('Analytics: ', event, options);
@@ -77,22 +32,8 @@ Wu.Analytics = Wu.Class.extend({
 
 		});
 
-
 		app.Socket.analytics(data);
-
 	},
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	_listen : function () {

@@ -45,12 +45,15 @@ Wu.Socket = Wu.Class.extend({
 
 	send : function (channel, options, callback) {
 
+		console.log('socket send', arguments);
+
 		// add access_token
 		var options = options || {};
 		options.access_token = app.tokens.access_token;
 
 		// send event
 		var socket = this._socket;
+		console.log('scoket', socket);
 		socket.emit(channel, options);
 	},
 

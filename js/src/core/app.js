@@ -164,14 +164,17 @@ Wu.App = Wu.Class.extend({
 		app._logEntry();
 
 		// force login
-		app._forceLogin();
+		// app._forceLogin();
 
 	},
 
 	_forceLogin : function () {
-		if (app.options.force_login && app.Account.isPublic()) {
-			this._login('Welcome! Please log in.');
-		}
+		if (!app.options.force_login) return;
+		if (!app.Account.isPublic()) return;
+		if (this._publicProjectActive) return;
+
+		// login screen
+		this._login('Welcome! Please log in.');
 	},
 
 	_logEntry : function () {
@@ -308,6 +311,8 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initHotlink : function (hotlink) {
+
+		console.error('_initHotlink', hotlink);
 		
 		// parse error prone content of hotlink..
 		var hotlink = hotlink || window.hotlink;
@@ -318,6 +323,7 @@ Wu.App = Wu.Class.extend({
 
 		// check if user owns project
 		var project = app._projectExists(app.hotlink);
+		console.log('project', project);
 		if (project) {
 			app._setProject(project);
 			return true;
@@ -328,14 +334,20 @@ Wu.App = Wu.Class.extend({
 			username : app.hotlink.username,
 			project_slug : app.hotlink.project
 		}, function (err, project_json) {
+			console.log('err, projec', err, project_json);
 			if (err) return app._login('Please log in to view this private project.');
 
 			var project_store = Wu.parse(project_json);
 
 			// import project
 			app._importProject(project_store, function (err, project) {
+				console.log('_importProject', err, project);
 				app._setProject(project);
-			});
+
+				if (project.isPublic()) {
+					this._publicProjectActive = true;
+				}
+			}.bind(this));
 		});
 
 		return true;
