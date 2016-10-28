@@ -146,6 +146,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// select project trigger
 		Wu.DomEvent.on(wrapper, 'click', function () {
 			project.selectProject();
+			app.log('selected:project', {info : {project_name : project.getName()}});
 		}, project);
 
 		
@@ -409,6 +410,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	_openEditProjectFullscreen : function (project, e) {
 
+		app.log('opened:project:edit');
+
 		// set project
 		project = project || app.activeProject;
 
@@ -618,8 +621,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		if (isPublic) {
 			this._hideUserShare();
+			app.log('set_public:project', {info : {project_name : this._project.getName()}});
 		} else {
 			this._showUserShare();
+			app.log('set_private:project', {info : {project_name : this._project.getName()}});
 		}
 	},
 
@@ -1130,6 +1135,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				
 				// remove div
 				Wu.DomUtil.remove(user_container);
+
+				app.log('removed:access:' + options.type, {
+					info : {
+						project_name : this._project.getName(),
+						user : user.getName()
+					}
+				});
 				
 				// remove from array
 				_.remove(this._access[options.type], function (i) {
@@ -1138,7 +1150,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 				delete options.checkedUsers[user.getFullName()];
 				options.onKeyUp.call(this);
-			}, this);
+			}.bind(this));
+
 		} else {
 
 			// add special color to self
@@ -1151,6 +1164,13 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			user : user,
 			user_container : user_container
 		});
+
+		app.log('added:access:' + options.type, {
+			info : {
+				project_name : this._project.getName(),
+				user : user.getName()
+			}
+		})
 
 		// remove from other list if active there
 		var otherType = (options.type == 'edit') ? 'read' : 'edit';
@@ -1180,9 +1200,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_deleteProject : function (options) {
 
 		var project = options.project;
+		var project_name = project.getName();
 
 		// confirm
-		var answer = confirm('Are you sure you want to delete project ' + project.getName() + '? This action cannot be undone!');
+		var answer = confirm('Are you sure you want to delete project ' + project_name + '? This action cannot be undone!');
 		if (!answer) return;
 
 		// delete
@@ -1192,6 +1213,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// close fullscreen
 		this._fullscreen.close();
+
+		app.log('deleted:project', {info : {project_name : project_name}});
+
 	},
 
 	_updateProject : function (options) {
@@ -1237,6 +1261,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			projectName : projectName
 		});
 
+
 		// reset
 		this._resetAccess();
 
@@ -1278,10 +1303,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		}
 
 		// send event
-		// app.Socket.sendUserEvent({
 		app.log('updated:project', {
-		    	info : description,
-		    	project : project,
+		    	info : {
+		    		description: description,
+		    		project_name : project.getName(),
+		    	},
 		    	category : 'project'
 		});
 	},
@@ -1312,6 +1338,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// set error message
 			parameters.name_error.innerHTML = 'Please enter a project name';
+
+			app.log('error:project:tried_to_create_with_no_name');
+
 			
 			// done here
 			return;
@@ -1391,6 +1420,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// release
 			this._creatingProject = false;
+
+			// analytics
+			app.log('created:project', {info : {project_name : project.getName()}});
+
 
 		});
 

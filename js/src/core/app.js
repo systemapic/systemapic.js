@@ -312,8 +312,6 @@ Wu.App = Wu.Class.extend({
 
 	_initHotlink : function (hotlink) {
 
-		console.error('_initHotlink', hotlink);
-		
 		// parse error prone content of hotlink..
 		var hotlink = hotlink || window.hotlink;
 		app.hotlink = Wu.parse(hotlink);
@@ -323,7 +321,6 @@ Wu.App = Wu.Class.extend({
 
 		// check if user owns project
 		var project = app._projectExists(app.hotlink);
-		console.log('project', project);
 		if (project) {
 			app._setProject(project);
 			return true;

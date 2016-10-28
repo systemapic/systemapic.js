@@ -252,14 +252,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         // open/close
         this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 
-        if (this._isOpen) {
-
-            // fire event
-            // app.Socket.sendUserEvent({
-            app.log('opened:datalibrary', {
-                category : 'Data Library'
-            });
-        }
     },
 
     _show : function () {
@@ -831,6 +823,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
         // close on click
         Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);
+
+        app.log('processing:error', {info : {
+            error : feedbackText
+        }});
     },
 
 
@@ -1107,6 +1103,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
         .on('click', function (d) {
             var uuid = d.getUuid();
             this.enableFilePopUp(uuid)
+
+            app.log('opened_options:file', {info : {file_name : d.getName()}});
+
         }.bind(this));
 
 
@@ -1139,6 +1138,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             return false;
         }.bind(this))
         .on('click', function (file) {
+            app.log('created:layer', {info : {file_name : file.getName()}});
             file._createLayer(app.activeProject);
         }.bind(this));
 
@@ -2854,8 +2854,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
     _refreshLayers : function () {
 
-        console.log('this.layerProviders', this.layerProviders);
-
         // layers
         for (var p in this.layerProviders) {
             var provider = this.layerProviders[p];
@@ -3008,6 +3006,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             this._project.setBaseLayer([]);
             this._enableColorSelector();
             this._updateColor(bgc);
+            app.log('selected:background_layer', {info : {layer_name : 'solid_color' + bgc}});
             return;
         }
 
@@ -3025,6 +3024,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
             zIndex : 1,
             opacity : 1
         }]);
+
+        app.log('selected:background_layer', {info : {layer_name : layer.getName()}})
     },
 
     _setDefaultBackgroundColor : function () {

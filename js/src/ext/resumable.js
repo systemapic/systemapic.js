@@ -88,6 +88,11 @@ Wu.Resumable = Wu.Class.extend({
 			// give feedback
 			this.feedbackUploadStarted(file);
 
+			app.log('uploading:data', {info : {
+				file_name : file.file.name,
+				size : parseInt(file.size / 1000 / 1000) + 'MB'
+			}});
+
 		}.bind(this));
 
 		// file success
@@ -95,13 +100,12 @@ Wu.Resumable = Wu.Class.extend({
 			var data = Wu.parse(message);
 			var file_id = data.file_id;
 
-			// check upload status (long-polling, websocket fallback) // todo: overkill, figure out why websocket is fickle.
-			// this._checkStatusPeriodically(file_id);
-
 			// hide progess bar
 			app.ProgressBar.hideProgress();
 
 			this._uploadDone();
+
+			app.log('uploaded:data');
 
 		}.bind(this));
 
@@ -140,6 +144,7 @@ Wu.Resumable = Wu.Class.extend({
 		}.bind(this));
 		
 		r.on('fileError', function(file, message){
+			console.log('fileError', file, message);
 		}.bind(this));
 
 	},
@@ -302,6 +307,11 @@ Wu.Resumable = Wu.Class.extend({
 			title : 'Sorry, you can\'t do that!',
 			description : description
 		});
+
+		app.log('uploading:data:error', {info : {
+			file_name : file.file.name,
+			error : description
+		}});
 
 	}
 

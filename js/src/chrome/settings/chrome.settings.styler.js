@@ -359,6 +359,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// Update style
 	_updateStyle : function (newLegend) {
+		app.log('updated:style', {info : {
+			layer_name : this._layer.getName()
+		}})
 		if (this._layer.isCube())   return this._updateCube();
 		if (this._layer.isVector()) return this._updateVector(newLegend);
 		if (this._layer.isRaster()) return this._updateRaster();

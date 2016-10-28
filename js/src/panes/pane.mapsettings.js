@@ -317,6 +317,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		// toggle on map
 		on ? control._on() : control._off();
 
+		app.log('control:' + key + ':' + on);
+
 	},
 
 
@@ -349,6 +351,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 
 		// save to project
 		project.setPosition(position);
+
+		app.log('set:position');
 	},		
 
 
@@ -381,6 +385,9 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		
 		// enforce new bounds
 		this.enforceBounds();
+
+		app.log('set:bounds');
+
 	},
 
 	clearBounds : function () {
@@ -410,6 +417,9 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 
 		// no bounds
 		map.setMaxBounds(false);
+
+		app.log('clear:bounds');
+
 	},		
 
 	enforceBounds : function () {

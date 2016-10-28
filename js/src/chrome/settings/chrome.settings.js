@@ -18,18 +18,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 		Wu.DomEvent.on(window, 'resize', this._windowResize, this);
 
-
 		Wu.Mixin.Events.on('layerSelected', this._refreshTab, this);
-
-		// _addHooks : function () {
-
-		// 	// fire event
-		// 	Wu.Mixin.Events.fire('layerEnabled', { detail : {
-		// 		layer : layer
-		// 	}});
-
-		// },	
-
 	},
 
 	_refreshTab : function (e) {
@@ -41,7 +30,6 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 		// refresh
 		if ( this.showing ) this.show();		
-		
 	},
 
 

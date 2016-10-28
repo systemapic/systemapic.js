@@ -33,10 +33,6 @@ Wu.Socket = Wu.Class.extend({
 	},
 
 	analytics : function (options) {
-		// // defaults
-		// options.user = options.user || app.Account.getFullName();
-		// options.timestamp = options.timestamp || Date.now();
-
 		// send event
 		var socket = this._socket;
 		app.Socket.send('analytics', options);
@@ -45,15 +41,12 @@ Wu.Socket = Wu.Class.extend({
 
 	send : function (channel, options, callback) {
 
-		console.log('socket send', arguments);
-
 		// add access_token
 		var options = options || {};
 		options.access_token = app.tokens.access_token;
 
 		// send event
 		var socket = this._socket;
-		console.log('scoket', socket);
 		socket.emit(channel, options);
 	},
 
@@ -116,8 +109,7 @@ Wu.Socket = Wu.Class.extend({
 		});
 		
 		socket.on('generate_tiles', function (data) {
-
-			if (data.err) return;
+			if (!data || data.err) return;
 
 			// fire
 			Wu.Mixin.Events.fire('generatedTiles', {
@@ -127,7 +119,6 @@ Wu.Socket = Wu.Class.extend({
 		});
 		
 		socket.on('downloadReady', function (data) {
-			// select project
 			var event_id = 'downloadReady-' + data.file_id;
 			Wu.Mixin.Events.fire(event_id, {detail : data});
 		});
@@ -144,7 +135,6 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('errorMessage', function (data) {
 
 			var content = data.error;
-
 			var uniqueIdentifier = content.uniqueIdentifier;
 
 			if (uniqueIdentifier) {

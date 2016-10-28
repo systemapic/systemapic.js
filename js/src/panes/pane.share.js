@@ -173,8 +173,6 @@ Wu.Share = Wu.Pane.extend({
 
 	_shareImage : function () {
 
-		// return this._setFeedback('Screenshot currently disabled.');
-
 		// take snap
 		app.phantomjs.snap(function (err, file) {
 
@@ -188,6 +186,10 @@ Wu.Share = Wu.Pane.extend({
 
 		// set feedback
 		this._setFeedback(this.options.text.creating);
+
+		app.log('screenshot', {info : {
+			project_name : app.activeProject.getName()
+		}})
 	},
 
 	openImage : function (context, file, c) {
@@ -209,17 +211,10 @@ Wu.Share = Wu.Pane.extend({
 
 		var project = app.activeProject;
 
-		// app.Analytics.onScreenshot({
-		// 	project_name : project.getName(),
-		// 	file_id : image
-		// });
-
 		// set feedback
 		this._setFeedback('Done!');
 
 	},
-
-	
 
 	_shareInvite : function () {
 		app.Chrome.Left._tabs.projects.openShare();

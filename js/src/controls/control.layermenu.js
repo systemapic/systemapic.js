@@ -68,6 +68,9 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// calc height
 		this.calculateHeight();
+
+		
+		app.log('opened:layermenu');
 	}, 
 
 	close : function () {
@@ -81,6 +84,9 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// calc height
 		this.calculateHeight();
+
+		app.log('closed:layermenu');
+
 	},
 
 	_addTo : function () {
@@ -279,42 +285,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 
-	// Runs on window resize. Gets called up in app.js
-	// resizeEvent : function (dimensions) {
-
-	// 	// Window max height (minus padding)
-	// 	var layersMaxHeight = dimensions.height - 135;
-
-	// 	// Set max height of Layers selector container
-	// 	this.setMaxHeight(layersMaxHeight);
-	// },
-
-
-	// setMaxHeight : function (layersMaxHeight) {
-
-	// 	var layersMaxHeight = layersMaxHeight || window.innerHeight - 135;
-
-	// 	// Make space for inspect control, if it's there, yo
-	// 	var inspectControl = app.MapPane.getControls().inspect;
-		
-	// 	if (inspectControl) {
-
-	// 		var inspectorHeight = inspectControl._container.offsetHeight;
-
-	// 		layersMaxHeight -= inspectorHeight - 5;
-	// 	}
-
-	// 	// Set max height of scroller container
-	// 	this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
-
-	// 	// set new height for relative wrapper
-	// 	this._setHeight();
-	// },	
-
-	// _setHeight : function (extra) {
-		
-	// },
-
 	_getOpenItems : function () {
 		var childNodes = this._content.childNodes;
 		var open = _.filter(childNodes, function (c) {
@@ -447,6 +417,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		// open all items in layermenu
 		this.openAll();
 
+		app.log('enabled_edit:layermenu');
+
+
 	},
 
 	_isEmpty : function () {
@@ -480,6 +453,9 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// remove new drag'n drop folder
 		this._removeMenuFolder();
+
+		app.log('disabled_edit:layermenu');
+
 	},
 	
 
@@ -499,6 +475,9 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomUtil.removeClass(this._menuFolder, 'displayNone');
 			Wu.DomUtil.removeClass(this._editSwitchContainer, 'displayNone')
 		}
+
+		app.log('created_folder:layermenu');
+
 
 	},
 
@@ -874,8 +853,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	closeAll : function () {
 
-
 		this.updateLogic();
+
 		for (var l in this._logic) {
 			var item = this.layers[l];
 			if (item) {
@@ -886,7 +865,9 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	openAll : function () {
+	
 		this.updateLogic();
+	
 		for (var l in this._logic) {
 			var item = this.layers[l];
 			if (item) {
@@ -909,13 +890,18 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// get layer
 		var layer = item.layer;
-		var _layerName = layer ? layer.getTitle() : 'Folder';
+		var layer_name = layer ? layer.getTitle() : 'Folder';
 
 		// toggle
 		if (item.on) {
 			this.disableLayer(item);
+			app.log('disabled_layer:layermenu', {info : {layer_name : layer_name}});
+
 		} else {
 			this.enableLayer(item);
+
+			app.log('enabled_layer:layermenu', {info : {layer_name : layer_name}});
+
 
 			// fire selected event, todo: necessary to fire both layerSelected and layerEnabled??
 			// todo: refactor this, 
@@ -972,16 +958,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// mark editing
 		app.Chrome.Right.options.editingLayer = layer.getUuid();
 
-		// // fire event
-		// Wu.Mixin.Events.fire('layerEnabled', { detail : {
-		// 	layer : layer
-		// }});
-
-		// // fire on layer
-		// layer.fire('enabled', {
-		// 	layer : layer
-		// });
-
 	},
 
 	// disable by layermenuItem
@@ -990,21 +966,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		var layer = layermenuItem.layer;
 		if (!layer) return;	
 
-		this._disableLayer(layer);
-
-		// Make room for Layer inspector
-		// var dimensions = app._getDimensions();
-		// this.resizeEvent(dimensions);		
+		this._disableLayer(layer);	
 
 		app.Chrome.Right.options.editingLayer = false;
 
-		// // fire event
-		// Wu.Mixin.Events.fire('layerDisabled', { detail : {
-		// 	layer : layer
-		// }}); 
-
-		// // fire on layer
-		// layer.fire('disabled');
 	},
 
 	// disable by layer
@@ -1070,6 +1035,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		// save
 		this.save();
 
+		var layer_name = layer ? layer.getTitle() : 'Folder';
+
+		app.log('removed_layer:layermenu', {info : {layer_name : layer_name}});
+
+
 	},
 
 	removeLayermenuItem : function () {
@@ -1111,6 +1081,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		// save
 		this._project.store.layermenu.push(item); // refactor
 		this.save();
+
+		app.log('added_layer:layermenu', {info : {layer_name : layer.getName()}});
+
 
 		// this._setHeight();
 
@@ -1199,6 +1172,9 @@ L.Control.Layermenu = Wu.Control.extend({
 			var flyto = Wu.DomUtil.get('layer-flyto-' + layer.getUuid());
 			Wu.DomEvent.on(flyto, 'mousedown', function (e) {
 				Wu.DomEvent.stop(e);
+				app.log('flyto:layer', {info : {
+					layer_name : layer.getName()
+				}});
 				layer.flyTo();
 			}, this);
 		}
@@ -1298,6 +1274,16 @@ L.Control.Layermenu = Wu.Control.extend({
 			if (event.which == 13 || event.keyCode == 13) input.blur(); // enter
 			if (event.which == 27 || event.keyCode == 27) input.blur(); // esc
 		}, this);
+
+		// get layer
+		var i = _.findIndex(this._project.store.layermenu, {'uuid' : uuid});
+		var layerUuid = this._project.store.layermenu[i].layer;
+		var layer = this._project.getLayer(layerUuid);
+		var layer_name = layer ? layer.getTitle() : 'Folder';
+
+		// log
+		app.log('edited_folder_title:layermenu', {info : {layer_name : layer_name}});
+
 
 	},
 

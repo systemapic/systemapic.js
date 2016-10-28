@@ -95,6 +95,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// register event
 		Wu.DomEvent.on(buttonDiv, 'mousedown', trigger, ctx);
 
+		// analytics
+		Wu.DomEvent.on(buttonDiv, 'mousedown', function () {
+			app.log('clicked:' + name);
+		});
+
 		return buttonDiv;
 	},
 
@@ -234,7 +239,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_shortenTitle : function (title) {
 		var maxLength = this._getMaxTitleLength();
-		console.log('maxLength', maxLength);
 		if (!title || !_.isString(title) || title.length <= maxLength) return title;
 		var cutString = title.substring(0, maxLength-1) + '...';
 		return cutString;

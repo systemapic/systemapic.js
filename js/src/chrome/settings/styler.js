@@ -664,15 +664,12 @@ Wu.Styler = Wu.Class.extend({
 			info : {
 				type : this.type,
 				attribute : 'color',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
-		// app.Socket.sendUserEvent({
-		//     	event : '`styled the ' + this.type + '-color` on',
-		//     	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
+	
 	},
 
 	_updateWidth : function () {
@@ -690,19 +687,15 @@ Wu.Styler = Wu.Class.extend({
 		this.markChanged();
 
 		// send user event
-		// app.Socket.sendUserEvent({
-		//     	event : '`styled the ' + this.type + '-width` on',
-		//     	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });	
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'width',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 	},
 
 	_updateOpacity : function (e) {
@@ -732,19 +725,15 @@ Wu.Styler = Wu.Class.extend({
 		this.markChanged();
 
 		// send user event
-		// app.Socket.sendUserEvent({
-		//     	event : '`styled the ' + this.type + '-opacity` on',
-		//     	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'opacity',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 		
 	},
 
@@ -772,21 +761,16 @@ Wu.Styler = Wu.Class.extend({
 		// mark changed
 		this.markChanged();
 
-		// // send user event
-		// app.Socket.sendUserEvent({
-		//     	event : '`styled the ' + this.type + '-size` on',
-		//     	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
-
+		// send user event
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'size',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 
 	},
 
@@ -828,20 +812,15 @@ Wu.Styler = Wu.Class.extend({
 		this.markChanged();
 
 		// send user event
-		// app.Socket.sendUserEvent({
-		//     	event : '`styled the ' + this.type + '-color range` on',
-		//     	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
-
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'color range',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 
 	},
 
@@ -909,20 +888,16 @@ Wu.Styler = Wu.Class.extend({
 		// mark changed
 		this.markChanged();
 
-		// user event
-		// app.Socket.sendUserEvent({
-		//     	event : '`styled the ' + this.type + '-color range` on',
-		//     	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
+		// send user event
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'color range',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 
 	},
 
@@ -979,21 +954,16 @@ Wu.Styler = Wu.Class.extend({
 		// mark changed
 		this.markChanged();
 
-		// user event
-		// app.Socket.sendUserEvent({
-		// 	event : '`styled the ' + this.type + '-' + field + '` by column `' + column + '` on layer',
-		// 	description : this.options.layer.getTitle() + ' in project ' + this.options.project.getName()
-		// });
-
+		// send user event
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'field',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 
 
 	},
@@ -1109,20 +1079,16 @@ Wu.Styler = Wu.Class.extend({
 		// mark changed
 		this.markChanged();
 
-		// user event
-		// app.Socket.sendUserEvent({
-		// 	event : '`styled the ' + this.type + '-size` on',
-		// 	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
+		// send user event
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'size',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 	},
 
 	saveOpacityDualBlur : function (max, min, absoluteMax, absoluteMin) {
@@ -1140,21 +1106,16 @@ Wu.Styler = Wu.Class.extend({
 		// mark changed
 		this.markChanged();
 
-		// user event
-		// app.Socket.sendUserEvent({
-		// 	event : '`styled the ' + this.type + '-opacity` on',
-		// 	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
-
+		// send user event
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'opacity',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 	},
 
 	saveWidthDualBlur : function (max, min, absoluteMax, absoluteMin) {
@@ -1172,21 +1133,16 @@ Wu.Styler = Wu.Class.extend({
 		// mark changed
 		this.markChanged();
 
-		// user event
-		// app.Socket.sendUserEvent({
-		// 	event : '`styled the ' + this.type + '-width` on',
-		// 	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')'
-		// });
-
+		// send user event
 		app.log('styled:layer', {
 			info : {
 				type : this.type,
 				attribute : 'width',
-				layer : this.options.layer.getTitle(),
-				project : this.options.project,
-				category : 'Styling'
-			}
-		})
+				layer_name : this.options.layer.getName(),
+				project_name : this.options.project.getName(),
+			},
+			category : 'Styling'
+		});
 	},
 
 	_closeColorRangeSelector : function () {

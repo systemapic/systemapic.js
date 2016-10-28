@@ -12,9 +12,8 @@ Wu.Analytics = Wu.Class.extend({
 		ga('send', 'pageview');
 	},
 
+	// app.log()
 	fire : function (event, options) {
-		console.log('Analytics: ', event, options);
-
 
 		var data = {
 			event : event,
@@ -24,15 +23,16 @@ Wu.Analytics = Wu.Class.extend({
 			options : options
 		}
 
+		// local analytics
+		app.Socket.analytics(data);
+
+		// google analytics
 		ga('send', {
 			hitType: 'event',
 			eventAction: event,
-			eventCategory: options.category,
-			// eventLabel: 'Fall Campaign',
-
+			eventCategory: options ? options.category : 'noCategory',
 		});
 
-		app.Socket.analytics(data);
 	},
 
 

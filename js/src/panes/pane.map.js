@@ -147,28 +147,48 @@ Wu.MapPane = Wu.Pane.extend({
 
 
         // todo: remove this?
-        // global map events
-        map.on('zoomstart', function (e) {
+        // // global map events
+        // map.on('zoomstart', function (e) {
 
-            map.eachLayer(function (layer) {
-                if (!layer.options) return;
+        //     map.eachLayer(function (layer) {
+        //         if (!layer.options) return;
 
-                var layerUuid = layer.options.layerUuid;
+        //         var layerUuid = layer.options.layerUuid;
 
-                if (!layerUuid) return;
+        //         if (!layerUuid) return;
 
-                // get wu layer
-                var l = app.activeProject.getPostGISLayer(layerUuid);
+        //         // get wu layer
+        //         var l = app.activeProject.getPostGISLayer(layerUuid);
         
-                if (!l) return ;
+        //         if (!l) return ;
                 
-                l._invalidateTiles();
-            });
+        //         l._invalidateTiles();
+        //     });
 
-            // send invalidate to pile
-            this._invalidateTiles();
+        //     // send invalidate to pile
+        //     this._invalidateTiles();
 
-        }, this);
+        // }, this);
+
+        map.on('moveend', function () {
+            app.log('moved:map');
+        });
+
+        map.on('zoomend', function () {
+            app.log('zoomed:map', {info : {zoom : map.getZoom()}})
+        });
+
+        map.on('locationerror', function () {
+            app.log('error:location');
+        });
+
+        map.on('locationfound', function (l) {
+            app.log('found:location', {info : {
+                accuracy : l.accuracy,
+                latlng : l.latlng.toString(),
+                heading : l.heading,
+            }})
+        })
 
         // on projectSelected
         map.on('projectSelected', function (e) {
