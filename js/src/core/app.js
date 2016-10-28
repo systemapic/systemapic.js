@@ -1,4 +1,4 @@
-Wu.version = '1.6.0';
+Wu.version = '1.6.1';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
